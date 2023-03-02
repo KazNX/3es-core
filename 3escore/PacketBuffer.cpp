@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <iostream>
 #include <iterator>
 
 namespace tes
@@ -68,13 +69,14 @@ int PacketBuffer::addBytes(const uint8_t *bytes, size_t byte_count)
 {
   if (_marker_found)
   {
+    // Append to the existing buffer.
     appendData(bytes, bytes + byte_count);
     // All bytes accepted.
     return 0;
   }
 
-  // Clear for the marker in the incoming bytes.
-  // Reject bytes not found.
+  // Buffer does not hold any interesting data. Find the marker position in incoming data and
+  // initialise the _packet_buffer from there.
   const int marker_pos = packetMarkerPosition(bytes, byte_count);
   if (marker_pos >= 0)
   {
@@ -95,8 +97,7 @@ PacketHeader *PacketBuffer::extractPacket(std::vector<uint8_t> &buffer)
     // that in our mem copy.
     auto *pending = reinterpret_cast<PacketHeader *>(_packet_buffer.data());
     const PacketReader reader(pending);
-    if (sizeof(PacketHeader) + reader.payloadSize() + sizeof(PacketReader::CrcType) <=
-        _packet_buffer.size())
+    if (reader.packetSize() <= _packet_buffer.size())
     {
       // We have a full packet. Allocate a copy and extract the full packet data.
       const unsigned packet_size = reader.packetSize();
@@ -112,6 +113,8 @@ PacketHeader *PacketBuffer::extractPacket(std::vector<uint8_t> &buffer)
         // Find next marker beyond the packet just returned.
         const int next_marker_pos = packetMarkerPosition(_packet_buffer.data() + packet_size,
                                                          _packet_buffer.size() - packet_size);
+        // TODO(KS): should highlight an error when next_marker_pos != packet_size as that suggests
+        // some sort of data issue.
         if (next_marker_pos >= 0)
         {
           removeData(int_cast<size_t>(packet_size + next_marker_pos));
@@ -143,13 +146,13 @@ void PacketBuffer::appendData(const Iter &begin, const Iter &end)
 }
 
 
-void PacketBuffer::removeData(size_t byte_count)
+void PacketBuffer::removeData(size_t remove_byte_count)
 {
-  if (byte_count < _packet_buffer.size())
+  if (remove_byte_count < _packet_buffer.size())
   {
-    const size_t new_size = _packet_buffer.size() - byte_count;
-    std::memmove(_packet_buffer.data(), _packet_buffer.data() + byte_count,
-                 sizeof(*_packet_buffer.data()) * new_size);
+    const size_t new_size = _packet_buffer.size() - remove_byte_count;
+    std::copy(_packet_buffer.begin() + remove_byte_count, _packet_buffer.end(),
+              _packet_buffer.begin());
     _packet_buffer.resize(new_size);
   }
   else

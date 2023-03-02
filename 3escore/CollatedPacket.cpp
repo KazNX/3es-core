@@ -288,9 +288,7 @@ int CollatedPacket::create(const Shape &shape)
   bool expanded = false;
   const unsigned initial_cursor = _cursor;
 
-  PacketWriter writer(_buffer.data() + _cursor,
-                      static_cast<uint16_t>(std::min<size_t>(
-                        _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+  PacketWriter writer(_buffer.data() + _cursor, _buffer.size() - _cursor);
   // Keep trying to write the packet while we don't have a fatal error.
   // Supports resizing the buffer.
   while (!wrote_message && written != -1)
@@ -313,9 +311,7 @@ int CollatedPacket::create(const Shape &shape)
       // Try resize.
       expand(1024u, _buffer, _max_packet_size);
       expanded = true;
-      writer = PacketWriter(_buffer.data() + _cursor,
-                            static_cast<uint16_t>(std::min<size_t>(
-                              _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+      writer = PacketWriter(_buffer.data() + _cursor, _buffer.size() - _cursor);
     }
     else
     {
@@ -332,9 +328,7 @@ int CollatedPacket::create(const Shape &shape)
 
     while (!complete && written != -1)
     {
-      writer = PacketWriter(_buffer.data() + _cursor,
-                            static_cast<uint16_t>(std::min<size_t>(
-                              _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+      writer = PacketWriter(_buffer.data() + _cursor, _buffer.size() - _cursor);
       res = shape.writeData(writer, progress);
 
       if (res >= 0)
@@ -345,10 +339,7 @@ int CollatedPacket::create(const Shape &shape)
           // Good finalise.
           _cursor += writer.packetSize();
           written += writer.packetSize();
-          writer =
-            PacketWriter(_buffer.data() + _cursor,
-                         static_cast<uint16_t>(std::min<size_t>(
-                           _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+          writer = PacketWriter(_buffer.data() + _cursor, _buffer.size() - _cursor);
         }
         else
         {
@@ -364,10 +355,7 @@ int CollatedPacket::create(const Shape &shape)
         if (_buffer.size() < maxPacketSize())
         {
           expand(1024u, _buffer, _max_packet_size);
-          writer =
-            PacketWriter(_buffer.data() + _cursor,
-                         static_cast<uint16_t>(std::min<size_t>(
-                           _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+          writer = PacketWriter(_buffer.data() + _cursor, _buffer.size() - _cursor);
         }
         else
         {
@@ -401,9 +389,7 @@ int CollatedPacket::destroy(const Shape &shape)
   bool expanded = false;
   const unsigned initial_cursor = _cursor;
 
-  PacketWriter writer(_buffer.data() + _cursor,
-                      static_cast<uint16_t>(std::min<size_t>(
-                        _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+  PacketWriter writer(_buffer.data() + _cursor, _buffer.size() - _cursor);
   // Keep trying to write the packet while we don't have a fatal error.
   // Supports resizing the buffer.
   while (wrote_message && written != -1)
@@ -426,9 +412,7 @@ int CollatedPacket::destroy(const Shape &shape)
       // Try resize.
       expand(1024u, _buffer, _max_packet_size);
       expanded = true;
-      writer = PacketWriter(_buffer.data() + _cursor,
-                            static_cast<uint16_t>(std::min<size_t>(
-                              _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+      writer = PacketWriter(_buffer.data() + _cursor, _buffer.size() - _cursor);
     }
     else
     {
@@ -459,9 +443,7 @@ int CollatedPacket::update(const Shape &shape)
   bool expanded = false;
   const unsigned initial_cursor = _cursor;
 
-  PacketWriter writer(_buffer.data() + _cursor,
-                      static_cast<uint16_t>(std::min<size_t>(
-                        _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+  PacketWriter writer(_buffer.data() + _cursor, _buffer.size() - _cursor);
   // Keep trying to write the packet while we don't have a fatal error.
   // Supports resizing the buffer.
   while (wrote_message && written != -1)
@@ -484,9 +466,7 @@ int CollatedPacket::update(const Shape &shape)
       // Try resize.
       expand(1024u, _buffer, _max_packet_size);
       expanded = true;
-      writer = PacketWriter(_buffer.data() + _cursor,
-                            static_cast<uint16_t>(std::min<size_t>(
-                              _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+      writer = PacketWriter(_buffer.data() + _cursor, _buffer.size() - _cursor);
     }
     else
     {
@@ -546,9 +526,7 @@ bool CollatedPacket::sendServerInfo(const ServerInfoMessage &info)
   bool expanded = false;
   const unsigned initial_cursor = _cursor;
 
-  PacketWriter writer(_buffer.data() + _cursor,
-                      static_cast<uint16_t>(std::min<size_t>(
-                        _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+  PacketWriter writer(_buffer.data() + _cursor, _buffer.size() - _cursor);
   writer.reset(MtServerInfo, 0);
   // Keep trying to write the packet while we don't have a fatal error.
   // Supports resizing the buffer.
@@ -572,9 +550,7 @@ bool CollatedPacket::sendServerInfo(const ServerInfoMessage &info)
       // Try resize.
       expand(1024u, _buffer, _max_packet_size);
       expanded = true;
-      writer = PacketWriter(_buffer.data() + _cursor,
-                            static_cast<uint16_t>(std::min<size_t>(
-                              _buffer.size() - _cursor - sizeof(PacketWriter::CrcType), 0xffffu)));
+      writer = PacketWriter(_buffer.data() + _cursor, _buffer.size() - _cursor);
     }
     else
     {

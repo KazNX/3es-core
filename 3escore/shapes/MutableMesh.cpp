@@ -272,7 +272,7 @@ void MutableMesh::update(Connection *con)
   }
 
   // Send mesh redefinition message.
-  std::vector<uint8_t> buffer(0xffffu);
+  std::vector<uint8_t> buffer(kMaxPacketSize);
   PacketWriter packet(buffer.data(), int_cast<uint16_t>(buffer.size()));
   MeshRedefineMessage msg = {};
   MeshComponentMessage component_msg = {};

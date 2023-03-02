@@ -249,13 +249,13 @@ bool MeshShape::writeCreate(PacketWriter &packet) const
 int MeshShape::writeData(PacketWriter &packet, unsigned &progress_marker) const
 {
   bool ok = true;
-  DataMessage msg;
+  DataMessage msg = {};
   msg.id = _data.id;
   packet.reset(routingId(), DataMessage::MessageId);
   ok = msg.write(packet);
 
   // Send vertices or indices?
-  uint32_t offset;
+  uint32_t offset = 0;
 
   // Resolve what we are currently sending.
   unsigned phase_index = 0;

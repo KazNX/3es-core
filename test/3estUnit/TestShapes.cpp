@@ -117,8 +117,8 @@ void validateDataRead(const DataReadFunc &dataRead, const T &referenceShape,
 {
   typedef std::chrono::steady_clock Clock;
   ServerInfoMessage readServerInfo;
-  std::vector<uint8_t> readBuffer(0xffffu);
-  std::vector<uint8_t> decodeBuffer(0xffffu);
+  std::vector<uint8_t> readBuffer(tes::kMaxPacketSize);
+  std::vector<uint8_t> decodeBuffer(tes::kMaxPacketSize);
   ResourceMap resources;
   PacketBuffer packetBuffer;
   CollatedPacketDecoder decoder;
@@ -316,12 +316,8 @@ void validateFileStream(const char *fileName, const T &referenceShape,
 
   ASSERT_TRUE(inFile.is_open()) << "Failed to read file '" << fileName << "'";
   const DataReadFunc fileRead = [&inFile](uint8_t *buffer, int bufferLength) {
-#if WIN32
     inFile.read(reinterpret_cast<char *>(buffer), bufferLength);
     const auto readBytes = inFile.gcount();
-#else   // WIN32
-    const auto readBytes = inFile.readsome(reinterpret_cast<char *>(buffer), bufferLength);
-#endif  // WIN32
     if (inFile.bad())
     {
       return -1;
