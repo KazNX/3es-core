@@ -98,7 +98,7 @@ void NetworkThread::configureSocket(TcpSocket &socket)
   socket.setNoDelay(true);
   socket.setReadTimeout(0);
   socket.setWriteTimeout(0);
-  socket.setReadBufferSize(0xffff);
+  socket.setReadBufferSize(1024 * 1024);
   socket.setSendBufferSize(4 * 1024);
 }
 

@@ -585,7 +585,8 @@ int getReceiveBufferSize(int socket)
 bool setReceiveBufferSize(int socket, int buffer_size)
 {
   const socklen_t len = sizeof(buffer_size);
-  return ::setsockopt(socket, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char *>(&buffer_size), len) >=
-         0;
+  const auto ok =
+    ::setsockopt(socket, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char *>(&buffer_size), len) >= 0;
+  return ok;
 }
 }  // namespace tes::tcpbase

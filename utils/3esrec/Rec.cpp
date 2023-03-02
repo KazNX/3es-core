@@ -8,10 +8,12 @@
 #include <3escore/StreamUtil.h>
 #include <3escore/TcpSocket.h>
 
+#include <array>
 #include <chrono>
 #include <csignal>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -43,36 +45,33 @@ class TesRec
   static const unsigned PacketLimit = 500u;
 #endif  // PACKET_TIMING
 public:
-  bool quit() const { return _quit; }
-  bool argsOk() const { return _argsOk; }
-  bool showUsage() const { return _showUsage; }
-  bool connected() const { return _connected; }
-  bool persist() const { return _persist; }
-  bool overwrite() const { return _overwrite; }
-  bool quiet() const { return _quiet; }
+  [[nodiscard]] bool quit() const { return _quit; }
+  [[nodiscard]] bool argsOk() const { return _args_ok; }
+  [[nodiscard]] bool showUsage() const { return _show_usage; }
+  [[nodiscard]] bool connected() const { return _connected; }
+  [[nodiscard]] bool persist() const { return _persist; }
+  [[nodiscard]] bool overwrite() const { return _overwrite; }
+  [[nodiscard]] bool quiet() const { return _quiet; }
 
-  Mode decodeMode() const { return _decodeMode; }
+  [[nodiscard]] Mode decodeMode() const { return _decode_mode; }
 
-  unsigned totalFrames() const { return _totalFrames; }
+  [[nodiscard]] unsigned totalFrames() const { return _total_frames; }
   // IPEndPoint ServerEndPoint { get; private set; }
-  const std::string &outputPrefix() const { return _outputPrefix; }
-  static const char *defaultPrefix() { return "tes"; }
-  static uint16_t defaultPort() { return 33500; }
-  static const char *defaultIP() { return "127.0.0.1"; }
+  [[nodiscard]] const std::string &outputPrefix() const { return _output_prefix; }
+  [[nodiscard]] constexpr static const char *defaultPrefix() { return "tes"; }
+  // NOLINTNEXTLINE(readability-magic-numbers)
+  [[nodiscard]] constexpr static uint16_t defaultPort() { return 33500u; }
+  [[nodiscard]] constexpr static const char *defaultIP() { return "127.0.0.1"; }
 
-  static const char **defaultArgs() { return s_defaultArgs; }
+  [[nodiscard]] static const char *modeToArg(Mode m);
 
-  static const char **modeArgStrings() { return s_modeArgStrings; }
-
-  static const char *modeToArg(Mode m);
-
-  static Mode argToMode(const char *arg);
+  [[nodiscard]] static Mode argToMode(const char *arg);
 
   TesRec(int argc, const char **args);
 
-  void usage() const;
+  static void usage();
 
-  void run(FrameDisplay *frameDisplay);
+  void run(FrameDisplay *frame_display);
 
   void requestQuit() { _quit = true; }
 
@@ -83,47 +82,41 @@ private:
 
   std::string generateNewOutputFile();
 
-  void parseArgs(int argc, const char **argv);
+  void parseArgs(int argc, const char *const *argv);
 
-private:
-  ServerInfoMessage _serverInfo;
-  int _nextOutputNumber = 0;
-  unsigned _totalFrames = 0;
-  Mode _decodeMode = Mode::Default;
-  std::string _outputPrefix = "tes";
+  ServerInfoMessage _server_info;
+  int _next_output_number = 0;
+  unsigned _total_frames = 0;
+  Mode _decode_mode = Mode::Default;
+  std::string _output_prefix = "tes";
 
-  std::string _serverIp;
-  uint16_t _serverPort = 0;
+  std::string _server_ip;
+  uint16_t _server_port = 0;
 
   bool _quit = false;
-  bool _argsOk = true;
-  bool _showUsage = false;
+  bool _args_ok = true;
+  bool _show_usage = false;
   bool _connected = false;
   bool _persist = false;
   bool _overwrite = false;
   bool _quiet = false;
 
-  static const char *s_defaultArgs[];
-  static const size_t s_defaultArgsCount;
-  static const char *s_modeArgStrings[];
-  static const size_t s_modeArgStringsCount;
+  using DefaultArgsArray = std::array<const char *, 4>;
+  using DefaultModesAray = std::array<const char *, 5>;
+  static const DefaultArgsArray DefaultArgs;
+  static const DefaultModesAray ModeArgStrings;
 };
 
-const char *TesRec::s_defaultArgs[] = { "--ip", "127.0.0.1", "--port", "33500" };
-
-const size_t TesRec::s_defaultArgsCount = sizeof(s_defaultArgs) / sizeof(s_defaultArgs[0]);
-
-const char *TesRec::s_modeArgStrings[] = { "mc", "mC", "mz", "mu", "m-" };
-
-const size_t TesRec::s_modeArgStringsCount = sizeof(s_modeArgStrings) / sizeof(s_modeArgStrings[0]);
+const TesRec::DefaultArgsArray TesRec::DefaultArgs = { "--ip", "127.0.0.1", "--port", "33500" };
+const TesRec::DefaultModesAray TesRec::ModeArgStrings = { "mc", "mC", "mz", "mu", "m-" };
 
 
 const char *TesRec::modeToArg(Mode m)
 {
-  const int mi = (int)m;
-  if (0 <= mi && mi <= (int)s_modeArgStringsCount)
+  const int mi = static_cast<int>(m);
+  if (0 <= mi && mi <= static_cast<int>(ModeArgStrings.size()))
   {
-    return s_modeArgStrings[mi];
+    return ModeArgStrings[mi];
   }
 
   return "";
@@ -131,17 +124,17 @@ const char *TesRec::modeToArg(Mode m)
 
 Mode TesRec::argToMode(const char *arg)
 {
-  std::string argStr(arg);
-  while (!argStr.empty() && argStr[0] == '-')
+  std::string arg_str(arg);
+  while (!arg_str.empty() && arg_str[0] == '-')
   {
-    argStr.erase(0, 1);
+    arg_str.erase(0, 1);
   }
 
-  for (int i = 0; i < (int)s_modeArgStringsCount; ++i)
+  for (int i = 0; i < static_cast<int>(ModeArgStrings.size()); ++i)
   {
-    if (argStr.compare(s_modeArgStrings[i]) == 0)
+    if (arg_str == ModeArgStrings[i])
     {
-      return (Mode)i;
+      return static_cast<Mode>(i);
     }
   }
 
@@ -150,19 +143,19 @@ Mode TesRec::argToMode(const char *arg)
 
 TesRec::TesRec(int argc, const char **args)
 {
-  initDefaultServerInfo(&_serverInfo);
+  initDefaultServerInfo(&_server_info);
   if (argc)
   {
     parseArgs(argc, args);
   }
   else
   {
-    parseArgs(int(s_defaultArgsCount), s_defaultArgs);
+    parseArgs(static_cast<int>(DefaultArgs.size()), DefaultArgs.data());
   }
 }
 
 
-void TesRec::usage() const
+void TesRec::usage()
 {
   printf("Usage:\n"
          "3esrec --ip <server-ip> [--port <server-port>] [prefix]\n"
@@ -212,25 +205,28 @@ void TesRec::usage() const
   // , modeToArg(Mode::Default), defaultPort());
 }
 
-void TesRec::run(FrameDisplay *frameDisplay)
+void TesRec::run(FrameDisplay *frame_display)
 {
-  int connectionPollTimeSecMs = 250;
-  std::vector<uint8_t> socketBuffer(4 * 1024);
-  std::vector<uint8_t> decodeBuffer(4 * 1024);
+  const int connection_poll_time_sec_ms = 250;
+  const auto socket_buffer_size = 4u * 1024u * 1024u;
+  const auto decode_buffer_size = 4u * 1024u;
+  const auto sleep_interval = std::chrono::microseconds(500);
+  std::vector<uint8_t> socket_buffer(socket_buffer_size);
+  std::vector<uint8_t> decode_buffer(decode_buffer_size);
   std::unique_ptr<TcpSocket> socket = nullptr;
-  std::unique_ptr<PacketBuffer> packetBuffer;
-  std::unique_ptr<std::iostream> ioStream;
-  CollatedPacketDecoder collatedDecoder;
+  std::unique_ptr<PacketBuffer> packet_buffer;
+  std::unique_ptr<std::iostream> io_stream;
+  CollatedPacketDecoder collated_decoder;
 #if PACKET_TIMING
   using TimingClock = std::chrono::high_resolution_clock;
-  auto startTime = TimingClock::now();                  // Set startTime type
-  auto timingElapsed = TimingClock::now() - startTime;  // Set timingElapsed type
-#endif                                                  // PACKET_TIMING
+  auto start_time = TimingClock::now();                   // Set start_time type
+  auto timing_elapsed = TimingClock::now() - start_time;  // Set timing_elapsed type
+#endif                                                    // PACKET_TIMING
   bool once = true;
 
   if (!_quiet)
   {
-    printf("Connecting to %s:%d\n", _serverIp.c_str(), _serverPort);
+    std::cout << "Connecting to " << _server_ip << ":" << _server_port << std::endl;
   }
 
   while (!_quit && (_persist || once))
@@ -243,21 +239,21 @@ void TesRec::run(FrameDisplay *frameDisplay)
       if (socket)
       {
 #if PACKET_TIMING
-        startTime = TimingClock::now();
+        start_time = TimingClock::now();
 #endif  // PACKET_TIMING
-        _totalFrames = 0u;
-        frameDisplay->reset();
+        _total_frames = 0u;
+        frame_display->reset();
         if (!_quiet)
         {
-          frameDisplay->start();
+          frame_display->start();
         }
 
-        ioStream = std::move(createOutputWriter());
-        if (ioStream)
+        io_stream = std::move(createOutputWriter());
+        if (io_stream)
         {
           _connected = true;
           // Create a new packet buffer for this connection.
-          packetBuffer = std::make_unique<PacketBuffer>();
+          packet_buffer = std::make_unique<PacketBuffer>();
         }
         // Log.Flush();
       }
@@ -265,52 +261,54 @@ void TesRec::run(FrameDisplay *frameDisplay)
       {
         // Log.Flush();
         // Wait the timeout period before attempting to reconnect.
-        std::this_thread::sleep_for(std::chrono::milliseconds(connectionPollTimeSecMs));
+        std::this_thread::sleep_for(std::chrono::milliseconds(connection_poll_time_sec_ms));
       }
     }
 
     // Read while connected or data still available.
-    bool haveData = false;
-    while (!_quit && socket && (socket->isConnected() || haveData))
+    bool have_data = false;
+    while (!_quit && socket && (socket->isConnected() || have_data))
     {
       // We have a connection. Read messages while we can.
-      int bytesRead = socket->readAvailable(socketBuffer.data(), int(socketBuffer.size()));
-      haveData = false;
-      if (bytesRead <= 0)
+      const int bytes_read =
+        socket->readAvailable(socket_buffer.data(), static_cast<int>(socket_buffer.size()));
+      have_data = false;
+      if (bytes_read <= 0)
       {
-        std::this_thread::sleep_for(std::chrono::microseconds(500));
+        std::this_thread::sleep_for(sleep_interval);
         continue;
       }
 
-      haveData = true;
-      packetBuffer->addBytes(socketBuffer.data(), bytesRead);
+      have_data = true;
+      packet_buffer->addBytes(socket_buffer.data(), bytes_read);
 
-      while (PacketHeader *newPacketHeader = packetBuffer->extractPacket(decodeBuffer))
+      while (PacketHeader *new_packet_header = packet_buffer->extractPacket(decode_buffer))
       {
-        PacketReader completedPacket(newPacketHeader);
+        PacketReader completed_packet(new_packet_header);
 
-        if (!completedPacket.checkCrc())
+        if (!completed_packet.checkCrc())
         {
-          printf("CRC failure\n");
+          std::cout << "CRC failure" << std::endl;
           continue;
         }
 
-        // TODO: Check for dropped byte in the packet buffer.
+        // TODO(KS): Check for dropped byte in the packet buffer.
 
-        if (_decodeMode == Mode::Passthrough)
+        if (_decode_mode == Mode::Passthrough)
         {
-          ioStream->write((const char *)newPacketHeader, completedPacket.packetSize());
+          io_stream->write(reinterpret_cast<const char *>(new_packet_header),
+                           completed_packet.packetSize());
 
-          if (completedPacket.routingId() == MtControl)
+          if (completed_packet.routingId() == MtControl)
           {
-            if (completedPacket.messageId() == CIdFrame)
+            if (completed_packet.messageId() == CIdFrame)
             {
-              ++_totalFrames;
-              frameDisplay->incrementFrame();
+              ++_total_frames;
+              frame_display->incrementFrame();
 #if PACKET_TIMING
-              if (_totalFrames >= PacketLimit)
+              if (_total_frames >= PacketLimit)
               {
-                timingElapsed = TimingClock::now() - startTime;
+                timing_elapsed = TimingClock::now() - start_time;
                 _quit = true;
               }
 #endif  // PACKET_TIMING
@@ -321,25 +319,22 @@ void TesRec::run(FrameDisplay *frameDisplay)
         {
           // Decode and decompress collated packets. This will just return the same packet
           // if not collated.
-          collatedDecoder.setPacket(newPacketHeader);
-          while (const PacketHeader *decodedPacketHeader = collatedDecoder.next())
+          collated_decoder.setPacket(new_packet_header);
+          while (const PacketHeader *decoded_packet_header = collated_decoder.next())
           {
-            PacketReader decodedPacket(decodedPacketHeader);
-            bool exportPacket = true;
+            PacketReader decoded_packet(decoded_packet_header);
 
-            // Console.WriteLine("Msg: {0} {1}", completedPacket.Header.RoutingID,
-            // completedPacket.Header.MessageID);
-            switch (completedPacket.routingId())
+            switch (completed_packet.routingId())
             {
             case MtControl:
-              if (decodedPacket.messageId() == CIdFrame)
+              if (decoded_packet.messageId() == CIdFrame)
               {
-                ++_totalFrames;
-                frameDisplay->incrementFrame();
+                ++_total_frames;
+                frame_display->incrementFrame();
 #if PACKET_TIMING
-                if (_totalFrames >= PacketLimit)
+                if (_total_frames >= PacketLimit)
                 {
-                  timingElapsed = TimingClock::now() - startTime;
+                  timing_elapsed = TimingClock::now() - start_time;
                   _quit = true;
                 }
 #endif  // PACKET_TIMING
@@ -347,9 +342,9 @@ void TesRec::run(FrameDisplay *frameDisplay)
               break;
 
             case MtServerInfo:
-              if (_serverInfo.read(decodedPacket))
+              if (_server_info.read(decoded_packet))
               {
-                printf("Failed to decode ServerInfo message\n");
+                std::cout << "\nFailed to decode ServerInfo message" << std::endl;
                 _quit = true;
               }
               break;
@@ -358,28 +353,26 @@ void TesRec::run(FrameDisplay *frameDisplay)
               break;
             }
 
-            if (exportPacket)
-            {
-              // TODO: use a local collated packet to re-compress data.
-              ioStream->write((const char *)newPacketHeader, completedPacket.packetSize());
-            }
+            // TODO(KS): use a local collated packet to re-compress data.
+            io_stream->write(reinterpret_cast<const char *>(new_packet_header),
+                             completed_packet.packetSize());
           }
         }
       }
     }
 
-    frameDisplay->stop();
+    frame_display->stop();
 
-    if (ioStream)
+    if (io_stream)
     {
-      streamutil::finaliseStream(*ioStream, _totalFrames);
-      ioStream->flush();
-      ioStream.reset(nullptr);
+      streamutil::finaliseStream(*io_stream, _total_frames);
+      io_stream->flush();
+      io_stream.reset(nullptr);
     }
 
     if (!_quiet)
     {
-      printf("\nConnection closed\n");
+      std::cout << "\nConnection closed" << std::endl;
     }
 
     // Disconnected.
@@ -393,8 +386,9 @@ void TesRec::run(FrameDisplay *frameDisplay)
   }
 
 #if PACKET_TIMING
-  const auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(timingElapsed);
-  printf("Processed %d packets in %dms\n", PacketLimit, int(elapsedMs.count()));
+  const auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(timing_elapsed);
+  std::cout << "Processed " << PacketLimit << " packets in " << static_cast<int>(elapsedMs.count())
+            << "ms" << std::endl;
 #endif  // PACKET_TIMING
 }
 
@@ -402,11 +396,12 @@ std::unique_ptr<TcpSocket> TesRec::attemptConnection()
 {
   std::unique_ptr<TcpSocket> socket(new TcpSocket);
 
-  if (socket->open(_serverIp.c_str(), _serverPort))
+  if (socket->open(_server_ip.c_str(), _server_port))
   {
     socket->setNoDelay(true);
     socket->setWriteTimeout(0);
     socket->setReadTimeout(0);
+    socket->setReadBufferSize(1024 * 1024);
     return std::move(socket);
   }
 
@@ -416,19 +411,19 @@ std::unique_ptr<TcpSocket> TesRec::attemptConnection()
 
 std::unique_ptr<std::iostream> TesRec::createOutputWriter()
 {
-  std::string filePath = generateNewOutputFile();
-  if (filePath.empty())
+  const std::string file_path = generateNewOutputFile();
+  if (file_path.empty())
   {
-    printf("Unable to generate a numbered file name using the prefix: %s. Try cleaning up the "
-           "output directory.\n",
-           _outputPrefix.c_str());
+    std::cout << "Unable to generate a numbered file name using the prefix: " << _output_prefix
+              << "Try cleaning up the output directory" << std::endl;
     return nullptr;
   }
-  printf("Recording to: %s\n", filePath.c_str());
+  std::cout << "Recording to: " << file_path << std::endl;
 
   std::unique_ptr<std::fstream> stream(new std::fstream);
 
-  stream->open(filePath.c_str(), std::ios::binary | std::ios::out | std::ios::in | std::ios::trunc);
+  stream->open(file_path.c_str(),
+               std::ios::binary | std::ios::out | std::ios::in | std::ios::trunc);
 
   if (!stream->is_open())
   {
@@ -439,11 +434,11 @@ std::unique_ptr<std::iostream> TesRec::createOutputWriter()
   // We'll rewind here later and update the frame count.
   // Write to a memory stream to prevent corruption of the file stream when we wrap it
   // in a GZipStream.
-  streamutil::initialiseStream(*stream, &_serverInfo);
+  streamutil::initialiseStream(*stream, &_server_info);
 
   return std::move(stream);
 
-  // TODO: implement compression modes
+  // TODO(KS): implement compression modes
   // switch (DecodeMode)
   // {
   //   case Mode.CollateAndCompress:
@@ -466,54 +461,53 @@ std::unique_ptr<std::iostream> TesRec::createOutputWriter()
 
 std::string TesRec::generateNewOutputFile()
 {
-  const int maxFiles = 1000;
-  std::string outputPath;
-  _nextOutputNumber = _nextOutputNumber % maxFiles;
-  for (int i = _nextOutputNumber; i < maxFiles; ++i)
+  const int max_files = 1000;
+  std::string output_path;
+  _next_output_number = _next_output_number % max_files;
+  for (int i = _next_output_number; i < max_files; ++i)
   {
-    std::ostringstream outputPathStream;
-    outputPathStream << _outputPrefix << std::setw(3) << std::setfill('0') << i << ".3es";
-    outputPath = outputPathStream.str();
+    std::ostringstream output_path_stream;
+    output_path_stream << _output_prefix << std::setw(3) << std::setfill('0') << i << ".3es";
+    output_path = output_path_stream.str();
 
     // Check if the file exists.
-    bool pathOk = _overwrite;
-    if (!pathOk)
+    bool path_ok = _overwrite;
+    if (!path_ok)
     {
-      std::ifstream inTest(outputPath.c_str());
-      pathOk = !inTest.is_open();
+      const std::ifstream in_test(output_path.c_str());
+      path_ok = !in_test.is_open();
     }
 
-    if (pathOk)
+    if (path_ok)
     {
-      _nextOutputNumber = i + 1;
-      return outputPath;
+      _next_output_number = i + 1;
+      return output_path;
     }
   }
 
-  return std::string();
+  return {};
 }
 
 
-void TesRec::parseArgs(int argc, const char **argv)
+void TesRec::parseArgs(int argc, const char *const *argv)
 {
   bool ok = argc > 0;
-  std::string ipStr;
-  std::string portStr;
+  std::string ip_str;
   bool output_prefix_set = false;
 
-  _argsOk = false;
+  _args_ok = false;
   for (int i = 1; i < argc; ++i)
   {
-    std::string arg(argv[i]);
-    if (arg.compare("--help") == 0 || arg.compare("-?") == 0 || arg.compare("-h") == 0)
+    const std::string arg(argv[i]);
+    if (arg == "--help" || arg == "-?" || arg == "-h")
     {
-      _showUsage = true;
+      _show_usage = true;
     }
-    else if (arg.compare("--ip") == 0)
+    else if (arg == "--ip")
     {
       if (i + 1 < argc)
       {
-        ipStr = argv[++i];
+        ip_str = argv[++i];
       }
       else
       {
@@ -522,31 +516,31 @@ void TesRec::parseArgs(int argc, const char **argv)
     }
     else if (arg.find("-m") == 0)
     {
-      _decodeMode = argToMode(arg.c_str());
+      _decode_mode = argToMode(arg.c_str());
     }
-    else if (arg.compare("--overwrite") == 0 || arg.compare("-w") == 0)
+    else if (arg == "--overwrite" || arg == "-w")
     {
       _overwrite = true;
     }
-    else if (arg.compare("--persist") == 0 || arg.compare("-w") == 0)
+    else if (arg == "--persist" || arg == "-w")
     {
       _persist = true;
     }
-    else if (arg.compare("--quiet") == 0 || arg.compare("-q") == 0)
+    else if (arg == "--quiet" || arg == "-q")
     {
       _quiet = true;
-      // printf("Setting Quiet\n");
+      // std::cout << "Setting Quiet" << std::endl;
     }
-    else if (arg.compare("--port") == 0)
+    else if (arg == "--port")
     {
       if (i + 1 < argc)
       {
-        std::string portStr = argv[++i];
-        std::istringstream portIn(portStr);
-        portIn >> _serverPort;
-        if (portIn.bad())
+        const std::string port_str = argv[++i];
+        std::istringstream port_in(port_str);
+        port_in >> _server_port;
+        if (port_in.bad())
         {
-          printf("Error parsing port\n");
+          std::cout << "Error parsing port" << std::endl;
           ok = false;
         }
       }
@@ -555,42 +549,42 @@ void TesRec::parseArgs(int argc, const char **argv)
         ok = false;
       }
     }
-    else if (!output_prefix_set && arg.find("-") != 0)
+    else if (!output_prefix_set && arg.find('-') != 0)
     {
-      _outputPrefix = arg;
+      _output_prefix = arg;
       output_prefix_set = true;
     }
   }
 
   if (ok)
   {
-    if (_serverPort == 0)
+    if (_server_port == 0)
     {
-      _serverPort = defaultPort();
+      _server_port = defaultPort();
     }
 
-    if (ipStr.empty())
+    if (ip_str.empty())
     {
-      ipStr = defaultIP();
+      ip_str = defaultIP();
     }
 
-    if (!ipStr.empty() && _serverPort > 0)
+    if (!ip_str.empty() && _server_port > 0)
     {
-      _serverIp = ipStr;
+      _server_ip = ip_str;
     }
     else
     {
       ok = false;
-      printf("Missing valid server IP address and port.\n");
+      std::cout << "Missing valid server IP address and port." << std::endl;
     }
   }
 
-  if (_outputPrefix.empty())
+  if (_output_prefix.empty())
   {
-    _outputPrefix = defaultPrefix();
+    _output_prefix = defaultPrefix();
   }
 
-  _argsOk = ok;
+  _args_ok = ok;
 }
 }  // namespace tes
 
@@ -598,8 +592,9 @@ namespace
 {
 tes::TesRec *g_prog = nullptr;
 
-void onSignal(int)
+void onSignal(int signal)
 {
+  (void)signal;
   if (g_prog)
   {
     g_prog->requestQuit();
@@ -622,9 +617,9 @@ int main(int argc, const char **argv)
     return 1;
   }
 
-  tes::FrameDisplay frameDisplay;
-  prog.run(&frameDisplay);
-  frameDisplay.stop();
+  tes::FrameDisplay frame_display;
+  prog.run(&frame_display);
+  frame_display.stop();
 
   g_prog = nullptr;
 

@@ -7,7 +7,7 @@
 using namespace tes;
 
 FrameDisplay::FrameDisplay()
-  : _frameNumber(0)
+  : _frame_number(0)
   , _quit(false)
 {}
 
@@ -45,7 +45,7 @@ void FrameDisplay::run()
   int64_t lastFrame = 0;
   while (!_quit)
   {
-    const int64_t frameNumber = _frameNumber;
+    const int64_t frameNumber = _frame_number;
 
     if (lastFrame > frameNumber)
     {
@@ -64,7 +64,7 @@ void FrameDisplay::run()
   }
 
   // Display final frame number.
-  const int64_t finalFrame = _frameNumber;
+  const int64_t finalFrame = _frame_number;
   if (finalFrame != lastFrame)
   {
     // Clear the display line.
