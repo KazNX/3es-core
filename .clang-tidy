@@ -34,7 +34,7 @@ Checks: >
   -readability-implicit-bool-conversion,
   -readability-uppercase-literal-suffix,
   -readability-identifier-length,
-  hicpp-signed-bitwise
+  -hicpp-signed-bitwise
 WarningsAsErrors: ""
 HeaderFilterRegex: ".*"
 AnalyzeTemporaryDtors: false
