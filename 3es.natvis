@@ -249,4 +249,21 @@
       <Item Name="resource">_owner->_items[_id].resource</Item>
     </Expand>
   </Type>
+
+  <!-- Convert from network Endian. Comment if the host architecture is network Endian. -->
+  <Type Name="tes::PacketHeader">
+    <Expand>
+      <Item Name="marker">marker</Item>
+      <Item Condition="marker==0x305ee503u" Name="version_major">((version_major &amp; 0xFF) &lt;&lt; 8) | ((version_major &gt;&gt; 8) &amp; 0xFF)</Item>
+      <Item Condition="marker==0x03e55e30u" Name="version_major">version_major</Item>
+      <Item Condition="marker==0x305ee503u" Name="version_minor">((version_minor &amp; 0xFF) &lt;&lt; 8) | ((version_minor &gt;&gt; 8) &amp; 0xFF)</Item>
+      <Item Condition="marker==0x03e55e30u" Name="version_minor">version_minor</Item>
+      <Item Condition="marker==0x305ee503u" Name="routing_id">((routing_id &amp; 0xFF) &lt;&lt; 8) | ((routing_id &gt;&gt; 8) &amp; 0xFF)</Item>
+      <Item Condition="marker==0x03e55e30u" Name="routing_id">routing_id</Item>
+      <Item Condition="marker==0x305ee503u" Name="message_id">((message_id &amp; 0xFF) &lt;&lt; 8) | ((message_id &gt;&gt; 8) &amp; 0xFF)</Item>
+      <Item Condition="marker==0x03e55e30u" Name="message_id">message_id</Item>
+      <Item Condition="marker==0x305ee503u" Name="payload_size">((payload_size &amp; 0xFF) &lt;&lt; 8) | ((payload_size &gt;&gt; 8) &amp; 0xFF)</Item>
+      <Item Condition="marker==0x03e55e30u" Name="payload_size">payload_size</Item>
+    </Expand>
+  </Type>
 </AutoVisualizer>
