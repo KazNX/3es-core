@@ -164,7 +164,7 @@ bool SettingsView::showProperty(unsigned idx, settings::Bool &prop)
 {
   beginProperty(idx, prop.label(), prop.tip());
   bool value = prop.value();
-  const bool dirty = ImGui::Checkbox(prop.label().c_str(), &value);
+  const auto dirty = ImGui::Checkbox(prop.label().c_str(), &value);
   if (dirty)
   {
     prop.setValue(value);
@@ -313,7 +313,10 @@ void SettingsView::beginProperty(unsigned idx, const std::string &label, const s
   ImGui::AlignTextToFramePadding();
   const ImGuiTreeNodeFlags flags =
     ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet;
-  ImGui::TreeNodeEx(label.c_str(), flags);
+  // We must give the tree node a name unique from the label as the label will be used for the child
+  // UI node.
+  const std::string tree_node_name = label + "_node";
+  ImGui::TreeNodeEx(tree_node_name.c_str(), flags);
   if (ImGui::IsItemHovered())
   {
     ImGui::BeginTooltip();
