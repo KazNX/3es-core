@@ -94,6 +94,15 @@ public:
   /// Wait for this thread to finish.
   void join() override;
 
+  /// Check for packet version number compability.
+  /// @param header The packet header to check - expecting network byte order.
+  /// @return True if compatible.
+  static bool checkCompatibility(const PacketHeader *header);
+  /// Check for packet version number compability.
+  /// @param reader Packet to check wrapper in a reader.
+  /// @return True if compatible.
+  static bool checkCompatibility(const PacketReader &reader);
+
 protected:
   /// Thread entry point.
   void run();

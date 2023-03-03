@@ -97,6 +97,46 @@ void StreamThread::join()
 }
 
 
+bool StreamThread::checkCompatibility(const PacketHeader *header)
+{
+  return checkCompatibility(PacketReader(header));
+}
+
+
+bool StreamThread::checkCompatibility(const PacketReader &reader)
+{
+  const auto version_major = reader.versionMajor();
+  const auto version_minor = reader.versionMinor();
+
+  // Exact version match.
+  if (version_major == kPacketVersionMajor && version_minor == kPacketCompatibilityVersionMinor)
+  {
+    return true;
+  }
+  // Check major version is in the allowed range (open interval).
+  if (kPacketCompatibilityVersionMajor < version_major && version_major < kPacketVersionMajor)
+  {
+    // Major version is between the allowed range.
+    return true;
+  }
+
+  // Major version match, ensure minor version is in range.
+  if (version_major == kPacketVersionMajor && version_minor <= kPacketVersionMinor)
+  {
+    return true;
+  }
+
+  // Major version compatibility match, ensure minor version is in range.
+  if (version_major == kPacketCompatibilityVersionMajor &&
+      version_minor >= kPacketCompatibilityVersionMinor)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
 void StreamThread::run()
 {
   Clock::time_point next_frame_start = Clock::now();
@@ -153,9 +193,18 @@ void StreamThread::run()
     at_frame_boundary = false;  // Tracks when we reach a frame boundary.
     while (!_quitFlag && !at_frame_boundary && _stream_reader->isOk() && !_stream_reader->isEof())
     {
-      auto packet_header = _stream_reader->extractPacket();
+      auto [packet_header, status] = _stream_reader->extractPacket();
       if (packet_header)
       {
+        // Check the initial packet compability.
+        if (!checkCompatibility(packet_header))
+        {
+          const PacketReader packet(packet_header);
+          log::warn("Unsupported packet version: ", packet.versionMajor(), ".",
+                    packet.versionMinor());
+          continue;
+        }
+
         // Handle collated packets by wrapping the header.
         // This is fine for normal packets too.
         packer_decoder.setPacket(packet_header);
@@ -164,6 +213,16 @@ void StreamThread::run()
         while (auto *header = packer_decoder.next())
         {
           PacketReader packet(header);
+
+          // Check extracted packet compability. This may be the same as the one checked above, or
+          // it may be a new packet from a CollatedPacket
+          if (!checkCompatibility(packet))
+          {
+            log::warn("Unsupported packet version (extracted): ", packet.versionMajor(), ".",
+                      packet.versionMinor());
+            continue;
+          }
+
           // Lock for frame control messages as these tell us to advance the frame and how long to
           // wait.
           switch (packet.routingId())

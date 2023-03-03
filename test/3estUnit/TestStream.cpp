@@ -30,7 +30,7 @@ bool readStreamInfo(std::shared_ptr<std::iostream> stream, ServerInfoMessage &se
                     uint32_t &frame_count)
 {
   PacketStreamReader stream_reader(stream);
-  const PacketHeader *header = stream_reader.extractPacket();
+  auto [header, status] = stream_reader.extractPacket();
 
   if (!header)
   {
@@ -50,7 +50,9 @@ bool readStreamInfo(std::shared_ptr<std::iostream> stream, ServerInfoMessage &se
   }
 
   // Next read frame count.
-  header = stream_reader.extractPacket();
+  const auto extracted = stream_reader.extractPacket();
+  header = extracted.first;
+  status = extracted.second;
 
   if (!header)
   {

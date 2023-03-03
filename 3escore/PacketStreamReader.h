@@ -27,6 +27,23 @@ struct PacketHeader;
 class TES_CORE_API PacketStreamReader
 {
 public:
+  /// Status values for @c extractPacket()
+  enum class Status
+  {
+    /// Operation successful.
+    Success,
+    /// There is no stream to read from.
+    NoStream,
+    /// No data available
+    Unavailable,
+    /// Operation successful, but some data where skiped/dropped.
+    Dropped,
+    /// A packet header marker was found, but the packet is incomplete.
+    Incomplete,
+    /// The end of the stream has been reached. Nothing more is available.
+    End,
+  };
+
   /// Default constructor. The resulting reader is invalid. Use @c setStream() to initialise.
   PacketStreamReader();
   /// Construct a stream reader for the given stream.
@@ -53,8 +70,11 @@ public:
   /// valid until the next call to @c extractPacket(). This object retains the
   /// ownership.
   ///
-  /// @return The next packet or null on failure. Check status on failure.
-  const PacketHeader *extractPacket();
+  /// Note there is no version check on the packet. The caller should check the
+  /// packet version for compatibility.
+  ///
+  /// @return The next packet or null on failure and a @c Status code.
+  std::pair<const PacketHeader *, Status> extractPacket();
 
   /// Seek to the given stream position.
   ///

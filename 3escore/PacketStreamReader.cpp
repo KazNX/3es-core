@@ -34,11 +34,11 @@ void PacketStreamReader::setStream(std::shared_ptr<std::istream> stream)
 }
 
 
-const PacketHeader *PacketStreamReader::extractPacket()
+std::pair<const PacketHeader *, PacketStreamReader::Status> PacketStreamReader::extractPacket()
 {
   if (!_stream)
   {
-    return nullptr;
+    return { nullptr, Status::NoStream };
   }
 
   consume();
@@ -49,20 +49,22 @@ const PacketHeader *PacketStreamReader::extractPacket()
     if (readMore(_chunk_size - _buffer.size()) == 0)
     {
       // We have no data to read more.
-      return nullptr;
+      return { nullptr, Status::End };
     }
   }
 
   // Scan for the buffer start.
   for (size_t i = 0; i < _buffer.size(); ++i)
   {
+    Status status = Status::Success;
     if (checkMarker(_buffer, i))
     {
       // Marker found. Shift down to comsume trash at the start of the buffer.
       if (i > 0)
       {
-        std::memmove(_buffer.data(), _buffer.data() + i, _buffer.size() - i);
+        std::copy(_buffer.begin() + i, _buffer.end(), _buffer.begin());
         _buffer.resize(_buffer.size() - i);
+        status = Status::Dropped;
       }
 
       if (_buffer.size() < sizeof(PacketHeader))
@@ -71,7 +73,7 @@ const PacketHeader *PacketStreamReader::extractPacket()
         if (_buffer.size() < sizeof(PacketHeader))
         {
           // Can't read sufficient bytes. Abort.
-          return nullptr;
+          return { nullptr, Status::Incomplete };
         }
       }
 
@@ -84,17 +86,17 @@ const PacketHeader *PacketStreamReader::extractPacket()
         if (_buffer.size() < target_size)
         {
           // Failed to read enough.
-          return nullptr;
+          return { nullptr, Status::Incomplete };
         }
       }
 
       // We have our packet.
       // Mark to consume on next call.
-      return reinterpret_cast<const PacketHeader *>(_buffer.data());
+      return { reinterpret_cast<const PacketHeader *>(_buffer.data()), status };
     }
   }
 
-  return nullptr;
+  return { nullptr, Status::Unavailable };
 }
 
 
@@ -164,7 +166,7 @@ void PacketStreamReader::consume()
   if (_buffer.size() >= target_size)
   {
     // Consume.
-    std::memmove(_buffer.data(), _buffer.data() + target_size, _buffer.size() - target_size);
+    std::copy(_buffer.begin() + target_size, _buffer.end(), _buffer.begin());
     _buffer.resize(_buffer.size() - target_size);
   }
 }
