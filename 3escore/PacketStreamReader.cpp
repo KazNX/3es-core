@@ -120,14 +120,14 @@ size_t PacketStreamReader::readMore(size_t more_count)
   auto have_count = _buffer.size();
   _buffer.resize(have_count + more_count);
   // Note(KS): I was using readsome() because that returns the count read, but it was also not
-  // working as expected. Using read() and with tellg() will do.
-  const auto start_pos = _stream->tellg();
-  const auto avail = _stream->rdbuf()->in_avail();
+  // working as expected.
   _stream->read(reinterpret_cast<char *>(_buffer.data()) + have_count,
                 int_cast<unsigned>(more_count));
-  // Handle reading to end of stream. We report the amount available if we reached the end of
-  // stream as tellg() may become invalid.
-  const auto read_count = (!_stream->eof()) ? _stream->tellg() - start_pos : avail;
+  const auto read_count = _stream->gcount();
+  if (read_count == std::numeric_limits<std::streamsize>::max())
+  {
+    return 0;
+  }
   _buffer.resize(have_count + read_count);
   return read_count;
 }
