@@ -346,10 +346,26 @@ bool load(Settings::Config &config, const std::filesystem::path &path)
   }
 
   bool ok = true;
+  if (root.has_child("camera"))
+  {
   ok = load(root["camera"], config.camera) && ok;
+  }
+  if (root.has_child("log"))
+  {
   ok = load(root["log"], config.log) && ok;
+  }
+  if (root.has_child("playback"))
+  {
   ok = load(root["playback"], config.playback) && ok;
+  }
+  if (root.has_child("render"))
+  {
   ok = load(root["render"], config.render) && ok;
+  }
+  if (root.has_child("connection"))
+  {
+    ok = load(root["connection"], config.connection) && ok;
+  }
   return ok;
 }
 
