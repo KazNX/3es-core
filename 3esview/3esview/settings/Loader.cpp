@@ -22,6 +22,103 @@ namespace tes::view::settings
 {
 namespace
 {
+/// Tag set used for yaml keys.
+///
+/// Note: most return @c ryml::csubstr which borrows memory from a static string representation.
+///
+/// The @c Common::trueSet() and @c Common::falseSet() arrays contain @c std::string because of
+/// different usage.
+struct Tags
+{
+  struct Root
+  {
+    static ryml::csubstr camera()
+    {
+      static const std::string str = "camera";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+    static ryml::csubstr log()
+    {
+      static const std::string str = "log";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+    static ryml::csubstr playback()
+    {
+      static const std::string str = "playback";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+    static ryml::csubstr render()
+    {
+      static const std::string str = "render";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+    static ryml::csubstr connection()
+    {
+      static const std::string str = "connection";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+  };
+
+  struct Connection
+  {
+    static ryml::csubstr history()
+    {
+      static const std::string str = "history";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+    static ryml::csubstr host()
+    {
+      static const std::string str = "host";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+    static ryml::csubstr port()
+    {
+      static const std::string str = "port";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+  };
+
+  struct Common
+  {
+    static const std::array<const std::string, 4> &trueSet()
+    {
+      static const std::array<const std::string, 4> values = { "1", "on", "yes", "true" };
+      return values;
+    }
+    static const std::array<const std::string, 4> &falseSet()
+    {
+      static const std::array<const std::string, 4> values = { "0", "off", "no", "false" };
+      return values;
+    }
+    static ryml::csubstr trueStr()
+    {
+      static const std::string str = "true";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+    static ryml::csubstr falseStr()
+    {
+      static const std::string str = "false";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+    static ryml::csubstr red()
+    {
+      static const std::string str = "red";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+    static ryml::csubstr green()
+    {
+      static const std::string str = "green";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+    static ryml::csubstr blue()
+    {
+      static const std::string str = "blue";
+      return ryml::csubstr(str.c_str(), str.size());
+    }
+  };
+};
+
+
 bool parse(const ryml::NodeRef &parent, const std::string &key, std::string &value)
 {
   if (parent.empty())
@@ -57,12 +154,14 @@ bool parse(const ryml::NodeRef &parent, Bool &value)
 
   std::string str(node.val().data(), node.val().size());
   std::transform(str.begin(), str.end(), str.begin(), [](char ch) { return ::tolower(ch); });
-  if (str == "1" || str == "on" || str == "yes" || str == "true")
+  if (std::find(Tags::Common::trueSet().begin(), Tags::Common::trueSet().end(), str) !=
+      Tags::Common::trueSet().end())
   {
     value.setValue(true);
     return true;
   }
-  if (str == "0" || str == "off" || str == "no" || str == "false")
+  if (std::find(Tags::Common::falseSet().begin(), Tags::Common::falseSet().end(), str) !=
+      Tags::Common::falseSet().end())
   {
     value.setValue(false);
     return true;
@@ -86,9 +185,9 @@ bool parse(const ryml::NodeRef &parent, Colour &value)
   }
 
   std::array<ryml::NodeRef, 3> nodes = {
-    node["red"],
-    node["green"],
-    node["blue"],
+    node[Tags::Common::red()],
+    node[Tags::Common::green()],
+    node[Tags::Common::blue()],
   };
   std::array<tes::Colour::Channel, 3> channels = { tes::Colour::Channel::R, tes::Colour::Channel::G,
                                                    tes::Colour::Channel::B };
@@ -194,7 +293,7 @@ bool write(ryml::NodeRef &parent, const T &prop)
 bool write(ryml::NodeRef &parent, const Bool &prop)
 {
   const auto key = ryml::csubstr(prop.label().c_str(), prop.label().size());
-  parent[key] << (prop.value() ? "true" : "false");
+  parent[key] << (prop.value() ? Tags::Common::trueStr() : Tags::Common::falseStr());
   return true;
 }
 
@@ -205,9 +304,9 @@ bool write(ryml::NodeRef &parent, const Colour &prop)
   auto node = parent[ryml::csubstr(prop.label().c_str(), prop.label().size())];
   node |= ryml::MAP;
 
-  node["red"] << static_cast<int>(prop.value().red());
-  node["green"] << static_cast<int>(prop.value().green());
-  node["blue"] << static_cast<int>(prop.value().blue());
+  node[Tags::Common::red()] << static_cast<int>(prop.value().red());
+  node[Tags::Common::green()] << static_cast<int>(prop.value().green());
+  node[Tags::Common::blue()] << static_cast<int>(prop.value().blue());
 
   return true;
 }
@@ -284,25 +383,28 @@ bool load(const ryml::NodeRef &node, Connection &connection)
   connection.history.clear();
   if (!node.empty())
   {
-    const auto history_node = node["history"];
-    // Read history sequence.
-    if (!history_node.empty() && history_node.is_seq())
+    if (node.has_child(Tags::Connection::history()))
     {
-      for (auto &&child : history_node.children())
+      const auto history_node = node[Tags::Connection::history()];
+      // Read history sequence.
+      if (!history_node.empty() && history_node.is_seq())
       {
-        std::string host;
-        UInt port = { "port", 0, "" };
-        bool item_ok = true;
-        item_ok = parse(child, "host", host) && item_ok;
-        item_ok = parse(child, port) && item_ok;
-
-        if (!item_ok)
+        for (auto &&child : history_node.children())
         {
-          ok = false;
-          continue;
-        }
+          std::string host;
+          UInt port = { Tags::Connection::port().data(), 0, "" };
+          bool item_ok = true;
+          item_ok = parse(child, Tags::Connection::host().data(), host) && item_ok;
+          item_ok = parse(child, port) && item_ok;
 
-        connection.history.emplace_back(host, static_cast<uint16_t>(port.value()));
+          if (!item_ok)
+          {
+            ok = false;
+            continue;
+          }
+
+          connection.history.emplace_back(host, static_cast<uint16_t>(port.value()));
+        }
       }
     }
     else
@@ -364,15 +466,15 @@ bool save(ryml::NodeRef &node, const Connection &connection)
 
   if (!connection.history.empty())
   {
-    auto history_node = node["history"];
+    auto history_node = node[Tags::Connection::history()];
     history_node |= ryml::SEQ;
 
     for (const auto &[host, port] : connection.history)
     {
       ryml::NodeRef history_item = history_node.append_child();
       history_item |= ryml::MAP;
-      history_item["host"] << host;
-      history_item["port"] << port;
+      history_item[Tags::Connection::host()] << host;
+      history_item[Tags::Connection::port()] << port;
     }
   }
 
@@ -425,25 +527,25 @@ bool load(Settings::Config &config, const std::filesystem::path &path)
   }
 
   bool ok = true;
-  if (root.has_child("camera"))
+  if (root.has_child(Tags::Root::camera()))
   {
-    ok = load(root["camera"], config.camera) && ok;
+    ok = load(root[Tags::Root::camera()], config.camera) && ok;
   }
-  if (root.has_child("log"))
+  if (root.has_child(Tags::Root::log()))
   {
-    ok = load(root["log"], config.log) && ok;
+    ok = load(root[Tags::Root::log()], config.log) && ok;
   }
-  if (root.has_child("playback"))
+  if (root.has_child(Tags::Root::playback()))
   {
-    ok = load(root["playback"], config.playback) && ok;
+    ok = load(root[Tags::Root::playback()], config.playback) && ok;
   }
-  if (root.has_child("render"))
+  if (root.has_child(Tags::Root::render()))
   {
-    ok = load(root["render"], config.render) && ok;
+    ok = load(root[Tags::Root::render()], config.render) && ok;
   }
-  if (root.has_child("connection"))
+  if (root.has_child(Tags::Root::connection()))
   {
-    ok = load(root["connection"], config.connection) && ok;
+    ok = load(root[Tags::Root::connection()], config.connection) && ok;
   }
   return ok;
 }
@@ -470,11 +572,11 @@ bool save(const Settings::Config &config, const std::filesystem::path &path)
   // Mark root as a map.
   root |= ryml::MAP;
 
-  ok = save(root["camera"], config.camera) && ok;
-  ok = save(root["log"], config.log) && ok;
-  ok = save(root["playback"], config.playback) && ok;
-  ok = save(root["render"], config.render) && ok;
-  ok = save(root["connection"], config.connection) && ok;
+  ok = save(root[Tags::Root::camera()], config.camera) && ok;
+  ok = save(root[Tags::Root::log()], config.log) && ok;
+  ok = save(root[Tags::Root::playback()], config.playback) && ok;
+  ok = save(root[Tags::Root::render()], config.render) && ok;
+  ok = save(root[Tags::Root::connection()], config.connection) && ok;
 
   out_file << doc;
   out_file.flush();
