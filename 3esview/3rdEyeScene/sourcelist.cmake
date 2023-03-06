@@ -28,6 +28,8 @@ list(APPEND SOURCES
   ui/Playback.h
   ui/SettingsView.cpp
   ui/SettingsView.h
+  ui/TreeView.cpp
+  ui/TreeView.h
   Main.cpp
   UIViewer.cpp
   UIViewer.h

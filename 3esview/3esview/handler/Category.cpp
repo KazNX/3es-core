@@ -17,55 +17,13 @@ Category::Category()
 {}
 
 
-bool Category::isActive(unsigned category) const
-{
-  std::lock_guard guard(_mutex);
-  auto search = _category_map.find(category);
-  bool active = true;
-  while (active && search != _category_map.end())
-  {
-    active = search->second.active;
-    // Recurse on parent unless we are the root, or we know it's not active.
-    search =
-      (search->first != 0) ? _category_map.find(search->second.parent_id) : _category_map.end();
-  }
-  return active;
-}
-
-
-bool Category::setActive(unsigned category, bool active)
-{
-  std::lock_guard guard(_mutex);
-  const auto search = _category_map.find(category);
-  if (search != _category_map.end())
-  {
-    search->second.active = active;
-    return true;
-  }
-  return false;
-}
-
-
-bool Category::lookup(unsigned category, CategoryInfo &info)
-{
-  std::lock_guard guard(_mutex);
-  const auto search = _category_map.find(category);
-  if (search != _category_map.end())
-  {
-    info = search->second;
-    return true;
-  }
-  return false;
-}
-
-
 void Category::initialise()
 {}
 
 void Category::reset()
 {
   std::lock_guard guard(_mutex);
-  _category_map.clear();
+  _categories.clear();
 }
 
 
@@ -78,14 +36,22 @@ void Category::prepareFrame(const FrameStamp &stamp)
 void Category::endFrame(const FrameStamp &stamp)
 {
   (void)stamp;
+  std::lock_guard guard(_mutex);
+  for (const auto &info : _pending)
+  {
+    _categories.updateCategory(info);
+  }
+  _pending.clear();
 }
 
 
-void Category::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params)
+void Category::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+                    const painter::CategoryState &categories)
 {
-  (void)pass;
-  (void)stamp;
-  (void)params;
+  TES_UNUSED(pass);
+  TES_UNUSED(stamp);
+  TES_UNUSED(params);
+  TES_UNUSED(categories);
 }
 
 
@@ -100,13 +66,13 @@ void Category::readMessage(PacketReader &reader)
     ok = msg.read(reader, name.data(), name.size());
     if (ok)
     {
-      CategoryInfo info = {};
+      painter::CategoryInfo info = {};
       info.name = msg.name;
       info.id = msg.category_id;
       info.parent_id = msg.parent_id;
       info.default_active = msg.default_active != 0;
       info.active = info.default_active;
-      ok = updateCategory(info);
+      _pending.emplace_back(info);
     }
 
     if (!ok)
@@ -132,7 +98,7 @@ void Category::serialise(Connection &out, ServerInfoMessage &info)
   const uint16_t buffer_size = 1024u;
   std::vector<uint8_t> packet_buffer(buffer_size, 0u);
   PacketWriter writer(packet_buffer.data(), buffer_size);
-  for (auto &[id, info] : _category_map)
+  for (auto &[id, info] : _categories.map())
   {
     msg.category_id = info.id;
     msg.parent_id = info.parent_id;
@@ -158,13 +124,5 @@ void Category::serialise(Connection &out, ServerInfoMessage &info)
   {
     log::error("Category serialisation failed.");
   }
-}
-
-
-bool Category::updateCategory(const CategoryInfo &info)
-{
-  std::lock_guard guard(_mutex);
-  _category_map[info.id] = info;
-  return true;
 }
 }  // namespace tes::view::handler

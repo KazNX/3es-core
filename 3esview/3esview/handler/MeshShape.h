@@ -50,7 +50,8 @@ public:
   void prepareFrame(const FrameStamp &stamp) override;
   void endFrame(const FrameStamp &stamp) override;
 
-  void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params) override;
+  void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+            const painter::CategoryState &categories) override;
 
   void readMessage(PacketReader &reader) override;
   void serialise(Connection &out, ServerInfoMessage &info) override;
@@ -75,6 +76,7 @@ protected:
   {
     BoundsId bounds_id = BoundsCuller::kInvalidId;
     Bounds bounds = {};
+    unsigned category_id = 0;
     std::shared_ptr<tes::MeshShape> shape;
     Magnum::Matrix4 transform = {};
     /// The mesh to render.

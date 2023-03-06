@@ -22,6 +22,25 @@ namespace tes::view::settings
 {
 namespace
 {
+bool parse(const ryml::NodeRef &parent, const std::string &key, std::string &value)
+{
+  if (parent.empty())
+  {
+    return true;
+  }
+
+  const auto key2 = ryml::csubstr(key.c_str(), key.size());
+  const auto node = parent[key2];
+  if (node.empty())
+  {
+    return false;
+  }
+
+  value = std::string(node.val().data(), node.val().size());
+  return true;
+}
+
+
 bool parse(const ryml::NodeRef &parent, Bool &value)
 {
   if (parent.empty())
@@ -258,6 +277,44 @@ bool load(const ryml::NodeRef &node, Playback &playback)
 }
 
 
+bool load(const ryml::NodeRef &node, Connection &connection)
+{
+  bool ok = true;
+
+  connection.history.clear();
+  if (!node.empty())
+  {
+    const auto history_node = node["history"];
+    // Read history sequence.
+    if (!history_node.empty() && history_node.is_seq())
+    {
+      for (auto &&child : history_node.children())
+      {
+        std::string host;
+        UInt port = { "port", 0, "" };
+        bool item_ok = true;
+        item_ok = parse(child, "host", host) && item_ok;
+        item_ok = parse(child, port) && item_ok;
+
+        if (!item_ok)
+        {
+          ok = false;
+          continue;
+        }
+
+        connection.history.emplace_back(host, static_cast<uint16_t>(port.value()));
+      }
+    }
+    else
+    {
+      ok = false;
+    }
+  }
+
+  return ok;
+}
+
+
 bool save(ryml::NodeRef &node, const Playback &playback)
 {
   bool ok = true;
@@ -299,6 +356,28 @@ bool save(ryml::NodeRef &node, const Render &render)
   return ok;
 }
 
+bool save(ryml::NodeRef &node, const Connection &connection)
+{
+  bool ok = true;
+
+  node |= ryml::MAP;
+
+  if (!connection.history.empty())
+  {
+    auto history_node = node["history"];
+    history_node |= ryml::SEQ;
+
+    for (const auto &[host, port] : connection.history)
+    {
+      ryml::NodeRef history_item = history_node.append_child();
+      history_item |= ryml::MAP;
+      history_item["host"] << host;
+      history_item["port"] << port;
+    }
+  }
+
+  return ok;
+}
 std::filesystem::path userConfigPath()
 {
   std::array<char, 1024> user_config_path;
@@ -348,19 +427,19 @@ bool load(Settings::Config &config, const std::filesystem::path &path)
   bool ok = true;
   if (root.has_child("camera"))
   {
-  ok = load(root["camera"], config.camera) && ok;
+    ok = load(root["camera"], config.camera) && ok;
   }
   if (root.has_child("log"))
   {
-  ok = load(root["log"], config.log) && ok;
+    ok = load(root["log"], config.log) && ok;
   }
   if (root.has_child("playback"))
   {
-  ok = load(root["playback"], config.playback) && ok;
+    ok = load(root["playback"], config.playback) && ok;
   }
   if (root.has_child("render"))
   {
-  ok = load(root["render"], config.render) && ok;
+    ok = load(root["render"], config.render) && ok;
   }
   if (root.has_child("connection"))
   {
@@ -395,6 +474,7 @@ bool save(const Settings::Config &config, const std::filesystem::path &path)
   ok = save(root["log"], config.log) && ok;
   ok = save(root["playback"], config.playback) && ok;
   ok = save(root["render"], config.render) && ok;
+  ok = save(root["connection"], config.connection) && ok;
 
   out_file << doc;
   out_file.flush();

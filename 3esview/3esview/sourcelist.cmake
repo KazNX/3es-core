@@ -50,6 +50,7 @@ list(APPEND PUBLIC_HEADERS
   mesh/Converter.h
   painter/Arrow.h
   painter/Box.h
+  painter/CategoryState.h
   painter/Capsule.h
   painter/Cone.h
   painter/Cylinder.h
@@ -128,6 +129,7 @@ list(APPEND SOURCES
   painter/Arrow.cpp
   painter/Box.cpp
   painter/Capsule.cpp
+  painter/CategoryState.cpp
   painter/Cone.cpp
   painter/Cylinder.cpp
   painter/Plane.cpp

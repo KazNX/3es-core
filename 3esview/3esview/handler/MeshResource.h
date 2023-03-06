@@ -101,7 +101,8 @@ public:
 
   void prepareFrame(const FrameStamp &stamp) override;
   void endFrame(const FrameStamp &stamp) override;
-  void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params) override;
+  void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+            const painter::CategoryState &categories) override;
   void readMessage(PacketReader &reader) override;
   void serialise(Connection &out, ServerInfoMessage &info) override;
 

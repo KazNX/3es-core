@@ -19,13 +19,16 @@ class ShaderLibrary;
 
 namespace tes::view::painter
 {
-/// A @c ShapePainter renders a single primitive shape type in either solid, wireframe or transparent forms. The
-/// painter also associated 3rd Eye Scene shape @c Id objects with renderable objects. The painter effects the @c Id
-/// semantics, with zero value ids representing transient shapes, removed when @c endFrame() is called.
+class CategoryState;
+
+/// A @c ShapePainter renders a single primitive shape type in either solid, wireframe or
+/// transparent forms. The painter also associated 3rd Eye Scene shape @c Id objects with renderable
+/// objects. The painter effects the @c Id semantics, with zero value ids representing transient
+/// shapes, removed when @c endFrame() is called.
 ///
-/// The painter is supported by the @c ShapeCache class, one instance for each drawing @c Type . As such it has similar
-/// supporting requirements; a @c BoundsCuller , @c Mesh objects for solid, wireframe and transparent rendering and a
-/// bounds calculation function.
+/// The painter is supported by the @c ShapeCache class, one instance for each drawing @c Type . As
+/// such it has similar supporting requirements; a @c BoundsCuller , @c Mesh objects for solid,
+/// wireframe and transparent rendering and a bounds calculation function.
 class TES_VIEWER_API ShapePainter
 {
 public:
@@ -104,12 +107,14 @@ public:
   /// @param wireframe Mesh used for wireframe rendering (line based).
   /// @param transparent Mesh used for transparent rendering.
   /// @param bounds_calculator Bounds calculation function.
-  ShapePainter(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders,
-               std::initializer_list<Part> solid, std::initializer_list<Part> wireframe,
-               std::initializer_list<Part> transparent, BoundsCalculator bounds_calculator);
+  ShapePainter(std::shared_ptr<BoundsCuller> culler,
+               std::shared_ptr<shaders::ShaderLibrary> shaders, std::initializer_list<Part> solid,
+               std::initializer_list<Part> wireframe, std::initializer_list<Part> transparent,
+               BoundsCalculator bounds_calculator);
   /// @overload
-  ShapePainter(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders,
-               const std::vector<Part> &solid, const std::vector<Part> &wireframe, const std::vector<Part> &transparent,
+  ShapePainter(std::shared_ptr<BoundsCuller> culler,
+               std::shared_ptr<shaders::ShaderLibrary> shaders, const std::vector<Part> &solid,
+               const std::vector<Part> &wireframe, const std::vector<Part> &transparent,
                BoundsCalculator bounds_calculator);
   /// Destructor.
   ~ShapePainter();
@@ -120,17 +125,18 @@ public:
   /// Add a shape with the given @p id to paint.
   ///
   /// This change is not effected util the next @c commit() call.
-  /// @param id The object @c Id for the shape. A zero @c Id is a transient shape and is removed between draw calls.
+  /// @param id The object @c Id for the shape. A zero @c Id is a transient shape and is removed
+  /// between draw calls.
   /// @param frame_number The frame at which the shape becomes visible.
   /// @param type The draw type for the shape.
   /// @param transform The shape transformation.
   /// @param colour The shape colour.
-  /// @param hidden True to prevent rendering of the shape. Normally used for parent shapes so it's transform is only
-  /// used to collectively move the children.
-  /// @return An id value which can be passed to @c addChild() to add child shapes. This is transient and should
-  /// only be used immediately after calling @c add() to call @c addChild() .
-  virtual ParentId add(const Id &id, Type type, const Magnum::Matrix4 &transform, const Magnum::Color4 &colour,
-                       bool hidden = false);
+  /// @param hidden True to prevent rendering of the shape. Normally used for parent shapes so it's
+  /// transform is only used to collectively move the children.
+  /// @return An id value which can be passed to @c addChild() to add child shapes. This is
+  /// transient and should only be used immediately after calling @c add() to call @c addChild() .
+  virtual ParentId add(const Id &id, Type type, const Magnum::Matrix4 &transform,
+                       const Magnum::Color4 &colour, bool hidden = false);
 
   /// Lookup a shape by @p id to retrieve it's @c ParentId.
   ///
@@ -150,12 +156,14 @@ public:
 
   /// Add a sub shape part.
   ///
-  /// This supports multi-shape messages where multiple shapes are part of the same @p id . Shapes added with
-  /// @c addChild() are essentially children of the first shape in a scene hierarchy sense, and the primary shape
-  /// transform also affects children. Removing a shape also removes its sub shapes.
+  /// This supports multi-shape messages where multiple shapes are part of the same @p id . Shapes
+  /// added with
+  /// @c addChild() are essentially children of the first shape in a scene hierarchy sense, and the
+  /// primary shape transform also affects children. Removing a shape also removes its sub shapes.
   ///
-  /// To add a sub shape, first call @p add() with a new @p id , then call @c addChild() for each sub/child shape.
-  /// Remember passing an identity @p transform for a sub shape co-locates the sub shape with the first shape.
+  /// To add a sub shape, first call @p add() with a new @p id , then call @c addChild() for each
+  /// sub/child shape. Remember passing an identity @p transform for a sub shape co-locates the sub
+  /// shape with the first shape.
   ///
   /// This change is not effected util the next @c commit() call.
   /// @param parent_id The parent id obtained from @c add() .
@@ -201,24 +209,25 @@ public:
   /// @param[out] transform Transform output. Does not include any parent transform.
   /// @param[out] colour Colour output.
   /// @return True if @p id is valid.
-  virtual bool readChildShape(const ChildId &child_id, bool include_parent_transform, Magnum::Matrix4 &transform,
-                              Magnum::Color4 &colour) const;
+  virtual bool readChildShape(const ChildId &child_id, bool include_parent_transform,
+                              Magnum::Matrix4 &transform, Magnum::Color4 &colour) const;
 
   /// Render the current opaque (solid & wireframe) shapes set.
   /// @param stamp The frame stamp to draw at.
   /// @param projection_matrix The view projection matrix.
   virtual void drawOpaque(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                          const Magnum::Matrix4 &view_matrix);
+                          const Magnum::Matrix4 &view_matrix, const CategoryState &categories);
 
   /// Render the current transparent shapes set.
   /// @param stamp The frame stamp to draw at.
   /// @param projection_matrix The view projection matrix.
   virtual void drawTransparent(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                               const Magnum::Matrix4 &view_matrix);
+                               const Magnum::Matrix4 &view_matrix, const CategoryState &categories);
 
   /// Commit the pending changes.
   ///
-  /// This removes the current transient objects, then effects changes from the following function calls:
+  /// This removes the current transient objects, then effects changes from the following function
+  /// calls:
   /// - @c add()
   /// - @c addChild()
   /// - @c update ()
@@ -228,7 +237,8 @@ public:
 
   /// An iterator for the shapes in the painter. Only iterates one shape @c Type at a time.
   ///
-  /// Contents are read only and provide a @c View to the shape. For shapes with a @c child_count, use
+  /// Contents are read only and provide a @c View to the shape. For shapes with a @c child_count,
+  /// use
   /// @c getChild() to iterate the children.
   class TES_VIEWER_API const_iterator
   {
@@ -362,11 +372,17 @@ public:
   /// Begin iteration of the shapes of @p type.
   /// @param type The @c Type of shape to iterate.
   /// @return The starting iterator.
-  inline const_iterator begin(Type type) const { return const_iterator(type, cacheForType(type), true); }
+  inline const_iterator begin(Type type) const
+  {
+    return const_iterator(type, cacheForType(type), true);
+  }
   /// End iterator for shapes of @p type.
   /// @param type The @c Type of shape to iterate.
   /// @return The end iterator.
-  inline const_iterator end(Type type) const { return const_iterator(type, cacheForType(type), false); }
+  inline const_iterator end(Type type) const
+  {
+    return const_iterator(type, cacheForType(type), false);
+  }
 
 protected:
   /// Identifies a shape type and index into the associated @c ShapeCache .
@@ -378,9 +394,10 @@ protected:
 
   /// Mapping of shape @c Id to @c ShapeCache index.
   /// @todo Use a different map; MSVC @c std::unordered_map performance is terrible.
-  using IdIndexMap = std::unordered_map<Id, CacheIndex>;
+  using IdIndexMap = std::unordered_map<uint32_t, CacheIndex>;
 
-  virtual util::ResourceListId addShape(const Id &shape_id, Type type, const Magnum::Matrix4 &transform,
+  virtual util::ResourceListId addShape(const Id &shape_id, Type type,
+                                        const Magnum::Matrix4 &transform,
                                         const Magnum::Color4 &colour, bool hidden,
                                         const ParentId &parent_id, unsigned *child_index);
 

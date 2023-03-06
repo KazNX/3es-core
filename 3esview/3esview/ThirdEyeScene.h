@@ -44,11 +44,13 @@ class FboEffect;
 namespace handler
 {
 class Camera;
+class Category;
 class Message;
 }  // namespace handler
 
 namespace painter
 {
+class CategoryState;
 class ShapePainter;
 class Text;
 }  // namespace painter
@@ -100,6 +102,11 @@ public:
 
   [[nodiscard]] const settings::Settings &settings() const { return _settings; }
   [[nodiscard]] settings::Settings &settings() { return _settings; }
+
+  [[nodiscard]] handler::Camera &cameraHandler() { return *_camera_handler; }
+  [[nodiscard]] const handler::Camera &cameraHandler() const { return *_camera_handler; }
+  [[nodiscard]] handler::Category &categoryHandler() { return *_category_handler; }
+  [[nodiscard]] const handler::Category &categoryHandler() const { return *_category_handler; }
 
   [[nodiscard]] std::shared_ptr<handler::Message> messageHandler(uint32_t routing_id)
   {
@@ -164,17 +171,17 @@ private:
   /// Primary drawing pass. Draws _main_draw_handlers with the FBO effect active.
   /// @param dt Time since last render (seconds).
   /// @param params Draw parameters.
-  void drawPrimary(float dt, const DrawParams &params);
+  void drawPrimary(float dt, const DrawParams &params, const painter::CategoryState &categories);
   /// Secondary drawing pass. Draws _secondary_draw_handlers using the main frame buffer.
   /// @param dt Time since last render (seconds).
   /// @param params Draw parameters.
-  void drawSecondary(float dt, const DrawParams &params);
+  void drawSecondary(float dt, const DrawParams &params, const painter::CategoryState &categories);
   /// Draw all items from @p drawers calling @c handler::Message::draw() for each
   /// @c handler::Message::DrawPass .
   /// @param dt Time since last render (seconds).
   /// @param params Draw parameters.
   /// @param drawers What to draw.
-  void draw(float dt, const DrawParams &params,
+  void draw(float dt, const DrawParams &params, const painter::CategoryState &categories,
             const std::vector<std::shared_ptr<handler::Message>> &drawers);
   void updateFpsDisplay(float dt, const DrawParams &params);
 
@@ -201,7 +208,8 @@ private:
   /// List of unknown message handlers for which we've raised warnings. Cleared on @c reset().
   std::unordered_set<uint32_t> _unknown_handlers;
 
-  std::shared_ptr<handler::Camera> _camera_handler;
+  handler::Camera *_camera_handler = nullptr;
+  handler::Category *_category_handler = nullptr;
 
   std::shared_ptr<painter::Text> _text_painter;
 

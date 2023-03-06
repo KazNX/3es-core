@@ -55,6 +55,15 @@ void Settings::update(const Render &config)
 }
 
 
+void Settings::update(const Connection &config)
+{
+  const std::lock_guard guard(_mutex);
+  _config.connection = config;
+  const auto full_config = _config;
+  notify(Category::Connection, full_config);
+}
+
+
 void Settings::addObserver(NotifyCallback callback)
 {
   const std::lock_guard guard(_observer_mutex);

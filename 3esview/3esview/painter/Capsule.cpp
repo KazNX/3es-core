@@ -77,7 +77,7 @@ void Capsule::reset()
 
 bool Capsule::update(const Id &id, const Magnum::Matrix4 &transform, const Magnum::Color4 &colour)
 {
-  const auto search = _id_index_map.find(id);
+  const auto search = _id_index_map.find(id.id());
   if (search != _id_index_map.end())
   {
     if (ShapeCache *cache = cacheForType(search->second.type))
@@ -103,7 +103,7 @@ bool Capsule::update(const Id &id, const Magnum::Matrix4 &transform, const Magnu
 
 bool Capsule::remove(const Id &id)
 {
-  const auto search = _id_index_map.find(id);
+  const auto search = _id_index_map.find(id.id());
   if (search != _id_index_map.end())
   {
     if (ShapeCache *cache = cacheForType(search->second.type))
@@ -126,26 +126,26 @@ bool Capsule::remove(const Id &id)
 
 
 void Capsule::drawOpaque(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                         const Magnum::Matrix4 &view_matrix)
+                         const Magnum::Matrix4 &view_matrix, const CategoryState &categories)
 {
-  _solid_cache->draw(stamp, projection_matrix, view_matrix);
-  _solid_end_caps[0]->draw(stamp, projection_matrix, view_matrix);
-  _solid_end_caps[1]->draw(stamp, projection_matrix, view_matrix);
+  _solid_cache->draw(stamp, projection_matrix, view_matrix, categories);
+  _solid_end_caps[0]->draw(stamp, projection_matrix, view_matrix, categories);
+  _solid_end_caps[1]->draw(stamp, projection_matrix, view_matrix, categories);
 
-  _wireframe_cache->draw(stamp, projection_matrix, view_matrix);
-  _wireframe_end_caps[0]->draw(stamp, projection_matrix, view_matrix);
-  _wireframe_end_caps[1]->draw(stamp, projection_matrix, view_matrix);
+  _wireframe_cache->draw(stamp, projection_matrix, view_matrix, categories);
+  _wireframe_end_caps[0]->draw(stamp, projection_matrix, view_matrix, categories);
+  _wireframe_end_caps[1]->draw(stamp, projection_matrix, view_matrix, categories);
 }
 
 
 void Capsule::drawTransparent(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                              const Magnum::Matrix4 &view_matrix)
+                              const Magnum::Matrix4 &view_matrix, const CategoryState &categories)
 {
   Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha,
                                          Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
-  _transparent_cache->draw(stamp, projection_matrix, view_matrix);
-  _transparent_end_caps[0]->draw(stamp, projection_matrix, view_matrix);
-  _transparent_end_caps[1]->draw(stamp, projection_matrix, view_matrix);
+  _transparent_cache->draw(stamp, projection_matrix, view_matrix, categories);
+  _transparent_end_caps[0]->draw(stamp, projection_matrix, view_matrix, categories);
+  _transparent_end_caps[1]->draw(stamp, projection_matrix, view_matrix, categories);
   Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::One,
                                          Magnum::GL::Renderer::BlendFunction::Zero);
 }

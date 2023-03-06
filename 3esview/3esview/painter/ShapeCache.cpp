@@ -1,5 +1,7 @@
 #include "ShapeCache.h"
 
+#include "CategoryState.h"
+
 #include <3esview/BoundsCuller.h>
 #include <3esview/shaders/Shader.h>
 
@@ -247,12 +249,12 @@ void ShapeCache::commit()
 
 
 void ShapeCache::draw(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                      const Magnum::Matrix4 &view_matrix)
+                      const Magnum::Matrix4 &view_matrix, const CategoryState &categories)
 {
   _shader->setProjectionMatrix(projection_matrix);
   _shader->setViewMatrix(view_matrix);
   _shader->setModelMatrix({});
-  buildInstanceBuffers(stamp);
+  buildInstanceBuffers(stamp, categories);
   for (auto &buffer : _instance_buffers)
   {
     if (buffer.count)
@@ -338,7 +340,7 @@ bool ShapeCache::release(util::ResourceListId id)
 }
 
 
-void ShapeCache::buildInstanceBuffers(const FrameStamp &stamp)
+void ShapeCache::buildInstanceBuffers(const FrameStamp &stamp, const CategoryState &categories)
 {
   (void)stamp;
   // Clear previous results.
@@ -375,7 +377,7 @@ void ShapeCache::buildInstanceBuffers(const FrameStamp &stamp)
   for (auto iter = _shapes.begin(); iter != _shapes.end(); ++iter)
   {
     if ((iter->flags & (ShapeFlag::Pending | ShapeFlag::Hidden)) == ShapeFlag::None &&
-        culler.isVisible(iter->bounds_id))
+        culler.isVisible(iter->bounds_id) && categories.isActive(iter->shape_id.category()))
     {
       const unsigned marshal_index = _instance_buffers[cur_instance_buffer_idx].count;
       ++_instance_buffers[cur_instance_buffer_idx].count;

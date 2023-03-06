@@ -80,11 +80,13 @@ void Camera::endFrame(const FrameStamp &stamp)
 }
 
 
-void Camera::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params)
+void Camera::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+                  const painter::CategoryState &categories)
 {
   (void)pass;
   (void)stamp;
   (void)params;
+  (void)categories;
 }
 
 

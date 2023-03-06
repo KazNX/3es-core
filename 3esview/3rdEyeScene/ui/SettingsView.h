@@ -6,7 +6,7 @@
 
 #include <3rdEyeScene/ClientConfig.h>
 
-#include "Panel.h"
+#include "TreeView.h"
 
 #include <3esview/settings/Settings.h>
 
@@ -27,7 +27,7 @@ class Command;
 
 namespace tes::view::ui
 {
-class SettingsView : public Panel
+class SettingsView : public TreeView
 {
 public:
   SettingsView(Viewer &viewer);
@@ -48,11 +48,6 @@ private:
   bool showProperty(unsigned idx, settings::Colour &prop);
   template <typename E>
   bool showProperty(unsigned idx, settings::Enum<E> &prop);
-
-  bool beginSection(unsigned idx, const std::string &label);
-  void endSection(bool open);
-  void beginProperty(unsigned idx, const std::string &label, const std::string &info);
-  void endProperty();
 };
 }  // namespace tes::view::ui
 

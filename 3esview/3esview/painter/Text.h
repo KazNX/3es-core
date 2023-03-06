@@ -98,6 +98,8 @@ public:
     Magnum::Float font_size = 1;
     /// Rendering flags.
     TextFlag flags = TextFlag::Zero;
+    /// Category ID - see @c painter::CategoryState .
+    unsigned category_id = 0u;
   };
 
   /// Construct a text renderer.
@@ -120,7 +122,8 @@ public:
   ///
   /// @tparam Iter The forward iterator type for a collection of @c TextEntry items.
   /// @tparam Resolver The @c TextEntry resolver. A callable object of the form:
-  ///   `std::function<const TextEntry &(const Iter &)>`
+  ///   `std::function<std::pair<const TextEntry &, bool>(const Iter &)>`. The bool return value
+  ///   indicates whether the text is visible or not.
   /// @param begin The first item to render.
   /// @param end The end iterator.
   /// @param resolver A functional object which resolves an @c Iter object to a @c TextEntry
@@ -138,7 +141,7 @@ public:
   /// @param params Draw parameters.
   void draw2D(const TextEntry &text, const DrawParams &params)
   {
-    const auto draw_item = [&text](const int) { return text; };
+    const auto draw_item = [&text](const int) { return std::pair{ text, true }; };
     draw2D(0, 1, draw_item, params);
   }
 
@@ -166,7 +169,7 @@ public:
   /// @param params Draw parameters.
   void draw3D(const TextEntry &text, const DrawParams &params)
   {
-    const auto draw_item = [&text](const int) { return text; };
+    const auto draw_item = [&text](const int) { return std::pair{ text, true }; };
     draw3D(0, 1, draw_item, params);
   }
 
@@ -239,7 +242,11 @@ void Text::draw2D(const Iter &begin, const Iter &end, const Resolver &resolver,
   _shader_2d.bindVectorTexture(_cache->texture());
   for (auto iter = begin; iter != end; ++iter)
   {
-    draw2DText(resolver(iter), params);
+    const auto &&[text, visible] = resolver(iter);
+    if (visible)
+    {
+      draw2DText(text, params);
+    }
   }
   endDraw2D();
 }
@@ -259,7 +266,11 @@ void Text::draw3D(const Iter &begin, const Iter &end, const Resolver &resolver,
   _shader_3d.bindVectorTexture(_cache->texture());
   for (auto iter = begin; iter != end; ++iter)
   {
-    draw3DText(resolver(iter), params);
+    const auto &&[text, visible] = resolver(iter);
+    if (visible)
+    {
+      draw3DText(text, params);
+    }
   }
   endDraw3D();
 }

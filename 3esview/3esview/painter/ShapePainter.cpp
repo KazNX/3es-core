@@ -8,15 +8,19 @@
 
 namespace tes::view::painter
 {
-ShapePainter::ShapePainter(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders,
-                           std::initializer_list<Part> solid_mesh, std::initializer_list<Part> wireframe_mesh,
-                           std::initializer_list<Part> transparent_mesh, BoundsCalculator bounds_calculator)
+ShapePainter::ShapePainter(std::shared_ptr<BoundsCuller> culler,
+                           std::shared_ptr<shaders::ShaderLibrary> shaders,
+                           std::initializer_list<Part> solid_mesh,
+                           std::initializer_list<Part> wireframe_mesh,
+                           std::initializer_list<Part> transparent_mesh,
+                           BoundsCalculator bounds_calculator)
   : ShapePainter(std::move(culler), std::move(shaders), std::vector<Part>(std::move(solid_mesh)),
-                 std::vector<Part>(std::move(wireframe_mesh)), std::vector<Part>(std::move(transparent_mesh)),
-                 std::move(bounds_calculator))
+                 std::vector<Part>(std::move(wireframe_mesh)),
+                 std::vector<Part>(std::move(transparent_mesh)), std::move(bounds_calculator))
 {}
 
-ShapePainter::ShapePainter(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders,
+ShapePainter::ShapePainter(std::shared_ptr<BoundsCuller> culler,
+                           std::shared_ptr<shaders::ShaderLibrary> shaders,
                            const std::vector<Part> &solid, const std::vector<Part> &wireframe,
                            const std::vector<Part> &transparent, BoundsCalculator bounds_calculator)
 {
@@ -51,7 +55,7 @@ ShapePainter::ParentId ShapePainter::add(const Id &id, Type type, const Magnum::
   if (!id.isTransient())
   {
     // Handle re-adding a shape which is already pending removal.
-    const auto search = _id_index_map.find(id);
+    const auto search = _id_index_map.find(id.id());
     if (search != _id_index_map.end())
     {
       _id_index_map.erase(search);
@@ -67,7 +71,7 @@ ShapePainter::ParentId ShapePainter::add(const Id &id, Type type, const Magnum::
         }
       }
     }
-    _id_index_map.emplace(id, CacheIndex{ type, index });
+    _id_index_map.emplace(id.id(), CacheIndex{ type, index });
   }
   return ParentId(id, index);
 }
@@ -75,7 +79,7 @@ ShapePainter::ParentId ShapePainter::add(const Id &id, Type type, const Magnum::
 
 ShapePainter::ParentId ShapePainter::lookup(const Id &id, Type &type) const
 {
-  const auto search = _id_index_map.find(id);
+  const auto search = _id_index_map.find(id.id());
   if (search != _id_index_map.end())
   {
     type = search->second.type;
@@ -87,7 +91,8 @@ ShapePainter::ParentId ShapePainter::lookup(const Id &id, Type &type) const
 }
 
 
-ShapePainter::ChildId ShapePainter::addChild(const ParentId &parent_id, Type type, const Magnum::Matrix4 &transform,
+ShapePainter::ChildId ShapePainter::addChild(const ParentId &parent_id, Type type,
+                                             const Magnum::Matrix4 &transform,
                                              const Magnum::Color4 &colour)
 {
   unsigned child_index = 0;
@@ -96,14 +101,16 @@ ShapePainter::ChildId ShapePainter::addChild(const ParentId &parent_id, Type typ
 }
 
 
-util::ResourceListId ShapePainter::addShape(const Id &shape_id, Type type, const Magnum::Matrix4 &transform,
-                                            const Magnum::Color4 &colour, bool hidden, const ParentId &parent_id,
-                                            unsigned *child_index)
+util::ResourceListId ShapePainter::addShape(const Id &shape_id, Type type,
+                                            const Magnum::Matrix4 &transform,
+                                            const Magnum::Color4 &colour, bool hidden,
+                                            const ParentId &parent_id, unsigned *child_index)
 {
   if (ShapeCache *cache = cacheForType(type))
   {
     ShapeCache::ShapeFlag flags = ShapeCache::ShapeFlag::None;
-    flags |= (shape_id.isTransient()) ? ShapeCache::ShapeFlag::Transient : ShapeCache::ShapeFlag::None;
+    flags |=
+      (shape_id.isTransient()) ? ShapeCache::ShapeFlag::Transient : ShapeCache::ShapeFlag::None;
     flags |= (hidden) ? ShapeCache::ShapeFlag::Hidden : ShapeCache::ShapeFlag::None;
     return cache->add(shape_id, transform, colour, flags, parent_id.resourceId(), child_index);
   }
@@ -111,9 +118,10 @@ util::ResourceListId ShapePainter::addShape(const Id &shape_id, Type type, const
 }
 
 
-bool ShapePainter::update(const Id &id, const Magnum::Matrix4 &transform, const Magnum::Color4 &colour)
+bool ShapePainter::update(const Id &id, const Magnum::Matrix4 &transform,
+                          const Magnum::Color4 &colour)
 {
-  const auto search = _id_index_map.find(id);
+  const auto search = _id_index_map.find(id.id());
   if (search != _id_index_map.end())
   {
     if (ShapeCache *cache = cacheForType(search->second.type))
@@ -130,7 +138,7 @@ bool ShapePainter::update(const Id &id, const Magnum::Matrix4 &transform, const 
 bool ShapePainter::updateChildShape(const ChildId &child_id, const Magnum::Matrix4 &transform,
                                     const Magnum::Color4 &colour)
 {
-  const auto search = _id_index_map.find(child_id.shapeId());
+  const auto search = _id_index_map.find(child_id.shapeId().id());
   if (search != _id_index_map.end())
   {
     if (ShapeCache *cache = cacheForType(search->second.type))
@@ -151,7 +159,7 @@ bool ShapePainter::updateChildShape(const ChildId &child_id, const Magnum::Matri
 
 bool ShapePainter::remove(const Id &id)
 {
-  const auto search = _id_index_map.find(id);
+  const auto search = _id_index_map.find(id.id());
   if (search != _id_index_map.end())
   {
     if (ShapeCache *cache = cacheForType(search->second.type))
@@ -168,7 +176,7 @@ bool ShapePainter::remove(const Id &id)
 
 bool ShapePainter::readShape(const Id &id, Magnum::Matrix4 &transform, Magnum::Color4 &colour) const
 {
-  const auto search = _id_index_map.find(id);
+  const auto search = _id_index_map.find(id.id());
   if (search != _id_index_map.end())
   {
     if (const ShapeCache *cache = cacheForType(search->second.type))
@@ -180,10 +188,10 @@ bool ShapePainter::readShape(const Id &id, Magnum::Matrix4 &transform, Magnum::C
 }
 
 
-bool ShapePainter::readChildShape(const ChildId &child_id, bool include_parent_transform, Magnum::Matrix4 &transform,
-                                  Magnum::Color4 &colour) const
+bool ShapePainter::readChildShape(const ChildId &child_id, bool include_parent_transform,
+                                  Magnum::Matrix4 &transform, Magnum::Color4 &colour) const
 {
-  const auto search = _id_index_map.find(child_id.shapeId());
+  const auto search = _id_index_map.find(child_id.shapeId().id());
   if (search != _id_index_map.end())
   {
     if (const ShapeCache *cache = cacheForType(search->second.type))
@@ -201,19 +209,21 @@ bool ShapePainter::readChildShape(const ChildId &child_id, bool include_parent_t
 
 
 void ShapePainter::drawOpaque(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                              const Magnum::Matrix4 &view_matrix)
+                              const Magnum::Matrix4 &view_matrix, const CategoryState &categories)
 {
-  _solid_cache->draw(stamp, projection_matrix, view_matrix);
-  _wireframe_cache->draw(stamp, projection_matrix, view_matrix);
+  _solid_cache->draw(stamp, projection_matrix, view_matrix, categories);
+  _wireframe_cache->draw(stamp, projection_matrix, view_matrix, categories);
 }
 
 
-void ShapePainter::drawTransparent(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                                   const Magnum::Matrix4 &view_matrix)
+void ShapePainter::drawTransparent(const FrameStamp &stamp,
+                                   const Magnum::Matrix4 &projection_matrix,
+                                   const Magnum::Matrix4 &view_matrix,
+                                   const CategoryState &categories)
 {
   Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha,
                                          Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
-  _transparent_cache->draw(stamp, projection_matrix, view_matrix);
+  _transparent_cache->draw(stamp, projection_matrix, view_matrix, categories);
   Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::One,
                                          Magnum::GL::Renderer::BlendFunction::Zero);
 }
@@ -227,7 +237,7 @@ void ShapePainter::commit()
 
   for (auto id : _pending_removal)
   {
-    const auto search = _id_index_map.find(id);
+    const auto search = _id_index_map.find(id.id());
     if (search != _id_index_map.end())
     {
       _id_index_map.erase(search);

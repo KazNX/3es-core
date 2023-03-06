@@ -15,7 +15,7 @@
 namespace tes::view::ui
 {
 SettingsView::SettingsView(Viewer &viewer)
-  : Panel(viewer)
+  : TreeView(viewer)
 {}
 
 
@@ -79,7 +79,7 @@ void SettingsView::draw(Magnum::ImGuiIntegration::Context &ui)
 
 bool SettingsView::show(unsigned idx, settings::Camera &config)
 {
-  const bool open = beginSection(idx, "Camera");
+  const bool open = beginBranch(idx, "Camera");
   bool dirty = false;
 
   if (open)
@@ -92,7 +92,7 @@ bool SettingsView::show(unsigned idx, settings::Camera &config)
     dirty = showProperty(idx++, config.fov) || dirty;
   }
 
-  endSection(open);
+  endBranch(open);
 
   return dirty;
 }
@@ -100,7 +100,7 @@ bool SettingsView::show(unsigned idx, settings::Camera &config)
 
 bool SettingsView::show(unsigned idx, settings::Log &config)
 {
-  const bool open = beginSection(idx, "Log");
+  const bool open = beginBranch(idx, "Log");
   bool dirty = false;
 
   if (open)
@@ -109,7 +109,7 @@ bool SettingsView::show(unsigned idx, settings::Log &config)
     dirty = showProperty(idx++, config.log_window_size) || dirty;
   }
 
-  endSection(open);
+  endBranch(open);
 
   return dirty;
 }
@@ -117,7 +117,7 @@ bool SettingsView::show(unsigned idx, settings::Log &config)
 
 bool SettingsView::show(unsigned idx, settings::Playback &config)
 {
-  const bool open = beginSection(idx, "Playback");
+  const bool open = beginBranch(idx, "Playback");
   bool dirty = false;
 
   if (open)
@@ -132,7 +132,7 @@ bool SettingsView::show(unsigned idx, settings::Playback &config)
     dirty = showProperty(idx++, config.pause_on_error) || dirty;
   }
 
-  endSection(open);
+  endBranch(open);
 
   return dirty;
 }
@@ -140,7 +140,7 @@ bool SettingsView::show(unsigned idx, settings::Playback &config)
 
 bool SettingsView::show(unsigned idx, settings::Render &config)
 {
-  const bool open = beginSection(idx, "Render");
+  const bool open = beginBranch(idx, "Render");
   bool dirty = false;
 
   if (open)
@@ -154,7 +154,7 @@ bool SettingsView::show(unsigned idx, settings::Render &config)
     dirty = showProperty(idx++, config.background_colour) || dirty;
   }
 
-  endSection(open);
+  endBranch(open);
 
   return dirty;
 }
@@ -162,77 +162,77 @@ bool SettingsView::show(unsigned idx, settings::Render &config)
 
 bool SettingsView::showProperty(unsigned idx, settings::Bool &prop)
 {
-  beginProperty(idx, prop.label(), prop.tip());
+  beginLeaf(idx, prop.label(), prop.tip());
   bool value = prop.value();
   const auto dirty = ImGui::Checkbox(prop.label().c_str(), &value);
   if (dirty)
   {
     prop.setValue(value);
   }
-  endProperty();
+  endLeaf();
   return dirty;
 }
 
 
 bool SettingsView::showProperty(unsigned idx, settings::Int &prop)
 {
-  beginProperty(idx, prop.label(), prop.tip());
+  beginLeaf(idx, prop.label(), prop.tip());
   int value = prop.value();
   const bool dirty = ImGui::InputInt(prop.label().c_str(), &value);
   if (dirty)
   {
     prop.setValue(value);
   }
-  endProperty();
+  endLeaf();
   return dirty;
 }
 
 
 bool SettingsView::showProperty(unsigned idx, settings::UInt &prop)
 {
-  beginProperty(idx, prop.label(), prop.tip());
+  beginLeaf(idx, prop.label(), prop.tip());
   unsigned value = prop.value();
   const bool dirty = ImGui::InputInt(prop.label().c_str(), reinterpret_cast<int *>(&value));
   if (dirty)
   {
     prop.setValue(value);
   }
-  endProperty();
+  endLeaf();
   return dirty;
 }
 
 
 bool SettingsView::showProperty(unsigned idx, settings::Float &prop)
 {
-  beginProperty(idx, prop.label(), prop.tip());
+  beginLeaf(idx, prop.label(), prop.tip());
   float value = prop.value();
   const bool dirty = ImGui::InputFloat(prop.label().c_str(), &value);
   if (dirty)
   {
     prop.setValue(value);
   }
-  endProperty();
+  endLeaf();
   return dirty;
 }
 
 
 bool SettingsView::showProperty(unsigned idx, settings::Double &prop)
 {
-  beginProperty(idx, prop.label(), prop.tip());
+  beginLeaf(idx, prop.label(), prop.tip());
   double value = prop.value();
   const bool dirty = ImGui::InputDouble(prop.label().c_str(), &value);
   if (dirty)
   {
     prop.setValue(value);
   }
-  endProperty();
+  endLeaf();
   return dirty;
 }
 
 
 bool SettingsView::showProperty(unsigned idx, settings::Colour &prop)
 {
-  beginProperty(idx, prop.label(), prop.tip());
+  beginLeaf(idx, prop.label(), prop.tip());
   auto value = prop.value();
   std::array<float, 3> rgb_f = { prop.value().rf(), prop.value().gf(), prop.value().bf() };
   const bool dirty = ImGui::ColorEdit3(prop.label().c_str(), rgb_f.data());
@@ -243,7 +243,7 @@ bool SettingsView::showProperty(unsigned idx, settings::Colour &prop)
     value.setBf(rgb_f[2]);
     prop.setValue(value);
   }
-  endProperty();
+  endLeaf();
   return dirty;
 }
 
@@ -251,7 +251,7 @@ bool SettingsView::showProperty(unsigned idx, settings::Colour &prop)
 template <typename E>
 bool SettingsView::showProperty(unsigned idx, settings::Enum<E> &prop)
 {
-  beginProperty(idx, prop.label(), prop.tip());
+  beginLeaf(idx, prop.label(), prop.tip());
   bool dirty = false;
   auto value = prop.value();
   if (ImGui::BeginCombo(prop.label().c_str(), prop.valueName().c_str()))
@@ -274,64 +274,7 @@ bool SettingsView::showProperty(unsigned idx, settings::Enum<E> &prop)
     }
   }
   ImGui::EndCombo();
-  endProperty();
+  endLeaf();
   return dirty;
-}
-
-
-bool SettingsView::beginSection(unsigned idx, const std::string &label)
-{
-  // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
-  ImGui::PushID(idx);
-  ImGui::TableNextRow();
-  ImGui::TableSetColumnIndex(0);
-  ImGui::AlignTextToFramePadding();
-  const bool node_open = ImGui::TreeNode(label.c_str());
-  ImGui::TableSetColumnIndex(1);
-  ImGui::Text(label.c_str());
-
-  return node_open;
-}
-
-
-void SettingsView::endSection(bool open)
-{
-  if (open)
-  {
-    ImGui::TreePop();
-  }
-  ImGui::PopID();
-}
-
-
-void SettingsView::beginProperty(unsigned idx, const std::string &label, const std::string &info)
-{
-  TES_UNUSED(info);
-  ImGui::PushID(idx);  // Use field index as identifier.
-  ImGui::TableNextRow();
-  ImGui::TableSetColumnIndex(0);
-  ImGui::AlignTextToFramePadding();
-  const ImGuiTreeNodeFlags flags =
-    ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet;
-  // We must give the tree node a name unique from the label as the label will be used for the child
-  // UI node.
-  const std::string tree_node_name = label + "_node";
-  ImGui::TreeNodeEx(tree_node_name.c_str(), flags);
-  if (ImGui::IsItemHovered())
-  {
-    ImGui::BeginTooltip();
-    ImGui::SetTooltip(info.c_str());
-    ImGui::EndTooltip();
-  }
-
-  ImGui::TableSetColumnIndex(1);
-  ImGui::SetNextItemWidth(-FLT_MIN);
-}
-
-
-void SettingsView::endProperty()
-{
-  ImGui::NextColumn();
-  ImGui::PopID();
 }
 }  // namespace tes::view::ui

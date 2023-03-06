@@ -11,13 +11,15 @@
 namespace tes::view::painter
 {
 Plane::Plane(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders)
-  : ShapePainter(std::move(culler), std::move(shaders), { Part{ solidMesh() } }, { Part{ wireframeMesh() } },
-                 { Part{ solidMesh() } }, ShapeCache::calcSphericalBounds)
+  : ShapePainter(std::move(culler), std::move(shaders), { Part{ solidMesh() } },
+                 { Part{ wireframeMesh() } }, { Part{ solidMesh() } },
+                 ShapeCache::calcSphericalBounds)
 {}
 
 Magnum::GL::Mesh Plane::solidMesh()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtTriangles, SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
+  static SimpleMesh build_mesh(0, 0, 0, DtTriangles,
+                               SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
   static std::mutex guard;
 
   std::unique_lock<std::mutex> lock(guard);
@@ -83,19 +85,19 @@ Magnum::GL::Mesh Plane::wireframeMesh()
 
 
 void Plane::drawOpaque(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                       const Magnum::Matrix4 &view_matrix)
+                       const Magnum::Matrix4 &view_matrix, const CategoryState &categories)
 {
   Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::FaceCulling);
-  ShapePainter::drawOpaque(stamp, projection_matrix, view_matrix);
+  ShapePainter::drawOpaque(stamp, projection_matrix, view_matrix, categories);
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::FaceCulling);
 }
 
 
 void Plane::drawTransparent(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                            const Magnum::Matrix4 &view_matrix)
+                            const Magnum::Matrix4 &view_matrix, const CategoryState &categories)
 {
   Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::FaceCulling);
-  ShapePainter::drawTransparent(stamp, projection_matrix, view_matrix);
+  ShapePainter::drawTransparent(stamp, projection_matrix, view_matrix, categories);
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::FaceCulling);
 }
 }  // namespace tes::view::painter

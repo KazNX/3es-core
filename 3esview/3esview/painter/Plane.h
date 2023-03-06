@@ -25,9 +25,10 @@ public:
   static Magnum::GL::Mesh wireframeMesh();
 
   void drawOpaque(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                  const Magnum::Matrix4 &view_matrix) override;
+                  const Magnum::Matrix4 &view_matrix, const CategoryState &categories) override;
   void drawTransparent(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                       const Magnum::Matrix4 &view_matrix) override;
+                       const Magnum::Matrix4 &view_matrix,
+                       const CategoryState &categories) override;
 
 private:
 };

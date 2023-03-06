@@ -33,11 +33,13 @@ class Shader;
 
 namespace tes::view::painter
 {
+class CategoryState;
+
 /// An instanced shape rendering cache.
 ///
-/// A shape cache is designed to rendering the same mesh/shape multiple times using instanced rendering, with each shape
-/// afforded a transformation matrix and a colour. A shape cache has the following components passed on construction to
-/// assist in preparation and rendering;
+/// A shape cache is designed to rendering the same mesh/shape multiple times using instanced
+/// rendering, with each shape afforded a transformation matrix and a colour. A shape cache has the
+/// following components passed on construction to assist in preparation and rendering;
 ///
 /// - a @c BoundsCuller (shared) for visibility determination
 /// - bounds calculation for each primitive to update bounds for the @c BoundsCuller
@@ -45,25 +47,28 @@ namespace tes::view::painter
 /// - a @c Shader to draw the mesh with (transferred ownership)
 /// - an optional mesh transformation applied to the @c Mesh
 ///
-/// Shapes are added using @c add() specifying the transform and colour for the shape instance. This in turn adds a new
-/// bounds entry in the @c BoundsCuller , calculated using @c calcBounds() . The cache draws all current shapes
-/// when @c draw() is called, using the cache's shader to draw it's mesh using instanced semantics.
+/// Shapes are added using @c add() specifying the transform and colour for the shape instance. This
+/// in turn adds a new bounds entry in the @c BoundsCuller , calculated using @c calcBounds() . The
+/// cache draws all current shapes when @c draw() is called, using the cache's shader to draw it's
+/// mesh using instanced semantics.
 ///
-/// When added, a shape is assigned an ID (ostensibly it's internal index), which can be used to @c update() or
-/// @c remove() the shape. Updating a shape recalculates the bounds. Removing a shape releases the shape bounds entry
-/// back to the @c BoundsCuller .
+/// When added, a shape is assigned an ID (ostensibly it's internal index), which can be used to @c
+/// update() or
+/// @c remove() the shape. Updating a shape recalculates the bounds. Removing a shape releases the
+/// shape bounds entry back to the @c BoundsCuller .
 ///
 /// Internally the cache maintains a free list which recycles IDs/indices in a LIFO order.
 ///
-/// Shapes may be added with a parent specified. Shapes with a parent use the parent transform in calculating their
-/// final transform and are visible so long as the parent is visible. @c endShape() should only be called for the parent
-/// shape and not for child shapes. Shape parenting primarily supports multi-shape specifications allowing shapes to be
-/// addressed collectively. The are added by first adding the parent shape and noting its index. Other shapes in the are
-/// added passing this index to the @c add() function. The parent shape forms the head of a linked list, with additional
-/// shapes inserted just after the parent shape.
+/// Shapes may be added with a parent specified. Shapes with a parent use the parent transform in
+/// calculating their final transform and are visible so long as the parent is visible. @c
+/// endShape() should only be called for the parent shape and not for child shapes. Shape parenting
+/// primarily supports multi-shape specifications allowing shapes to be addressed collectively. The
+/// are added by first adding the parent shape and noting its index. Other shapes in the are added
+/// passing this index to the @c add() function. The parent shape forms the head of a linked list,
+/// with additional shapes inserted just after the parent shape.
 ///
-/// Child shapes may have @c update() called, although the parent transform always affects the child transform.
-/// Shape chains are removed collectively by specifying the parent shape.
+/// Child shapes may have @c update() called, although the parent transform always affects the child
+/// transform. Shape chains are removed collectively by specifying the parent shape.
 class TES_VIEWER_API ShapeCache
 {
   struct Shape;
@@ -71,9 +76,9 @@ class TES_VIEWER_API ShapeCache
 public:
   /// Helper function used to implement @c calcBounds() for the cached shape type.
   ///
-  /// The calculation must vary depending on the shape type. For spheres, for example, the bounds are constant and the
-  /// default implementation is used, where the @p transform scale is mapped to @p halfExtents . Other shapes need
-  /// to consider the effects of rotation.
+  /// The calculation must vary depending on the shape type. For spheres, for example, the bounds
+  /// are constant and the default implementation is used, where the @p transform scale is mapped to
+  /// @p halfExtents . Other shapes need to consider the effects of rotation.
   ///
   /// @param transform The shape transformation matrix.
   /// @param[out] bounds Set to the calculated bounds axis aligned box.
@@ -99,7 +104,8 @@ public:
     // Internal use.
     /// Internal: Marks a shape as pending "creation" after the next @c commit().
     Pending = 1u << 8u,
-    /// Internal: Marks a shape as pending an update, changing it's shape properties on the next @c commit().
+    /// Internal: Marks a shape as pending an update, changing it's shape properties on the next @c
+    /// commit().
     Dirty = 1u << 9u
   };
 
@@ -114,8 +120,8 @@ public:
 
   /// A mesh and transform part for use with the @c ShapeCache .
   ///
-  /// A @c ShapeCache can have one or more @c Part objects to render. Each mesh is rendered by first applying an
-  /// instance transform, then the @c Part::transform then the projection matrix thusly;
+  /// A @c ShapeCache can have one or more @c Part objects to render. Each mesh is rendered by first
+  /// applying an instance transform, then the @c Part::transform then the projection matrix thusly;
   ///
   /// @code{.unparsed}
   ///   transform = projection_matrix * part.transform * instance_transform;
@@ -151,7 +157,8 @@ public:
   };
 
 
-  /// The default implementation of a @c BoundsCalculator , calculating a spherical bounds, unaffected by rotation.
+  /// The default implementation of a @c BoundsCalculator , calculating a spherical bounds,
+  /// unaffected by rotation.
   /// @param transform The shape transformation matrix.
   /// @param[out] centre Set to the bounds centre.
   /// @param[out] halfExtents Set to the bounds half extents vector.
@@ -163,13 +170,15 @@ public:
   /// @param length Cylindrical length.
   /// @param[out] centre Set to the bounds centre.
   /// @param[out] halfExtents Set to the bounds half extents vector.
-  static void calcCylindricalBounds(const Magnum::Matrix4 &transform, float radius, float length, Bounds &bounds);
+  static void calcCylindricalBounds(const Magnum::Matrix4 &transform, float radius, float length,
+                                    Bounds &bounds);
 
   /// Internal free list terminator value.
   static constexpr size_t kListEnd = util::kNullResource;
 
   /// @overload
-  ShapeCache(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::Shader> shader, const Part &part,
+  ShapeCache(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::Shader> shader,
+             const Part &part,
              BoundsCalculator bounds_calculator = ShapeCache::calcSphericalBounds);
 
   /// Construct a shape cache.
@@ -178,11 +187,13 @@ public:
   /// @param shader The shader used to draw the mesh.
   /// @param bounds_calculator Bounds calculation function.
   ShapeCache(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::Shader> shader,
-             const std::vector<Part> &parts, BoundsCalculator bounds_calculator = ShapeCache::calcSphericalBounds);
+             const std::vector<Part> &parts,
+             BoundsCalculator bounds_calculator = ShapeCache::calcSphericalBounds);
 
   /// @overload
   ShapeCache(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::Shader> shader,
-             std::initializer_list<Part> parts, BoundsCalculator bounds_calculator = ShapeCache::calcSphericalBounds);
+             std::initializer_list<Part> parts,
+             BoundsCalculator bounds_calculator = ShapeCache::calcSphericalBounds);
 
   /// Calculate the bounds for a shape instance with the given transform.
   /// @param transform The shape instance transformation matrix.
@@ -194,35 +205,41 @@ public:
 
   /// Set the bounds calculation function.
   /// @param bounds_calculator New bounds calculation function.
-  void setBoundsCalculator(BoundsCalculator bounds_calculator) { _bounds_calculator = std::move(bounds_calculator); }
+  void setBoundsCalculator(BoundsCalculator bounds_calculator)
+  {
+    _bounds_calculator = std::move(bounds_calculator);
+  }
 
   /// Get the active transform modifier. May be empty.
   /// @return The transform modifier function.
   const TransformModifier &transformModifier() const { return _transform_modifier; }
   /// Set the active transform modifier. May be empty.
   ///
-  /// Applied when finalising the render transform for a shape. The @c transform passed to the @p modifier will have
-  /// the parent transform included.
+  /// Applied when finalising the render transform for a shape. The @c transform passed to the @p
+  /// modifier will have the parent transform included.
   ///
   /// @param modifier The transform modifier function.
   void setTransformModifier(const TransformModifier &modifier) { _transform_modifier = modifier; }
 
-  /// Add a shape instance which persists over the specified @p window . Use an open window if the end frame is not yet
-  /// known.
+  /// Add a shape instance which persists over the specified @p window . Use an open window if the
+  /// end frame is not yet known.
   ///
   ///
-  /// @param shape_id The user ID for the shape. This is only kept as a user value, it is never used to address a shape
-  /// in the cache.
+  /// @param shape_id The user ID for the shape. This is only kept as a user value, it is never used
+  /// to address a shape in the cache.
   /// @param transform The shape instance transformation.
   /// @param colour The shape instance colour.
-  /// @param parent_rid Index of the parent shape whose transform also affects this shape. Use ~0u for no parent.
-  ///   Must be valid when specified - i.e., the parent must be added first and removed last. Specifying the parent
-  ///   index also forms a shape chain.
-  /// @param child_index When adding a child shape, this will be set to the index of the child in the parent (if not
+  /// @param parent_rid Index of the parent shape whose transform also affects this shape. Use ~0u
+  /// for no parent.
+  ///   Must be valid when specified - i.e., the parent must be added first and removed last.
+  ///   Specifying the parent index also forms a shape chain.
+  /// @param child_index When adding a child shape, this will be set to the index of the child in
+  /// the parent (if not
   ///   null). Behaviour is undefined when @p parent_rid is invalid.
   /// @return The shape ID/index. Must be used to @c remove() or @c update() the shape.
-  util::ResourceListId add(const tes::Id &shape_id, const Magnum::Matrix4 &transform, const Magnum::Color4 &colour,
-                           ShapeFlag flags = ShapeFlag::None, util::ResourceListId parent_rid = kListEnd,
+  util::ResourceListId add(const tes::Id &shape_id, const Magnum::Matrix4 &transform,
+                           const Magnum::Color4 &colour, ShapeFlag flags = ShapeFlag::None,
+                           util::ResourceListId parent_rid = kListEnd,
                            unsigned *child_index = nullptr);
   /// Mark a shape for removal on the next @c commit() .
   /// @param id Id of the shape to remove.
@@ -234,15 +251,16 @@ public:
   /// @param transform The shape instance transformation.
   /// @param colour The shape instance colour.
   /// @return True if the @p id was valid and an instance updated.
-  bool update(util::ResourceListId id, const Magnum::Matrix4 &transform, const Magnum::Color4 &colour);
+  bool update(util::ResourceListId id, const Magnum::Matrix4 &transform,
+              const Magnum::Color4 &colour);
 
   /// Get the details of an existing shape instance at the @c activeWindow().startFrame() .
   /// @param id Id of the shape to update.
   //// @param apply_parent_transform Apply parentage when retrieving the transform?
   /// @param[out] transform Set to the shape instance transformation.
   /// @param[out] colour Set to the shape instance colour.
-  /// @return True if the @p id was valid and an instance data retrieved. The out values are undefined when @p id is
-  /// invalid.
+  /// @return True if the @p id was valid and an instance data retrieved. The out values are
+  /// undefined when @p id is invalid.
   bool get(util::ResourceListId id, bool apply_parent_transform, Magnum::Matrix4 &transform,
            Magnum::Color4 &colour) const;
   /// @overload
@@ -257,7 +275,8 @@ public:
   ///
   /// @param parent_id The parent shape's resource Id.
   /// @param child_index The index of the child.
-  /// @return The resource id of the child shape, or @c util::kNullResource if the id arguments are invalid.
+  /// @return The resource id of the child shape, or @c util::kNullResource if the id arguments are
+  /// invalid.
   util::ResourceListId getChildId(util::ResourceListId parent_id, unsigned child_index) const;
 
   /// Expire all shapes which were viewable before, but not at @p before_frame .
@@ -266,21 +285,23 @@ public:
 
   /// Draw all shape instances considered visible by the @p render_mark .
   ///
-  /// Before calling this function, the @c BoundsCuller::cull() should be called with the same @p render_mark , which
-  /// ensure the bounds entries are marked as visibly for the @p render_mark .
+  /// Before calling this function, the @c BoundsCuller::cull() should be called with the same @p
+  /// render_mark , which ensure the bounds entries are marked as visibly for the @p render_mark .
   ///
-  /// @param stamp The frame stamp to draw shapes for.
+  /// @param stamp The frame stamp to 3 shapes for.
   /// @param projection_matrix View to projection matrix.
   /// @param projection_matrix World to view (inverse camera) matrix.
-  void draw(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix, const Magnum::Matrix4 &view_matrix);
+  /// @param categories Describes the active categories.
+  void draw(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
+            const Magnum::Matrix4 &view_matrix, const CategoryState &categories);
 
   /// Clear the shape cache, removing all shapes.
   ///
   /// @note Bounds are returned to the @c BoundsCuller iteratively.
   void clear();
 
-  /// Iterator for the shape cache. Iteration is read only and shows a proxy @c View for the shape, rather than
-  /// addressing the actual shape data.
+  /// Iterator for the shape cache. Iteration is read only and shows a proxy @c View for the shape,
+  /// rather than addressing the actual shape data.
   class TES_VIEWER_API const_iterator
   {
   public:
@@ -300,7 +321,8 @@ public:
     /// Iteration constructor
     /// @param cursor Initial iterator position
     /// @param end End iterator for the internal cache data.
-    const_iterator(util::ResourceList<Shape>::const_iterator &&cursor, util::ResourceList<Shape>::const_iterator &&end)
+    const_iterator(util::ResourceList<Shape>::const_iterator &&cursor,
+                   util::ResourceList<Shape>::const_iterator &&end)
       : _cursor(std::move(cursor))
       , _end(std::move(end))
     {}
@@ -390,12 +412,14 @@ private:
     ShapeFlag flags = ShapeFlag::None;
     /// The shape entry @c BoundsCuller entry ID.
     BoundsId bounds_id = ~0u;
-    /// Index of the "parent" shape. The parent shape transform also affects this shape's final transformation.
+    /// Index of the "parent" shape. The parent shape transform also affects this shape's final
+    /// transformation.
     util::ResourceListId parent_rid = kListEnd;
-    /// Shape list (linked list) next item ID. Used to link the free list when a shape is not in used. Used to specify
-    /// a multi-shape chain dependency for valid shapes. This value is @c kListEnd for the end of the
-    /// list.
-    /// @note Children appear in reverse order with the oldest at the end of the list, which is child "index" zero.
+    /// Shape list (linked list) next item ID. Used to link the free list when a shape is not in
+    /// used. Used to specify a multi-shape chain dependency for valid shapes. This value is @c
+    /// kListEnd for the end of the list.
+    /// @note Children appear in reverse order with the oldest at the end of the list, which is
+    /// child "index" zero.
     util::ResourceListId next = kListEnd;
     /// Number of children for a parent shape.
     unsigned child_count = 0;
@@ -421,7 +445,8 @@ private:
 
   void calcBoundsForShape(const Shape &child, Bounds &bounds) const;
 
-  /// Release a shape to the free list. This also releases the shape chain if this is the head of a chain.
+  /// Release a shape to the free list. This also releases the shape chain if this is the head of a
+  /// chain.
   ///
   /// Must only be called for the head of a shape chain, not the links.
   ///
@@ -430,10 +455,9 @@ private:
   bool release(util::ResourceListId id);
 
   /// Fill the @p InstanceBuffer objects in @c _instance_buffers .
-  /// @param frame_number The frame number to draw shapes for.
-  /// @param render_mark Visibility render mark used to determine shape instance visibility in the @c BoundsCuller .
-  void buildInstanceBuffers(const FrameStamp &stamp);
-
+  /// @param stamp The frame stamp to draw shapes for.
+  /// @param categories Describes the active categories.
+  void buildInstanceBuffers(const FrameStamp &stamp, const CategoryState &categories);
 
   /// The bounds culler used to determine visibility.
   std::shared_ptr<BoundsCuller> _culler;
@@ -441,11 +465,11 @@ private:
   util::ResourceList<Shape> _shapes;
   /// Mesh parts to render.
   std::vector<Part> _parts;
-  /// Transformation matrix applied to the shape before rendering. This allows the Magnum primitives to be transformed
-  /// to suit the 3rd Eye Scene rendering.
+  /// Transformation matrix applied to the shape before rendering. This allows the Magnum primitives
+  /// to be transformed to suit the 3rd Eye Scene rendering.
   std::vector<InstanceBuffer> _instance_buffers;
-  /// Buffer used to marshal active shape instances in @c buildInstanceBuffers() . The size of this array determines
-  /// the number of instances per @p InstanceBuffer .
+  /// Buffer used to marshal active shape instances in @c buildInstanceBuffers() . The size of this
+  /// array determines the number of instances per @p InstanceBuffer .
   std::array<ShapeInstance, 2048> _marshal_buffer;
   /// Shaper used to draw the shapes.
   std::shared_ptr<shaders::Shader> _shader;

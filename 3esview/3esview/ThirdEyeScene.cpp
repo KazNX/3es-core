@@ -191,6 +191,7 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
     }
   }
 
+  const auto categories = *_category_handler->categories();
   const DrawParams params(_camera, window_size);
   ++_render_stamp.render_mark;
 
@@ -208,7 +209,7 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
       .bind();
   }
 
-  drawPrimary(dt, params);
+  drawPrimary(dt, params, categories);
   //---------------------------------------------------------------------------
 
   //---------------------------------------------------------------------------
@@ -222,7 +223,7 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
   }
 
   updateFpsDisplay(dt, params);
-  drawSecondary(dt, params);
+  drawSecondary(dt, params, categories);
   //---------------------------------------------------------------------------
 }
 
@@ -443,9 +444,13 @@ void ThirdEyeScene::initialiseHandlers()
   _painters.emplace(SIdArrow, std::make_shared<painter::Arrow>(_culler, _shader_library));
   _painters.emplace(SIdPose, std::make_shared<painter::Pose>(_culler, _shader_library));
 
-  _ordered_message_handlers.emplace_back(std::make_shared<handler::Category>());
-  _camera_handler = std::make_shared<handler::Camera>();
-  _ordered_message_handlers.emplace_back(_camera_handler);
+  const auto category_handler = std::make_shared<handler::Category>();
+  _ordered_message_handlers.emplace_back(category_handler);
+  _category_handler = category_handler.get();
+
+  const auto camera_handler = std::make_shared<handler::Camera>();
+  _ordered_message_handlers.emplace_back(camera_handler);
+  _camera_handler = camera_handler.get();
 
   _ordered_message_handlers.emplace_back(
     std::make_shared<handler::Shape>(SIdSphere, "sphere", _painters[SIdSphere]));
@@ -511,34 +516,37 @@ void ThirdEyeScene::initialiseShaders()
 }
 
 
-void ThirdEyeScene::drawPrimary(float dt, const DrawParams &params)
+void ThirdEyeScene::drawPrimary(float dt, const DrawParams &params,
+                                const painter::CategoryState &categories)
 {
-  draw(dt, params, _main_draw_handlers);
+  draw(dt, params, categories, _main_draw_handlers);
 }
 
 
-void ThirdEyeScene::drawSecondary(float dt, const DrawParams &params)
+void ThirdEyeScene::drawSecondary(float dt, const DrawParams &params,
+                                  const painter::CategoryState &categories)
 {
-  draw(dt, params, _secondary_draw_handlers);
+  draw(dt, params, categories, _secondary_draw_handlers);
 }
 
 
 void ThirdEyeScene::draw(float dt, const DrawParams &params,
+                         const painter::CategoryState &categories,
                          const std::vector<std::shared_ptr<handler::Message>> &drawers)
 {
   (void)dt;
   // Draw opaque then transparent for proper blending.
   for (const auto &handler : drawers)
   {
-    handler->draw(handler::Message::DrawPass::Opaque, _render_stamp, params);
+    handler->draw(handler::Message::DrawPass::Opaque, _render_stamp, params, categories);
   }
   for (const auto &handler : drawers)
   {
-    handler->draw(handler::Message::DrawPass::Transparent, _render_stamp, params);
+    handler->draw(handler::Message::DrawPass::Transparent, _render_stamp, params, categories);
   }
   for (const auto &handler : drawers)
   {
-    handler->draw(handler::Message::DrawPass::Overlay, _render_stamp, params);
+    handler->draw(handler::Message::DrawPass::Overlay, _render_stamp, params, categories);
   }
 }
 

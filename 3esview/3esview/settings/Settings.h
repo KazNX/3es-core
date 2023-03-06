@@ -7,6 +7,7 @@
 #include <3esview/ViewConfig.h>
 
 #include "Camera.h"
+#include "Connection.h"
 #include "Log.h"
 #include "Playback.h"
 #include "Render.h"
@@ -28,12 +29,7 @@ public:
     Log log;
     Playback playback;
     Render render;
-
-    Config() = default;
-    Config(const Config &other) = default;
-    Config(Config &&other) = default;
-    Config &operator=(const Config &other) = default;
-    Config &operator=(Config &&other) = default;
+    Connection connection;
   };
 
   enum class Category : unsigned
@@ -42,6 +38,7 @@ public:
     Log,
     Playback,
     Render,
+    Connection,
 
     Count,
     Invalid = Count
@@ -55,6 +52,7 @@ public:
   void update(const Log &config);
   void update(const Playback &config);
   void update(const Render &config);
+  void update(const Connection &config);
 
   void addObserver(NotifyCallback callback);
   void addObserver(Category category, NotifyCallback callback);
