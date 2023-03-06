@@ -152,9 +152,9 @@ private:
   template <typename T>
   size_t pack(size_t index, const T &arg)
   {
-    if (_args.size() < index + 1)
+    while (_args.size() < index + 1)
     {
-      _args.resize(index + 1);
+      _args.emplace_back(std::any());
     }
     _args[index] = arg;
     return index + 1;
@@ -170,12 +170,12 @@ private:
   template <typename T, typename... Types>
   size_t pack(size_t index, const T &arg, Types... args)
   {
-    if (_args.size() < index + 1)
+    while (_args.size() < index + 1)
     {
-      _args.resize(index + 1);
+      _args.emplace_back(std::any());
     }
     _args[index] = arg;
-    return pack(index + 1, &args...);
+    return pack(index + 1, args...);
   }
 
   /// Unpack argument at @p index into @p arg.
