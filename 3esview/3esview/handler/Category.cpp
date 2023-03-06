@@ -14,7 +14,9 @@ namespace tes::view::handler
 {
 Category::Category()
   : Message(MtCategory, "category")
-{}
+{
+  ensureRoot();
+}
 
 
 void Category::initialise()
@@ -24,6 +26,7 @@ void Category::reset()
 {
   std::lock_guard guard(_mutex);
   _categories.clear();
+  ensureRoot();
 }
 
 
@@ -123,6 +126,15 @@ void Category::serialise(Connection &out, ServerInfoMessage &info)
   if (!ok)
   {
     log::error("Category serialisation failed.");
+  }
+}
+
+
+void Category::ensureRoot()
+{
+  if (!_categories.has(0))
+  {
+    _categories.addCategory({ "root", 0, 0, true, true });
   }
 }
 }  // namespace tes::view::handler

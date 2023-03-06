@@ -62,7 +62,7 @@ void CategoriesView::drawNode(const painter::CategoryState &categories,
 
   for (const auto &[id, info] : categories.map())
   {
-    if (info.parent_id == cat_info.id)
+    if (info.parent_id == cat_info.id && info.parent_id != info.id)
     {
       children.emplace_back(&info);
     }

@@ -81,6 +81,9 @@ public:
   void serialise(Connection &out, ServerInfoMessage &info) override;
 
 private:
+  /// Ensure the root category is present and has a name.
+  void ensureRoot();
+
   mutable std::mutex _mutex;
   painter::CategoryState _categories;
   std::vector<painter::CategoryInfo> _pending;

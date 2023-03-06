@@ -38,6 +38,17 @@ void CategoryState::updateCategory(const CategoryInfo &info)
 }
 
 
+bool CategoryState::has(unsigned category) const
+{
+  const auto search = _category_map.find(category);
+  if (search != _category_map.end())
+  {
+    return true;
+  }
+  return false;
+}
+
+
 bool CategoryState::lookup(unsigned category, CategoryInfo &info) const
 {
   const auto search = _category_map.find(category);

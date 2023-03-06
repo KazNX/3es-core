@@ -56,6 +56,11 @@ public:
   /// @param info Category to add/update.
   void updateCategory(const CategoryInfo &info);
 
+  /// Check if the given category ID is present.
+  /// @param category The category ID.
+  /// @return True if the @p category id is valid.
+  [[nodiscard]] bool has(unsigned category) const;
+
   /// Retrieve information for a category.
   /// @param category The category ID.
   /// @param info The structure to update with info about @p category .

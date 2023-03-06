@@ -26,7 +26,8 @@ bool TreeView::beginBranch(unsigned idx, const std::string &label, bool draw_lab
   ImGui::TableNextRow();
   ImGui::TableSetColumnIndex(0);
   ImGui::AlignTextToFramePadding();
-  const bool node_open = ImGui::TreeNode(label.c_str());
+  const auto id_str = label + "_branch";
+  const bool node_open = ImGui::TreeNode(id_str.c_str(), label.c_str());
   ImGui::TableSetColumnIndex(1);
   if (draw_label)
   {
