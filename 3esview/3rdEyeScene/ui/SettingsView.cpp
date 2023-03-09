@@ -15,19 +15,14 @@
 namespace tes::view::ui
 {
 SettingsView::SettingsView(Viewer &viewer)
-  : TreeView(viewer)
+  : TreeView("Settings", viewer)
 {}
 
 
-void SettingsView::draw(Magnum::ImGuiIntegration::Context &ui)
+void SettingsView::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
 {
   TES_UNUSED(ui);
-  if (!ImGui::Begin("Settings"))
-  {
-    ImGui::End();
-    return;
-  }
-
+  TES_UNUSED(window);
   auto config = _viewer.tes()->settings().config();
   if (ImGui::BeginTable("SettingsSplit", 2,
                         ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable))
@@ -72,8 +67,6 @@ void SettingsView::draw(Magnum::ImGuiIntegration::Context &ui)
 
     ImGui::EndTable();
   }
-
-  ImGui::End();
 }
 
 

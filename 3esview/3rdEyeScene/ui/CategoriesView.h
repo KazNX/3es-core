@@ -35,9 +35,9 @@ class CategoriesView : public TreeView
 public:
   CategoriesView(Viewer &viewer);
 
-  void draw(Magnum::ImGuiIntegration::Context &ui) override;
-
 private:
+  void drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window) override;
+
   void drawNode(const painter::CategoryState &categories, const painter::CategoryInfo &cat_info);
   void drawBranch(const painter::CategoryState &categories, const painter::CategoryInfo &cat_info,
                   const std::vector<const painter::CategoryInfo *> &children);

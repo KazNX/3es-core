@@ -14,8 +14,8 @@
 
 namespace tes::view::ui
 {
-TreeView::TreeView(Viewer &viewer)
-  : Panel(viewer)
+TreeView::TreeView(const std::string &name, Viewer &viewer, const PreferredCoordinates &preferred)
+  : Panel(name, viewer, preferred)
 {}
 
 

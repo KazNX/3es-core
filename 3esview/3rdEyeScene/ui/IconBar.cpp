@@ -27,8 +27,10 @@ namespace tes::view::ui
 {
 
 IconBar::IconBar(Viewer &viewer)
-  : Panel(viewer)
+  : Panel("Icon Bar", viewer)
 {
+  _preferred_coordinates.position = { { 0, 0 }, Anchor::TopLeft, true };
+  _preferred_coordinates.size = { { kPanelSize, -Playback::kPanelSize }, Stretch::Vertical, true };
   initialiseIcons();
 }
 
@@ -76,19 +78,32 @@ void IconBar::registerView(View view, std::shared_ptr<Panel> panel)
   {
     const auto view_idx = static_cast<unsigned>(view);
     _panels[view_idx] = panel;
+    panel->setPreferredCoordinates(viewCoordinates());
   }
 }
 
 
-void IconBar::draw(Magnum::ImGuiIntegration::Context &ui)
+Panel::PreferredCoordinates IconBar::viewCoordinates() const
+{
+  PreferredCoordinates coords = {};
+  coords.position.anchor = Anchor::TopLeft;
+  coords.position.coord.x() = _preferred_coordinates.size.extents.x();
+  coords.position.coord.y() = 0;
+  coords.position.in_use = true;
+
+  coords.size.stretch = Stretch::Horizontal | Stretch::Vertical;
+  coords.size.extents.x() = -coords.position.coord.x();
+  coords.size.extents.y() = -Playback::kPanelSize;
+  coords.size.in_use = true;
+
+  return coords;
+}
+
+
+void IconBar::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
 {
   TES_UNUSED(ui);
 
-  setNextWindowPos({ 0, 0 }, Anchor::TopLeft);
-  setNextWindowSize({ kPanelSize, -Playback::kPanelSize }, Stretch::Vertical);
-
-  ImGui::Begin("Icon Bar", nullptr,
-               ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
   const ImVec2 icon_size = { kButtonSize, kButtonSize };
   button({ &_icons[static_cast<unsigned>(View::Settings)], "Settings",
            _commands[static_cast<unsigned>(View::Settings)].get(), icon_size });
@@ -98,7 +113,7 @@ void IconBar::draw(Magnum::ImGuiIntegration::Context &ui)
            _commands[static_cast<unsigned>(View::Categories)].get(), icon_size });
   button({ &_icons[static_cast<unsigned>(View::Log)], "Log",
            _commands[static_cast<unsigned>(View::Log)].get(), icon_size });
-  ImGui::End();
+  window.end();
 
   if (_active_view != View::Invalid)
   {

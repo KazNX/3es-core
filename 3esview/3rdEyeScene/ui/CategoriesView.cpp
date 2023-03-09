@@ -14,19 +14,13 @@
 namespace tes::view::ui
 {
 CategoriesView::CategoriesView(Viewer &viewer)
-  : TreeView(viewer)
+  : TreeView("Categories", viewer)
 {}
 
 
-void CategoriesView::draw(Magnum::ImGuiIntegration::Context &ui)
+void CategoriesView::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
 {
   TES_UNUSED(ui);
-  if (!ImGui::Begin("Categories"))
-  {
-    ImGui::End();
-    return;
-  }
-
   if (!ImGui::BeginTable("CategoriesSplit", 2,
                          ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable))
   {
@@ -48,7 +42,7 @@ void CategoriesView::draw(Magnum::ImGuiIntegration::Context &ui)
   drawNode(categories, root_info);
 
   ImGui::EndTable();
-  ImGui::End();
+  window.end();
 
   effectChanges();
 }
@@ -93,10 +87,10 @@ void CategoriesView::drawBranch(const painter::CategoryState &categories,
     return;
   }
 
-  for (const auto child : children)
-  {
-    drawNode(categories, *child);
-  }
+    for (const auto child : children)
+    {
+      drawNode(categories, *child);
+    }
 }
 
 

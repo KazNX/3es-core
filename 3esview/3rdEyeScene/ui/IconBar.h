@@ -61,9 +61,10 @@ public:
   void registerCommand(View view, std::shared_ptr<tes::view::command::Command> command);
   void registerView(View view, std::shared_ptr<Panel> panel);
 
-  void draw(Magnum::ImGuiIntegration::Context &ui) override;
+  PreferredCoordinates viewCoordinates() const;
 
 private:
+  void drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window) override;
   void initialiseIcons();
 
   using ViewIcons = std::array<Magnum::GL::Texture2D, static_cast<unsigned>(View::Count)>;

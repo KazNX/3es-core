@@ -16,21 +16,17 @@
 namespace tes::view::ui
 {
 ConnectView::ConnectView(Viewer &viewer)
-  : Panel(viewer)
+  : Panel("Connect", viewer)
 {
   registerAction(Action::Connect, viewer.commands()->lookupName("openTcp").command);
   registerAction(Action::Disconnect, viewer.commands()->lookupName("close").command);
 }
 
 
-void ConnectView::draw(Magnum::ImGuiIntegration::Context &ui)
+void ConnectView::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
 {
   TES_UNUSED(ui);
-  if (!ImGui::Begin("Connect"))
-  {
-    ImGui::End();
-    return;
-  }
+  TES_UNUSED(window);
 
   std::copy(_host.begin(), _host.end(), _host_buffer.begin());
   _host_buffer[_host.length()] = '\0';
@@ -98,8 +94,6 @@ void ConnectView::draw(Magnum::ImGuiIntegration::Context &ui)
       updateHistory(connect_ip, connect_port);
     }
   }
-
-  ImGui::End();
 }
 
 

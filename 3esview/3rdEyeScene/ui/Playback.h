@@ -72,9 +72,9 @@ public:
     return {};
   }
 
-  void draw(Magnum::ImGuiIntegration::Context &ui) override;
-
 private:
+  void drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window);
+
   struct PlaybackButtonParams
   {
     /// The button action to represent. Determines the icon unless using @c icon_alias .

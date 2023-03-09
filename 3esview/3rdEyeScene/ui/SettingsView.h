@@ -32,9 +32,9 @@ class SettingsView : public TreeView
 public:
   SettingsView(Viewer &viewer);
 
-  void draw(Magnum::ImGuiIntegration::Context &ui) override;
-
 private:
+  void drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window) override;
+
   bool show(unsigned idx, settings::Camera &config);
   bool show(unsigned idx, settings::Log &config);
   bool show(unsigned idx, settings::Playback &config);

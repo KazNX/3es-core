@@ -30,9 +30,8 @@ class LogView : public Panel
 public:
   LogView(Viewer &viewer);
 
-  void draw(Magnum::ImGuiIntegration::Context &ui) override;
-
 private:
+  void drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window) override;
 };
 }  // namespace tes::view::ui
 

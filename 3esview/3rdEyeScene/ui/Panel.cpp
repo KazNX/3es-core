@@ -10,15 +10,10 @@
 
 namespace tes::view::ui
 {
-Magnum::Vector2i Panel::uiViewportSize() const
+Magnum::Vector2i Panel::PreferredCoordinates::Position::forView(
+  const Magnum::Vector2i &viewport_size) const
 {
-  return _viewer.windowSize() / _viewer.dpiScaling();
-}
-
-
-void Panel::setNextWindowPos(Magnum::Vector2i pos, Anchor anchor) const
-{
-  const auto viewport_size = uiViewportSize();
+  auto pos = coord;
   // Fix left/right adjustment
   switch (anchor)
   {
@@ -65,28 +60,43 @@ void Panel::setNextWindowPos(Magnum::Vector2i pos, Anchor anchor) const
     break;
   }
 
-  ImGui::SetNextWindowPos({ static_cast<float>(pos.x()), static_cast<float>(pos.y()) });
+  return pos;
 }
 
 
-void Panel::setNextWindowSize(Magnum::Vector2i size, Stretch stretch) const
+Magnum::Vector2i Panel::PreferredCoordinates::Size::forView(
+  const Magnum::Vector2i &viewport_size) const
 {
-  const auto viewport_size = uiViewportSize();
-  switch (stretch)
+  auto size = extents;
+  if ((stretch & Stretch::Horizontal) != Stretch::None)
   {
-  default:
-  case Stretch::None:
-    // No change
-    break;
-  case Stretch::Horizontal:
     size.x() += viewport_size.x();
-    break;
-  case Stretch::Vertical:
+  }
+  if ((stretch & Stretch::Vertical) != Stretch::None)
+  {
     size.y() += viewport_size.y();
-    break;
   }
 
-  ImGui::SetNextWindowSize({ static_cast<float>(size.x()), static_cast<float>(size.y()) });
+  return size;
+}
+
+
+void Panel::draw(Magnum::ImGuiIntegration::Context &ui)
+{
+  auto window = defineWindow(preferredCoordinates());
+  drawContent(ui, window);
+}
+
+
+Magnum::Vector2i Panel::uiViewportSize() const
+{
+  return _viewer.windowSize() / _viewer.dpiScaling();
+}
+
+
+Panel::Window Panel::defineWindow(const PreferredCoordinates &preferred_coordinates)
+{
+  return { name(), uiViewportSize(), preferred_coordinates };
 }
 
 

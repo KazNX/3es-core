@@ -63,9 +63,8 @@ public:
     return {};
   }
 
-  void draw(Magnum::ImGuiIntegration::Context &ui) override;
-
 private:
+  void drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window) override;
   void updateHistory(const std::string &host, uint16_t port);
 
   using ActionSet =

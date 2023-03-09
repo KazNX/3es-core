@@ -11,12 +11,13 @@
 namespace tes::view::ui
 {
 LogView::LogView(Viewer &viewer)
-  : Panel(viewer)
+  : Panel("Log", viewer)
 {}
 
 
-void LogView::draw(Magnum::ImGuiIntegration::Context &ui)
+void LogView::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
 {
   TES_UNUSED(ui);
+  TES_UNUSED(window);
 }
 }  // namespace tes::view::ui

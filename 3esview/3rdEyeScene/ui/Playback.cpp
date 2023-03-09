@@ -25,8 +25,11 @@ namespace tes::view::ui
 {
 
 Playback::Playback(Viewer &viewer)
-  : Panel(viewer)
+  : Panel("Playback", viewer)
 {
+  _preferred_coordinates.position = { { 0, -kPanelSize }, Anchor::BottomLeft, true };
+  _preferred_coordinates.size = { { 0, kPanelSize }, Stretch::Horizontal, true };
+
   initialiseIcons();
   registerAction(ui::Playback::Stop, viewer.commands()->lookupName("stop").command);
   registerAction(ui::Playback::Record, viewer.commands()->lookupName("record").command);
@@ -49,24 +52,14 @@ void Playback::registerAction(Action action, std::shared_ptr<command::Command> c
   }
 }
 
-void Playback::draw(Magnum::ImGuiIntegration::Context &ui)
+void Playback::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
 {
   TES_UNUSED(ui);
-
-  setNextWindowPos({ 0, -kPanelSize }, Anchor::BottomLeft);
-  setNextWindowSize({ 0, kPanelSize }, Stretch::Horizontal);
-  ImGui::Begin("Playback", nullptr,
-               ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-
+  TES_UNUSED(window);
 
   auto data_thread = _viewer.dataThread();
-
   drawButtons(data_thread.get());
   drawFrameSlider(data_thread.get());
-
-  auto pos = ImGui::GetWindowPos();
-
-  ImGui::End();
 }
 
 

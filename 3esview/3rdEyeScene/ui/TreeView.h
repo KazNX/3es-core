@@ -17,7 +17,7 @@ namespace tes::view::ui
 class TreeView : public Panel
 {
 public:
-  TreeView(Viewer &viewer);
+  TreeView(const std::string &name, Viewer &viewer, const PreferredCoordinates &preferred = {});
 
 protected:
   static bool beginBranch(unsigned idx, const std::string &label, bool draw_label = true);
