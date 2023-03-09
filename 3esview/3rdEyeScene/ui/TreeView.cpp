@@ -60,7 +60,7 @@ void TreeView::beginLeaf(unsigned idx, const std::string &label, const std::stri
   // We must give the tree node a name unique from the label as the label will be used for the child
   // UI node.
   const std::string tree_node_name = label + "_leaf";
-  ImGui::TreeNodeEx(tree_node_name.c_str(), flags);
+  ImGui::TreeNodeEx(tree_node_name.c_str(), flags, label.c_str());
   if (!info.empty() && ImGui::IsItemHovered())
   {
     ImGui::BeginTooltip();

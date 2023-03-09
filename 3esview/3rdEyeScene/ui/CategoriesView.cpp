@@ -80,17 +80,16 @@ void CategoriesView::drawBranch(const painter::CategoryState &categories,
   const bool open = beginBranch(cat_info.id, cat_info.name, false);
 
   drawCheckbox(cat_info);
-  endBranch(open);
 
-  if (!open)
+  if (open)
   {
-    return;
-  }
-
     for (const auto child : children)
     {
       drawNode(categories, *child);
     }
+  }
+
+  endBranch(open);
 }
 
 
