@@ -75,6 +75,7 @@ void Category::readMessage(PacketReader &reader)
       info.parent_id = msg.parent_id;
       info.default_active = msg.default_active != 0;
       info.active = info.default_active;
+      info.expanded = true;
       _pending.emplace_back(info);
     }
 
@@ -134,7 +135,7 @@ void Category::ensureRoot()
 {
   if (!_categories.has(0))
   {
-    _categories.addCategory({ "root", 0, 0, true, true });
+    _categories.addCategory({ "root", 0, 0, true, true, true });
   }
 }
 }  // namespace tes::view::handler

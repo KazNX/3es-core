@@ -19,17 +19,23 @@ TreeView::TreeView(const std::string &name, Viewer &viewer, const PreferredCoord
 {}
 
 
-bool TreeView::beginBranch(unsigned idx, const std::string &label, bool draw_label)
+bool TreeView::beginBranch(unsigned idx, const std::string &label, BranchFlag flags)
 {
   // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
   ImGui::PushID(idx);
   ImGui::TableNextRow();
   ImGui::TableSetColumnIndex(0);
   ImGui::AlignTextToFramePadding();
+
+  if ((flags & BranchFlag::ForceOpen) != BranchFlag::None)
+  {
+    ImGui::SetNextItemOpen(true);
+  }
+
   const auto id_str = label + "_branch";
   const bool node_open = ImGui::TreeNode(id_str.c_str(), label.c_str());
   ImGui::TableSetColumnIndex(1);
-  if (draw_label)
+  if ((flags & BranchFlag::DrawLabel) != BranchFlag::None)
   {
     ImGui::Text(label.c_str());
   }

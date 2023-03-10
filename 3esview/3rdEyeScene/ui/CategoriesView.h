@@ -46,7 +46,10 @@ private:
 
   void effectChanges();
 
-  std::vector<std::pair<unsigned, bool>> _changes;
+  /// Pending changes for the active state. Pair is `{category_id, active}`.
+  std::vector<std::pair<unsigned, bool>> _active_changes;
+  /// Pending changes for the tree view state. Pair is `{category_id, expanded}`.
+  std::vector<std::pair<unsigned, bool>> _view_changes;
 };
 }  // namespace tes::view::ui
 

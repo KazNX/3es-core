@@ -25,6 +25,8 @@ struct TES_VIEWER_API CategoryInfo
   bool default_active = false;
   /// Currently active?
   bool active = false;
+  /// Should be expanded in the UI view?
+  bool expanded = false;
 };
 
 /// Tracks and reflects the current state of the categories.
@@ -47,6 +49,16 @@ public:
   /// @param active True to activate.
   /// @return True if the @p category id is valid.
   bool setActive(unsigned category, bool active = true);
+
+  /// Check the view expended status for a category.
+  /// @param category The category ID to check.
+  /// @return True if the ID is valid and should be expanded in the UI view.
+  [[nodiscard]] bool isExpanded(unsigned category) const;
+  /// Set the expanded status for a category.
+  /// @param category The category ID to set.
+  /// @param expanded True to expand.
+  /// @return True if the @p category id is valid.
+  bool setExpanded(unsigned category, bool expanded = true);
 
   /// Add/update category info. This registers @p info using @p info.id .
   /// @param info The category details.
@@ -77,29 +89,6 @@ public:
 private:
   CategoryMap _category_map;
 };
-
-
-inline bool CategoryState::isActive(unsigned category) const
-{
-  const auto search = _category_map.find(category);
-  if (search == _category_map.end())
-  {
-    // Default to unknown being active.
-    return true;
-  }
-  // return search->second.active;
-  if (search->second.active)
-  {
-    // Possible active. Check parent.
-    const auto parent_id = search->second.parent_id;
-    if (parent_id == category)
-    {
-      return true;
-    }
-    return isActive(parent_id);
-  }
-  return false;
-}
 }  // namespace tes::view::painter
 
 #endif  // TES_VIEW_HANDLER_PAINTER_STATE_H

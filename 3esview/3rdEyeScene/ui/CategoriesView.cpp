@@ -30,7 +30,8 @@ void CategoriesView::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &
 
   // Get the categories.
   const auto categories = *viewer().tes()->categoryHandler().categories();
-  _changes.clear();
+  _active_changes.clear();
+  _view_changes.clear();
 
   // Start with the root node. Use default name if not present.
   painter::CategoryInfo root_info = {};
@@ -77,7 +78,8 @@ void CategoriesView::drawBranch(const painter::CategoryState &categories,
                                 const std::vector<const painter::CategoryInfo *> &children)
 {
   // Draw branch
-  const bool open = beginBranch(cat_info.id, cat_info.name, false);
+  const auto branch_flags = (cat_info.expanded) ? BranchFlag::ForceOpen : BranchFlag::None;
+  const bool open = beginBranch(cat_info.id, cat_info.name, branch_flags);
 
   drawCheckbox(cat_info);
 
@@ -90,6 +92,11 @@ void CategoriesView::drawBranch(const painter::CategoryState &categories,
   }
 
   endBranch(open);
+
+  if (open != cat_info.expanded)
+  {
+    _view_changes.emplace_back(cat_info.id, open);
+  }
 }
 
 
@@ -107,7 +114,7 @@ void CategoriesView::drawCheckbox(const painter::CategoryInfo &cat_info)
   const auto dirty = ImGui::Checkbox(cat_info.name.c_str(), &value);
   if (dirty)
   {
-    _changes.emplace_back(static_cast<unsigned>(cat_info.id), value);
+    _active_changes.emplace_back(static_cast<unsigned>(cat_info.id), value);
   }
 }
 
@@ -115,10 +122,15 @@ void CategoriesView::drawCheckbox(const painter::CategoryInfo &cat_info)
 void CategoriesView::effectChanges()
 {
   auto categories = viewer().tes()->categoryHandler().categories();
-  for (const auto &[id, activate] : _changes)
+  for (const auto &[id, activate] : _active_changes)
   {
     categories->setActive(id, activate);
   }
-  _changes.clear();
+  _active_changes.clear();
+  for (const auto &[id, expanded] : _view_changes)
+  {
+    categories->setExpanded(id, expanded);
+  }
+  _view_changes.clear();
 }
 }  // namespace tes::view::ui
