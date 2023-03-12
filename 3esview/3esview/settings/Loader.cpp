@@ -407,10 +407,6 @@ bool load(const ryml::NodeRef &node, Connection &connection)
         }
       }
     }
-    else
-    {
-      ok = false;
-    }
   }
 
   return ok;
