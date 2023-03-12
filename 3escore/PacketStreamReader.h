@@ -44,10 +44,24 @@ public:
     End,
   };
 
+  /// Return value for @c extractPacket() .
+  struct ExtractedPacket
+  {
+    /// A borrowed pointer to the extracted packet. Valid until the next @c extractPacket() call.
+    /// Null if there are no packets available.
+    const PacketHeader *header = nullptr;
+    /// Status indicator of the operation state.
+    Status status = Status::NoStream;
+    /// File position at which the @c header starts.
+    std::istream::pos_type pos = {};
+  };
+
   /// Default constructor. The resulting reader is invalid. Use @c setStream() to initialise.
   PacketStreamReader();
   /// Construct a stream reader for the given stream.
   /// @param stream The stream to read.
+  /// @todo It doens't make sense to use a @c std::shared_ptr to a @c std::istream . Convert to move
+  /// semantics.
   PacketStreamReader(std::shared_ptr<std::istream> stream);
   ~PacketStreamReader();
 
@@ -74,7 +88,7 @@ public:
   /// packet version for compatibility.
   ///
   /// @return The next packet or null on failure and a @c Status code.
-  std::pair<const PacketHeader *, Status> extractPacket();
+  ExtractedPacket extractPacket();
 
   /// Seek to the given stream position.
   ///
@@ -99,6 +113,7 @@ private:
   std::array<uint8_t, sizeof(tes::kPacketMarker)> _marker_bytes;
   std::vector<uint8_t> _buffer;
   size_t _chunk_size = 1024u;
+  std::istream::pos_type _current_packet_pos = {};
 };
 }  // namespace tes
 

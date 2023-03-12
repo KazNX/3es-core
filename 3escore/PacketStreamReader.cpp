@@ -21,6 +21,10 @@ PacketStreamReader::PacketStreamReader(std::shared_ptr<std::istream> stream)
   : PacketStreamReader()
 {
   _stream = std::move(stream);
+  if (_stream)
+  {
+    _current_packet_pos = _stream->tellg();
+  }
 }
 
 
@@ -31,14 +35,18 @@ void PacketStreamReader::setStream(std::shared_ptr<std::istream> stream)
 {
   std::swap(stream, _stream);
   _buffer.clear();
+  if (_stream)
+  {
+    _current_packet_pos = _stream->tellg();
+  }
 }
 
 
-std::pair<const PacketHeader *, PacketStreamReader::Status> PacketStreamReader::extractPacket()
+PacketStreamReader::ExtractedPacket PacketStreamReader::extractPacket()
 {
   if (!_stream)
   {
-    return { nullptr, Status::NoStream };
+    return { nullptr, Status::NoStream, 0 };
   }
 
   consume();
@@ -49,7 +57,7 @@ std::pair<const PacketHeader *, PacketStreamReader::Status> PacketStreamReader::
     if (readMore(_chunk_size - _buffer.size()) == 0)
     {
       // We have no data to read more.
-      return { nullptr, Status::End };
+      return { nullptr, Status::End, 0 };
     }
   }
 
@@ -73,7 +81,7 @@ std::pair<const PacketHeader *, PacketStreamReader::Status> PacketStreamReader::
         if (_buffer.size() < sizeof(PacketHeader))
         {
           // Can't read sufficient bytes. Abort.
-          return { nullptr, Status::Incomplete };
+          return { nullptr, Status::Incomplete, 0 };
         }
       }
 
@@ -86,17 +94,18 @@ std::pair<const PacketHeader *, PacketStreamReader::Status> PacketStreamReader::
         if (_buffer.size() < target_size)
         {
           // Failed to read enough.
-          return { nullptr, Status::Incomplete };
+          return { nullptr, Status::Incomplete, 0 };
         }
       }
 
       // We have our packet.
       // Mark to consume on next call.
-      return { reinterpret_cast<const PacketHeader *>(_buffer.data()), status };
+      return { reinterpret_cast<const PacketHeader *>(_buffer.data()), status,
+               _current_packet_pos };
     }
   }
 
-  return { nullptr, Status::Unavailable };
+  return { nullptr, Status::Unavailable, 0 };
 }
 
 
@@ -162,9 +171,11 @@ void PacketStreamReader::consume()
     return;
   }
 
-  auto target_size = calcExpectedSize();
+  const auto target_size = calcExpectedSize();
   if (_buffer.size() >= target_size)
   {
+    // Update cursor.
+    _current_packet_pos += _buffer.size() - target_size;
     // Consume.
     std::copy(_buffer.begin() + target_size, _buffer.end(), _buffer.begin());
     _buffer.resize(_buffer.size() - target_size);
