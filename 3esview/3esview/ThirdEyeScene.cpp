@@ -577,9 +577,18 @@ void ThirdEyeScene::onCameraConfigChange(const settings::Settings::Config &confi
 void ThirdEyeScene::restoreSettings()
 {
   settings::Settings::Config config = {};
-  if (settings::load(config))
+  const auto io_result = settings::load(config);
+  if (io_result.code != settings::IOCode::Error)
   {
+    if (!io_result.message.empty())
+    {
+      tes::log::info(io_result.message);
+    }
     _settings.update(config);
+  }
+  else if (!io_result.message.empty())
+  {
+    tes::log::warn(io_result.message);
   }
 }
 
@@ -587,6 +596,17 @@ void ThirdEyeScene::restoreSettings()
 void ThirdEyeScene::storeSettings()
 {
   const auto config = _settings.config();
-  settings::save(config);
+  const auto io_result = settings::save(config);
+  if (!io_result.message.empty())
+  {
+    if (io_result.code == settings::IOCode::Ok)
+    {
+      tes::log::info(io_result.message);
+    }
+    else
+    {
+      tes::log::warn(io_result.message);
+    }
+  }
 }
 }  // namespace tes::view
