@@ -1,14 +1,16 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PRIVATE_BASE_CONNECTION_H
-#define TES_CORE_PRIVATE_BASE_CONNECTION_H
+#ifndef TES_CORE_BASE_CONNECTION_H
+#define TES_CORE_BASE_CONNECTION_H
 
-#include "../Server.h"
+#include "CoreConfig.h"
 
-#include <3escore/Connection.h>
-#include <3escore/Messages.h>
-#include <3escore/PacketWriter.h>
+#include "Server.h"
+
+#include "Connection.h"
+#include "Messages.h"
+#include "PacketWriter.h"
 
 #include <atomic>
 #include <list>
@@ -22,8 +24,6 @@ namespace tes
 class CollatedPacket;
 class Resource;
 class ResourcePacker;
-class TcpSocket;
-
 
 // Resource management:
 // - Reference count resources.
@@ -163,4 +163,4 @@ protected:
 };
 }  // namespace tes
 
-#endif  // TES_CORE_PRIVATE_BASE_CONNECTION_H
+#endif  // TES_CORE_BASE_CONNECTION_H

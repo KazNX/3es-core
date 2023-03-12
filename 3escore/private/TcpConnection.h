@@ -4,9 +4,9 @@
 #ifndef TES_CORE_PRIVATE_TCP_CONNECTION_H
 #define TES_CORE_PRIVATE_TCP_CONNECTION_H
 
-#include "../Server.h"
+#include <3escore/Server.h>
 
-#include "BaseConnection.h"
+#include <3escore/BaseConnection.h>
 
 #include <memory>
 

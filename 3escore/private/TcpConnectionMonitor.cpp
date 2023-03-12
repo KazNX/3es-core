@@ -3,11 +3,11 @@
 //
 #include "TcpConnectionMonitor.h"
 
-#include "FileConnection.h"
 #include "TcpConnection.h"
 #include "TcpServer.h"
 
 #include <3escore/CoreUtil.h>
+#include <3escore/FileConnection.h>
 #include <3escore/TcpListenSocket.h>
 #include <3escore/TcpSocket.h>
 

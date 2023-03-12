@@ -1,10 +1,12 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PRIVATE_FILE_CONNECTION_H
-#define TES_CORE_PRIVATE_FILE_CONNECTION_H
+#ifndef TES_CORE_FILE_CONNECTION_H
+#define TES_CORE_FILE_CONNECTION_H
 
-#include "../Server.h"
+#include "CoreConfig.h"
+
+#include "Server.h"
 
 #include "BaseConnection.h"
 
@@ -50,4 +52,4 @@ private:
 };
 }  // namespace tes
 
-#endif  // TES_CORE_PRIVATE_FILE_CONNECTION_H
+#endif  // TES_CORE_FILE_CONNECTION_H
