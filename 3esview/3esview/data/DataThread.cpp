@@ -6,7 +6,7 @@
 #include <3escore/Messages.h>
 #include <3escore/PacketReader.h>
 
-namespace tes::view
+namespace tes::view::data
 {
 DataThread::~DataThread() = default;
 

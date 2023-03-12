@@ -15,7 +15,10 @@
 
 namespace tes::view
 {
+namespace data
+{
 class DataThread;
+}  // namespace data
 namespace painter
 {
 class CategoryState;

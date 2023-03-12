@@ -31,7 +31,10 @@ class TcpSocket;
 namespace tes::view
 {
 class ThirdEyeScene;
+}  // namespace tes::view
 
+namespace tes::view::data
+{
 /// A @c DataThread implementation which reads and processes packets form a live network connection.
 class TES_VIEWER_API NetworkThread : public DataThread
 {
@@ -166,6 +169,6 @@ private:
   std::thread _thread;
   ServerInfoMessage _server_info = {};
 };
-}  // namespace tes::view
+}  // namespace tes::view::data
 
 #endif  // TES_VIEW_NETWORK_THREAD_H

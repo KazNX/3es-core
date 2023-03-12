@@ -14,7 +14,10 @@
 
 namespace tes::view
 {
+namespace data
+{
 class DataThread;
+}  // namespace data
 class ThirdEyeScene;
 /// An application harness for running a windowless viewer in the test environment.
 ///
@@ -55,13 +58,13 @@ public:
 
   /// Get the @c DataThread if any.
   /// @return The running @c DataThread.
-  const std::shared_ptr<DataThread> &dataThread() const
+  const std::shared_ptr<data::DataThread> &dataThread() const
   {
     std::scoped_lock guard(_mutex);
     return _data_thread;
   }
 
-  /// Open a 3es playback file using a @c StreamThread.
+  /// Open a 3es playback file using a @c data::StreamThread.
   ///
   /// Always closes the current @c dataThread() first.
   ///
@@ -69,7 +72,7 @@ public:
   /// @return True on success.
   bool open(const std::filesystem::path &path);
 
-  /// Make a 3es network connection using @c NetworkThread.
+  /// Make a 3es network connection using @c data::NetworkThread.
   ///
   /// Always closes the current @c dataThread() first.
   ///
@@ -141,7 +144,7 @@ private:
 
 private:
   std::shared_ptr<ThirdEyeScene> _tes;
-  std::shared_ptr<DataThread> _data_thread;
+  std::shared_ptr<data::DataThread> _data_thread;
   std::optional<Clock::time_point> _end_time;
   std::optional<FrameNumber> _quit_after_frames = 0;
   FrameFunction _frame_function = {};

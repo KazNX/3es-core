@@ -229,9 +229,8 @@ void MeshResource::readMessage(PacketReader &reader)
 }
 
 
-void MeshResource::serialise(Connection &out, ServerInfoMessage &info)
+void MeshResource::serialise(Connection &out)
 {
-  (void)info;
   const std::lock_guard guard(_resource_lock);
 
   for (auto &[id, resource] : _resources)

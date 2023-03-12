@@ -11,24 +11,25 @@
 namespace tes::view::util
 {
 using ResourceListId = size_t;
-/// A @c ResourceList marker value for null items. Internally used to identify the end of the free list or other linked
-/// list structures.
+/// A @c ResourceList marker value for null items. Internally used to identify the end of the free
+/// list or other linked list structures.
 inline constexpr ResourceListId kNullResource = ~ResourceListId(0u);
 /// A @c ResourceList marker value used for items which are currently allocated.
 inline constexpr ResourceListId kAllocatedResource = ~ResourceListId(0u) - 1;
 
-/// A resource list is a container which assigns items from it's internal buffer - resources - for external usage.
+/// A resource list is a container which assigns items from it's internal buffer - resources - for
+/// external usage.
 ///
-/// Such resource items may be released back to the @c ResourceList where they are added to a free item list and may
-/// be used in future resource assignments.
+/// Such resource items may be released back to the @c ResourceList where they are added to a free
+/// item list and may be used in future resource assignments.
 ///
-/// Resources are assigned by @c Id and such an id must be dereferenced every time a resource item is to be accessed.
-/// This is because allocating new resource may reallocate the internal buffer invalidating any resources currently held
-/// externally to this class.
+/// Resources are assigned by @c Id and such an id must be dereferenced every time a resource item
+/// is to be accessed. This is because allocating new resource may reallocate the internal buffer
+/// invalidating any resources currently held externally to this class.
 ///
-/// A @c ResourceRef can be used as a kind of resource lock which ensures the @c ResourceList cannot invalidate items.
-/// As such a @c ResourceRef must be short lived and no new resources can be assigned while at least one @c ResourceRef
-/// is held.
+/// A @c ResourceRef can be used as a kind of resource lock which ensures the @c ResourceList cannot
+/// invalidate items. As such a @c ResourceRef must be short lived and no new resources can be
+/// assigned while at least one @c ResourceRef is held.
 ///
 /// @tparam T The resource type.
 template <typename T>
@@ -43,11 +44,13 @@ public:
 
   /// Represents a transient reference to an item in the @c ResourceList .
   ///
-  /// @c ResourceRefBase objects are obtained via @c allocate() and @c Id indexing functions ensures that the resource
-  /// remains valid for the lifespan on the @c ResourceRefBase object. This includes locking the @c ResourceList for the
-  /// current thread, thus only one thread at a time can hold any @c ResourceRefBase objects at a time.
+  /// @c ResourceRefBase objects are obtained via @c allocate() and @c Id indexing functions ensures
+  /// that the resource remains valid for the lifespan on the @c ResourceRefBase object. This
+  /// includes locking the @c ResourceList for the current thread, thus only one thread at a time
+  /// can hold any @c ResourceRefBase objects at a time.
   ///
-  /// The resource should only be accessed using @c * and @c -> operators as these accessors remain valid even if
+  /// The resource should only be accessed using @c * and @c -> operators as these accessors remain
+  /// valid even if
   /// @c allocate() causes the resource list to reallocate.
   ///
   /// @note A @c ResourceList must outlive all its @c ResourceRefBase objects.
@@ -99,11 +102,13 @@ public:
       return *this;
     }
 
-    /// Check if this resource reference is valid. A valid reference has a valid @c Id and addresses a @c ResourceList .
+    /// Check if this resource reference is valid. A valid reference has a valid @c Id and addresses
+    /// a @c ResourceList .
     /// @return
     inline bool isValid() const
     {
-      return _resource_list != nullptr && _resource_list->_items[_id].next_free == kAllocatedResource;
+      return _resource_list != nullptr &&
+             _resource_list->_items[_id].next_free == kAllocatedResource;
     }
 
     /// Dereference the resource.
@@ -113,8 +118,8 @@ public:
     /// @return The references resource entry.
     inline const Item *operator->() const { return &_resource_list->_items[_id].resource; }
 
-    /// Get the resource entry @c Id . This can be stored in order to later access the resource via @c ResourceList
-    /// indexing functions.
+    /// Get the resource entry @c Id . This can be stored in order to later access the resource via
+    /// @c ResourceList indexing functions.
     /// @return The resource Id.
     inline Id id() const { return _id; }
 
@@ -242,11 +247,37 @@ public:
       }
     }
 
-    BaseIterator(const BaseIterator &other) = default;
-    BaseIterator(BaseIterator &&other) = default;
+    BaseIterator(const BaseIterator &other)
+      : BaseIterator(other._owner, other._id)
+    {}
+    BaseIterator(BaseIterator &&other)
+      : _owner(std::exchange(other._owner, nullptr))
+      , _id(std::exchange(other._id, kNullResource))
+    {}
 
-    BaseIterator &operator=(const BaseIterator &other) = default;
-    BaseIterator &operator=(BaseIterator &&other) = default;
+    BaseIterator &operator=(const BaseIterator &other)
+    {
+      if (this != &other)
+      {
+        if (_owner)
+        {
+          _owner->unlock();
+        }
+        _owner = other._owner;
+        _id = other._id;
+        if (_owner)
+        {
+          _owner->lock();
+        }
+      }
+      return *this;
+    }
+    BaseIterator &operator=(BaseIterator &&other)
+    {
+      _owner = std::exchange(other._owner, nullptr);
+      _id = std::exchange(other._id, kNullResource);
+      return *this;
+    }
 
     ResourceListT *owner() const { return _owner; }
     inline Id id() const { return _id; }
@@ -254,8 +285,8 @@ public:
   protected:
     void next()
     {
-      // Not happy with how clunky the next/prev implementations are. The compiler will probably sort it out, but it
-      // should be nicer.
+      // Not happy with how clunky the next/prev implementations are. The compiler will probably
+      // sort it out, but it should be nicer.
       if (_owner && _id != kNullResource && _id + 1 < _owner->_items.size())
       {
         do
@@ -280,8 +311,8 @@ public:
           --_id;
         } while (_id < _owner->_items.size() && _id != kNullResource &&
                  _owner->_items[_id].next_free != kAllocatedResource);
-        // Note: we let underflow deal with setting id to kNullResource as we reach the end of iteration. Let's assert
-        // that's valid though.
+        // Note: we let underflow deal with setting id to kNullResource as we reach the end of
+        // iteration. Let's assert that's valid though.
         static_assert(decltype(_id)(0) - decltype(_id)(1) == kNullResource);
       }
       else

@@ -13,7 +13,7 @@ namespace tes::view::settings
 struct Playback
 {
   Bool allow_key_frames = {
-    "Allow key frames", true, "Enable scene keyframes to cache frames during playback and stepping?"
+    "Allow key frames", false, "Enable scene keyframes to cache frames during playback and stepping?"
   };
   UInt keyframe_every_mib = {
     "Keyframe every MiB", 20, 1, 1024 * 1024,

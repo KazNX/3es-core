@@ -244,16 +244,7 @@ public:
   {
   public:
     /// An external view of a shape.
-    struct TES_VIEWER_API View
-    {
-      Id id;
-      /// The instance transformation matrix.
-      Magnum::Matrix4 transform = {};
-      /// The instance colour.
-      Magnum::Color4 colour = {};
-      /// Number of children this shape has.
-      unsigned child_count = 0;
-    };
+    using View = ShapeCache::const_iterator::View;
 
     /// Default constructor.
     const_iterator();
@@ -325,48 +316,35 @@ public:
 
     /// Dereference to a @c View.
     /// @return A @c View to the current item.
-    inline const View &operator*() const { return _view; }
+    inline const View &operator*() const { return *_cursor; }
     /// Dereference to a @c View.
     /// @return A @c View to the current item.
-    inline const View *operator->() const { return &_view; }
+    inline const View *operator->() const { return &*_cursor; }
 
     /// Get a @c View to the child at @p child_index.
     /// @param child_index The index of the child to retrieve.
     /// @return The child @c View.
     View getChild(unsigned child_index) const
     {
-      View view = {};
-      view.id = _view.id;
+      View view = *_cursor;
       view.child_count = 0;
       auto child_rid = _cache->getChildId(_cursor.rid(), child_index);
       if (child_rid != util::kNullResource)
       {
-        _cache->get(child_rid, false, view.transform, view.colour);
+        _cache->get(child_rid, false, view.attributes.transform, view.attributes.colour);
       }
       return view;
     }
 
   protected:
     /// Iterate to the next item.
-    void next()
-    {
-      ++_cursor;
-      if (_cursor != _end)
-      {
-        _view = { _cursor->id, _cursor->attributes.transform, _cursor->attributes.colour };
-      }
-      else
-      {
-        _view = {};
-      }
-    }
+    void next() { ++_cursor; }
 
   private:
     ShapeCache::const_iterator _cursor;
     ShapeCache::const_iterator _end;
     const ShapeCache *_cache = nullptr;
     Type _cache_type = Type::Solid;
-    View _view = {};
   };
 
   /// Begin iteration of the shapes of @p type.

@@ -33,7 +33,7 @@ public:
             const painter::CategoryState &categories) override;
 
   void readMessage(PacketReader &reader) override;
-  void serialise(Connection &out, ServerInfoMessage &info) override;
+  void serialise(Connection &out) override;
 
   /// Compose the object transform from the given object attributes.
   /// @param attrs Object attributes as read from the message payload.
@@ -63,6 +63,7 @@ private:
     bool double_precision = false;
   };
 
+  // std::mutex _data_mutex;
   std::shared_ptr<painter::ShapePainter> _painter;
   /// Map of multi-shape attributes. We need to use some of this information when unpacking the data
   /// messages.

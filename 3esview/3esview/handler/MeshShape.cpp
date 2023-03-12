@@ -181,15 +181,13 @@ void MeshShape::readMessage(PacketReader &reader)
 }
 
 
-void MeshShape::serialise(Connection &out, ServerInfoMessage &info)
+void MeshShape::serialise(Connection &out)
 {
-  (void)info;
-  info = _server_info;
-
-  const auto check = [](int error) {
-    if (error)
+  std::lock_guard guard(_shapes_mutex);
+  const auto check = [](int wrote) {
+    if (wrote < 0)
     {
-      log::error("Error code serialising mesh: ", error);
+      log::error("Error code serialising mesh: ", wrote);
     }
   };
 

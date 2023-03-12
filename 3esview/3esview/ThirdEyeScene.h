@@ -27,6 +27,7 @@
 #include <array>
 #include <chrono>
 #include <condition_variable>
+#include <filesystem>
 #include <memory>
 #include <optional>
 #include <thread>
@@ -159,6 +160,19 @@ public:
   /// @param packet
   void processMessage(PacketReader &packet);
 
+  /// Save a snapshot of the last displayed frame to @p path .
+  ///
+  /// The snapshot represents the current frame state, encoding all persistent shapes.
+  ///
+  /// This function is thread save in that it can be called from any thread. On the main thread,
+  /// this immediately saves the last frame. From other threads, it blocks that thread until the
+  /// main thread is able to save the snapshot after the next @c prepareFrame() .
+  ///
+  /// @param path The path to save the snapshot to.
+  /// @return A pair containing a boolean success indicator and the frame number which has been
+  /// saved.
+  std::pair<bool, FrameNumber> saveSnapshot(const std::filesystem::path &path);
+
   void createSampleShapes();
 
 private:
@@ -186,6 +200,14 @@ private:
   void updateFpsDisplay(float dt, const DrawParams &params);
 
   void onCameraConfigChange(const settings::Settings::Config &config);
+
+  /// Handle pending snapshot if waiting.
+  void handlePendingSnapshot();
+
+  /// Implements the detail of @c saveSnapshot() .
+  /// @param path The file path to save to.
+  /// @return True on success.
+  bool saveCurrentFrameSnapshot(const std::filesystem::path &path);
 
   void restoreSettings();
   void storeSettings();
@@ -219,6 +241,23 @@ private:
 
   ResetCallback _reset_callback;
 
+  enum class SnapshotState
+  {
+    None,
+    Waiting,
+    Success,
+    Failed
+  };
+
+  struct SnapshotWait
+  {
+    std::mutex mutex;
+    std::condition_variable signal;
+    std::filesystem::path path;
+    SnapshotState waiting = SnapshotState::None;
+    FrameNumber frame_number = 0;
+  };
+
   std::mutex _render_mutex;
   FrameNumber _new_frame = 0;
   ServerInfoMessage _server_info = {};
@@ -230,6 +269,7 @@ private:
   unsigned _reset_marker = 0;
 
   std::thread::id _main_thread_id;
+  SnapshotWait _snapshot_wait;
 
   FramesPerSecondWindow _fps;
 

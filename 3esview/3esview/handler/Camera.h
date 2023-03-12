@@ -42,7 +42,7 @@ public:
   void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
             const painter::CategoryState &categories) override;
   void readMessage(PacketReader &reader) override;
-  void serialise(Connection &out, ServerInfoMessage &info) override;
+  void serialise(Connection &out) override;
 
   static void getWorldAxes(tes::CoordinateFrame frame, Magnum::Vector3 *side, Magnum::Vector3 *fwd,
                            Magnum::Vector3 *up);

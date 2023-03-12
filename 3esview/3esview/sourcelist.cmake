@@ -35,6 +35,7 @@ list(APPEND PUBLIC_HEADERS
   command/playback/StepForward.h
   command/playback/Stop.h
   data/DataThread.h
+  data/KeyframeStore.h
   data/NetworkThread.h
   data/StreamThread.h
   handler/Camera.h
@@ -114,6 +115,7 @@ list(APPEND SOURCES
   command/playback/StepForward.cpp
   command/playback/Stop.cpp
   data/DataThread.cpp
+  data/KeyframeStore.cpp
   data/NetworkThread.cpp
   data/StreamThread.cpp
   handler/Camera.cpp

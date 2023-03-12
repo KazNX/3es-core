@@ -15,7 +15,7 @@
 #include <memory>
 #include <optional>
 
-namespace tes::view
+namespace tes::view::data
 {
 class DataThread;
 }
@@ -101,8 +101,8 @@ private:
     PlaybackButtonParams &operator=(PlaybackButtonParams &&other) = default;
   };
 
-  void drawButtons(DataThread *data_thread);
-  void drawFrameSlider(DataThread *data_thread);
+  void drawButtons(data::DataThread *data_thread);
+  void drawFrameSlider(data::DataThread *data_thread);
 
   /// Draw a button associated with the given action.
   /// @param params Details of the button.

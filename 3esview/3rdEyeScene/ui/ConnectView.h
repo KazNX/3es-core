@@ -15,7 +15,7 @@
 #include <array>
 #include <memory>
 
-namespace tes::view
+namespace tes::view::data
 {
 class DataThread;
 }

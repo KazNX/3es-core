@@ -63,7 +63,7 @@ void Playback::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window
 }
 
 
-void Playback::drawButtons(DataThread *data_thread)
+void Playback::drawButtons(data::DataThread *data_thread)
 {
   // Layout playback buttons horizontally grouped.
   const auto button_row_size = kButtonSize + 8;
@@ -124,7 +124,7 @@ void Playback::drawButtons(DataThread *data_thread)
 }
 
 
-void Playback::drawFrameSlider(DataThread *data_thread)
+void Playback::drawFrameSlider(data::DataThread *data_thread)
 {
   int total_frames = 0;
   int current_frame = 0;

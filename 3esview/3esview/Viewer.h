@@ -25,7 +25,11 @@ class Edl;
 
 class EdlEffect;
 class FboEffect;
+
+namespace data
+{
 class DataThread;
+}  // namespace data
 
 class TES_VIEWER_API Viewer : public Magnum::Platform::Application
 {
@@ -41,7 +45,7 @@ public:
 
   [[nodiscard]] std::shared_ptr<ThirdEyeScene> tes() const { return _tes; }
 
-  [[nodiscard]] const std::shared_ptr<DataThread> &dataThread() const { return _data_thread; }
+  [[nodiscard]] const std::shared_ptr<data::DataThread> &dataThread() const { return _data_thread; }
   [[nodiscard]] std::shared_ptr<command::Set> commands() { return _commands; }
   [[nodiscard]] const std::shared_ptr<command::Set> &commands() const { return _commands; }
 
@@ -132,6 +136,10 @@ private:
   StartupMode parseStartupArgs(const Arguments &arguments, CommandLineOptions &opt);
   bool handleStartupArgs(const Arguments &arguments);
 
+  /// Update keyframes to the @c _data_thread if it's a @c StreamThread .
+  /// @param config New playback settings. Only keyframe settings are used.
+  void updateStreamThreadKeyframesConfig(const settings::Playback &config);
+
   struct KeyAxis
   {
     KeyEvent::Key key;
@@ -144,7 +152,7 @@ private:
   EdlParam _edl_tweak = EdlParam::LinearScale;
 
   std::shared_ptr<ThirdEyeScene> _tes;
-  std::shared_ptr<DataThread> _data_thread;
+  std::shared_ptr<data::DataThread> _data_thread;
   std::shared_ptr<command::Set> _commands;
 
   Clock::time_point _last_sim_time = Clock::now();

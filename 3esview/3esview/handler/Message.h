@@ -126,6 +126,10 @@ public:
   /// Called on all handlers whenever the server info changes.
   virtual void updateServerInfo(const ServerInfoMessage &info);
 
+  /// Query the current server info.
+  /// @return The current @c ServerInfoMessage .
+  inline ServerInfoMessage serverInfo() const { return _server_info; }
+
   /// Called from the main thread to prepare the next @c draw() calls following and @c endFrame()
   /// call.
   ///
@@ -183,17 +187,10 @@ public:
   /// @param reader The message data reader.
   virtual void readMessage(PacketReader &reader) = 0;
 
-  virtual inline void serialise(Connection &out)
-  {
-    ServerInfoMessage info = {};
-    serialise(out, info);
-  }
-
-  /// Serialise a snapshot of the renderable objects for the specified frame. Serialisation is
+  /// Serialise a snapshot of the renderable objects for the current frame. Serialisation is
   /// performed using the messages required to restore the current state.
   /// @param out Stream to write to.
-  /// @param[out] info Provides information about about the serialisation.
-  virtual void serialise(Connection &out, ServerInfoMessage &info) = 0;
+  virtual void serialise(Connection &out) = 0;
 
   static Magnum::Matrix4 composeTransform(const ObjectAttributes &attrs);
   static void decomposeTransform(const Magnum::Matrix4 &transform, ObjectAttributes &attrs);

@@ -46,7 +46,7 @@ bool TestViewer::open(const std::filesystem::path &path)
 
   std::scoped_lock guard(_mutex);
   _data_thread =
-    std::make_shared<StreamThread>(_tes, std::make_shared<std::ifstream>(std::move(file)));
+    std::make_shared<data::StreamThread>(_tes, std::make_shared<std::ifstream>(std::move(file)));
   // Do not allow looping in the windowless/test context.
   _data_thread->setLooping(false);
   return true;
@@ -58,7 +58,7 @@ bool TestViewer::connect(const std::string &host, uint16_t port)
   closeOrDisconnect();
   std::scoped_lock guard(_mutex);
   // Do not allow auto reconnect in the windowless/test context.
-  auto net_thread = std::make_shared<NetworkThread>(_tes, host, port, false);
+  auto net_thread = std::make_shared<data::NetworkThread>(_tes, host, port, false);
   _data_thread = net_thread;
   // Reconnection not allowed. Wait until the network thread has tried to connect...
   const auto start_time = std::chrono::steady_clock::now();

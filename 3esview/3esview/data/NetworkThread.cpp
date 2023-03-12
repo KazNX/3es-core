@@ -12,7 +12,7 @@
 #include <cinttypes>
 #include <vector>
 
-namespace tes::view
+namespace tes::view::data
 {
 NetworkThread::NetworkThread(std::shared_ptr<ThirdEyeScene> tes, const std::string &host,
                              uint16_t port, bool allow_reconnect)
@@ -213,4 +213,4 @@ void NetworkThread::processControlMessage(PacketReader &packet)
     break;
   }
 }
-}  // namespace tes::view
+}  // namespace tes::view::data
