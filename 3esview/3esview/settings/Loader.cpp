@@ -150,6 +150,12 @@ IOCode parse(const ryml::NodeRef &parent, const std::string &key, std::string &v
   }
 
   const auto key2 = ryml::csubstr(key.c_str(), key.size());
+  if (!parent.has_child(key2))
+  {
+    append(log) << "Missing node: " << key;
+    return IOCode::Partial;
+  }
+
   const auto node = parent[key2];
   if (node.empty())
   {
@@ -258,7 +264,14 @@ IOCode parse(const ryml::NodeRef &parent, Numeric<T> &value, std::ostream &log)
     return IOCode::Partial;
   }
 
+
   const auto key = ryml::csubstr(value.label().c_str(), value.label().size());
+  if (!parent.has_child(key))
+  {
+    append(log) << "Missing node: " << value.label();
+    return IOCode::Partial;
+  }
+
   const auto node = parent[key];
   if (node.empty())
   {
@@ -292,6 +305,12 @@ IOCode parse(const ryml::NodeRef &parent, Enum<E> &value, std::ostream &log)
   }
 
   const auto key = ryml::csubstr(value.label().c_str(), value.label().size());
+  if (!parent.has_child(key))
+  {
+    append(log) << "Missing node: " << value.label();
+    return IOCode::Partial;
+  }
+
   const auto node = parent[key];
   if (node.empty())
   {
