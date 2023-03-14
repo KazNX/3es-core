@@ -102,21 +102,31 @@ public:
   /// @return True if new keyframes are allowed.
   bool allowKeyframes() const;
 
-  /// Set the keyframe size interval. Keyframes are not allowed until both intervals have elapsed.
+  /// Set the keyframe size interval. Keyframes are taken when either interval elapses.
   /// @param interval_mib The number of MiB which must elapsed before a new keyframe is taken.
   void setKeyframeSizeInterval(size_t interval_mib);
 
   /// Get the keyframe size interval.
-  /// @return The size interval - MiB
+  /// @return The size interval between keyframes - MiB
   size_t keyframeSizeIntervalMiB() const;
 
-  /// Set the keyframe interval. Keyframes are not allowed until both intervals have elapsed.
-  /// @param interval The number of frames which must elapsed before a new keyframe is taken.
+  /// Set the keyframe interval. Keyframes are taken when either interval elapses.
+  /// @param interval The number of frames between keyframes.
   void setKeyframeInterval(FrameNumber interval);
 
   /// Set the keyframe interval.
-  /// @return interval The minimum number of frames between each keyframe.
+  /// @return The number of frames between each keyframe.
   FrameNumber keyframeInterval() const;
+
+  /// Set the minimum keyframe interval. Keyframes are not allowed unless at least this many frames
+  /// has elapsed. Then either the @c keyframeInterval() or the @c keyframeSizeIntervaMiB() can
+  /// trigger a keyframe..
+  /// @param interval The number of frames which must elapsed before a new keyframe is taken.
+  void setKeyframeMinimumInterval(FrameNumber interval);
+
+  /// Set the minimum keyframe interval.
+  /// @return interval The minimum number of frames between each keyframe.
+  FrameNumber keyframeMinimumInterval() const;
 
   /// Wait for this thread to finish.
   void join() override;
@@ -274,9 +284,11 @@ private:
     /// Keyframe storage
     std::unique_ptr<KeyframeStore> store;
     /// Data at which to make a new keyframe (MiB).
-    size_t size_interval_mib = 20;
+    size_t size_interval_mib = 20;  // NOLINT(readability-magic-numbers)
     /// Frame number interval at which to make keyframes.
-    FrameNumber frame_interval = 5;
+    FrameNumber frame_interval = 100;  // NOLINT(readability-magic-numbers)
+    /// Minimum number of frames between key frames..
+    FrameNumber frame_minimum_interval = 5;  // NOLINT(readability-magic-numbers)
     /// True if new keyfames are allowed.
     bool enabled = true;
   };

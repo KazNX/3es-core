@@ -134,6 +134,20 @@ FrameNumber StreamThread::keyframeInterval() const
 }
 
 
+void StreamThread::setKeyframeMinimumInterval(FrameNumber interval)
+{
+  const std::scoped_lock guard(_data_mutex);
+  _keyframes.frame_minimum_interval = interval;
+}
+
+
+FrameNumber StreamThread::keyframeMinimumInterval() const
+{
+  const std::scoped_lock guard(_data_mutex);
+  return _keyframes.frame_minimum_interval;
+}
+
+
 void StreamThread::join()
 {
   _quit_flag = true;
@@ -483,8 +497,9 @@ bool StreamThread::keyframeNeeded(FrameNumber frame_number,
 
   // Check size and frame intervals have elapsed.
   if (_keyframes.enabled &&
-      frame_number >= last_keyframe.frame_number + _keyframes.frame_interval &&
-      static_cast<size_t>(stream_position - last_keyframe.position) >= bytes_interval)
+      frame_number >= last_keyframe.frame_number + _keyframes.frame_minimum_interval &&
+      (frame_number >= last_keyframe.frame_number + _keyframes.frame_interval ||
+       static_cast<size_t>(stream_position - last_keyframe.position) >= bytes_interval))
   {
     // Time for a keyframe.
     return true;

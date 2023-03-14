@@ -433,7 +433,7 @@ IOCode load(const ryml::NodeRef &node, Playback &playback, std::ostream &log)
   code = mergeCode(parse(node, playback.allow_key_frames, log), code);
   code = mergeCode(parse(node, playback.keyframe_every_mib, log), code);
   code = mergeCode(parse(node, playback.keyframe_every_frames, log), code);
-  code = mergeCode(parse(node, playback.keyframe_skip_forward_frames, log), code);
+  code = mergeCode(parse(node, playback.keyframe_min_separation, log), code);
   code = mergeCode(parse(node, playback.keyframe_compression, log), code);
   code = mergeCode(parse(node, playback.looping, log), code);
   code = mergeCode(parse(node, playback.pause_on_error, log), code);
@@ -491,7 +491,7 @@ IOCode save(ryml::NodeRef &node, const Playback &playback, std::ostream &log)
   code = mergeCode(write(node, playback.allow_key_frames, log), code);
   code = mergeCode(write(node, playback.keyframe_every_mib, log), code);
   code = mergeCode(write(node, playback.keyframe_every_frames, log), code);
-  code = mergeCode(write(node, playback.keyframe_skip_forward_frames, log), code);
+  code = mergeCode(write(node, playback.keyframe_min_separation, log), code);
   code = mergeCode(write(node, playback.keyframe_compression, log), code);
   code = mergeCode(write(node, playback.looping, log), code);
   code = mergeCode(write(node, playback.pause_on_error, log), code);
