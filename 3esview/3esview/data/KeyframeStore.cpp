@@ -28,6 +28,17 @@ bool KeyframeStore::remove(FrameNumber keyframe_number)
   {
     return false;
   }
+  const auto keyframe = _keyframes[index];
+  // Delete the keyframe file.
+  try
+  {
+    std::filesystem::remove(keyframe.snapshot_path);
+  }
+  catch (std::filesystem::filesystem_error &)
+  {
+    // Ignore errors deleting files
+  }
+  // Remove the record.
   _keyframes.erase(_keyframes.begin() + index);
   return true;
 }
@@ -104,7 +115,7 @@ std::pair<size_t, bool> KeyframeStore::exactKeyframeIndex(FrameNumber target_fra
   {
     if (_keyframes[i].frame_number == target_frame)
     {
-      return { i - 1, true };
+      return { i, true };
     }
   }
 

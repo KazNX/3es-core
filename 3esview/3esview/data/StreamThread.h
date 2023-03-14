@@ -45,7 +45,7 @@ public:
   using Clock = std::chrono::steady_clock;
 
   StreamThread(std::shared_ptr<ThirdEyeScene> tes, std::shared_ptr<std::istream> stream);
-  ~StreamThread();
+  ~StreamThread() override;
 
   /// Reports whether the current stream is a live connection or a replay.
   ///
@@ -65,30 +65,26 @@ public:
   FrameNumber targetFrame() const override;
 
   /// Get the current frame number.
-  FrameNumber currentFrame() const override { return _currentFrame; }
+  FrameNumber currentFrame() const override { return _frame.current; }
 
-  FrameNumber totalFrames() const override
-  {
-    std::lock_guard guard(_data_mutex);
-    return _total_frames;
-  }
+  FrameNumber totalFrames() const override { return _frame.total; }
 
   void setLooping(bool loop) override;
   bool looping() const override;
 
-  void setPlaybackSpeed(float speed);
-  float playbackSpeed() const;
+  void setPlaybackSpeed(float speed) override;
+  float playbackSpeed() const override;
 
   /// Request the thread to quit. The thread may then be joined.
   void stop() override
   {
-    _quitFlag = true;
+    _quit_flag = true;
     unpause();
   }
 
   /// Check if a quit has been requested.
   /// @return True when a quit has been requested.
-  bool stopping() const { return _quitFlag; }
+  bool stopping() const { return _quit_flag; }
 
   /// Check if playback is paused.
   /// @return True if playback is paused.
@@ -138,7 +134,7 @@ protected:
   /// Thread entry point.
   void run();
 
-  void skipBack(FrameNumber targetFrame);
+  void skipBack(FrameNumber target_frame);
 
 public:
   /// Option flags for @c processPacket()
@@ -157,6 +153,9 @@ private:
   {
     /// An error has occurred
     Error,
+    /// We are at the end of a frame and the end frame packet was naked; not part of a collated
+    /// packet.
+    EndFrameNaked,
     /// We are at the end of a frame.
     EndFrame,
     /// We are in the middle of processing a frame.
@@ -206,7 +205,7 @@ private:
   /// - @c CIdFrame increments @p _currentFrame then calls @c ThirdEyeScene::updateToFrame() .
   /// - @c CIdCoordinateFrame updates @c _server_info then calls @c
   /// ThirdEyeScene::updateServerInfo() .
-  /// - @c CIdFrameCount updates @c _total_frames.
+  /// - @c CIdFrameCount updates @c _frame.total.
   /// - @c CIdForceFrameFlush calls @c ThirdEyeScene::updateToFrame() with the @p _currentFrame.
   /// - @c CIdReset resets the @c _currentFrame and calls @c ThirdEyeScene::reset() .
   /// - @c CIdKeyframe - NYI
@@ -220,7 +219,8 @@ private:
   /// Return values for @c checkTargetFrameState()
   enum class TargetFrameState
   {
-    NotSet,  ///< No target frame set
+    NotSet,        ///< No target frame set
+    KeyframeSkip,  ///< Need to skip to keyframe nearest the  target frame before checking again.
     Behind,  ///< Target frame is set and behind the current frame. Requires keyframe or file reset.
     Ahead,   ///< The target frame is ahead of the current frame.
     Reached  ///< Target frame has just been reached.
@@ -281,17 +281,30 @@ private:
     bool enabled = true;
   };
 
+  /// Tracks details about frame counts and targets.
+  struct FrameState
+  {
+    /// The current frame.
+    FrameNumberAtomic current = 0;
+    /// The total number of frames in the stream, if know. Zero when unknown.
+    FrameNumberAtomic total = 0;
+    /// The target frame we are trying to get to. Commited from @c _pending_target once that value
+    /// has been accepted.
+    std::optional<FrameNumber> target;
+    /// Pending value for @c target. We use a pending value as a kind of hysteresis against spamming
+    /// @c setTargetFrame() .
+    std::optional<FrameNumber> pending_target;
+    /// True whenever the @c current frame is catching up to the @c target frame.
+    bool catching_up = false;
+  };
+
   mutable std::mutex _data_mutex;
   std::condition_variable _notify;
-  std::atomic_bool _quitFlag;
+  FrameState _frame;
+  std::atomic_bool _quit_flag;
   std::atomic_bool _paused;
-  bool _catchingUp = false;
   bool _looping = false;
   float _playback_speed = 1.0f;
-  std::optional<FrameNumber> _target_frame;
-  FrameNumberAtomic _currentFrame = 0;
-  /// The total number of frames in the stream, if know. Zero when unknown.
-  FrameNumber _total_frames = 0;
   std::unique_ptr<PacketStreamReader> _stream_reader;
   /// The scene manager.
   std::shared_ptr<ThirdEyeScene> _tes;
