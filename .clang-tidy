@@ -1,6 +1,7 @@
 # Run clang tidy general analysis, excluding variable naming checks.
 ---
-# readability-identifier-length disabled since I could not get the ignore expressions working.
+# * readability-identifier-length disabled since I could not get the ignore expressions working.
+# * readability-simplify-boolean-expr there are good debugging reasons to keep expanded versions.
 Checks: >
   clang-diagnostic-*,
   clang-analyzer-*,
@@ -34,6 +35,7 @@ Checks: >
   -readability-implicit-bool-conversion,
   -readability-uppercase-literal-suffix,
   -readability-identifier-length,
+  -readability-simplify-boolean-expr,
   -hicpp-signed-bitwise
 WarningsAsErrors: ""
 HeaderFilterRegex: ".*"
