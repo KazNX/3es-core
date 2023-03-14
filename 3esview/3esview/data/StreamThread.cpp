@@ -210,6 +210,10 @@ void StreamThread::run()
       break;
     case TargetFrameState::KeyframeSkip: {
       // Try restore a keyframe.
+      // FIXME(KS): restoring a key frame can result in rendering preceeding frames during catch up.
+      // For now, this is left as is. One solution is to disable rendering during catch up. Another
+      // is to keep rendering the last frame as a 2D image. I somewhat prefer this as it keeps the
+      // UI responsive.
       skipToClosestKeyframe(target_frame);
       continue;
     }
