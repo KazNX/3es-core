@@ -13,6 +13,11 @@ namespace tes::view::ui
 Magnum::Vector2i Panel::PreferredCoordinates::Position::forView(
   const Magnum::Vector2i &viewport_size) const
 {
+  if (!in_use)
+  {
+    return { 0, 0 };
+  }
+
   auto pos = coord;
   // Fix left/right adjustment
   switch (anchor)
@@ -67,6 +72,11 @@ Magnum::Vector2i Panel::PreferredCoordinates::Position::forView(
 Magnum::Vector2i Panel::PreferredCoordinates::Size::forView(
   const Magnum::Vector2i &viewport_size) const
 {
+  if (!in_use)
+  {
+    return { 0, 0 };
+  }
+
   auto size = extents;
   if ((stretch & Stretch::Horizontal) != Stretch::None)
   {

@@ -12,6 +12,7 @@
 
 #include <Magnum/GL/Texture.h>
 
+#include <functional>
 #include <memory>
 
 namespace tes::view::command
@@ -150,21 +151,55 @@ protected:
       , size(size)
     {}
     ButtonParams(const ButtonParams &other) = default;
-    ButtonParams(ButtonParams &&other) = default;
+    ButtonParams(ButtonParams &&other) noexcept = default;
 
     ButtonParams &operator=(const ButtonParams &other) = default;
-    ButtonParams &operator=(ButtonParams &&other) = default;
+    ButtonParams &operator=(ButtonParams &&other) noexcept = default;
   };
 
-  struct Window
+  struct WindowBlock
   {
-    Magnum::Vector2i viewport_size;
-    const PreferredCoordinates *coords = nullptr;
+    void end()
+    {
+      if (_end)
+      {
+        _end();
+      }
+      _end = {};
+    }
+
+  protected:
+    WindowBlock(std::function<void()> end)
+      : _end(std::move(end))
+    {}
+
+    WindowBlock(WindowBlock &&other) noexcept
+      : _end(std::exchange(other._end, {}))
+    {}
+
+    WindowBlock(const WindowBlock &) = delete;
+
+    WindowBlock &operator=(WindowBlock &&other) noexcept
+    {
+      _end = std::exchange(other._end, _end);
+      return *this;
+    }
+
+    WindowBlock &operator=(const WindowBlock &) = delete;
+
+    ~WindowBlock() { end(); }
+
+    std::function<void()> _end;
+  };
+
+  struct Window : public WindowBlock
+  {
+    PreferredCoordinates coords = {};
 
     Window(const std::string &name, const Magnum::Vector2i &viewport_size,
            const PreferredCoordinates &coords)
-      : viewport_size(viewport_size)
-      , coords(&coords)
+      : WindowBlock(makeEnd())
+      , coords(coords)
     {
       if (coords.position.in_use)
       {
@@ -181,31 +216,65 @@ protected:
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
     }
 
-    Window(Window &&other)
-      : viewport_size(std::exchange(other.viewport_size, {}))
-      , coords(std::exchange(other.coords, nullptr))
-
+    Window(Window &&other) noexcept
+      : WindowBlock(std::move(other))
+      , coords(std::exchange(other.coords, {}))
     {}
     Window(const Window &other) = delete;
 
-    ~Window() { end(); }
+    ~Window() = default;
 
-    void end()
+    Window &operator=(Window &&other) noexcept
     {
-      if (coords)
-      {
-        ImGui::End();
-        coords = nullptr;
-      }
-    }
-
-    Window &operator=(Window &&other)
-    {
-      coords = std::exchange(other.coords, nullptr);
-      viewport_size = std::exchange(other.viewport_size, {});
+      WindowBlock::operator=(std::move(other));
+      coords = std::exchange(other.coords, coords);
       return *this;
     }
     Window &operator=(const Window &other) = delete;
+
+  protected:
+    static std::function<void()> makeEnd()
+    {
+      return []() { ImGui::End(); };
+    }
+  };
+
+  struct ChildWindow : public WindowBlock
+  {
+    PreferredCoordinates::Size preferred_size = {};
+
+    ChildWindow(const std::string &name, const Magnum::Vector2i &viewport_size,
+                const PreferredCoordinates::Size &preferred_size)
+      : WindowBlock(makeEnd())
+      , preferred_size(preferred_size)
+    {
+      const auto size = preferred_size.forView(viewport_size);
+      ImGui::BeginChild(name.c_str(),
+                        ImVec2{ static_cast<float>(size.x()), static_cast<float>(size.y()) });
+    }
+
+    ChildWindow(ChildWindow &&other) noexcept
+      : WindowBlock(std::move(other))
+      , preferred_size(std::exchange(other.preferred_size, {}))
+    {}
+
+    ChildWindow(const ChildWindow &other) = delete;
+
+    ~ChildWindow() = default;
+
+    ChildWindow &operator=(ChildWindow &&other) noexcept
+    {
+      WindowBlock::operator=(std::move(other));
+      preferred_size = std::exchange(other.preferred_size, preferred_size);
+      return *this;
+    }
+    ChildWindow &operator=(const ChildWindow &other) = delete;
+
+  protected:
+    static std::function<void()> makeEnd()
+    {
+      return []() { ImGui::EndChild(); };
+    }
   };
 
   /// Begin a new window and define it's size and position.

@@ -105,14 +105,28 @@ void IconBar::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
   TES_UNUSED(ui);
 
   const ImVec2 icon_size = { kButtonSize, kButtonSize };
-  button({ &_icons[static_cast<unsigned>(View::Settings)], "Settings",
-           _commands[static_cast<unsigned>(View::Settings)].get(), icon_size });
   button({ &_icons[static_cast<unsigned>(View::Connect)], "Connect",
            _commands[static_cast<unsigned>(View::Connect)].get(), icon_size });
   button({ &_icons[static_cast<unsigned>(View::Categories)], "Categories",
            _commands[static_cast<unsigned>(View::Categories)].get(), icon_size });
   button({ &_icons[static_cast<unsigned>(View::Log)], "Log",
            _commands[static_cast<unsigned>(View::Log)].get(), icon_size });
+
+  // Place the settings button at the bottom of the icon bar.
+  const auto viewport_size = uiViewportSize();
+  const auto available_size = ImGui::GetContentRegionAvail();
+  // Work out an approximate spacing between buttons.
+  const auto spacing =
+    3 * static_cast<int>(ImGui::GetFrameHeightWithSpacing() - ImGui::GetFrameHeight());
+  // Add a child window to stretch to fill space to the bottom of the window, allowing for the
+  // settings button.
+  ChildWindow child_window(
+    "IconBarSpacer", viewport_size,
+    { { 0, static_cast<int>(available_size.y) - (spacing + kButtonSize) }, Stretch::None, true });
+  child_window.end();
+
+  button({ &_icons[static_cast<unsigned>(View::Settings)], "Settings",
+           _commands[static_cast<unsigned>(View::Settings)].get(), icon_size });
   window.end();
 
   if (_active_view != View::Invalid)
