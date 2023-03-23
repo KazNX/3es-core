@@ -379,7 +379,7 @@ void Viewer::mouseMoveEvent(MouseMoveEvent &event)
 
 void Viewer::onReset()
 {
-  _active_remote_camera = handler::Camera::kInvalidCameraId;
+  _active_recorded_camera = handler::Camera::kInvalidCameraId;
 }
 
 
@@ -491,15 +491,16 @@ bool Viewer::checkEdlKeys(KeyEvent &event)
 
 void Viewer::updateCamera(float dt, bool allow_user_input)
 {
-  auto camera_handler = std::dynamic_pointer_cast<handler::Camera>(_tes->messageHandler(MtCamera));
-  if (camera_handler)
+  if (_active_recorded_camera != handler::Camera::kInvalidCameraId)
   {
-    if (_active_remote_camera != handler::Camera::kInvalidCameraId)
+    auto camera_handler =
+      std::dynamic_pointer_cast<handler::Camera>(_tes->messageHandler(MtCamera));
+    if (camera_handler)
     {
       const auto config = _tes->settings().config().camera;
       // Check camera handler for an active camera.
       camera::Camera remote_camera = {};
-      camera_handler->lookup(_active_remote_camera, remote_camera);
+      camera_handler->lookup(_active_recorded_camera, remote_camera);
       if (!config.allow_remote_settings.value())
       {
         // Don't allow remote camera settings. Keep the user settings.
@@ -508,8 +509,8 @@ void Viewer::updateCamera(float dt, bool allow_user_input)
         remote_camera.fov_horizontal_deg = _camera.fov_horizontal_deg;
       }
       _tes->setCamera(remote_camera);
-      allow_user_input = false;
     }
+    allow_user_input = false;
   }
 
   if (allow_user_input)

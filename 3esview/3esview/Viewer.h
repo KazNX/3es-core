@@ -57,6 +57,10 @@ public:
   void setContinuousSim(bool continuous);
   [[nodiscard]] bool continuousSim();
 
+  void setActiveCamera(handler::Camera::CameraId id) { _active_recorded_camera = id; }
+  void clearActiveCamera() { setActiveCamera(handler::Camera::kInvalidCameraId); }
+  [[nodiscard]] handler::Camera::CameraId activeCamera() const { return _active_recorded_camera; }
+
 protected:
   /// Return value for @c onDrawStart()
   enum class DrawMode
@@ -158,7 +162,9 @@ private:
   Clock::time_point _last_sim_time = Clock::now();
 
   camera::Camera _camera = {};
-  handler::Camera::CameraId _active_remote_camera = handler::Camera::kInvalidCameraId;
+  /// ID of the recorded camera to use the transform of.
+  /// This identifies one of the hander::Camera cameras.
+  handler::Camera::CameraId _active_recorded_camera = handler::Camera::kInvalidCameraId;
   camera::Fly _fly;
 
   bool _mouse_rotation_active = false;

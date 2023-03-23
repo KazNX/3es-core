@@ -118,12 +118,9 @@ void IconBar::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
   // Work out an approximate spacing between buttons.
   const auto spacing =
     3 * static_cast<int>(ImGui::GetFrameHeightWithSpacing() - ImGui::GetFrameHeight());
-  // Add a child window to stretch to fill space to the bottom of the window, allowing for the
-  // settings button.
-  ChildWindow child_window(
-    "IconBarSpacer", viewport_size,
-    { { 0, static_cast<int>(available_size.y) - (spacing + kButtonSize) }, Stretch::None, true });
-  child_window.end();
+  // Add a dummy to fill space to the bottom of the window, allowing for the settings button at the
+  // bottom of the icon bar.
+  ImGui::Dummy({ 0.0f, available_size.y - (spacing + kButtonSize) });
 
   button({ &_icons[static_cast<unsigned>(View::Settings)], "Settings",
            _commands[static_cast<unsigned>(View::Settings)].get(), icon_size });

@@ -22,6 +22,7 @@ list(APPEND PUBLIC_HEADERS
   command/DefaultCommands.h
   command/Set.h
   command/Shortcut.h
+  command/camera/SetCamera.h
   command/connection/Close.h
   command/connection/OpenFile.h
   command/connection/OpenTcp.h
@@ -102,6 +103,7 @@ list(APPEND SOURCES
   command/DefaultCommands.cpp
   command/Set.cpp
   command/Shortcut.cpp
+  command/camera/SetCamera.cpp
   command/connection/Close.cpp
   command/connection/OpenFile.cpp
   command/connection/OpenTcp.cpp

@@ -3,9 +3,10 @@
 //
 #include "UIViewer.h"
 
-#include "ui/IconBar.h"
 #include "ui/CategoriesView.h"
 #include "ui/ConnectView.h"
+#include "ui/Hud.h"
+#include "ui/IconBar.h"
 #include "ui/Playback.h"
 #include "ui/SettingsView.h"
 #include "ui/command/ToggleCategories.h"
@@ -148,6 +149,7 @@ void UIViewer::initialiseUi()
   initialiseImGui();
   initialisePlaybackUi();
   initialiseIconBarUi();
+  initialiseHud();
 }
 
 
@@ -166,6 +168,21 @@ void UIViewer::initialiseImGui()
       key = -1;
     }
   }
+}
+
+
+void UIViewer::initialiseHud()
+{
+  // Position the panel by stretching the available space, removing the icon bar and playback bar
+  // sizes.
+  const ui::Panel::PreferredCoordinates coords = {
+    { { ui::IconBar::kPanelSize, 0 }, ui::Panel::Anchor::TopLeft, true },
+    { { -ui::IconBar::kPanelSize, -ui::Playback::kPanelSize },
+      ui::Panel::Stretch::Horizontal | ui::Panel::Stretch::Vertical,
+      true }
+  };
+  const auto hud = std::make_shared<ui::Hud>(*this, coords);
+  _panels.emplace_back(hud);
 }
 
 

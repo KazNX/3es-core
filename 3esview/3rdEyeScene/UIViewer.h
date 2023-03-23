@@ -63,6 +63,7 @@ protected:
 private:
   void initialiseUi();
   void initialiseImGui();
+  void initialiseHud();
   void initialiseIconBarUi();
   void initialisePlaybackUi();
 

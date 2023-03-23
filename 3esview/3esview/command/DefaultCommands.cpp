@@ -5,6 +5,7 @@
 
 #include "Set.h"
 
+#include "camera/SetCamera.h"
 #include "connection/Close.h"
 #include "connection/OpenFile.h"
 #include "connection/OpenTcp.h"
@@ -24,6 +25,7 @@ namespace tes::view::command
 {
 void registerDefaultCommands(Set &commands)
 {
+  commands.registerCommand(std::make_shared<camera::SetCamera>());
   commands.registerCommand(std::make_shared<connection::Close>(), Shortcut("ctrl+shift+c"));
   commands.registerCommand(std::make_shared<connection::OpenFile>(), Shortcut("ctrl+o"));
   commands.registerCommand(std::make_shared<connection::OpenTcp>(), Shortcut("ctrl+c"));
