@@ -18,6 +18,7 @@ list(APPEND PUBLIC_HEADERS
   Exception.h
   Feature.h
   FileConnection.h
+  Finally.h
   IntArg.h
   Log.h
   Maths.h
