@@ -309,18 +309,20 @@ void ThirdEyeScene::handlePendingSnapshot()
 }
 
 
-std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(const std::filesystem::path &path)
+std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(const std::filesystem::path &path,
+                                                         std::function<bool()> cancel_snapshot)
 {
   // Note(KS): The server settings are irrelevant for a file connection. We can use teh default.
   // Arguably this implies the Connection constructor should be refactored.
   FileConnection out(path.string(), ServerSettings());
-  const auto result = saveSnapshot(out);
+  const auto result = saveSnapshot(out, cancel_snapshot);
   out.close();
   return result;
 }
 
 
-std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(tes::Connection &connection)
+std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(tes::Connection &connection,
+                                                         std::function<bool()> cancel_snapshot)
 {
   std::unique_lock guard(_snapshot_wait.mutex);
 
@@ -344,8 +346,14 @@ std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(tes::Connection &connec
   _snapshot_wait.waiting = SnapshotState::Waiting;
   while (_snapshot_wait.waiting == SnapshotState::Waiting)
   {
-    _snapshot_wait.signal.wait(
-      guard, [this]() { return _snapshot_wait.waiting != SnapshotState::Waiting; });
+    _snapshot_wait.signal.wait(guard, [this, &cancel_snapshot]() {
+      return cancel_snapshot() || _snapshot_wait.waiting != SnapshotState::Waiting;
+    });
+  }
+
+  if (cancel_snapshot())
+  {
+    return { false, 0 };
   }
 
   const bool ok = _snapshot_wait.waiting == SnapshotState::Success;

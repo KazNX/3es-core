@@ -295,7 +295,9 @@ void NetworkThread::recordFlush(float dt, const camera::Camera &camera)
     }
     else if (_record->status() == StreamRecorder::State::PendingSnapshot)
     {
-      const auto [success, _] = _tes->saveSnapshot(_record->connection());
+      // Make sure we fail the snapshot if a quit is requested to prevent a deadlock.
+      const auto [success, _] = _tes->saveSnapshot(
+        _record->connection(), [this]() { return static_cast<bool>(_quit_flag); });
       if (success)
       {
         _record->markSnapshot();

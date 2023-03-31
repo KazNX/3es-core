@@ -517,7 +517,9 @@ bool StreamThread::makeKeyframe(FrameNumber frame_number, std::istream::pos_type
   const auto keyframe_file = std::filesystem::temp_directory_path() /
                              (std::string("3es_keyframe_") + std::to_string(frame_number));
   // saveSnapshot() blocks until it can be serviced in a thread safe manner.
-  const auto [ok, saved_frame] = _tes->saveSnapshot(keyframe_file.string());
+  // Note we cancel if the _quit_flag is set to prevent deadlock.
+  const auto [ok, saved_frame] =
+    _tes->saveSnapshot(keyframe_file.string(), [this]() { return static_cast<bool>(_quit_flag); });
   if (ok)
   {
     log::info("Make keyframe ", frame_number, " at stream pos ", stream_position);

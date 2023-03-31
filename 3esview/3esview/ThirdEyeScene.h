@@ -183,14 +183,20 @@ public:
   /// main thread is able to save the snapshot after the next @c prepareFrame() .
   ///
   /// @param path The path to save the snapshot to.
+  /// @param cancel_snapshot Cancellation function. This should return true if the snapshot request
+  /// is cancelled by the requesting thread.
   /// @return A pair containing a boolean success indicator and the frame number which has been
   /// saved.
-  std::pair<bool, FrameNumber> saveSnapshot(const std::filesystem::path &path);
+  std::pair<bool, FrameNumber> saveSnapshot(const std::filesystem::path &path,
+                                            std::function<bool()> cancel_snapshot);
   /// This overload of @c saveSnapshot() writes the snapshot to the given @p connection.
   /// @param connection The connection to write to.
+  /// @param cancel_snapshot Cancellation function. This should return true if the snapshot request
+  /// is cancelled by the requesting thread.
   /// @return A pair containing a boolean success indicator and the frame number which has been
   /// saved.
-  std::pair<bool, FrameNumber> saveSnapshot(tes::Connection &connection);
+  std::pair<bool, FrameNumber> saveSnapshot(tes::Connection &connection,
+                                            std::function<bool()> cancel_snapshot);
 
   void createSampleShapes();
 
