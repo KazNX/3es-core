@@ -10,7 +10,7 @@ namespace Magnum
 namespace GL
 {
 class Framebuffer;
-}
+}  // namespace GL
 }  // namespace Magnum
 
 namespace tes::view
@@ -33,10 +33,11 @@ public:
   /// @param projection_type Identifies the type of projection.
   /// @param near_clip The near clip plane distance.
   /// @param far_clip The far clip plane distance.
-  virtual void prepareFrame(const Magnum::Matrix4 &projection_matrix, ProjectionType projection_type, float near_clip,
-                            float far_clip) = 0;
+  virtual void prepareFrame(const Magnum::Matrix4 &projection_matrix,
+                            ProjectionType projection_type, float near_clip, float far_clip) = 0;
 
-  /// Complete rendering of the frame. This must blit back to the active frame buffer, normally the default.
+  /// Complete rendering of the frame. This must blit back to the active frame buffer, normally the
+  /// default.
   virtual void completeFrame() = 0;
 
   /// Called when the viewport changes. Allows the frame buffer to resize if required.

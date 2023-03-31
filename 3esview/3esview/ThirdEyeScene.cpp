@@ -212,7 +212,7 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
   }
   else
   {
-    clearDefaultFbo();
+    bindFinalFrameBuffer();
   }
 
   drawPrimary(dt, params, categories);
@@ -222,15 +222,11 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
   // This section is not protected by the _render_mutex
   if (_active_fbo_effect)
   {
-    clearDefaultFbo();
-    // drawSecondary(dt, params, categories);
+    bindFinalFrameBuffer();
     _active_fbo_effect->completeFrame();
   }
-  // else
-  {
-    drawSecondary(dt, params, categories);
-  }
   //---------------------------------------------------------------------------
+  drawSecondary(dt, params, categories);
   updateFps(dt);
 }
 
@@ -597,7 +593,7 @@ void ThirdEyeScene::initialiseShaders()
 }
 
 
-void ThirdEyeScene::clearDefaultFbo()
+void ThirdEyeScene::bindFinalFrameBuffer()
 {
   Magnum::GL::defaultFramebuffer
     .clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth)

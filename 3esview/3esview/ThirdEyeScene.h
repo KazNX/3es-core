@@ -201,8 +201,8 @@ private:
   void initialiseHandlers();
   void initialiseShaders();
 
-  /// Clear the default frame buffer.
-  void clearDefaultFbo();
+  /// Bind and active the final frame buffer target.
+  void bindFinalFrameBuffer();
 
   /// Primary drawing pass. Draws _main_draw_handlers with the FBO effect active.
   /// @param dt Time since last render (seconds).
