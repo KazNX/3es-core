@@ -13,9 +13,3 @@ Advanced:
 - Consider interpolating transforms over render frames for smoother animation.
   - This would lag the viewer so it may be better to leave as is.
 - Don't render while catching up to a target frame.
-
-### Viewer bugs
-
-- Mouse camera control is broken since IMGui integration
-- Command shortcuts are broken since IMGui integration
-- Enabling the EDL shader breaks text rendering (since IMGui integration?)
