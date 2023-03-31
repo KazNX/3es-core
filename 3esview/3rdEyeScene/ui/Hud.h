@@ -38,6 +38,7 @@ public:
 private:
   void drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window);
   void drawCameraCombo();
+  void drawFps();
 
   std::weak_ptr<command::Command> _set_camera_command;
 };

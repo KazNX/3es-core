@@ -212,9 +212,7 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
   }
   else
   {
-    Magnum::GL::defaultFramebuffer
-      .clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth)
-      .bind();
+    clearDefaultFbo();
   }
 
   drawPrimary(dt, params, categories);
@@ -224,15 +222,16 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
   // This section is not protected by the _render_mutex
   if (_active_fbo_effect)
   {
-    Magnum::GL::defaultFramebuffer
-      .clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth)
-      .bind();
+    clearDefaultFbo();
+    // drawSecondary(dt, params, categories);
     _active_fbo_effect->completeFrame();
   }
-
-  updateFpsDisplay(dt, params);
-  drawSecondary(dt, params, categories);
+  // else
+  {
+    drawSecondary(dt, params, categories);
+  }
   //---------------------------------------------------------------------------
+  updateFps(dt);
 }
 
 
@@ -598,6 +597,14 @@ void ThirdEyeScene::initialiseShaders()
 }
 
 
+void ThirdEyeScene::clearDefaultFbo()
+{
+  Magnum::GL::defaultFramebuffer
+    .clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth)
+    .bind();
+}
+
+
 void ThirdEyeScene::drawPrimary(float dt, const DrawParams &params,
                                 const painter::CategoryState &categories)
 {
@@ -633,18 +640,10 @@ void ThirdEyeScene::draw(float dt, const DrawParams &params,
 }
 
 
-void ThirdEyeScene::updateFpsDisplay(float dt, const DrawParams &params)
+void ThirdEyeScene::updateFps(float dt)
 {
   // Update stats.
   _fps.push(dt);
-  // Calculate FPS.
-  const auto fps = _fps.fps();
-  // Render
-  // FIXME(KS): the transform should be adjusted to consider screen resolution and text size.
-  painter::Text::TextEntry fps_text = {};
-  fps_text.transform = Magnum::Matrix4::translation(Magnum::Vector3(0.01f, 0.015f, 0.0f));
-  fps_text.text = std::to_string(fps);
-  _text_painter->draw2D(fps_text, params);
 }
 
 

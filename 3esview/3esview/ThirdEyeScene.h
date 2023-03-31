@@ -124,6 +124,12 @@ public:
     return {};
   }
 
+  /// Query the current frame rate : frames per second.
+  [[nodiscard]] float fps() const { return _fps.fps(); }
+
+  /// Access the FPS window calculator.
+  [[nodiscard]] FramesPerSecondWindow fpsWindow() const { return _fps; }
+
   /// Reset the current state, clearing all the currently visible data.
   ///
   /// When called on the main thread, this immediately resets the message handlers. From other
@@ -195,6 +201,9 @@ private:
   void initialiseHandlers();
   void initialiseShaders();
 
+  /// Clear the default frame buffer.
+  void clearDefaultFbo();
+
   /// Primary drawing pass. Draws _main_draw_handlers with the FBO effect active.
   /// @param dt Time since last render (seconds).
   /// @param params Draw parameters.
@@ -210,7 +219,7 @@ private:
   /// @param drawers What to draw.
   void draw(float dt, const DrawParams &params, const painter::CategoryState &categories,
             const std::vector<std::shared_ptr<handler::Message>> &drawers);
-  void updateFpsDisplay(float dt, const DrawParams &params);
+  void updateFps(float dt);
 
   void onCameraConfigChange(const settings::Settings::Config &config);
 
