@@ -36,7 +36,7 @@ Hud::Hud(Viewer &viewer, const PreferredCoordinates &coords)
   : Panel("Hud", viewer)
 {
   _preferred_coordinates = coords;
-  _window_flags |= ImGuiWindowFlags_NoBackground;
+  _window_flags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMouseInputs;
   _set_camera_command = viewer.commands()->lookupName("setCamera").command;
 }
 

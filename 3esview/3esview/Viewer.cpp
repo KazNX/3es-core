@@ -371,7 +371,7 @@ void Viewer::mouseMoveEvent(MouseMoveEvent &event)
   }
 
   _fly.updateMouse(float(event.relativePosition().x()), float(event.relativePosition().y()),
-                   _tes->camera());
+                   _camera);
 
   event.setAccepted();
   redraw();
