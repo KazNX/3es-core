@@ -28,7 +28,7 @@ public:
   /// Provides a @c MeshResource wrapper around a @c MeshShape object. This
   /// allows the details of the @c MeshShape to be read via the @c MeshResource
   /// API.
-  class Resource : public MeshResource
+  class TES_CORE_API Resource : public MeshResource
   {
   public:
     /// Wraps a @c MeshShape with a @c MeshResource.

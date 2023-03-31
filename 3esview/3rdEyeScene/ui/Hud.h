@@ -26,7 +26,7 @@ class Command;
 
 namespace tes::view::ui
 {
-class Hud : public Panel
+class TES_VIEWER_API Hud : public Panel
 {
 public:
   constexpr static int kButtonSize = 24;

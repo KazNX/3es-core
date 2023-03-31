@@ -33,7 +33,7 @@ class Viewer;
 namespace tes::view::ui
 {
 /// Base class for a UI panel - anything which draws using the immediate mode UI.
-class Panel
+class TES_VIEWER_API Panel
 {
 public:
   enum class Anchor : unsigned

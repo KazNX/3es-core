@@ -20,7 +20,7 @@
 
 namespace tes::view::settings
 {
-class Settings
+class TES_VIEWER_API Settings
 {
 public:
   struct Config

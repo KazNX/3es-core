@@ -32,7 +32,7 @@ class ResourcePacker;
 
 /// Common @c Connection implementation base. Implements conversion of @c Shape messages into raw
 /// byte @c send() calls reducing the required subclass implementations to @c writeBytes().
-class BaseConnection : public Connection
+class TES_CORE_API BaseConnection : public Connection
 {
 public:
   using Lock = std::mutex;

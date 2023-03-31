@@ -21,7 +21,7 @@ class Panel;
 
 namespace tes::view
 {
-class UIViewer : public Viewer
+class TES_VIEWER_API UIViewer : public Viewer
 {
 public:
   class GuiContext

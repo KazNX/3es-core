@@ -16,7 +16,7 @@ namespace tes::view::ui
 ///
 /// To start a new tree branch call @c beginBranch() and @c endSection() .
 /// Use @c beginLeaf() and @c endLeaf() for each leaf.
-class TreeView : public Panel
+class TES_VIEWER_API TreeView : public Panel
 {
 public:
   /// Flags for @c beginBranch()

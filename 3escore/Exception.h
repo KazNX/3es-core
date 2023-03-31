@@ -11,7 +11,7 @@
 namespace tes
 {
 /// Exception type used by this library.
-class Exception : public std::exception
+class TES_CORE_API Exception : public std::exception
 {
 public:
   /// Constructor

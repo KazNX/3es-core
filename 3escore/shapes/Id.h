@@ -29,7 +29,7 @@ namespace tes
 /// shape ID.
 ///
 /// Note; the id 0xffffffu is reserved.
-class Id
+class TES_CORE_API Id
 {
 public:
   Id(uint32_t id = 0u, uint16_t category = 0u)

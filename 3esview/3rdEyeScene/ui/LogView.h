@@ -25,7 +25,7 @@ class Command;
 
 namespace tes::view::ui
 {
-class LogView : public Panel
+class TES_VIEWER_API LogView : public Panel
 {
 public:
   LogView(Viewer &viewer);

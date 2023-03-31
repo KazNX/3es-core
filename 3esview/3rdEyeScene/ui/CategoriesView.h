@@ -33,7 +33,7 @@ class Command;
 
 namespace tes::view::ui
 {
-class CategoriesView : public TreeView
+class TES_VIEWER_API CategoriesView : public TreeView
 {
 public:
   CategoriesView(Viewer &viewer);
