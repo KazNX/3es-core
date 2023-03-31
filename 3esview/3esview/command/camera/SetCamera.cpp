@@ -8,7 +8,7 @@
 namespace tes::view::command::camera
 {
 SetCamera::SetCamera()
-  : Command("setCamera", Args(static_cast<int>(handler::Camera::kInvalidCameraId)))
+  : Command("setCamera", Args(kFreeCameraId))
 {}
 
 
@@ -24,10 +24,19 @@ CommandResult SetCamera::invoke(Viewer &viewer, const ExecInfo &info, const Args
   (void)info;
   auto camera_id_int = arg<int>(0, args);
   // Limit to the expected range.
-  using CameraId = decltype(handler::Camera::kInvalidCameraId);
-  camera_id_int = std::min<int>(std::numeric_limits<CameraId>::min(),
-                                std::max<int>(camera_id_int, std::numeric_limits<CameraId>::max()));
-  viewer.setActiveCamera(static_cast<CameraId>(camera_id_int));
+  using CameraId = handler::Camera::CameraId;
+  if (camera_id_int != kFreeCameraId)
+  {
+    // Clamp to prevent exceptions.
+    camera_id_int =
+      std::max<int>(std::numeric_limits<CameraId>::min(),
+                    std::min<int>(camera_id_int, std::numeric_limits<CameraId>::max()));
+    viewer.setActiveCamera(static_cast<CameraId>(camera_id_int));
+  }
+  else
+  {
+    viewer.clearActiveCamera();
+  }
   return { CommandResult::Code::Ok };
 }
 }  // namespace tes::view::command::camera

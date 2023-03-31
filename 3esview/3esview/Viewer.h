@@ -9,6 +9,7 @@
 #include "ThirdEyeScene.h"
 
 #include <filesystem>
+#include <optional>
 
 namespace tes::view
 {
@@ -58,8 +59,12 @@ public:
   [[nodiscard]] bool continuousSim();
 
   void setActiveCamera(handler::Camera::CameraId id) { _active_recorded_camera = id; }
-  void clearActiveCamera() { setActiveCamera(handler::Camera::kInvalidCameraId); }
-  [[nodiscard]] handler::Camera::CameraId activeCamera() const { return _active_recorded_camera; }
+  void clearActiveCamera() { _active_recorded_camera.reset(); }
+  [[nodiscard]] handler::Camera::CameraId activeCamera() const
+  {
+    return (isCameraActive()) ? *_active_recorded_camera : 0;
+  }
+  [[nodiscard]] bool isCameraActive() const { return _active_recorded_camera.has_value(); }
 
 protected:
   /// Return value for @c onDrawStart()
@@ -164,7 +169,7 @@ private:
   camera::Camera _camera = {};
   /// ID of the recorded camera to use the transform of.
   /// This identifies one of the hander::Camera cameras.
-  handler::Camera::CameraId _active_recorded_camera = handler::Camera::kInvalidCameraId;
+  std::optional<handler::Camera::CameraId> _active_recorded_camera;
   camera::Fly _fly;
 
   bool _mouse_rotation_active = false;

@@ -9,7 +9,7 @@
 #include <3escore/Log.h>
 
 #include <3esview/command/Set.h>
-#include <3esview/data/DataThread.h>
+#include <3esview/data/NetworkThread.h>
 #include <3esview/Viewer.h>
 
 #include <Magnum/GL/TextureFormat.h>
@@ -105,8 +105,13 @@ void IconBar::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
   TES_UNUSED(ui);
 
   const ImVec2 icon_size = { kButtonSize, kButtonSize };
-  button({ &_icons[static_cast<unsigned>(View::Connect)], "Connect",
-           _commands[static_cast<unsigned>(View::Connect)].get(), icon_size });
+  auto *connect_icon = &_icons[static_cast<unsigned>(View::Connect)];
+  if (std::dynamic_pointer_cast<data::NetworkThread>(viewer().dataThread()))
+  {
+    connect_icon = &_icons[static_cast<unsigned>(View::Connected)];
+  };
+  button(
+    { connect_icon, "Connect", _commands[static_cast<unsigned>(View::Connect)].get(), icon_size });
   button({ &_icons[static_cast<unsigned>(View::Categories)], "Categories",
            _commands[static_cast<unsigned>(View::Categories)].get(), icon_size });
   button({ &_icons[static_cast<unsigned>(View::Log)], "Log",
@@ -174,10 +179,7 @@ void IconBar::initialiseIcons()
 const IconBar::ViewIconNames &IconBar::viewIconNames()
 {
   static IconBar::ViewIconNames names = {
-    "Settings.png",
-    "Connect.png",
-    "Categories.png",
-    "Log.png",
+    "Settings.png", "Connect.png", "Categories.png", "Log.png", "Connected.png",
   };
   return names;
 }

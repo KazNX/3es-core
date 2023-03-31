@@ -6,6 +6,7 @@
 #include <3escore/CoreUtil.h>
 #include <3escore/Log.h>
 
+#include <3esview/command/camera/SetCamera.h>
 #include <3esview/command/Set.h>
 #include <3esview/handler/Camera.h>
 #include <3esview/data/DataThread.h>
@@ -60,29 +61,41 @@ void Hud::drawCameraCombo()
   std::vector<CameraId> cameras;
   const auto active_camera_id = viewer().activeCamera();
   camera_handler.enumerate(cameras);
-  cameras.insert(cameras.begin(), handler::Camera::kInvalidCameraId);
+  constexpr auto kFreeCameraId = command::camera::SetCamera::kFreeCameraId;
 
-  std::vector<std::string> labels(cameras.size());
-  std::vector<CameraId> ids(cameras.size());
+  // Add an entry for the free/fly camera to the data arrays.
+  std::vector<std::string> labels(cameras.size() + 1);
+  std::vector<int> ids(labels.size());
   std::vector<const char *> labels_cstr(labels.size());
+
+  // Start by adding the free camera.
+  labels[0] = "Fly";
+  ids[0] = kFreeCameraId;
+  labels_cstr[0] = labels[0].c_str();
+
   int current_index = 0;
   for (int i = 0; i < int_cast<int>(cameras.size()); ++i)
   {
+    const auto write_idx = i + 1;
     const auto &id = cameras[i];
-    if (id != handler::Camera::kInvalidCameraId)
+    switch (id)
     {
-      labels[i] = "Camera " + std::to_string(static_cast<int>(id));
+    case kFreeCameraId:
+      labels[write_idx] = "Fly";
+      break;
+    case handler::Camera::kRecordedCameraID:
+      labels[write_idx] = "Recorded";
+      break;
+    default:
+      labels[write_idx] = "Camera " + std::to_string(static_cast<int>(id));
+      break;
     }
-    else
-    {
-      labels[i] = "Default";
-    }
-    labels_cstr[i] = labels[i].c_str();
-    ids[i] = id;
+    labels_cstr[write_idx] = labels[write_idx].c_str();
+    ids[write_idx] = id;
 
     if (id == active_camera_id)
     {
-      current_index = i;
+      current_index = write_idx;
     }
   }
 

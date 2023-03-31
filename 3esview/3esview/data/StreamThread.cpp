@@ -395,7 +395,9 @@ StreamThread::Clock::duration StreamThread::processControlMessage(PacketReader &
     const auto dt = (msg.value32) ? msg.value32 : _server_info.default_frame_time;
     if (!ignore_frame_change)
     {
-      _tes->updateToFrame(++_frame.current);
+      const auto current_frame = ++_frame.current;
+      _tes->updateToFrame(current_frame);
+      _frame.total = std::max(_frame.total.load(), current_frame);
     }
     return std::chrono::microseconds(
       static_cast<uint64_t>(_server_info.time_unit * dt / static_cast<double>(_playback_speed)));
@@ -414,7 +416,7 @@ StreamThread::Clock::duration StreamThread::processControlMessage(PacketReader &
   case CIdFrameCount:
     if (!ignore_frame_change)
     {
-      _frame.total = msg.value32;
+      _frame.total = std::max(_frame.total.load(), msg.value32);
     }
     break;
   case CIdForceFrameFlush:

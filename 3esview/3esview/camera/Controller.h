@@ -5,7 +5,7 @@
 
 #include "Camera.h"
 
-namespace tes::camera
+namespace tes::view::camera
 {
 /// Base class for camera update.
 class TES_VIEWER_API Controller
@@ -87,6 +87,6 @@ public:
 protected:
   Flag _flags = Flag::Zero;
 };
-}  // namespace tes::camera
+}  // namespace tes::view::camera
 
 #endif  // TES_VIEW_CAMERA_CONTROLLER_H

@@ -1,6 +1,6 @@
 #include "Fly.h"
 
-namespace tes::camera
+namespace tes::view::camera
 {
 Fly::Fly() = default;
 
@@ -65,4 +65,4 @@ void Fly::updateKeys(float dt, Magnum::Vector3i translate, Magnum::Vector3i rota
 }
 
 
-}  // namespace tes::camera
+}  // namespace tes::view::camera

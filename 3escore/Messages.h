@@ -12,6 +12,8 @@
 #include <cinttypes>
 #include <cstring>
 
+// Note: there are no compiler packing directives as we never write these structures directly.
+
 namespace tes
 {
 // NOLINTBEGIN(modernize-use-auto, modernize-avoid-c-arrays, modernize-loop-convert,
@@ -144,6 +146,16 @@ enum ObjectFlag : unsigned
   OFExtended = (1u << 8u)  ///< User flags start here.
 };
 
+/// Flags for @c CameraMessage
+enum CameraFlags : unsigned
+{
+  CFNone = 0,  ///< No flags. Default appearance.
+  /// Reserved: not supported for camera messages.
+  CFDoublePrecision = OFDoublePrecision,
+  /// Indicates the @c CameraMessage::coordinate_frame member is valid and to be respected.
+  /// Otherwise that member is ignored.
+  CFExplicitFrame = (OFDoublePrecision << 1u),
+};
 /// Additional attributes for point data sources.
 enum PointsAttributeFlag : unsigned
 {
@@ -744,10 +756,16 @@ struct TES_CORE_API CameraMessage
 
   /// ID of the camera. 255 is reserved to record the view used while recording.
   uint8_t camera_id;
-  /// Flags. Currently must be zero as the only valid flag is the double precision indicator (value
-  /// 1), which is not supported this structure. All values are floats.
+  /// Flags; must be zero as no flags are supported, however, @c OFDoublePrecision is reserved for
+  /// future semantics where double precision camera coordinates may be required.
   uint8_t flags;
+  /// Coordinate frame.
+  uint16_t coordinate_frame;
   /// Padding/reserved. Must be zero.
+  ///
+  /// @internal By luck this was set to 4 bytes when it should have been 2. This resulted in the
+  /// overall structure padding the next member another 2 bytes (as there was no packing pragmas at
+  /// the time). Once @c coordinate_frame was added, this corrected the overall alignmnt.
   uint32_t reserved;
 
   /// Position X coordinate.
@@ -785,6 +803,7 @@ struct TES_CORE_API CameraMessage
     bool ok = true;
     ok = reader.readElement(camera_id) == sizeof(camera_id) && ok;
     ok = reader.readElement(flags) == sizeof(flags) && ok;
+    ok = reader.readElement(coordinate_frame) == sizeof(coordinate_frame) && ok;
     ok = reader.readElement(reserved) == sizeof(reserved) && ok;
     ok = reader.readElement(x) == sizeof(x) && ok;
     ok = reader.readElement(y) == sizeof(y) && ok;
@@ -812,6 +831,7 @@ struct TES_CORE_API CameraMessage
     bool ok = true;
     ok = packet.writeElement(camera_id) == sizeof(camera_id) && ok;
     ok = packet.writeElement(flags) == sizeof(flags) && ok;
+    ok = packet.writeElement(coordinate_frame) == sizeof(coordinate_frame) && ok;
     ok = packet.writeElement(reserved) == sizeof(reserved) && ok;
     ok = packet.writeElement(x) == sizeof(x) && ok;
     ok = packet.writeElement(y) == sizeof(y) && ok;

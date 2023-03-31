@@ -34,7 +34,7 @@ size_t Camera::enumerate(std::vector<CameraId> &camera_ids) const
   return camera_ids.size();
 }
 
-bool Camera::lookup(CameraId camera_id, tes::camera::Camera &camera) const
+bool Camera::lookup(CameraId camera_id, camera::Camera &camera) const
 {
   std::lock_guard guard(_mutex);
   camera = _cameras[camera_id].first;
@@ -99,12 +99,14 @@ void Camera::readMessage(PacketReader &reader)
     return;
   }
 
-  tes::camera::Camera camera = {};
+  camera::Camera camera = {};
   camera.position = Magnum::Vector3(msg.x, msg.y, msg.z);
   camera.clip_near = msg.near;
   camera.clip_far = msg.far;
   camera.fov_horizontal_deg = msg.fov;
-  camera.frame = tes::CoordinateFrame(_server_info.coordinate_frame);
+  camera.frame = (msg.flags & CFExplicitFrame) ?
+                   static_cast<CoordinateFrame>(msg.coordinate_frame) :
+                   tes::CoordinateFrame(_server_info.coordinate_frame);
 
   // Determine pitch and yaw by a deviation from the expected axis.
   Magnum::Vector3 ref_dir;
@@ -274,9 +276,9 @@ void Camera::calculatePitchYaw(const Magnum::Vector3 &camera_fwd, const Magnum::
   if (std::abs(std::abs(fwd_up_dot) - 1.0f) > 1e-6f)
   {
     // Calculate pitch as the angle between the camera and world forward vectors.
-    // First calculate a world vector which is aligned with the camera forward.
+    // First calculate a world vector which is aligned with the camera forward (2D forward).
     ref_fwd = Magnum::Math::cross(camera_fwd, world_up);
-    ref_fwd = Magnum::Math::cross(world_up, camera_fwd);
+    ref_fwd = Magnum::Math::cross(world_up, ref_fwd);
     // We can just take the angle between them now.
     pitch = std::acos(Magnum::Math::dot(camera_fwd, ref_fwd));
 
@@ -284,18 +286,20 @@ void Camera::calculatePitchYaw(const Magnum::Vector3 &camera_fwd, const Magnum::
   }
   else
   {
-    // Edge case: forward ~ up
-    // Pitch is 90 degrees.
+    // Edge case: forward ~ +-up
+    // Pitch angle is 90 degrees. Sign is added in the outer scope.
     pitch = static_cast<Magnum::Float>(Magnum::Rad(Magnum::Deg(90.0f)));
     // We need to use the up vector to get the yaw as the pitch won't yield useful info.
     ref_fwd = camera_up;
   }
-  pitch *= (fwd_up_dot > 0) ? -1.0f : 1.0f;
+  pitch *= (fwd_up_dot <= 0) ? -1.0f : 1.0f;
 
   // Yaw
   // Calculate yaw as the deviation between the reference forward and the camera forward projected
   // onto the plane perpendicular to the world up axis.
   fwd_up_dot = Magnum::Math::dot(ref_fwd, world_up);
+  // This is probably unecessary in the case we aren't pitched 90 degrees as we should have a
+  // vector in the horizontal plane from the pitch calculation.
   ref_fwd -= world_up * fwd_up_dot;
   ref_fwd = ref_fwd.normalized();
 
@@ -303,7 +307,7 @@ void Camera::calculatePitchYaw(const Magnum::Vector3 &camera_fwd, const Magnum::
 
   // Check the direction of rotation.
   const auto world_side = Magnum::Math::cross(world_fwd, world_up);
-  if (Magnum::Math::dot(ref_fwd, world_side) < 0)
+  if (Magnum::Math::dot(ref_fwd, world_side) > 0)
   {
     yaw *= -1.0f;
   }
@@ -314,8 +318,9 @@ void Camera::calculateCameraAxes(float pitch, float yaw, const Magnum::Vector3 &
                                  const Magnum::Vector3 &world_up, Magnum::Vector3 &camera_fwd,
                                  Magnum::Vector3 &camera_up)
 {
+  const auto world_side = Magnum::Math::cross(world_fwd, world_up);
   const auto transform = Magnum::Matrix4::rotation(Magnum::Rad(yaw), world_up) *  //
-                         Magnum::Matrix4::rotation(Magnum::Rad(pitch), world_fwd);
+                         Magnum::Matrix4::rotation(Magnum::Rad(pitch), world_side);
 
   int fwd_axis = 0;
   int up_axis = 0;

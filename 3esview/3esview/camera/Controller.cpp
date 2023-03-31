@@ -1,7 +1,7 @@
 #include "Controller.h"
 
-namespace tes::camera
+namespace tes::view::camera
 {
 Controller::Controller() = default;
 Controller::~Controller() = default;
-}  // namespace tes::camera
+}  // namespace tes::view::camera

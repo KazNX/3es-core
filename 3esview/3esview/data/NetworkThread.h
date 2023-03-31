@@ -13,7 +13,7 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
-#include <iosfwd>
+#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -21,7 +21,9 @@
 
 namespace tes
 {
+class CollatedPacket;
 class CollatedPacketDecoder;
+class FileConnection;
 class PacketBuffer;
 class PacketReader;
 class PacketStreamReader;
@@ -31,10 +33,16 @@ class TcpSocket;
 namespace tes::view
 {
 class ThirdEyeScene;
+namespace camera
+{
+struct Camera;
+}
 }  // namespace tes::view
 
 namespace tes::view::data
 {
+class StreamRecorder;
+
 /// A @c DataThread implementation which reads and processes packets form a live network connection.
 class TES_VIEWER_API NetworkThread : public DataThread
 {
@@ -124,6 +132,22 @@ public:
   /// Wait for this thread to finish.
   void join() override;
 
+  /// Check if the stream is currently recording to a file.
+  /// @return True when recording.
+  bool isRecording() const;
+  /// Query the file to which we are recording.
+  /// @return The recording target path. Empty when not recording.
+  std::filesystem::path recodingPath() const;
+  /// Initiate recording to the specified @p path.
+  ///
+  /// This ends any current recording.
+  /// @param path The path to record to.
+  /// @return True on successfully starting to write to @p path.
+  bool startRecording(const std::filesystem::path &path);
+  /// End the current recording.
+  /// @return True if there was a recording to stop.
+  bool endRecording();
+
 protected:
   /// Thread entry point.
   void run();
@@ -152,6 +176,22 @@ private:
   /// @param packet The packet to control. The routing Id is always @c MtControl.
   void processControlMessage(PacketReader &packet);
 
+  /// Record the given packet if recording is active. Ignored when not recording.
+  /// @param packet The packet to record.
+  void recordPacket(const PacketReader &packet);
+
+  /// Flush the current frame in the recording stream. Ignored when not recording.
+  /// @param dt Frame elapsed time (seconds).
+  /// @param camera The current camera position, added to the recording stream.
+  void recordFlush(float dt, const camera::Camera &camera);
+
+  /// Stop the current recording.
+  ///
+  /// This occurs without locking @c _data_mutex and can be called by functions which already have a
+  /// lock.
+  /// @return True if there is something to stop.
+  bool recordStopUnguarded();
+
   mutable std::mutex _data_mutex;
   std::mutex _notify_mutex;
   std::condition_variable _notify;
@@ -162,6 +202,7 @@ private:
   FrameNumberAtomic _current_frame = 0;
   /// The total number of frames in the stream, if know. Zero when unknown.
   FrameNumber _total_frames = 0;
+  std::unique_ptr<StreamRecorder> _record;
   std::string _host;
   uint16_t _port = 0;
   /// The scene manager.

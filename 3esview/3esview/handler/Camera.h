@@ -23,7 +23,7 @@ class TES_VIEWER_API Camera : public Message
 {
 public:
   using CameraId = uint8_t;
-  constexpr static CameraId kInvalidCameraId = std::numeric_limits<CameraId>::max();
+  constexpr static CameraId kRecordedCameraID = tes::CameraMessage::kRecordedCameraID;
 
   Camera();
 
@@ -33,7 +33,7 @@ public:
   size_t enumerate(std::vector<CameraId> &camera_ids) const;
 
   [[nodiscard]] CameraId firstCameraId() const { return _first_valid; }
-  bool lookup(CameraId camera_id, tes::camera::Camera &camera) const;
+  bool lookup(CameraId camera_id, camera::Camera &camera) const;
 
   void initialise() override;
   void reset() override;
@@ -44,6 +44,11 @@ public:
   void readMessage(PacketReader &reader) override;
   void serialise(Connection &out) override;
 
+  /// Calculate the world basis vectors for the coordinate @p frame.
+  /// @param frame The world coordinate frame.
+  /// @param side The world side vector (optional).
+  /// @param fwd The world forward vector (optional).
+  /// @param up The world up vector (optional).
   static void getWorldAxes(tes::CoordinateFrame frame, Magnum::Vector3 *side, Magnum::Vector3 *fwd,
                            Magnum::Vector3 *up);
 
@@ -75,12 +80,12 @@ public:
 private:
   mutable std::mutex _mutex;
   /// Array of cameras. The boolean indicates the validity of the entry.
-  using CameraEntry = std::pair<tes::camera::Camera, bool>;
-  using CameraSet = std::array<CameraEntry, std::numeric_limits<CameraId>::max()>;
+  using CameraEntry = std::pair<camera::Camera, bool>;
+  using CameraSet = std::array<CameraEntry, std::numeric_limits<CameraId>::max() + 1>;
   /// Main thread camera state.
   CameraSet _cameras;
   /// Pending thread camera state for next @c prepareFrame().
-  std::vector<std::pair<CameraId, tes::camera::Camera>> _pending_cameras;
+  std::vector<std::pair<CameraId, camera::Camera>> _pending_cameras;
   CameraId _first_valid = 255u;
   ServerInfoMessage _server_info = {};
 };

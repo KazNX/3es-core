@@ -10,6 +10,7 @@
 #include "connection/OpenFile.h"
 #include "connection/OpenTcp.h"
 #include "playback/Loop.h"
+#include "playback/Record.h"
 #include "playback/Pause.h"
 #include "playback/SkipBackward.h"
 #include "playback/SkipForward.h"
@@ -30,6 +31,7 @@ void registerDefaultCommands(Set &commands)
   commands.registerCommand(std::make_shared<connection::OpenFile>(), Shortcut("ctrl+o"));
   commands.registerCommand(std::make_shared<connection::OpenTcp>(), Shortcut("ctrl+c"));
   commands.registerCommand(std::make_shared<playback::Loop>(), Shortcut("ctrl+l"));
+  commands.registerCommand(std::make_shared<playback::Record>(), Shortcut("ctrl+r"));
   commands.registerCommand(std::make_shared<playback::Pause>(), Shortcut("space"));
   commands.registerCommand(std::make_shared<playback::SkipBackward>(), Shortcut("ctrl+."));
   commands.registerCommand(std::make_shared<playback::SkipForward>(), Shortcut("ctrl+,"));

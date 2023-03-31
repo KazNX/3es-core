@@ -1,3 +1,6 @@
+//
+// Author: Kazys Stepanas
+//
 #include "Close.h"
 
 #include <3esview/Viewer.h>
