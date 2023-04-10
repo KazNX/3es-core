@@ -7,6 +7,7 @@
 #include "ui/ConnectView.h"
 #include "ui/Hud.h"
 #include "ui/IconBar.h"
+#include "ui/LogView.h"
 #include "ui/Playback.h"
 #include "ui/SettingsView.h"
 #include "ui/command/ToggleCategories.h"
@@ -207,6 +208,7 @@ void UIViewer::initialiseIconBarUi()
   command = std::make_shared<ui::command::ToggleLog>(*icon_bar);
   command_set->registerCommand(command);
   icon_bar->registerCommand(ui::IconBar::View::Log, command);
+  icon_bar->registerView(ui::IconBar::View::Log, std::make_shared<ui::LogView>(*this));
 
   command = std::make_shared<ui::command::ToggleSettings>(*icon_bar);
   command_set->registerCommand(command);

@@ -293,6 +293,7 @@ protected:
 
   /// Draws the content for the panel
   /// @param ui
+  /// @param window The window area this panel will draw in.
   virtual void drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window) = 0;
 
   /// Draw a button associated with the given action.

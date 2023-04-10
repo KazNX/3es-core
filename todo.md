@@ -6,6 +6,8 @@
 
 ## Viewer
 
+- Comment pass
+- Clang-tidy pass
 - Change shape maps using `Id` object as a key to just `uint32_t`. The category is not part of the key.
 
 Advanced:

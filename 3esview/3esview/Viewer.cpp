@@ -1,6 +1,7 @@
 #include "Viewer.h"
 
 #include "EdlEffect.h"
+#include "ViewerLog.h"
 
 #include "command/DefaultCommands.h"
 #include "command/Set.h"
@@ -86,6 +87,7 @@ Viewer::Viewer(const Arguments &arguments)
       { KeyEvent::Key::Q, 1, false },  //
       { KeyEvent::Key::E, 1, true },   //
     })
+  , _logger(std::make_unique<ViewerLog>())
 {
   _edl_effect = std::make_shared<EdlEffect>(Magnum::GL::defaultFramebuffer.viewport());
   command::registerDefaultCommands(*_commands);
@@ -115,11 +117,16 @@ Viewer::Viewer(const Arguments &arguments)
   _tes->settings().addObserver(
     settings::Settings::Category::Playback,
     [this](const settings::Settings::Config &config) { onPlaybackSettingsChange(config); });
+  // Install the logger function.
+  log::setLogger(
+    [this](log::Level level, const std::string &message) { _logger->log(level, message); });
 }
 
 
 Viewer::~Viewer()
 {
+  // Uninstall the logger.
+  setLogger(log::defaultLogger);
   closeOrDisconnect();
 }
 

@@ -32,6 +32,8 @@ namespace data
 class DataThread;
 }  // namespace data
 
+class ViewerLog;
+
 class TES_VIEWER_API Viewer : public Magnum::Platform::Application
 {
 public:
@@ -65,6 +67,9 @@ public:
     return (isCameraActive()) ? *_active_recorded_camera : 0;
   }
   [[nodiscard]] bool isCameraActive() const { return _active_recorded_camera.has_value(); }
+
+  [[nodiscard]] ViewerLog &logger() { return *_logger; }
+  [[nodiscard]] const ViewerLog &logger() const { return *_logger; }
 
 protected:
   /// Return value for @c onDrawStart()
@@ -163,6 +168,7 @@ private:
   std::shared_ptr<ThirdEyeScene> _tes;
   std::shared_ptr<data::DataThread> _data_thread;
   std::shared_ptr<command::Set> _commands;
+  std::unique_ptr<ViewerLog> _logger;
 
   Clock::time_point _last_sim_time = Clock::now();
 

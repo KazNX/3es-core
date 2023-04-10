@@ -14,6 +14,7 @@ list(APPEND PUBLIC_HEADERS
   ThirdEyeScene.h
   ViewableWindow.h
   Viewer.h
+  ViewerLog.h
   camera/Camera.h
   camera/Controller.h
   camera/Fly.h
@@ -97,6 +98,7 @@ list(APPEND SOURCES
   FrameStamp.cpp
   ThirdEyeScene.cpp
   Viewer.cpp
+  ViewerLog.cpp
   camera/Camera.cpp
   camera/Controller.cpp
   camera/Fly.cpp
