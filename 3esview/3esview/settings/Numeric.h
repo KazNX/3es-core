@@ -55,7 +55,7 @@ public:
   void setValue(T value) { _value = std::max(minimum(), std::min(value, maximum())); }
 
   bool hasMinimum() const { return _minimum.has_value(); }
-  T minimum() const { return (hasMinimum()) ? *_minimum : std::numeric_limits<T>::min(); }
+  T minimum() const { return (hasMinimum()) ? *_minimum : std::numeric_limits<T>::lowest(); }
   void setMinimum(T minimum) { _minimum = minimum; }
 
   bool hasMaximum() const { return _maximum.has_value(); }

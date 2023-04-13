@@ -64,6 +64,20 @@ void Settings::update(const Connection &config)
 }
 
 
+void Settings::update(const Extension &extension)
+{
+  const std::lock_guard guard(_mutex);
+  auto iter =
+    std::find_if(_config.extentions.begin(), _config.extentions.end(),
+                 [&extension](const Extension &e) { return extension.name() == e.name(); });
+  if (iter != _config.extentions.end())
+  {
+    iter->update(extension);
+    notify(_config);
+  }
+}
+
+
 void Settings::addObserver(NotifyCallback callback)
 {
   const std::lock_guard guard(_observer_mutex);

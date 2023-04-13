@@ -37,6 +37,7 @@ configure_file(TestViewerConfig.in.h "${CMAKE_CURRENT_BINARY_DIR}/3estViewer/Tes
 
 set(SOURCES
   TestLog.cpp
+  TestSettings.cpp
   TestShapes.cpp
   TestUtil.cpp
   TestViewer.cpp

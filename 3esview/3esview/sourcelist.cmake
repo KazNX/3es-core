@@ -70,6 +70,8 @@ list(APPEND PUBLIC_HEADERS
   settings/Camera.h
   settings/Colour.h
   settings/Enum.h
+  settings/Extension.h
+  settings/IOResult.h
   settings/Loader.h
   settings/Log.h
   settings/Numeric.h
@@ -77,6 +79,7 @@ list(APPEND PUBLIC_HEADERS
   settings/Render.h
   settings/Settings.h
   settings/Values.h
+  settings/YamlFwd.h
   shaders/Edl.h
   shaders/Flat.h
   shaders/PointGeom.h
@@ -150,6 +153,9 @@ list(APPEND SOURCES
   painter/Sphere.cpp
   painter/Star.cpp
   painter/Text.cpp
+  settings/private/Yaml.cpp
+  settings/private/Yaml.h
+  settings/Extension.cpp
   settings/Loader.cpp
   settings/Settings.cpp
   shaders/Edl.cpp

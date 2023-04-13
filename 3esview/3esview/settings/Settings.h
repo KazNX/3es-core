@@ -8,6 +8,7 @@
 
 #include "Camera.h"
 #include "Connection.h"
+#include "Extension.h"
 #include "Log.h"
 #include "Playback.h"
 #include "Render.h"
@@ -30,6 +31,7 @@ public:
     Playback playback;
     Render render;
     Connection connection;
+    std::vector<Extension> extentions;
   };
 
   enum class Category : unsigned
@@ -53,6 +55,7 @@ public:
   void update(const Playback &config);
   void update(const Render &config);
   void update(const Connection &config);
+  void update(const Extension &extension);
 
   void addObserver(NotifyCallback callback);
   void addObserver(Category category, NotifyCallback callback);

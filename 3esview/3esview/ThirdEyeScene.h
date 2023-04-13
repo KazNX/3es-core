@@ -237,7 +237,16 @@ private:
   /// @return True on success.
   bool saveCurrentFrameSnapshot(tes::Connection &connection);
 
+  /// Load the @c Settings from the default config location for the current platform.
   void restoreSettings();
+  /// Save the @c Settings from the default config location for the current platform.
+  ///
+  /// Settings location depends on platform:
+  ///
+  /// - Windows: `$env:APPDATA/3rdEyeScene.yaml`
+  /// - Linux: `TODO`
+  ///
+  /// @todo Identify the default config locations.
   void storeSettings();
 
   std::shared_ptr<FboEffect> _active_fbo_effect;

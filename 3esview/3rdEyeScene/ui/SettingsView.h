@@ -18,12 +18,12 @@
 namespace tes::view::data
 {
 class DataThread;
-}
+}  // namespace tes::view::data
 
 namespace tes::view::command
 {
 class Command;
-}
+}  // namespace tes::view::command
 
 namespace tes::view::ui
 {
@@ -39,6 +39,7 @@ private:
   bool show(unsigned idx, settings::Log &config);
   bool show(unsigned idx, settings::Playback &config);
   bool show(unsigned idx, settings::Render &config);
+  bool show(unsigned idx, settings::Extension &config);
 
   bool showProperty(unsigned idx, settings::Bool &prop);
   bool showProperty(unsigned idx, settings::Int &prop);
@@ -46,8 +47,7 @@ private:
   bool showProperty(unsigned idx, settings::Float &prop);
   bool showProperty(unsigned idx, settings::Double &prop);
   bool showProperty(unsigned idx, settings::Colour &prop);
-  template <typename E>
-  bool showProperty(unsigned idx, settings::Enum<E> &prop);
+  bool showProperty(unsigned idx, settings::Enum &prop);
 };
 }  // namespace tes::view::ui
 

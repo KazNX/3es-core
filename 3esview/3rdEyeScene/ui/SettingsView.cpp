@@ -33,6 +33,12 @@ void SettingsView::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &wi
     const bool render_dirty = show(idx++, config.render);
     const bool playback_dirty = show(idx++, config.playback);
     // const bool log_dirty = show(idx++,config.log);
+    bool extensions_dirty = false;
+
+    for (auto &extension : config.extentions)
+    {
+      extensions_dirty = show(idx++, extension) || extensions_dirty;
+    }
 
     // If more than two things are dirty, then update everything. Really should never happen as we
     // can only modify one property at a time.
@@ -40,6 +46,8 @@ void SettingsView::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &wi
     dirty_count += !!camera_dirty;
     dirty_count += !!render_dirty;
     dirty_count += !!playback_dirty;
+    // Force full refresh if any extensions are dirty.
+    dirty_count += (extensions_dirty) ? 2 : 0;
     // dirty_count += !!log_dirty;
     if (dirty_count == 1)
     {
@@ -153,6 +161,64 @@ bool SettingsView::show(unsigned idx, settings::Render &config)
 }
 
 
+bool SettingsView::show(unsigned idx, settings::Extension &config)
+{
+  const bool open = beginBranch(idx, config.name());
+  bool dirty = false;
+
+  if (open)
+  {
+    // Show all properties.
+    unsigned idx = 0;
+    for (auto &property : config)
+    {
+      // Brute force solution: try convert each property to each of the available types.
+      // Show the one which works.
+      if (auto *prop = property.getProperty<settings::Bool>())
+      {
+        dirty = showProperty(idx++, *prop) || dirty;
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::Colour>())
+      {
+        dirty = showProperty(idx++, *prop) || dirty;
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::Enum>())
+      {
+        dirty = showProperty(idx++, *prop) || dirty;
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::Int>())
+      {
+        dirty = showProperty(idx++, *prop) || dirty;
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::UInt>())
+      {
+        dirty = showProperty(idx++, *prop) || dirty;
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::Float>())
+      {
+        dirty = showProperty(idx++, *prop) || dirty;
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::Double>())
+      {
+        dirty = showProperty(idx++, *prop) || dirty;
+        continue;
+      }
+      log::warn("Extension property ", property.label(), " has unknown type");
+    }
+  }
+
+  endBranch(open);
+
+  return dirty;
+}
+
+
 bool SettingsView::showProperty(unsigned idx, settings::Bool &prop)
 {
   beginLeaf(idx, prop.label(), prop.tip());
@@ -241,32 +307,28 @@ bool SettingsView::showProperty(unsigned idx, settings::Colour &prop)
 }
 
 
-template <typename E>
-bool SettingsView::showProperty(unsigned idx, settings::Enum<E> &prop)
+bool SettingsView::showProperty(unsigned idx, settings::Enum &prop)
 {
   beginLeaf(idx, prop.label(), prop.tip());
   bool dirty = false;
   auto value = prop.value();
-  if (ImGui::BeginCombo(prop.label().c_str(), prop.valueName().c_str()))
+  const auto named_values = prop.namedValues();
+  int value_index = 0;
+  std::vector<const char *> names(named_values.size());
+  for (int i = 0; i < static_cast<int>(named_values.size()); ++i)
   {
-    const auto named_values = prop.namedValues();
-    int value_index = 0;
-    std::vector<const char *> names(named_values.size());
-    for (int i = 0; i < static_cast<int>(named_values.size()); ++i)
+    names[i] = named_values[i].second.c_str();
+    if (value == named_values[i].first)
     {
-      names[i] = named_values[i].second.c_str();
-      if (value == named_values[i])
-      {
-        value_index = i;
-      }
-    }
-    if (Combo(name.c_str(), &value_index, names.c_str(), static_cast<int>(names.size())))
-    {
-      prop.setValueByName(names[value_index]);
-      dirty = true;
+      value_index = i;
     }
   }
-  ImGui::EndCombo();
+  if (ImGui::Combo(prop.label().c_str(), &value_index, names.data(),
+                   static_cast<int>(names.size())))
+  {
+    prop.setValueByName(names[value_index]);
+    dirty = true;
+  }
   endLeaf();
   return dirty;
 }

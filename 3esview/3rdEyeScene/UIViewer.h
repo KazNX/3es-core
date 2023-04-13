@@ -44,6 +44,7 @@ public:
   };
 
   explicit UIViewer(const Arguments &arguments);
+  ~UIViewer();
 
   [[nodiscard]] bool uiEnabled() const { return _ui_enabled; }
   void setUiEnabled(bool enable) { _ui_enabled = enable; }

@@ -75,6 +75,9 @@ UIViewer::UIViewer(const Arguments &arguments)
 }
 
 
+UIViewer::~UIViewer() = default;
+
+
 UIViewer::DrawMode UIViewer::onDrawStart(float dt)
 {
   TES_UNUSED(dt);
