@@ -107,7 +107,7 @@ bool SettingsView::show(unsigned idx, settings::Log &config)
   if (open)
   {
     unsigned idx = 0;
-    dirty = showProperty(idx++, config.log_window_size) || dirty;
+    dirty = showProperty(idx++, config.log_history) || dirty;
   }
 
   endBranch(open);

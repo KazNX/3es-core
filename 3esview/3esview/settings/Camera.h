@@ -21,6 +21,14 @@ struct Camera
                      "The default far clip plane when not using remote settings." };
   Float fov = { "Field of view", 60.0f, 0.0f, 180.0f,
                 "The default horizontal field of view (degrees)." };
+
+  [[nodiscard]] inline bool operator==(const Camera &other) const
+  {
+    return invert_y == other.invert_y && allow_remote_settings == other.allow_remote_settings &&
+           near_clip == other.near_clip && far_clip == other.far_clip && fov == other.fov;
+  }
+
+  [[nodiscard]] inline bool operator!=(const Camera &other) const { return !operator==(other); }
 };
 }  // namespace tes::view::settings
 

@@ -133,7 +133,7 @@ IOCode save(ryml::NodeRef node, const Camera &camera, std::ostream &log)
 IOCode load(const ryml::NodeRef &node, Log &log_config, std::ostream &log)
 {
   auto code = IOCode::Ok;
-  code = mergeCode(priv::read(node, log_config.log_window_size, log), code);
+  code = mergeCode(priv::read(node, log_config.log_history, log), code);
   return code;
 }
 
@@ -142,7 +142,7 @@ IOCode save(ryml::NodeRef &node, const Log &log_settings, std::ostream &log)
 {
   auto code = IOCode::Ok;
   node |= ryml::MAP;
-  code = mergeCode(priv::write(node, log_settings.log_window_size, log), code);
+  code = mergeCode(priv::write(node, log_settings.log_history, log), code);
   return code;
 }
 

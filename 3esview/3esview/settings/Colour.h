@@ -35,6 +35,13 @@ public:
   [[nodiscard]] const ValueType &value() const { return _value; }
   void setValue(ValueType value) { _value = value; }
 
+  [[nodiscard]] bool operator==(const Colour &other) const
+  {
+    return _value == other._value && _label == other._label && _tip == other._tip;
+  }
+
+  [[nodiscard]] bool operator!=(const Colour &other) const { return !operator==(other); }
+
 private:
   ValueType _value = {};
   std::string _label;

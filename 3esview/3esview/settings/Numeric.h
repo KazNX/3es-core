@@ -62,6 +62,14 @@ public:
   T maximum() const { return (hasMaximum()) ? *_maximum : std::numeric_limits<T>::max(); }
   void setMaximum(T maximum) { _maximum = maximum; }
 
+  [[nodiscard]] bool operator==(const Numeric<T> &other) const
+  {
+    return _value == other._value && _minimum == other._minimum && _maximum == other._maximum &&
+           _label == other._label && _tip == other._tip;
+  }
+
+  [[nodiscard]] bool operator!=(const Numeric<T> &other) const { return !operator==(other); }
+
 private:
   T _value = {};
   std::optional<T> _minimum;
@@ -95,6 +103,13 @@ public:
 
   [[nodiscard]] bool value() const { return _value; }
   void setValue(bool value) { _value = value; }
+
+  [[nodiscard]] bool operator==(const Bool &other) const
+  {
+    return _value == other._value && _label == other._label && _tip == other._tip;
+  }
+
+  [[nodiscard]] bool operator!=(const Bool &other) const { return !operator==(other); }
 
 private:
   bool _value = false;

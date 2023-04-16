@@ -12,7 +12,14 @@ namespace tes::view::settings
 {
 struct Log
 {
-  UInt log_window_size = { "Window size", 300, 0, 1000, "Size of the log window." };
+  UInt log_history = { "Log history", 10000, 0, 1000000, "Size of the log history." };
+
+  [[nodiscard]] inline bool operator==(const Log &other) const
+  {
+    return log_history == other.log_history;
+  }
+
+  [[nodiscard]] inline bool operator!=(const Log &other) const { return !operator==(other); }
 };
 }  // namespace tes::view::settings
 

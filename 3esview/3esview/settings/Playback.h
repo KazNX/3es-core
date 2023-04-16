@@ -31,6 +31,18 @@ struct Playback
                    "Automatically restart playback at the end of a file stream?" };
   Bool pause_on_error = { "Pause on error", true,
                           "Pause if an error occurs during playback? Only affects file playback." };
+
+  [[nodiscard]] inline bool operator==(const Playback &other) const
+  {
+    return allow_key_frames == other.allow_key_frames &&
+           keyframe_every_mib == other.keyframe_every_mib &&
+           keyframe_every_frames == other.keyframe_every_frames &&
+           keyframe_min_separation == other.keyframe_min_separation &&
+           keyframe_compression == other.keyframe_compression && looping == other.looping &&
+           pause_on_error == other.pause_on_error;
+  }
+
+  [[nodiscard]] inline bool operator!=(const Playback &other) const { return !operator==(other); }
 };
 }  // namespace tes::view::settings
 

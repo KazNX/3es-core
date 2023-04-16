@@ -60,6 +60,14 @@ public:
     return _named_values;
   }
 
+  [[nodiscard]] bool operator==(const Enum &other) const
+  {
+    return _value == other._value && _named_values == other._named_values &&
+           _label == other._label && _tip == other._tip;
+  }
+
+  [[nodiscard]] bool operator!=(const Enum &other) const { return !operator==(other); }
+
 private:
   int _value = {};
   std::vector<std::pair<int, std::string>> _named_values;

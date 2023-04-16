@@ -19,6 +19,13 @@ struct Connection
   /// Connection history. Not displayable as a property, but does need serialisation.
   /// Requires special handling.
   std::vector<std::pair<std::string, uint16_t>> history;
+
+  [[nodiscard]] inline bool operator==(const Connection &other) const
+  {
+    return history == other.history;
+  }
+
+  [[nodiscard]] inline bool operator!=(const Connection &other) const { return !operator==(other); }
 };
 }  // namespace tes::view::settings
 

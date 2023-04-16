@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+/// Implement @c ExtensionPropertyAffordances for properties of @c Type .
 #define DEFINE_AFFORDANCES(Type)                                         \
   class Type##Affordances : public ExtensionPropertyAffordances          \
   {                                                                      \
@@ -50,26 +51,6 @@
                                                                          \
   private:                                                               \
     settings::Type _property;                                            \
-  }
-
-#define GET_PROPERTY_IMPL(Type)                                             \
-  template <>                                                               \
-  Type *ExtensionProperty::getProperty<Type>()                              \
-  {                                                                         \
-    if (_affordances && _affordances->type() == detail::PropertyType::Type) \
-    {                                                                       \
-      return reinterpret_cast<Type *>(_affordances->property());            \
-    }                                                                       \
-    return nullptr;                                                         \
-  }                                                                         \
-  template <>                                                               \
-  const Type *ExtensionProperty::getProperty<Type>() const                  \
-  {                                                                         \
-    if (_affordances && _affordances->type() == detail::PropertyType::Type) \
-    {                                                                       \
-      return reinterpret_cast<const Type *>(_affordances->property());      \
-    }                                                                       \
-    return nullptr;                                                         \
   }
 
 namespace tes::view::settings
@@ -137,13 +118,69 @@ void ExtensionProperty::update(const ExtensionProperty &other)
 }
 
 
-GET_PROPERTY_IMPL(Bool);
-GET_PROPERTY_IMPL(Colour);
-GET_PROPERTY_IMPL(Enum);
-GET_PROPERTY_IMPL(Int);
-GET_PROPERTY_IMPL(UInt);
-GET_PROPERTY_IMPL(Float);
-GET_PROPERTY_IMPL(Double);
+bool ExtensionProperty::operator==(const ExtensionProperty &other) const
+{
+  // TODO(KS): find a better way to do the type comparison such that we don't need to keep adding
+  // code if we add property types.
+  if (const auto *this_bool = getProperty<Bool>())
+  {
+    const auto *other_bool = other.getProperty<Bool>();
+    if (other_bool)
+    {
+      return *this_bool == *other_bool;
+    }
+  }
+  if (const auto *this_colour = getProperty<Colour>())
+  {
+    const auto *other_colour = other.getProperty<Colour>();
+    if (other_colour)
+    {
+      return *this_colour == *other_colour;
+    }
+  }
+  if (const auto *this_enum = getProperty<Enum>())
+  {
+    const auto *other_enum = other.getProperty<Enum>();
+    if (other_enum)
+    {
+      return *this_enum == *other_enum;
+    }
+  }
+  if (const auto *this_int = getProperty<Int>())
+  {
+    const auto *other_int = other.getProperty<Int>();
+    if (other_int)
+    {
+      return *this_int == *other_int;
+    }
+  }
+  if (const auto *this_uint = getProperty<UInt>())
+  {
+    const auto *other_uint = other.getProperty<UInt>();
+    if (other_uint)
+    {
+      return *this_uint == *other_uint;
+    }
+  }
+  if (const auto *this_float = getProperty<Float>())
+  {
+    const auto *other_float = other.getProperty<Float>();
+    if (other_float)
+    {
+      return *this_float == *other_float;
+    }
+  }
+  if (const auto *this_double = getProperty<Double>())
+  {
+    const auto *other_double = other.getProperty<Double>();
+    if (other_double)
+    {
+      return *this_double == *other_double;
+    }
+  }
+
+  return false;
+}
 
 Extension::Extension(const std::string &name)
   : _name(name)

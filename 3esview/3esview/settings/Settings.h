@@ -32,6 +32,16 @@ public:
     Render render;
     Connection connection;
     std::vector<Extension> extentions;
+
+
+    [[nodiscard]] inline bool operator==(const Config &other) const
+    {
+      return camera == other.camera && log == other.log && playback == other.playback &&
+             render == other.render && connection == other.connection &&
+             extentions == other.extentions;
+    }
+
+    [[nodiscard]] inline bool operator!=(const Config &other) const { return !operator==(other); }
   };
 
   enum class Category : unsigned
