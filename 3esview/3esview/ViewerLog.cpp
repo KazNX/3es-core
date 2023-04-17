@@ -13,7 +13,7 @@ ViewerLog::View::const_iterator ViewerLog::View::beginFiltered(log::Level filter
     return end();
   }
   // Find the first relevant item.
-  const_iterator iter(_log, _log->_begin_index, !_log->_lines.empty());
+  const_iterator iter(_log, _log->beginIndex(), !_log->_lines.empty());
   const auto end = this->end();
   for (; iter != end && !iter.isRelevant(filter_level); ++iter)
     ;
@@ -67,14 +67,14 @@ void ViewerLog::log(log::Level level, const std::string &msg)
   {
     // Full ring buffer. Remove the next item.
     // Replace the first item.
-    _lines[_begin_index] = Entry{ level, msg };
-    _begin_index = (_begin_index + 1) % _count;
+    _lines[_next_index] = Entry{ level, msg };
   }
   else
   {
-    _lines[_begin_index + _count] = Entry{ level, msg };
+    _lines[_next_index] = Entry{ level, msg };
     ++_count;
   }
+  _next_index = (_next_index + 1) % _max_lines;
 }
 
 
@@ -99,5 +99,67 @@ size_t ViewerLog::extract(std::vector<Entry> &items, log::Level filter_level, si
     }
   }
   return added;
+}
+
+
+void ViewerLog::setMaxLines(size_t new_max_lines)
+{
+  const std::lock_guard guard(_mutex);
+  if (new_max_lines == _max_lines)
+  {
+    // No change.
+    return;
+  }
+
+  // Need to copy the entire contents.
+  std::vector<Entry> new_history(new_max_lines);
+  size_t write_index = 0;
+  if (_max_lines < new_max_lines)
+  {
+    // Increasing log size.
+    // Copy first part of the current log.
+    for (size_t i = beginIndex(); i < _lines.size(); ++i)
+    {
+      new_history[write_index++] = _lines[i];
+    }
+    // Copy second part of the current log.
+    for (size_t i = 0; i < beginIndex(); ++i)
+    {
+      new_history[write_index++] = _lines[i];
+    }
+  }
+  else
+  {
+    // Reduced log size.
+    if (_count <= new_max_lines)
+    {
+      // Have not wrapped the log yet and there's enough room in the new log. copy everything.
+      for (size_t i = 0; i < _count; ++i)
+      {
+        new_history[write_index++] = _lines[i];
+      }
+    }
+    else
+    {
+      // Need to drop data.
+      // Calculate a start index such that it points to the first item to preserve.
+      size_t read_index = (beginIndex() + (_count - new_max_lines)) % _max_lines;
+      for (; write_index < new_history.size(); ++write_index)
+      {
+        new_history[write_index] = _lines[read_index];
+        // Update the read index, wrapping for the current buffer size.
+        read_index = (read_index + 1) % _lines.size();
+      }
+    }
+  }
+
+  // Finalise.
+  // Swap buffers.
+  std::swap(_lines, new_history);
+  // Set new count.
+  _count = write_index;
+  _next_index = write_index % new_max_lines;
+  // Finalise max lines.
+  _max_lines = new_max_lines;
 }
 }  // namespace tes::view

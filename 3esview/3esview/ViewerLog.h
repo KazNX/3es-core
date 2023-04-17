@@ -196,7 +196,7 @@ public:
       if (_filter_level == log::Level::Trace)
       {
         // Unfiltered.
-        return const_iterator(_log, _log->_begin_index, !_log->_lines.empty());
+        return const_iterator(_log, _log->beginIndex(), !_log->_lines.empty());
       }
       return beginFiltered(_filter_level);
     }
@@ -262,19 +262,28 @@ public:
   /// Attain a filtered log view showing only messages up to the given level.
   View view(log::Level filter_level) const { return View(*this, filter_level); }
 
+  /// Change the lost history size to the given number of lines.
+  void setMaxLines(size_t new_max_lines);
+  /// Query the log history size as a maximum number of lines to store.
+  size_t maxLines() const { return _max_lines; }
+
 private:
   friend View;
   friend View::const_iterator;
 
+  /// Get the index of the @c begin entry.
+  size_t beginIndex() const { return (_count < _max_lines) ? 0 : _next_index; }
+
   /// Get the index of the @c end entry.
-  size_t endIndex() const { return (_begin_index + _count) % _max_lines; }
+  size_t endIndex() const { return _next_index; }
 
   // Let's see how a naive implementation goes.
   /// Lines ring buffer.
   /// Is full once size reaches _max_lines.
   std::vector<Entry> _lines;
-  /// Ring buffer index for the first item (inclusive).
-  size_t _begin_index = 0;
+  /// Ring buffer index for the next item to write to.
+  /// This wraps once the @c _count reaches _max_lines .
+  size_t _next_index = 0;
   /// Number of items in the ring buffer.
   size_t _count = 0;
   /// Maximum number of lines allowed.
