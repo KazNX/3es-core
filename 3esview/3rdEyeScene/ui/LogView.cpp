@@ -118,7 +118,7 @@ void LogView::drawText(const ToolState &tool_state)
 
   log_view.release();
 
-#if 1
+#if 0
   // Test log window scrolling code.
   static log::Level level = log::Level::Trace;
 
