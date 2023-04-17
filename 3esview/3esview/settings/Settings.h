@@ -58,6 +58,8 @@ public:
 
   using NotifyCallback = std::function<void(const Config &)>;
 
+  explicit Settings(const std::vector<settings::Extension> &extended_settings = {});
+
   Config config() const;
   void update(const Config &config);
   void update(const Camera &config);

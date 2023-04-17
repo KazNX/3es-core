@@ -61,11 +61,17 @@ uint16_t Viewer::defaultPort()
 }
 
 Viewer::Viewer(const Arguments &arguments)
+  : Viewer(arguments, {})
+{}
+
+
+Viewer::Viewer(const Arguments &arguments,
+               const std::vector<settings::Extension> &extended_settings)
   : Magnum::Platform::Application{ arguments,
                                    Configuration{}
                                      .setTitle("3rd Eye Scene Viewer")
                                      .setWindowFlags(Configuration::WindowFlag::Resizable) }
-  , _tes(std::make_shared<ThirdEyeScene>())
+  , _tes(std::make_shared<ThirdEyeScene>(extended_settings))
   , _commands(std::make_shared<command::Set>())
   , _move_keys({
       { KeyEvent::Key::A, 0, true },         //
@@ -105,12 +111,16 @@ Viewer::Viewer(const Arguments &arguments)
   const auto config = _tes->settings().config();
   _camera.position = { 0, -5, 0 };
   onCameraSettingsChange(config);
+  onLogSettingsChange(config);
   onRenderSettingsChange(config);
   onPlaybackSettingsChange(config);
 
   _tes->settings().addObserver(
     settings::Settings::Category::Camera,
     [this](const settings::Settings::Config &config) { onCameraSettingsChange(config); });
+  _tes->settings().addObserver(
+    settings::Settings::Category::Log,
+    [this](const settings::Settings::Config &config) { onLogSettingsChange(config); });
   _tes->settings().addObserver(
     settings::Settings::Category::Render,
     [this](const settings::Settings::Config &config) { onRenderSettingsChange(config); });
@@ -396,6 +406,12 @@ void Viewer::onCameraSettingsChange(const settings::Settings::Config &config)
   _camera.clip_far = config.camera.far_clip.value();
   _camera.clip_near = config.camera.near_clip.value();
   _camera.fov_horizontal_deg = config.camera.fov.value();
+}
+
+
+void Viewer::onLogSettingsChange(const settings::Settings::Config &config)
+{
+  _logger->setMaxLines(config.log.log_history.value());
 }
 
 

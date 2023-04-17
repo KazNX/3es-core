@@ -212,4 +212,45 @@ void Extension::update(const Extension &other)
     iter->update(prop);
   }
 }
+
+
+bool Extension::hasProperty(const std::string &key) const
+{
+  for (auto iter = _properties.begin(); iter != _properties.end(); ++iter)
+  {
+    if (iter->label() == key)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+const ExtensionProperty &Extension::operator[](const std::string &key) const
+{
+  for (auto iter = _properties.begin(); iter != _properties.end(); ++iter)
+  {
+    if (iter->label() == key)
+    {
+      return *iter;
+    }
+  }
+
+  throw std::runtime_error("Unknown property key: " + key);
+}
+
+
+ExtensionProperty &Extension::operator[](const std::string &key)
+{
+  for (auto iter = _properties.begin(); iter != _properties.end(); ++iter)
+  {
+    if (iter->label() == key)
+    {
+      return *iter;
+    }
+  }
+
+  throw std::runtime_error("Unknown property key: " + key);
+}
 }  // namespace tes::view::settings

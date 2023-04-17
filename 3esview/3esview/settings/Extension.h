@@ -203,6 +203,10 @@ public:
 
   [[nodiscard]] inline bool operator!=(const Extension &other) const { return !operator==(other); }
 
+  bool hasProperty(const std::string &key) const;
+  const ExtensionProperty &operator[](const std::string &key) const;
+  ExtensionProperty &operator[](const std::string &key);
+
 private:
   Properties _properties;
   std::string _name;

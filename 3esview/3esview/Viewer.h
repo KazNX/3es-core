@@ -5,7 +5,6 @@
 
 #include "camera/Fly.h"
 #include "handler/Camera.h"
-#include "settings/Settings.h"
 #include "ThirdEyeScene.h"
 
 #include <filesystem>
@@ -44,6 +43,7 @@ public:
   [[nodiscard]] static uint16_t defaultPort();
 
   explicit Viewer(const Arguments &arguments);
+  Viewer(const Arguments &arguments, const std::vector<settings::Extension> &extended_settings);
   ~Viewer();
 
   [[nodiscard]] std::shared_ptr<ThirdEyeScene> tes() const { return _tes; }
@@ -106,6 +106,7 @@ protected:
 
   virtual void onReset();
   virtual void onCameraSettingsChange(const settings::Settings::Config &config);
+  virtual void onLogSettingsChange(const settings::Settings::Config &config);
   virtual void onRenderSettingsChange(const settings::Settings::Config &config);
   virtual void onPlaybackSettingsChange(const settings::Settings::Config &config);
 

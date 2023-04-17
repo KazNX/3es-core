@@ -73,7 +73,7 @@ public:
 
   /// Constructor. Must be created on the main thread only - the thread which manages the render
   /// resource - i.e., the OpenGL context.
-  ThirdEyeScene();
+  explicit ThirdEyeScene(const std::vector<settings::Extension> &extended_settings = {});
   /// Destructor.
   ~ThirdEyeScene();
 

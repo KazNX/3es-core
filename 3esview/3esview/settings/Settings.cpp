@@ -5,6 +5,12 @@
 
 namespace tes::view::settings
 {
+Settings::Settings(const std::vector<settings::Extension> &extended_settings)
+{
+  _config.extentions = extended_settings;
+}
+
+
 Settings::Config Settings::config() const
 {
   const std::lock_guard guard(_mutex);
