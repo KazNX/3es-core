@@ -54,8 +54,9 @@
 
 namespace tes::view
 {
-ThirdEyeScene::ThirdEyeScene()
+ThirdEyeScene::ThirdEyeScene(const std::vector<settings::Extension> &extended_settings)
   : _main_thread_id(std::this_thread::get_id())
+  , _settings(extended_settings)
 {
   using namespace Magnum::Math::Literals;
 
@@ -66,6 +67,7 @@ ThirdEyeScene::ThirdEyeScene()
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::ProgramPointSize);
   Magnum::GL::Renderer::setPointSize(8);
 
+  // Add extended settings before we continue.
   restoreSettings();
 
   _culler = std::make_shared<BoundsCuller>();
@@ -675,7 +677,8 @@ bool ThirdEyeScene::saveCurrentFrameSnapshot(tes::Connection &connection)
 
 void ThirdEyeScene::restoreSettings()
 {
-  settings::Settings::Config config = {};
+  // Start by copying what we have. We need to do this to get all the extension settings.
+  auto config = _settings.config();
   const auto io_result = settings::load(config);
   if (io_result.code != settings::IOCode::Error)
   {
