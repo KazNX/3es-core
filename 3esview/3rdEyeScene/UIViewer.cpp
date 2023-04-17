@@ -126,9 +126,14 @@ UIViewer::DrawMode UIViewer::onDrawStart(float dt)
 void UIViewer::drawEvent()
 {
   Viewer::drawEvent();
-  if (_expected_window_size != windowSize())
+  const auto window_size = windowSize();
+  if (_expected_window_size != window_size)
   {
-    setWindowSize(_expected_window_size);
+    // Copy the window size as we can end up modifying it again.
+    // Hack: adjust for dpiScaling() const windowSize() doesn't consider it, but setWindowSize()
+    // does.
+    const auto new_size = _expected_window_size / dpiScaling();
+    setWindowSize(new_size);
   }
 }
 

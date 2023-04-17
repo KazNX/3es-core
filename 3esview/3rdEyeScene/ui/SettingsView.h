@@ -35,19 +35,35 @@ public:
 private:
   void drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window) override;
 
-  bool show(unsigned idx, settings::Camera &config);
-  bool show(unsigned idx, settings::Log &config);
-  bool show(unsigned idx, settings::Playback &config);
-  bool show(unsigned idx, settings::Render &config);
-  bool show(unsigned idx, settings::Extension &config);
+  struct ViewStatus
+  {
+    bool active = false;
+    bool dirty = false;
 
-  bool showProperty(unsigned idx, settings::Bool &prop);
-  bool showProperty(unsigned idx, settings::Int &prop);
-  bool showProperty(unsigned idx, settings::UInt &prop);
-  bool showProperty(unsigned idx, settings::Float &prop);
-  bool showProperty(unsigned idx, settings::Double &prop);
-  bool showProperty(unsigned idx, settings::Colour &prop);
-  bool showProperty(unsigned idx, settings::Enum &prop);
+    ViewStatus &operator+=(const ViewStatus &other)
+    {
+      active = active + other.active;
+      dirty = dirty + other.dirty;
+      return *this;
+    }
+  };
+
+  ViewStatus show(unsigned idx, settings::Camera &config);
+  ViewStatus show(unsigned idx, settings::Log &config);
+  ViewStatus show(unsigned idx, settings::Playback &config);
+  ViewStatus show(unsigned idx, settings::Render &config);
+  ViewStatus show(unsigned idx, settings::Extension &config);
+
+  ViewStatus showProperty(unsigned idx, settings::Bool &prop);
+  ViewStatus showProperty(unsigned idx, settings::Int &prop);
+  ViewStatus showProperty(unsigned idx, settings::UInt &prop);
+  ViewStatus showProperty(unsigned idx, settings::Float &prop);
+  ViewStatus showProperty(unsigned idx, settings::Double &prop);
+  ViewStatus showProperty(unsigned idx, settings::Colour &prop);
+  ViewStatus showProperty(unsigned idx, settings::Enum &prop);
+
+  settings::Settings::Config _cached_config;
+  bool _editing_config = false;
 };
 }  // namespace tes::view::ui
 
