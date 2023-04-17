@@ -2,8 +2,6 @@
 
 ## Protocol breaking changes
 
-## Client
-
 ## Viewer
 
 - Comment pass
