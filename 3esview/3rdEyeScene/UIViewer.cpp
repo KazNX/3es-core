@@ -132,8 +132,9 @@ void UIViewer::drawEvent()
     // Copy the window size as we can end up modifying it again.
     // Hack: adjust for dpiScaling() const windowSize() doesn't consider it, but setWindowSize()
     // does.
-    const auto new_size = _expected_window_size / dpiScaling();
-    setWindowSize(new_size);
+    const auto new_size =
+      (Magnum::Vector2(_expected_window_size) / dpiScaling()) + Magnum::Vector2(0.5f, 0.5f);
+    setWindowSize(Magnum::Vector2i(new_size));
   }
 }
 
