@@ -1,11 +1,12 @@
 # Run clang tidy general analysis, excluding variable naming checks.
 ---
+# * modernize-avoid-c-arrays covered by cppcoreguidelines-avoid-c-arrays
+# * readability-magic-numbers covered by cppcoreguidelines-avoid-magic-numbers
 # * readability-identifier-length disabled since I could not get the ignore expressions working.
 # * readability-simplify-boolean-expr there are good debugging reasons to keep expanded versions.
 Checks: >
   clang-diagnostic-*,
   clang-analyzer-*,
-  boost-use-to-string,
   bugprone-*,
   -bugprone-easily-swappable-parameters,
   cert-dcl58-cpp,
@@ -16,12 +17,9 @@ Checks: >
   cert-mem57-cpp,
   cert-oop57-cpp,
   cert-oop58-cpp,
-  cppcoreguildelines-*,
+  cppcoreguidelines-*,
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-pro-bounds-pointer-arithmatic,
-  google-*,
-  -google-explicit-constructor,
-  -google-runtime-references,
   llvm-include-order,
   llvm-namespace-comment,
   misc-*,
@@ -29,14 +27,15 @@ Checks: >
   -misc-non-private-member-variables-in-classes,
   -misc-unused-parameters,
   modernize-*,
+  -modernize-avoid-c-arrays,
   -modernize-use-trailing-return-type,
   performance-*,
   readability-*,
+  -readability-magic-numbers,
   -readability-implicit-bool-conversion,
   -readability-uppercase-literal-suffix,
   -readability-identifier-length,
-  -readability-simplify-boolean-expr,
-  -hicpp-signed-bitwise
+  -readability-simplify-boolean-expr
 WarningsAsErrors: ""
 HeaderFilterRegex: ".*"
 AnalyzeTemporaryDtors: false
@@ -163,13 +162,13 @@ CheckOptions:
   - key: readability-identifier-naming.LocalVariableCase
     value: lower_case
 
-  # Magic number ignore list
+  # Magic number ignore list.
   # Ignore Integer powers of 2 seems a bit unreliable, so I've listed a bunch explicitly.
-  - key: readability-magic-numbers.IgnoredIntegerValues
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnoredIntegerValues
     value: "0;1;2;3;4;5;6;7;8;9;10;100;1000;255;65535;4294967295"
-  - key: readability-magic-numbers.IgnorePowersOf2IntegerValues
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnorePowersOf2IntegerValues
     value: true
-  - key: readability-magic-numbers.IgnoredFloatingPointValues
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnoredFloatingPointValues
     value: "0.25;0.5;0.75;1.0;1.5;2.0;2.5;3.0;10.0;100.0;255.0;1000.0;0.1;0.001;0.0001"
 
   # Variable naming constraints
