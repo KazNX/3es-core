@@ -41,7 +41,10 @@ public:
   /// @param clientSocket The socket to communicate on.
   /// @param settings Various server settings to initialise with.
   BaseConnection(const ServerSettings &settings);
+  BaseConnection(const BaseConnection &) = delete;
   ~BaseConnection() override;
+
+  BaseConnection &operator=(const BaseConnection &) = delete;
 
   /// Activate/deactivate the connection. Messages are ignored while inactive.
   /// @param enable The active state to set.
@@ -145,6 +148,8 @@ protected:
 
   void ensurePacketBufferCapacity(size_t size);
 
+  // FIXME(KS): address protected member usage.
+  // NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-classes)
   Lock _packet_lock;    ///< Lock for using @c _packet
   Lock _send_lock;      ///< Lock for @c writePacket() and @c flushCollatedPacket()
   Lock _resource_lock;  ///< Lock for @c _resources
@@ -160,6 +165,7 @@ protected:
   unsigned _server_flags = 0;
   std::unique_ptr<CollatedPacket> _collation;
   std::atomic_bool _active = { true };
+  // NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes)
 };
 }  // namespace tes
 

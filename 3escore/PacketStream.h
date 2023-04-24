@@ -148,9 +148,11 @@ public:
   [[nodiscard]] const uint8_t *payload() const;
 
 protected:
+  // NOLINTBEGIN(cppcoreguidlines-non-private-member-variables-in-classes)
   HEADER *_packet = nullptr;        ///< Packet header and buffer start address.
   uint16_t _status = Ok;            ///< @c Status bits.
   uint16_t _payload_position = 0u;  ///< Payload cursor.
+  // NOLINTEND(cppcoreguidlines-non-private-member-variables-in-classes)
 
   /// Type traits: is @c T const?
   template <class T>

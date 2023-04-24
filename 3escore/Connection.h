@@ -183,6 +183,7 @@ public:
   /// @overload
   int send(const int8_t *data, int byte_count, bool allow_collation = true)
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     return send(reinterpret_cast<const uint8_t *>(data), byte_count, allow_collation);
   }
 };

@@ -342,6 +342,8 @@ public:
   [[nodiscard]] virtual std::shared_ptr<Shape> clone() const;
 
 protected:
+  Shape &setRoutingId(uint16_t routing_id);
+
   /// Called when @p copy is created from this object to copy appropriate attributes to @p copy.
   ///
   /// The general use case is for a subclass to override @c clone(), creating the correct
@@ -352,6 +354,7 @@ protected:
 
   void init(const Id &id, const Transform &transform, uint16_t flags = 0);
 
+private:
   uint16_t _routing_id = 0;
   CreateMessage _data = {};
   ObjectAttributesd _attributes = {};
@@ -611,6 +614,13 @@ inline Shape &Shape::setColour(const Colour &colour)
 inline Colour Shape::colour() const
 {
   return { _attributes.colour };
+}
+
+
+inline Shape &Shape::setRoutingId(uint16_t routing_id)
+{
+  _routing_id = routing_id;
+  return *this;
 }
 }  // namespace tes
 

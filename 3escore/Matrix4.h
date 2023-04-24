@@ -39,7 +39,7 @@ public:
   Matrix4() noexcept = default;
   /// Array initialisation constructor from an array of at least 16 elements. No bounds checking.
   /// @param array16 The array of at least 16 value to initialise from.
-  Matrix4(const T array16[16]);  // NOLINT(modernize-avoid-c-arrays)
+  Matrix4(const T array16[16]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
   /// Construct from a @c std::array.
   ///
   /// Expects a row major format. Use @c transpose() when providing column major data.
@@ -94,6 +94,8 @@ public:
   /// @param other Matrix to assign from.
   /// @return @c *this
   Matrix4<T> &operator=(const Matrix4<T> &other) noexcept = default;
+
+  ~Matrix4() = default;
 
   /// Row/column access. Not bounds checked.
   /// @param r The row to access [0, 3]

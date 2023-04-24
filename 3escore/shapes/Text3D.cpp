@@ -13,7 +13,7 @@ bool Text3D::writeCreate(PacketWriter &stream) const
 {
   bool ok = true;
   stream.reset(routingId(), CreateMessage::MessageId);
-  ok = _data.write(stream, _attributes) && ok;
+  ok = data().write(stream, attributes()) && ok;
 
   // Write line count and lines.
   const auto text_length = int_cast<uint16_t>(_text.size());

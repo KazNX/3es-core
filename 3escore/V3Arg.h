@@ -15,7 +15,7 @@ struct V3Arg
 {
   /// Single precision pointer constructor.
   /// @param v Vector 3 array.
-  V3Arg(const float v[3])  // NOLINT(modernize-avoid-c-arrays)
+  V3Arg(const float v[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
     : v3(v)
   {}
   /// @overload
@@ -24,7 +24,7 @@ struct V3Arg
   {}
   /// Double precision pointer constructor.
   /// @param v Vector 3  array.
-  V3Arg(const double v[3])  // NOLINT(modernize-avoid-c-arrays)
+  V3Arg(const double v[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
     : v3(Vector3d(v))
   {}
   /// @overload

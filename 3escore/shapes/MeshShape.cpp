@@ -250,7 +250,7 @@ int MeshShape::writeData(PacketWriter &packet, unsigned &progress_marker) const
 {
   bool ok = true;
   DataMessage msg = {};
-  msg.id = _data.id;
+  msg.id = id();
   packet.reset(routingId(), DataMessage::MessageId);
   ok = msg.write(packet);
 
@@ -418,7 +418,6 @@ std::shared_ptr<Shape> MeshShape::clone() const
 {
   auto triangles = std::make_shared<MeshShape>();
   onClone(*triangles);
-  triangles->_data = _data;
   return triangles;
 }
 

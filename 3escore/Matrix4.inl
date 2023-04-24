@@ -9,7 +9,7 @@ namespace tes
 template <typename T>
 Matrix4<T> operator*(const Matrix4<T> &a, const Matrix4<T> &b)
 {
-  Matrix4<T> m;
+  Matrix4<T> m = {};
   m(0, 0) = a(0, 0) * b(0, 0) + a(0, 1) * b(1, 0) + a(0, 2) * b(2, 0) + a(0, 3) * b(3, 0);
   m(0, 1) = a(0, 0) * b(0, 1) + a(0, 1) * b(1, 1) + a(0, 2) * b(2, 1) + a(0, 3) * b(3, 1);
   m(0, 2) = a(0, 0) * b(0, 2) + a(0, 1) * b(1, 2) + a(0, 2) * b(2, 2) + a(0, 3) * b(3, 2);
@@ -36,7 +36,7 @@ Matrix4<T> operator*(const Matrix4<T> &a, const Matrix4<T> &b)
 template <typename T>
 Vector3<T> operator*(const Matrix4<T> &a, const Vector3<T> &v)
 {
-  Vector3<T> r;
+  Vector3<T> r = {};
 
   r.x() = a(0, 0) * v[0] + a(0, 1) * v[1] + a(0, 2) * v[2] + a(0, 3) * static_cast<T>(1);
   r.y() = a(1, 0) * v[0] + a(1, 1) * v[1] + a(1, 2) * v[2] + a(1, 3) * static_cast<T>(1);
@@ -48,7 +48,7 @@ Vector3<T> operator*(const Matrix4<T> &a, const Vector3<T> &v)
 template <typename T>
 Vector4<T> operator*(const Matrix4<T> &a, const Vector4<T> &v)
 {
-  Vector4<T> r;
+  Vector4<T> r = {};
 
   r.x() = a(0, 0) * v[0] + a(0, 1) * v[1] + a(0, 2) * v[2] + a(0, 3) * v[3];
   r.y() = a(1, 0) * v[0] + a(1, 1) * v[1] + a(1, 2) * v[2] + a(1, 3) * v[3];
@@ -65,10 +65,11 @@ template <typename T>
 const Matrix4<T> Matrix4<T>::Identity(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
 template <typename T>
-Matrix4<T>::Matrix4(const T array16[16])  // NOLINT(modernize-avoid-c-arrays)
+Matrix4<T>::Matrix4(const T array16[16])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   for (int i = 0; i < 16; ++i)
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     _storage[i] = array16[i];
   }
 }
@@ -205,7 +206,7 @@ Matrix4<T> Matrix4<T>::lookAt(const Vector3<T> &eye, const Vector3<T> &target,
     return Identity;
   }
 
-  std::array<Vector3<T>, 3> axes;
+  std::array<Vector3<T>, 3> axes = {};
   int side_axis_index = 0;
   if (forward_axis_index == 1 && up_axis_index == 2 ||
       up_axis_index == 1 && forward_axis_index == 2)
@@ -222,14 +223,14 @@ Matrix4<T> Matrix4<T>::lookAt(const Vector3<T> &eye, const Vector3<T> &target,
   {
     side_axis_index = 2;
   }
-  axes[forward_axis_index] = (target - eye).normalised();
-  axes[side_axis_index] = axes[forward_axis_index].cross(axis_up).normalised();
-  axes[up_axis_index] = axes[side_axis_index].cross(axes[forward_axis_index]);
+  axes.at(forward_axis_index) = (target - eye).normalised();
+  axes.at(side_axis_index) = axes.at(forward_axis_index).cross(axis_up).normalised();
+  axes.at(up_axis_index) = axes.at(side_axis_index).cross(axes.at(forward_axis_index));
 
   Matrix4<T> m = Identity;
-  m.setAxis(side_axis_index, axes[side_axis_index]);
-  m.setAxis(forward_axis_index, axes[forward_axis_index]);
-  m.setAxis(up_axis_index, axes[up_axis_index]);
+  m.setAxis(side_axis_index, axes.at(side_axis_index));
+  m.setAxis(forward_axis_index, axes.at(forward_axis_index));
+  m.setAxis(up_axis_index, axes.at(up_axis_index));
   m.setTranslation(eye);
 
   return m;
@@ -286,9 +287,9 @@ Matrix4<T> &Matrix4<T>::invert()
   // 3. Calculate the determinant of the given matrix.
   // 4. Multiply the matrix obtained in step 3 by the reciprocal of the determinant.
 
-  // NOLINTBEGIN(readability-magic-numbers)
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   Matrix4<T> transpose = transposed();  // transposed source matrix
-  std::array<T, 12> pairs;              // temp array for cofactors
+  std::array<T, 12> pairs = {};         // temp array for cofactors
   T det;                                // determinant
 
   // calculate pairs for first 8 elements
@@ -365,7 +366,7 @@ Matrix4<T> &Matrix4<T>::invert()
   {
     _storage[i] *= det_inv;
   }
-  // NOLINTEND(readability-magic-numbers)
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 
   return *this;
 }
@@ -401,7 +402,7 @@ inline Matrix4<T> &Matrix4<T>::rigidBodyInvert()
   (*this)(2, 3) = -(*this)(2, 3);
 
   // Multiply by the negated translation.
-  Vector3<T> v;
+  Vector3<T> v = {};
   v.x() =
     (*this)(0, 0) * (*this)(0, 3) + (*this)(0, 1) * (*this)(1, 3) + (*this)(0, 2) * (*this)(2, 3);
   v.y() =
@@ -426,10 +427,10 @@ inline Matrix4<T> Matrix4<T>::rigidBodyInverse() const
 template <typename T>
 T Matrix4<T>::determinant() const
 {
-  // NOLINTBEGIN(readability-magic-numbers)
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   Matrix4<T> transpose(transposed());  // transposed source matrix
-  std::array<T, 12> pairs;             // temp array for cofactors
-  std::array<T, 4> tmp;
+  std::array<T, 12> pairs = {};        // temp array for cofactors
+  std::array<T, 4> tmp = {};
 
   // calculate pairs for first 8 elements
   pairs[0] = transpose[10] * transpose[15];
@@ -458,7 +459,7 @@ T Matrix4<T>::determinant() const
   // calculate determinant
   return (transpose[0] * tmp[0] + transpose[4] * tmp[1] + transpose[8] * tmp[2] +
           transpose[12] * tmp[3]);
-  // NOLINTEND(readability-magic-numbers)
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }
 
 template <typename T>
@@ -583,7 +584,7 @@ inline Vector3<T> Matrix4<T>::transform(const Vector3<T> &v) const
 template <typename T>
 inline Vector3<T> Matrix4<T>::rotate(const Vector3<T> &v) const
 {
-  Vector3<T> r;
+  Vector3<T> r = {};
 
   r.x() = (*this)(0, 0) * v[0] + (*this)(0, 1) * v[1] + (*this)(0, 2) * v[2];
   r.y() = (*this)(1, 0) * v[0] + (*this)(1, 1) * v[1] + (*this)(1, 2) * v[2];
@@ -601,7 +602,7 @@ inline Vector4<T> Matrix4<T>::transform(const Vector4<T> &v) const
 template <typename T>
 inline Vector4<T> Matrix4<T>::rotate(const Vector4<T> &v) const
 {
-  Vector4<T> r;
+  Vector4<T> r = {};
 
   r.x() = (*this)(0, 0) * v[0] + (*this)(0, 1) * v[1] + (*this)(0, 2) * v[2];
   r.y() = (*this)(1, 0) * v[0] + (*this)(1, 1) * v[1] + (*this)(1, 2) * v[2];
@@ -615,7 +616,7 @@ inline Vector4<T> Matrix4<T>::rotate(const Vector4<T> &v) const
 template <typename T>
 inline bool Matrix4<T>::isEqual(const Matrix4<T> &a, const T epsilon) const
 {
-  // NOLINTBEGIN(readability-magic-numbers)
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   return std::abs(_storage[0] - a[0]) <= epsilon && std::abs(_storage[1] - a[1]) <= epsilon &&
          std::abs(_storage[2] - a[2]) <= epsilon && std::abs(_storage[3] - a[3]) <= epsilon &&
          std::abs(_storage[4] - a[4]) <= epsilon && std::abs(_storage[5] - a[5]) <= epsilon &&
@@ -624,7 +625,7 @@ inline bool Matrix4<T>::isEqual(const Matrix4<T> &a, const T epsilon) const
          std::abs(_storage[10] - a[10]) <= epsilon && std::abs(_storage[11] - a[11]) <= epsilon &&
          std::abs(_storage[12] - a[12]) <= epsilon && std::abs(_storage[13] - a[13]) <= epsilon &&
          std::abs(_storage[14] - a[14]) <= epsilon && std::abs(_storage[15] - a[15]) <= epsilon;
-  // NOLINTEND(readability-magic-numbers)
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }
 // NOLINTEND(readability-identifier-length)
 }  // namespace tes

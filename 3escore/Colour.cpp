@@ -11,7 +11,7 @@ namespace tes
 {
 Colour::Colour(NamedColour name)
 {
-  thread_local const std::array<Colour, Colour::PredefinedLast + 1> colours =  //
+  static const std::array<Colour, Colour::PredefinedLast + 1> colours =  //
     {
       Colour(220, 220, 220),  //
       Colour(211, 211, 211),  //
@@ -155,7 +155,7 @@ Colour::Colour(NamedColour name)
       Colour(123, 104, 238),  //
     };
 
-  *this = colours[static_cast<int>(name)];
+  *this = colours.at(static_cast<int>(name));
 }
 
 
@@ -233,23 +233,21 @@ void Colour::hsvToRgb(float &red, float &green, float &blue, const float hue,
   const float hue_sector = hue / degrees_per_sector;  // sector 0 to 5
   const int sector_index =
     static_cast<int>(std::min<float>(std::max<float>(0.0f, std::floor(hue_sector)), 5.0f));
-  // NOLINTBEGIN(readability-identifier-length)
   const float f = hue_sector - static_cast<float>(sector_index);
   const float p = value * (1 - saturation);
   const float q = value * (1 - saturation * f);
   const float t = value * (1 - saturation * (1 - f));
-  // NOLINTEND(readability-identifier-length)
 
   static const std::array<int, 6> vindex = { 0, 1, 1, 2, 2, 0 };
   static const std::array<int, 6> pindex = { 2, 2, 0, 0, 1, 1 };
   static const std::array<int, 6> qindex = { 3, 0, 3, 1, 3, 2 };
   static const std::array<int, 6> tindex = { 1, 3, 2, 3, 0, 3 };
 
-  std::array<float, 4> rgb;
-  rgb[vindex[sector_index]] = value;
-  rgb[pindex[sector_index]] = p;
-  rgb[qindex[sector_index]] = q;
-  rgb[tindex[sector_index]] = t;
+  std::array<float, 4> rgb = {};
+  rgb.at(vindex.at(sector_index)) = value;
+  rgb.at(pindex.at(sector_index)) = p;
+  rgb.at(qindex.at(sector_index)) = q;
+  rgb.at(tindex.at(sector_index)) = t;
 
   // Handle achromatic here by testing saturation inline.
   red = (saturation != 0) ? rgb[0] : value;
@@ -301,7 +299,7 @@ Colour ColourSet::cycle(size_t number) const
 
 const ColourSet &ColourSet::predefined(PredefinedSet name)
 {
-  thread_local std::array<ColourSet, LastSet + 1> sets = {
+  static const std::array<ColourSet, LastSet + 1> sets = {
     // Web safe
     ColourSet{
       Colour(Colour::Gainsboro),
@@ -615,6 +613,6 @@ const ColourSet &ColourSet::predefined(PredefinedSet name)
     } },
   };
 
-  return sets[static_cast<int>(name)];
+  return sets.at(static_cast<int>(name));
 }
 }  // namespace tes

@@ -36,7 +36,7 @@ public:
   Matrix3() noexcept = default;
   /// Array initialisation constructor from an array of at least 9 elements. No bounds checking.
   /// @param array9 The array of at least 9 value to initialise from.
-  Matrix3(const T array9[9]);  // NOLINT(modernize-avoid-c-arrays)
+  Matrix3(const T array9[9]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
   /// Construct from a @c std::array.
   ///
   /// Expects a row major format. Use @c transpose() when providing column major data.
@@ -60,6 +60,8 @@ public:
   /// Move constructor.
   /// @param other The matrix to move from.
   Matrix3(Matrix3<T> &&other) noexcept = default;
+
+  ~Matrix3() = default;
 
   /// Move assignment.
   /// @param other Matrix to assign from.

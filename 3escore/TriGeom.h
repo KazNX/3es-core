@@ -21,7 +21,7 @@ namespace tes::trigeom
 /// @return The centre of the triangle formed by the three points.
 [[nodiscard]] Vector3f centre(const std::array<Vector3f, 3> &tri);
 /// @overload
-[[nodiscard]] Vector3f centre(const Vector3f tri[3]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] Vector3f centre(const Vector3f tri[3]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 /// @overload
 [[nodiscard]] Vector3f normal(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2);
@@ -31,7 +31,7 @@ namespace tes::trigeom
 /// @return The triangle normal.
 [[nodiscard]] Vector3f normal(const std::array<Vector3f, 3> &tri);
 /// @overload
-[[nodiscard]] Vector3f normal(const Vector3f tri[3]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] Vector3f normal(const Vector3f tri[3]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 /// @overload
 [[nodiscard]] Vector4f plane(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2);
@@ -45,7 +45,7 @@ namespace tes::trigeom
 /// @return A representation of the triangle plane.
 [[nodiscard]] Vector4f plane(const std::array<Vector3f, 3> &tri);
 /// @overload
-[[nodiscard]] Vector4f plane(const Vector3f tri[3]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] Vector4f plane(const Vector3f tri[3]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 /// @overload
 [[nodiscard]] bool isDegenerate(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2,
@@ -58,7 +58,7 @@ namespace tes::trigeom
 [[nodiscard]] bool isDegenerate(const std::array<Vector3f, 3> &tri,
                                 float epsilon = Vector3f::kEpsilon);
 /// @overload
-[[nodiscard]] bool isDegenerate(const Vector3f tri[3],  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] bool isDegenerate(const Vector3f tri[3],  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                                 float epsilon = Vector3f::kEpsilon);
 
 /// @overload
@@ -69,8 +69,9 @@ namespace tes::trigeom
 /// @param point The point to test. Assumed to be on the triangle plane.
 /// @param tri The triangle vertices.
 /// @return True if @p point lies inside the triangle.
-[[nodiscard]] bool isPointInside(const Vector3f &point,
-                                 const Vector3f tri[3]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] bool isPointInside(
+  const Vector3f &point,
+  const Vector3f tri[3]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 /// @overload
 [[nodiscard]] Vector3f nearestPoint(const Vector3f &point, const Vector3f &v0, const Vector3f &v1,
@@ -83,8 +84,9 @@ namespace tes::trigeom
 /// @return The point on or within @p tri closest to @p point.
 [[nodiscard]] Vector3f nearestPoint(const Vector3f &point, const std::array<Vector3f, 3> &tri);
 /// @overload
-[[nodiscard]] Vector3f nearestPoint(const Vector3f &point,
-                                    const Vector3f tri[3]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] Vector3f nearestPoint(
+  const Vector3f &point,
+  const Vector3f tri[3]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 /// Performs a ray/triangle intersection test.
 ///
@@ -123,8 +125,9 @@ bool intersectRay(float *hit_time, const Vector3f &v0, const Vector3f &v1, const
 [[nodiscard]] bool intersectAABB(const std::array<Vector3f, 3> &tri,
                                  const std::array<Vector3f, 2> &aabb);
 /// @overload
-[[nodiscard]] bool intersectAABB(const Vector3f tri[3],    // NOLINT(modernize-avoid-c-arrays)
-                                 const Vector3f aabb[2]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] bool intersectAABB(
+  const Vector3f tri[3],    // NOLINT(cppcoreguidelines-avoid-c-arrays)
+  const Vector3f aabb[2]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 //--------------------------------------------------------------------------
 // Vector3d functions
@@ -134,27 +137,27 @@ bool intersectRay(float *hit_time, const Vector3f &v0, const Vector3f &v1, const
 /// @overload
 [[nodiscard]] Vector3d centre(const std::array<Vector3d, 3> &tri);
 /// @overload
-[[nodiscard]] Vector3d centre(const Vector3d tri[3]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] Vector3d centre(const Vector3d tri[3]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 /// @overload
 [[nodiscard]] Vector3d normal(const Vector3d &v0, const Vector3d &v1, const Vector3d &v2);
 /// @overload
 [[nodiscard]] Vector3d normal(std::array<Vector3d, 3> &tri);
 /// @overload
-[[nodiscard]] Vector3d normal(const Vector3d tri[3]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] Vector3d normal(const Vector3d tri[3]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 /// @overload
 [[nodiscard]] Vector4d plane(const Vector3d &v0, const Vector3d &v1, const Vector3d &v2);
 /// @overload
 [[nodiscard]] Vector4d plane(std::array<Vector3d, 3> &tri);
 /// @overload
-[[nodiscard]] Vector4d plane(const Vector3d tri[3]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] Vector4d plane(const Vector3d tri[3]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 /// @overload
 [[nodiscard]] bool isDegenerate(const Vector3d &v0, const Vector3d &v1, const Vector3d &v2,
                                 double epsilon = Vector3d::kEpsilon);
 /// @overload
-[[nodiscard]] bool isDegenerate(const Vector3d tri[3],  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] bool isDegenerate(const Vector3d tri[3],  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                                 double epsilon = Vector3d::kEpsilon);
 
 /// @overload
@@ -163,8 +166,9 @@ bool intersectRay(float *hit_time, const Vector3f &v0, const Vector3f &v1, const
 /// @overload
 [[nodiscard]] bool isPointInside(const Vector3d &point, std::array<Vector3d, 3> &tri);
 /// @overload
-[[nodiscard]] bool isPointInside(const Vector3d &point,
-                                 const Vector3d tri[3]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] bool isPointInside(
+  const Vector3d &point,
+  const Vector3d tri[3]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 /// @overload
 [[nodiscard]] Vector3d nearestPoint(const Vector3d &point, const Vector3d &v0, const Vector3d &v1,
@@ -172,8 +176,9 @@ bool intersectRay(float *hit_time, const Vector3f &v0, const Vector3f &v1, const
 /// @overload
 [[nodiscard]] Vector3d nearestPoint(const Vector3d &point, std::array<Vector3d, 3> &tri);
 /// @overload
-[[nodiscard]] Vector3d nearestPoint(const Vector3d &point,
-                                    const Vector3d tri[3]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] Vector3d nearestPoint(
+  const Vector3d &point,
+  const Vector3d tri[3]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 
 /// @overload
 bool intersectRay(double *hit_time, const Vector3d &v0, const Vector3d &v1, const Vector3d &v2,
@@ -187,8 +192,9 @@ bool intersectRay(double *hit_time, const Vector3d &v0, const Vector3d &v1, cons
 [[nodiscard]] bool intersectAABB(const std::array<Vector3d, 3> &tri,
                                  const std::array<Vector3d, 2> &aabb);
 /// @overload
-[[nodiscard]] bool intersectAABB(const Vector3d tri[3],    // NOLINT(modernize-avoid-c-arrays)
-                                 const Vector3d aabb[2]);  // NOLINT(modernize-avoid-c-arrays)
+[[nodiscard]] bool intersectAABB(
+  const Vector3d tri[3],    // NOLINT(cppcoreguidelines-avoid-c-arrays)
+  const Vector3d aabb[2]);  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 }  // namespace tes::trigeom
 
 #include "TriGeom.inl"

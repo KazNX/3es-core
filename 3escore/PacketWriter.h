@@ -185,7 +185,7 @@ public:
   template <typename T>
   PacketWriter &operator>>(T &val);
 
-protected:
+private:
   uint8_t *payloadWritePtr();
   void incrementPayloadSize(size_t inc);
 

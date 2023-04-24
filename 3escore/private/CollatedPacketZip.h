@@ -30,10 +30,8 @@ struct CollatedPacketZip
   bool inflate_mode = false;
 
   inline CollatedPacketZip(bool inflate)
-  {
-    memset(&stream, 0, sizeof(stream));
-    inflate_mode = inflate;
-  }
+    : inflate_mode(inflate)
+  {}
 
   inline ~CollatedPacketZip() { reset(); }
 

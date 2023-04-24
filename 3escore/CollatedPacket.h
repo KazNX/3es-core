@@ -88,8 +88,12 @@ public:
   /// @param max_packet_size The maximum packet size.
   CollatedPacket(unsigned buffer_size, unsigned max_packet_size);
 
+  CollatedPacket(const CollatedPacket &) = delete;
+
   /// Destructor.
   ~CollatedPacket() override;
+
+  CollatedPacket &operator=(const CollatedPacket &) = delete;
 
   /// Is compression enabled. Required ZLIB.
   /// @return True if compression is enabled.

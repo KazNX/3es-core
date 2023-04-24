@@ -32,6 +32,8 @@ BaseConnection::BaseConnection(const ServerSettings &settings)
   _packet = std::make_unique<PacketWriter>(_packet_buffer.data(),
                                            int_cast<uint16_t>(_packet_buffer.size()));
   initDefaultServerInfo(&_server_info);
+  // Member initialisation warning is wrong. It depends on _server_info changes.
+  // NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
   _seconds_to_time_unit =
     kSecondsToMicroseconds /
     (_server_info.time_unit ? static_cast<float>(_server_info.time_unit) : 1.0f);
@@ -118,6 +120,7 @@ int BaseConnection::send(const CollatedPacket &collated)
   const std::lock_guard<Lock> guard(_packet_lock);
   // Extract each packet in turn.
   // Cycle each message and send.
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   const auto *packet = reinterpret_cast<const PacketHeader *>(bytes);
   unsigned processed_bytes = CollatedPacket::InitialCursorOffset;
   unsigned packet_size = 0;
@@ -125,8 +128,10 @@ int BaseConnection::send(const CollatedPacket &collated)
   bool crc_present = false;
   if (!(packet->flags & PFNoCrc))
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     processed_bytes -= static_cast<unsigned>(sizeof(PacketWriter::CrcType));
   }
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-*)
   packet = reinterpret_cast<const PacketHeader *>(bytes + processed_bytes);
   while (processed_bytes + sizeof(PacketHeader) < collated_bytes)
   {
@@ -145,10 +150,12 @@ int BaseConnection::send(const CollatedPacket &collated)
     {
       return -1;
     }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     send(reinterpret_cast<const uint8_t *>(packet), int_cast<int>(packet_size));
 
     // Next packet.
     processed_bytes += packet_size;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-*)
     packet = reinterpret_cast<const PacketHeader *>(bytes + processed_bytes);
   }
 
@@ -329,7 +336,7 @@ int BaseConnection::updateFrame(float dt, bool flush)
 
   // std::lock_guard<Lock> guard(_lock);
   int wrote = -1;
-  ControlMessage msg;
+  ControlMessage msg = {};
   msg.control_flags = !flush * CFFramePersist;
   // Convert dt to desired time unit.
   msg.value32 = static_cast<uint32_t>(dt * _seconds_to_time_unit);

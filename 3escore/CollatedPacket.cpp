@@ -170,7 +170,7 @@ bool CollatedPacket::finalise()
 
     // Z_BEST_COMPRESSION
     // params: stream,level, method, window bits, memLevel, strategy
-    const int gzip_compression_level = tes::kTesToGZipCompressionLevel[_compression_level];
+    const int gzip_compression_level = tes::kTesToGZipCompressionLevel.at(_compression_level);
     deflateInit2(&_zip->stream, gzip_compression_level, Z_DEFLATED,
                  // NOLINTNEXTLINE(hicpp-signed-bitwise)
                  CollatedPacketZip::WindowBits | CollatedPacketZip::GZipEncoding, 8,

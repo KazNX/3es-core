@@ -106,7 +106,7 @@ template void TES_CORE_API transformToQuaternionTranslation(const Matrix4<double
 template <typename T>
 inline Quaternion<T> transformToQuaternionTranslation(const Matrix4<T> &m, Vector3<T> &translation)
 {
-  Quaternion<T> q;
+  Quaternion<T> q = {};
   transformToQuaternionTranslation(m, q, translation);
   return q;
 }

@@ -77,7 +77,9 @@ public:
   /// Initialisation from a array of at least length 3.
   /// No bounds checking is performed.
   /// @param array3 An array of at least length 3. Copies elements (0, 1, 2).
-  Vector3(const T array3[3]) noexcept  // NOLINT(modernize-avoid-c-arrays)
+  Vector3(
+    const T array3[3]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
+                                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ array3[0], array3[1], array3[2] })
   {}
 
@@ -85,7 +87,9 @@ public:
   /// No bounds checking is performed.
   /// @param array3 An array of at least length 3. Copies elements (0, 1, 2).
   template <typename U>
-  Vector3(const U array3[3]) noexcept  // NOLINT(modernize-avoid-c-arrays)
+  Vector3(
+    const U array3[3]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
+                                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ static_cast<T>(array3[0]), static_cast<T>(array3[1]), static_cast<T>(array3[2]) })
   {}
 
@@ -95,6 +99,8 @@ public:
   Vector3(const Vector3<U> &other) noexcept
     : _storage({ static_cast<T>(other.x()), static_cast<T>(other.y()), static_cast<T>(other.z()) })
   {}
+
+  ~Vector3() = default;
 
   /// Simple assignment operator.
   /// @param other Vector to copy the value of.
@@ -145,16 +151,16 @@ public:
   /// Index operator. Not bounds checked.
   /// @param index Access coordinates by index; 0 = x, 1 = y, 2 = z.
   /// @return The coordinate value.
-  T &operator[](int index) { return _storage[index]; }
+  T &operator[](int index) { return _storage.at(index); }
   /// @overload
-  [[nodiscard]] const T &operator[](int index) const { return _storage[index]; }
+  [[nodiscard]] const T &operator[](int index) const { return _storage.at(index); }
 
   /// Index operator. Not bounds checked.
   /// @param index Access coordinates by index; 0 = x, 1 = y, 2 = z.
   /// @return The coordinate value.
-  T &operator[](unsigned index) { return _storage[index]; }
+  T &operator[](unsigned index) { return _storage.at(index); }
   /// @overload
-  [[nodiscard]] const T &operator[](unsigned index) const { return _storage[index]; }
+  [[nodiscard]] const T &operator[](unsigned index) const { return _storage.at(index); }
 
   /// Exact equality operator. Compares each component with the same operator.
   /// @param other The vector to compare to.
@@ -492,7 +498,7 @@ inline T Vector3<T>::dot(const Vector3<T> &other) const
 template <typename T>
 inline Vector3<T> Vector3<T>::cross(const Vector3<T> &other) const
 {
-  Vector3<T> vec;
+  Vector3<T> vec = {};
   vec.x() = y() * other.z() - z() * other.y();
   vec.y() = z() * other.x() - x() * other.z();
   vec.z() = x() * other.y() - y() * other.x();

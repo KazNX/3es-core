@@ -690,7 +690,7 @@ inline Vector3f centre(const std::array<Vector3f, 3> &tri)
 }
 
 
-inline Vector3f centre(const Vector3f tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector3f centre(const Vector3f tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return centreT(std::array<Vector3f, 3>{ tri[0], tri[1], tri[2] });
 }
@@ -708,7 +708,7 @@ inline Vector3f normal(const std::array<Vector3f, 3> &tri)
 }
 
 
-inline Vector3f normal(const Vector3f tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector3f normal(const Vector3f tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return normalT(tri[0], tri[1], tri[2]);
 }
@@ -727,7 +727,7 @@ inline Vector4f plane(const std::array<Vector3f, 3> &tri)
 }
 
 
-inline Vector4f plane(const Vector3f tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector4f plane(const Vector3f tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return planeT(std::array<Vector3f, 3>{ tri[0], tri[1], tri[2] });
 }
@@ -746,7 +746,7 @@ inline bool isDegenerate(const std::array<Vector3f, 3> &tri, const float epsilon
 }
 
 
-inline bool isDegenerate(const Vector3f tri[3],  // NOLINT(modernize-avoid-c-arrays)
+inline bool isDegenerate(const Vector3f tri[3],  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                          const float epsilon)
 {
   return isDegenerateT(tri[0], tri[1], tri[2], epsilon);
@@ -768,7 +768,7 @@ inline bool isPointInside(const Vector3f &point, const std::array<Vector3f, 3> &
 
 
 inline bool isPointInside(const Vector3f &point,
-                          const Vector3f tri[3])  // NOLINT(modernize-avoid-c-arrays)
+                          const Vector3f tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return isPointInsideT(point, std::array<Vector3f, 3>{ tri[0], tri[1], tri[2] });
 }
@@ -789,7 +789,7 @@ inline Vector3f nearestPoint(const Vector3f &point, const std::array<Vector3f, 3
 
 
 inline Vector3f nearestPoint(const Vector3f &point,
-                             const Vector3f tri[3])  // NOLINT(modernize-avoid-c-arrays)
+                             const Vector3f tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return nearestPointT(point, std::array<Vector3f, 3>{ tri[0], tri[1], tri[2] });
 }
@@ -816,8 +816,8 @@ inline bool intersectAABB(const std::array<Vector3f, 3> &tri, const std::array<V
 }
 
 
-inline bool intersectAABB(const Vector3f tri[3],   // NOLINT(modernize-avoid-c-arrays)
-                          const Vector3f aabb[2])  // NOLINT(modernize-avoid-c-arrays)
+inline bool intersectAABB(const Vector3f tri[3],   // NOLINT(cppcoreguidelines-avoid-c-arrays)
+                          const Vector3f aabb[2])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return intersectAABBT(std::array<Vector3f, 3>{ tri[0], tri[1], tri[2] },
                         std::array<Vector3f, 2>{ aabb[0], aabb[1] });
@@ -840,7 +840,7 @@ inline Vector3d centre(const std::array<Vector3d, 3> &tri)
 }
 
 
-inline Vector3d centre(const Vector3d tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector3d centre(const Vector3d tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return centreT(std::array<Vector3d, 3>{ tri[0], tri[1], tri[2] });
 }
@@ -858,7 +858,7 @@ inline Vector3d normal(const std::array<Vector3d, 3> &tri)
 }
 
 
-inline Vector3d normal(const Vector3d tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector3d normal(const Vector3d tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return normalT(tri[0], tri[1], tri[2]);
 }
@@ -877,7 +877,7 @@ inline Vector4d plane(const std::array<Vector3d, 3> &tri)
 }
 
 
-inline Vector4d plane(const Vector3d tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector4d plane(const Vector3d tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return planeT(std::array<Vector3d, 3>{ tri[0], tri[1], tri[2] });
 }
@@ -896,7 +896,7 @@ inline bool isDegenerate(const std::array<Vector3d, 3> &tri, const double epsilo
 }
 
 
-inline bool isDegenerate(const Vector3d tri[3],  // NOLINT(modernize-avoid-c-arrays)
+inline bool isDegenerate(const Vector3d tri[3],  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                          const double epsilon)
 {
   return isDegenerateT(tri[0], tri[1], tri[2], epsilon);
@@ -918,7 +918,7 @@ inline bool isPointInside(const Vector3d &point, const std::array<Vector3d, 3> &
 
 
 inline bool isPointInside(const Vector3d &point,
-                          const Vector3d tri[3])  // NOLINT(modernize-avoid-c-arrays)
+                          const Vector3d tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return isPointInsideT(point, std::array<Vector3d, 3>{ tri[0], tri[1], tri[2] });
 }
@@ -939,7 +939,7 @@ inline Vector3d nearestPoint(const Vector3d &point, const std::array<Vector3d, 3
 
 
 inline Vector3d nearestPoint(const Vector3d &point,
-                             const Vector3d tri[3])  // NOLINT(modernize-avoid-c-arrays)
+                             const Vector3d tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return nearestPointT(point, std::array<Vector3d, 3>{ tri[0], tri[1], tri[2] });
 }
@@ -966,8 +966,8 @@ inline bool intersectAABB(const std::array<Vector3d, 3> &tri, const std::array<V
 }
 
 
-inline bool intersectAABB(const Vector3d tri[3],   // NOLINT(modernize-avoid-c-arrays)
-                          const Vector3d aabb[2])  // NOLINT(modernize-avoid-c-arrays)
+inline bool intersectAABB(const Vector3d tri[3],   // NOLINT(cppcoreguidelines-avoid-c-arrays)
+                          const Vector3d aabb[2])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   return intersectAABBT(std::array<Vector3d, 3>{ tri[0], tri[1], tri[2] },
                         std::array<Vector3d, 2>{ aabb[0], aabb[1] });

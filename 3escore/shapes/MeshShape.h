@@ -321,14 +321,15 @@ inline MeshShape::MeshShape(DrawType draw_type, const Id &id, DataBuffer vertice
 
 inline bool MeshShape::calculateNormals() const
 {
-  return (_data.flags & MeshShapeCalculateNormals) != 0;
+  return (flags() & MeshShapeCalculateNormals) != 0;
 }
 
 
 inline MeshShape &MeshShape::setCalculateNormals(bool calculate)
 {
-  _data.flags = static_cast<uint16_t>(_data.flags & ~MeshShapeCalculateNormals);
-  _data.flags = static_cast<uint16_t>(_data.flags | MeshShapeCalculateNormals * !!calculate);
+  auto new_flags = static_cast<uint16_t>(flags() & ~MeshShapeCalculateNormals);
+  new_flags |= MeshShapeCalculateNormals * !!calculate;
+  setFlags(new_flags);
   return *this;
 }
 
@@ -339,11 +340,11 @@ inline MeshShape &MeshShape::setColourByHeight(bool colour_by_height)
   {
     if (colour_by_height)
     {
-      _attributes.colour = 0;
+      setColour(Colour(0));
     }
-    else if (_attributes.colour == 0)
+    else if (colour().colour32() == 0)
     {
-      _attributes.colour = 0xFFFFFFFFu;
+      setColour(Colour(0xFFFFFFFFu));
     }
   }
 
@@ -352,7 +353,7 @@ inline MeshShape &MeshShape::setColourByHeight(bool colour_by_height)
 
 inline bool MeshShape::colourByHeight() const
 {
-  return drawType() == DtPoints && _attributes.colour == 0;
+  return drawType() == DtPoints && colour().colour32() == 0;
 }
 
 

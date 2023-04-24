@@ -16,7 +16,7 @@
 
 namespace tes
 {
-// NOLINTBEGIN(modernize-use-auto, modernize-avoid-c-arrays, modernize-loop-convert,
+// NOLINTBEGIN(modernize-use-auto, cppcoreguidelines-avoid-c-arrays, modernize-loop-convert,
 // google-readability-casting)
 
 /// List of routing IDs of common, built in message handlers.
@@ -849,7 +849,7 @@ struct TES_CORE_API CameraMessage
   }
 };
 
-// NOLINTEND(modernize-use-auto, modernize-avoid-c-arrays, modernize-loop-convert,
+// NOLINTEND(modernize-use-auto, cppcoreguidelines-avoid-c-arrays, modernize-loop-convert,
 // google-readability-casting)
 }  // namespace tes
 

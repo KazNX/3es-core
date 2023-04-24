@@ -69,14 +69,18 @@ public:
   /// Initialisation from a array of at least length 4.
   /// No bounds checking is performed.
   /// @param array4 An array of at least length 4. Copies elements (0, 1, 2, 3).
-  Quaternion(const T array4[4]) noexcept  // NOLINT(modernize-avoid-c-arrays)
+  Quaternion(
+    const T array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
+                                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ array4[0], array4[1], array4[2], array4[3] })
   {}
   /// Initialisation from a array of at least length 4.
   /// No bounds checking is performed.
   /// @param array4 An array of at least length 4. Copies elements (0, 1, 2, 3).
   template <typename U>
-  Quaternion(const U array4[4]) noexcept  // NOLINT(modernize-avoid-c-arrays)
+  Quaternion(
+    const U array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
+                                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ static_cast<T>(array4[0]), static_cast<T>(array4[1]), static_cast<T>(array4[2]),
                  static_cast<T>(array4[3]) })
   {}
@@ -86,6 +90,8 @@ public:
   /// @param to Target vector.
   Quaternion(const Vector3<T> &from, const Vector3<T> &to);
   // NOLINTEND(readability-identifier-length)
+
+  ~Quaternion() = default;
 
   /// Simple assignment operator.
   /// @param other Vector to copy the value of.
@@ -140,9 +146,9 @@ public:
   /// Index operator. Not bounds checked.
   /// @param index Access coordinates by index; 0 = x, 1 = y, 2 = z.
   /// @return The coordinate value.
-  T &operator[](int index) { return _storage[index]; }
+  T &operator[](int index) { return _storage.at(index); }
   /// @overload
-  const T &operator[](int index) const { return _storage[index]; }
+  const T &operator[](int index) const { return _storage.at(index); }
 
   /// Exact equality operator. Compares each component with the same operator.
   /// @param other The vector to compare to.
