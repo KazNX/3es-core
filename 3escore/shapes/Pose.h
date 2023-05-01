@@ -32,6 +32,18 @@ public:
   /// @param other Object to move.
   Pose(Pose &&other) noexcept = default;
 
+  ~Pose() override = default;
+
+  /// Copy assignment.
+  /// @param other The object to copy.
+  /// @return @c *this
+  Pose &operator=(const Pose &other) noexcept = default;
+
+  /// Move assignment.
+  /// @param other The object to move.
+  /// @return @c *this
+  Pose &operator=(Pose &&other) noexcept = default;
+
   [[nodiscard]] const char *type() const override { return "pose"; }
 };
 

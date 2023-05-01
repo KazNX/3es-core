@@ -201,7 +201,7 @@ enum DrawType : unsigned
 /// McfDoublePrecision set.
 ///
 /// Supports the following @c MeshFlag values:
-/// - @c McfDoublePrecision
+/// - @c McfDoublePrecsion
 struct MeshCreateMessage
 {
   /// ID for this message.
@@ -230,7 +230,6 @@ struct MeshCreateMessage
     ok = reader.readElement(index_count) == sizeof(index_count) && ok;
     ok = reader.readElement(flags) == sizeof(flags) && ok;
     ok = reader.readElement(draw_type) == sizeof(draw_type) && ok;
-    // NOLINTNEXTLINE(hicpp-signed-bitwise)
     ok = attributes.read(reader, flags & McfDoublePrecision) && ok;
     return ok;
   }
@@ -249,7 +248,6 @@ struct MeshCreateMessage
     ok = writer.writeElement(index_count) == sizeof(index_count) && ok;
     ok = writer.writeElement(flags) == sizeof(flags) && ok;
     ok = writer.writeElement(draw_type) == sizeof(draw_type) && ok;
-    // NOLINTNEXTLINE(hicpp-signed-bitwise)
     ok = attributes.write(writer, flags & McfDoublePrecision) && ok;
     return ok;
   }

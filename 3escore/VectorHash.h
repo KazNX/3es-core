@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace tes
 {
-// NOLINTBEGIN(readability-identifier-length,readability-magic-numbers, google-readability-casting)
+// NOLINTBEGIN(readability-identifier-length,cppcoreguidelines-avoid-magic-numbers, google-readability-casting)
 /// Magic number for vector hashing.
 inline constexpr uint32_t TES_CORE_API vectorHashMagic()
 {
@@ -157,7 +157,7 @@ public:
   /// @return The 32-bit hash code for @p p.
   inline size_t operator()(const T &p) const { return vhash::hash(p.x(), p.y(), p.z()); }
 };
-// NOLINTEND(readability-identifier-length,readability-magic-numbers, google-readability-casting)
+// NOLINTEND(readability-identifier-length,cppcoreguidelines-avoid-magic-numbers, google-readability-casting)
 }  // namespace tes
 
 #endif  // TES_CORE_VECTOR_HASH_H

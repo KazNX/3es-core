@@ -6,6 +6,7 @@
 #include "CoreUtil.h"
 #include "PacketReader.h"
 
+#include <cstddef>
 #include <cstring>
 
 namespace tes
@@ -20,6 +21,8 @@ PacketStreamReader::PacketStreamReader()
 PacketStreamReader::PacketStreamReader(std::shared_ptr<std::istream> stream)
   : PacketStreamReader()
 {
+  // An initialiser delegate must stand alone, so member initialisation must appear here.
+  // NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
   _stream = std::move(stream);
   if (_stream)
   {
@@ -70,7 +73,7 @@ PacketStreamReader::ExtractedPacket PacketStreamReader::extractPacket()
       // Marker found. Shift down to comsume trash at the start of the buffer.
       if (i > 0)
       {
-        std::copy(_buffer.begin() + i, _buffer.end(), _buffer.begin());
+        std::copy(_buffer.begin() + static_cast<ssize_t>(i), _buffer.end(), _buffer.begin());
         _buffer.resize(_buffer.size() - i);
         status = Status::Dropped;
       }
@@ -100,6 +103,7 @@ PacketStreamReader::ExtractedPacket PacketStreamReader::extractPacket()
 
       // We have our packet.
       // Mark to consume on next call.
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
       return { reinterpret_cast<const PacketHeader *>(_buffer.data()), status,
                _current_packet_pos };
     }
@@ -132,6 +136,7 @@ size_t PacketStreamReader::readMore(size_t more_count)
   _buffer.resize(have_count + more_count);
   // Note(KS): I was using readsome() because that returns the count read, but it was also not
   // working as expected.
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-*)
   _stream->read(reinterpret_cast<char *>(_buffer.data()) + have_count,
                 int_cast<unsigned>(more_count));
   const auto read_count = _stream->gcount();
@@ -148,6 +153,7 @@ bool PacketStreamReader::checkMarker(std::vector<uint8_t> &buffer, size_t i)
 {
   for (size_t j = 0; j < _marker_bytes.size() && i + j < buffer.size(); ++j)
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
     if (_buffer[i + j] != _marker_bytes[j])
     {
       return false;
@@ -175,15 +181,16 @@ void PacketStreamReader::consume()
   if (_buffer.size() >= target_size)
   {
     // Update cursor.
-    _current_packet_pos += _buffer.size() - target_size;
+    _current_packet_pos += static_cast<ssize_t>(_buffer.size() - target_size);
     // Consume.
-    std::copy(_buffer.begin() + target_size, _buffer.end(), _buffer.begin());
+    std::copy(_buffer.begin() + static_cast<ssize_t>(target_size), _buffer.end(), _buffer.begin());
     _buffer.resize(_buffer.size() - target_size);
   }
 }
 
 size_t PacketStreamReader::calcExpectedSize()
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   const auto *header = reinterpret_cast<const PacketHeader *>(_buffer.data());
   auto payload_size = networkEndianSwapValue(header->payload_size);
   if ((networkEndianSwapValue(header->flags) & PFNoCrc) == 0)

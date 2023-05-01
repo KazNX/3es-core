@@ -9,6 +9,8 @@
 #include <array>
 #include <cinttypes>
 
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
 namespace tes
 {
 /// Perform an Endian swap on the given @p data buffer.
@@ -73,7 +75,7 @@ inline void endianSwap8(uint8_t *data)
 /// @param data The 16-byte buffer to Endian swap.
 inline void endianSwap16(uint8_t *data)
 {
-  // NOLINTBEGIN(readability-magic-numbers)
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   uint8_t temp = data[15];
   data[15] = data[0];
   data[0] = temp;
@@ -99,7 +101,7 @@ inline void endianSwap16(uint8_t *data)
   temp = data[8];
   data[8] = data[7];
   data[7] = temp;
-  // NOLINTEND(readability-magic-numbers)
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }
 
 
@@ -116,12 +118,14 @@ inline void endianSwap(int8_t & /*data*/)
 /// @param[in,out] data Value to swap the Endian of.
 inline void endianSwap(uint16_t &data)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap2(reinterpret_cast<uint8_t *>(&data));
 }
 /// Two byte integer Endian swap.
 /// @param[in,out] data Value to swap the Endian of.
 inline void endianSwap(int16_t &data)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap2(reinterpret_cast<uint8_t *>(&data));
 }
 
@@ -129,12 +133,14 @@ inline void endianSwap(int16_t &data)
 /// @param[in,out] data Value to swap the Endian of.
 inline void endianSwap(uint32_t &data)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap4(reinterpret_cast<uint8_t *>(&data));
 }
 /// Four byte integer Endian swap.
 /// @param[in,out] data Value to swap the Endian of.
 inline void endianSwap(int32_t &data)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap4(reinterpret_cast<uint8_t *>(&data));
 }
 
@@ -142,12 +148,14 @@ inline void endianSwap(int32_t &data)
 /// @param[in,out] data Value to swap the Endian of.
 inline void endianSwap(uint64_t &data)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap8(reinterpret_cast<uint8_t *>(&data));
 }
 /// Eight byte integer Endian swap.
 /// @param[in,out] data Value to swap the Endian of.
 inline void endianSwap(int64_t &data)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap8(reinterpret_cast<uint8_t *>(&data));
 }
 
@@ -155,12 +163,14 @@ inline void endianSwap(int64_t &data)
 /// @param[in,out] data Value to swap the Endian of.
 inline void endianSwap(float &data)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap4(reinterpret_cast<uint8_t *>(&data));
 }
 /// Eight byte floating point Endian swap.
 /// @param[in,out] data Value to swap the Endian of.
 inline void endianSwap(double &data)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap8(reinterpret_cast<uint8_t *>(&data));
 }
 
@@ -191,24 +201,29 @@ void endianSwap(std::array<T, N> &byte_array)
   }
   if constexpr (N == 2)
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     endianSwap2(reinterpret_cast<uint8_t *>(byte_array.data()));
     return;
   }
   if constexpr (N == 4)
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     endianSwap4(reinterpret_cast<uint8_t *>(byte_array.data()));
     return;
   }
   if constexpr (N == 8)
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     endianSwap8(reinterpret_cast<uint8_t *>(byte_array.data()));
     return;
   }
   if constexpr (N == 16)
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     endianSwap16(reinterpret_cast<uint8_t *>(byte_array.data()));
     return;
   }
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap(reinterpret_cast<uint8_t *>(byte_array.data()), byte_array.size());
 }
 
@@ -255,6 +270,7 @@ inline void networkEndianSwap(int8_t &data)
 inline void networkEndianSwap(uint16_t &data)
 {
 #if !TES_IS_NETWORK_ENDIAN
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap2(reinterpret_cast<uint8_t *>(&data));
 #else   // !TES_IS_NETWORK_ENDIAN
   TES_UNUSED(data);
@@ -266,6 +282,7 @@ inline void networkEndianSwap(uint16_t &data)
 inline void networkEndianSwap(int16_t &data)
 {
 #if !TES_IS_NETWORK_ENDIAN
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap2(reinterpret_cast<uint8_t *>(&data));
 #else   // !TES_IS_NETWORK_ENDIAN
   TES_UNUSED(data);
@@ -277,6 +294,7 @@ inline void networkEndianSwap(int16_t &data)
 inline void networkEndianSwap(uint32_t &data)
 {
 #if !TES_IS_NETWORK_ENDIAN
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap4(reinterpret_cast<uint8_t *>(&data));
 #else   // !TES_IS_NETWORK_ENDIAN
   TES_UNUSED(data);
@@ -288,6 +306,7 @@ inline void networkEndianSwap(uint32_t &data)
 inline void networkEndianSwap(int32_t &data)
 {
 #if !TES_IS_NETWORK_ENDIAN
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap4(reinterpret_cast<uint8_t *>(&data));
 #else   // !TES_IS_NETWORK_ENDIAN
   TES_UNUSED(data);
@@ -299,6 +318,7 @@ inline void networkEndianSwap(int32_t &data)
 inline void networkEndianSwap(uint64_t &data)
 {
 #if !TES_IS_NETWORK_ENDIAN
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap8(reinterpret_cast<uint8_t *>(&data));
 #else   // !TES_IS_NETWORK_ENDIAN
   TES_UNUSED(data);
@@ -310,6 +330,7 @@ inline void networkEndianSwap(uint64_t &data)
 inline void networkEndianSwap(int64_t &data)
 {
 #if !TES_IS_NETWORK_ENDIAN
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap8(reinterpret_cast<uint8_t *>(&data));
 #else   // !TES_IS_NETWORK_ENDIAN
   TES_UNUSED(data);
@@ -321,6 +342,7 @@ inline void networkEndianSwap(int64_t &data)
 inline void networkEndianSwap(float &data)
 {
 #if !TES_IS_NETWORK_ENDIAN
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap4(reinterpret_cast<uint8_t *>(&data));
 #else   // !TES_IS_NETWORK_ENDIAN
   TES_UNUSED(data);
@@ -332,6 +354,7 @@ inline void networkEndianSwap(float &data)
 inline void networkEndianSwap(double &data)
 {
 #if !TES_IS_NETWORK_ENDIAN
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   endianSwap8(reinterpret_cast<uint8_t *>(&data));
 #else   // !TES_IS_NETWORK_ENDIAN
   TES_UNUSED(data);
@@ -362,5 +385,7 @@ inline int8_t networkEndianSwapValue(const int8_t &data)
   return data;
 }
 }  // namespace tes
+
+// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
 #endif  // TES_CORE_ENDIAN_H

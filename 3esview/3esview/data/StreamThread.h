@@ -284,11 +284,11 @@ private:
     /// Keyframe storage
     std::unique_ptr<KeyframeStore> store;
     /// Data at which to make a new keyframe (MiB).
-    size_t size_interval_mib = 20;  // NOLINT(readability-magic-numbers)
+    size_t size_interval_mib = 20;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     /// Frame number interval at which to make keyframes.
-    FrameNumber frame_interval = 100;  // NOLINT(readability-magic-numbers)
+    FrameNumber frame_interval = 100;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     /// Minimum number of frames between key frames..
-    FrameNumber frame_minimum_interval = 5;  // NOLINT(readability-magic-numbers)
+    FrameNumber frame_minimum_interval = 5;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     /// True if new keyfames are allowed.
     bool enabled = true;
   };

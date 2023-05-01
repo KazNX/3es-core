@@ -9,9 +9,9 @@ namespace tes::log
 {
 namespace
 {
-// Clang tidy erroneously considers this a global variable. It should be more of a static variable.
-// NOLINTNEXTLINE(readability-identifier-naming)
-LogFunction s_log_function;
+// Clang tidy considers this a global variable. It should be more of a static variable.
+// NOLINTNEXTLINE(readability-identifier-naming, cppcoreguidelines-avoid-non-const-global-variables)
+LogFunction s_log_function = {};
 
 struct DefaultLogFunctionInit
 {
@@ -53,7 +53,7 @@ const std::string &toString(Level level)
   static const std::array<std::string, 5> names = {
     "Fatal", "Error", "Warn", "Info", "Trace",
   };
-  return names[static_cast<unsigned>(level)];
+  return names.at(static_cast<unsigned>(level));
 }
 
 
@@ -62,7 +62,7 @@ const std::string &prefix(Level level)
   static const std::array<std::string, 5> prefixes = {
     "[Fatal] : ", "[Error] : ", "[Warn] : ", "[Info] : ", "[Trace] : ",
   };
-  return prefixes[static_cast<unsigned>(level)];
+  return prefixes.at(static_cast<unsigned>(level));
 }
 
 

@@ -26,15 +26,15 @@ using Double = Numeric<double>;
 
 namespace tes::view::settings::priv
 {
-IOCode read(const ryml::NodeRef &parent, const std::string &key, std::string &value,
+IOCode read(const ryml::ConstNodeRef &parent, const std::string &key, std::string &value,
             std::ostream &log);
-IOCode read(const ryml::NodeRef &parent, Bool &prop, std::ostream &log);
-IOCode read(const ryml::NodeRef &parent, Colour &prop, std::ostream &log);
-IOCode read(const ryml::NodeRef &parent, Enum &prop, std::ostream &log);
-IOCode read(const ryml::NodeRef &parent, Int &prop, std::ostream &log);
-IOCode read(const ryml::NodeRef &parent, UInt &prop, std::ostream &log);
-IOCode read(const ryml::NodeRef &parent, Float &prop, std::ostream &log);
-IOCode read(const ryml::NodeRef &parent, Double &prop, std::ostream &log);
+IOCode read(const ryml::ConstNodeRef &parent, Bool &prop, std::ostream &log);
+IOCode read(const ryml::ConstNodeRef &parent, Colour &prop, std::ostream &log);
+IOCode read(const ryml::ConstNodeRef &parent, Enum &prop, std::ostream &log);
+IOCode read(const ryml::ConstNodeRef &parent, Int &prop, std::ostream &log);
+IOCode read(const ryml::ConstNodeRef &parent, UInt &prop, std::ostream &log);
+IOCode read(const ryml::ConstNodeRef &parent, Float &prop, std::ostream &log);
+IOCode read(const ryml::ConstNodeRef &parent, Double &prop, std::ostream &log);
 
 IOCode write(ryml::NodeRef &parent, const Bool &prop, std::ostream &log);
 IOCode write(ryml::NodeRef &parent, const Colour &prop, std::ostream &log);

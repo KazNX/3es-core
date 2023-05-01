@@ -73,7 +73,7 @@ std::ostream &append(std::ostream &out)
 
 namespace tes::view::settings::priv
 {
-IOCode read(const ryml::NodeRef &parent, const std::string &key, std::string &value,
+IOCode read(const ryml::ConstNodeRef &parent, const std::string &key, std::string &value,
             std::ostream &log)
 {
   if (parent.empty())
@@ -101,7 +101,7 @@ IOCode read(const ryml::NodeRef &parent, const std::string &key, std::string &va
 }
 
 
-IOCode read(const ryml::NodeRef &parent, Bool &prop, std::ostream &log)
+IOCode read(const ryml::ConstNodeRef &parent, Bool &prop, std::ostream &log)
 {
   if (parent.empty())
   {
@@ -137,7 +137,7 @@ IOCode read(const ryml::NodeRef &parent, Bool &prop, std::ostream &log)
 }
 
 
-IOCode read(const ryml::NodeRef &parent, Colour &prop, std::ostream &log)
+IOCode read(const ryml::ConstNodeRef &parent, Colour &prop, std::ostream &log)
 {
   if (parent.empty())
   {
@@ -153,7 +153,7 @@ IOCode read(const ryml::NodeRef &parent, Colour &prop, std::ostream &log)
     return IOCode::Partial;
   }
 
-  std::array<ryml::NodeRef, 3> nodes = {
+  std::array<ryml::ConstNodeRef, 3> nodes = {
     node[Tags::Common::red()],
     node[Tags::Common::green()],
     node[Tags::Common::blue()],
@@ -189,7 +189,7 @@ IOCode read(const ryml::NodeRef &parent, Colour &prop, std::ostream &log)
 
 
 template <typename T>
-IOCode readNumeric(const ryml::NodeRef &parent, Numeric<T> &prop, std::ostream &log)
+IOCode readNumeric(const ryml::ConstNodeRef &parent, Numeric<T> &prop, std::ostream &log)
 {
   if (parent.empty())
   {
@@ -228,7 +228,7 @@ IOCode readNumeric(const ryml::NodeRef &parent, Numeric<T> &prop, std::ostream &
 }
 
 
-IOCode read(const ryml::NodeRef &parent, Enum &prop, std::ostream &log)
+IOCode read(const ryml::ConstNodeRef &parent, Enum &prop, std::ostream &log)
 {
   if (parent.empty())
   {
@@ -263,25 +263,25 @@ IOCode read(const ryml::NodeRef &parent, Enum &prop, std::ostream &log)
 }
 
 
-IOCode read(const ryml::NodeRef &parent, Int &prop, std::ostream &log)
+IOCode read(const ryml::ConstNodeRef &parent, Int &prop, std::ostream &log)
 {
   return readNumeric(parent, prop, log);
 }
 
 
-IOCode read(const ryml::NodeRef &parent, UInt &prop, std::ostream &log)
+IOCode read(const ryml::ConstNodeRef &parent, UInt &prop, std::ostream &log)
 {
   return readNumeric(parent, prop, log);
 }
 
 
-IOCode read(const ryml::NodeRef &parent, Float &prop, std::ostream &log)
+IOCode read(const ryml::ConstNodeRef &parent, Float &prop, std::ostream &log)
 {
   return readNumeric(parent, prop, log);
 }
 
 
-IOCode read(const ryml::NodeRef &parent, Double &prop, std::ostream &log)
+IOCode read(const ryml::ConstNodeRef &parent, Double &prop, std::ostream &log)
 {
   return readNumeric(parent, prop, log);
 }

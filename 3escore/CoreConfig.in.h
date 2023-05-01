@@ -18,11 +18,11 @@
 
 // Version setup.
 /// Major version number.
-#define TES_VERSION_MAJOR @TES_VERSION_MAJOR@ // NOLINT(modernize-macro-to-enum)
+#define TES_VERSION_MAJOR @TES_VERSION_MAJOR@  // NOLINT(modernize-macro-to-enum)
 /// Minor version number.
-#define TES_VERSION_MINOR @TES_VERSION_MINOR@ // NOLINT(modernize-macro-to-enum)
+#define TES_VERSION_MINOR @TES_VERSION_MINOR@  // NOLINT(modernize-macro-to-enum)
 /// Patch version number.
-#define TES_VERSION_PATCH @TES_VERSION_PATCH@ // NOLINT(modernize-macro-to-enum)
+#define TES_VERSION_PATCH @TES_VERSION_PATCH@  // NOLINT(modernize-macro-to-enum)
 /// Version string.
 #define TES_VERSION "@TES_VERSION@"
 
@@ -41,14 +41,14 @@ enum class Version : int
   /// Minor version number.
   Minor = @TES_VERSION_MINOR@,
   /// Patch version number.
-  Patch = @TES_VERSION_PATCH@ 
+  Patch = @TES_VERSION_PATCH@
 };
 }  // namespace tes
 
 // Force MSVC to define useful things like M_PI.
 #ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES // NOLINT(bugprone-reserved-identifier)
-#endif  // _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES  // NOLINT(bugprone-reserved-identifier)
+#endif                     // _USE_MATH_DEFINES
 
 // For MSVC to skip defining min/max as macros.
 #ifndef NOMINMAX
@@ -61,16 +61,17 @@ enum class Version : int
 #ifdef _MSC_VER
 // Avoid dubious security warnings for plenty of legitimate code
 #ifndef _SCL_SECURE_NO_WARNINGS
-#define _SCL_SECURE_NO_WARNINGS 1 // NOLINT(bugprone-reserved-identifier)
-#endif  // _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS 1  // NOLINT(bugprone-reserved-identifier)
+#endif                             // _SCL_SECURE_NO_WARNINGS
 #ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS 1 // NOLINT(bugprone-reserved-identifier)
-#endif  // _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS 1  // NOLINT(bugprone-reserved-identifier)
+#endif                             // _CRT_SECURE_NO_WARNINGS
 // #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 #endif  // _MSC_VER
 
 // Include standard headers to ensure we effect the configuration above.
 #include <cmath>
+#include <cstdint>
 // #include <cstddef>
 
 /// @def TES_ZLIB
@@ -78,8 +79,8 @@ enum class Version : int
 #cmakedefine TES_ZLIB
 
 // Define the local Endian and the network Endian
-#define TES_IS_BIG_ENDIAN @TES_IS_BIG_ENDIAN@ // NOLINT(modernize-macro-to-enum)
-#define TES_IS_NETWORK_ENDIAN @TES_IS_BIG_ENDIAN@ // NOLINT(modernize-macro-to-enum)
+#define TES_IS_BIG_ENDIAN @TES_IS_BIG_ENDIAN@      // NOLINT(modernize-macro-to-enum)
+#define TES_IS_NETWORK_ENDIAN @TES_IS_BIG_ENDIAN@  // NOLINT(modernize-macro-to-enum)
 
 // Define assertion usages.
 /// @def TES_ASSERT_ENABLE_DEBUG
@@ -93,12 +94,13 @@ enum class Version : int
 
 #if defined(NDEBUG) && TES_ASSERT_ENABLE_RELEASE || !defined(NDEBUG) && TES_ASSERT_ENABLE_DEBUG
 #define TES_ASSERT_ENABLE 1
-#endif  // defined(NDEBUG) && TES_ASSERT_ENABLE_RELEASE || !defined(NDEBUG) && TES_ASSERT_ENABLE_DEBUG
+#endif  // defined(NDEBUG) && TES_ASSERT_ENABLE_RELEASE || !defined(NDEBUG) &&
+        // TES_ASSERT_ENABLE_DEBUG
 
 // Define the word size (in bits)
 /// @def TES_32
 /// Defines when on a 32-bit platform.
-#cmakedefine TES_32 
+#cmakedefine TES_32
 /// @def TES_64
 /// Defines when on a 64-bit platform.
 #cmakedefine TES_64
@@ -115,5 +117,19 @@ enum class Version : int
 #else  // TES_64
 #define TES_ZU "%u"
 #endif  // TES_64
+
+namespace tes
+{
+// #if _­_­cplusplus >= 202002L
+// using ssize_t = std::ssize_t;
+// #else  // # _­_­cplusplus >= 202002L
+// #endif  // _­_­cplusplus >= 202002L
+#ifdef TES_64
+using ssize_t = int64_t;  // NOLINT(readability-identifier-naming)
+#else   // TES_64
+using ssize_t = int32_t;  // NOLINT(readability-identifier-naming)
+#endif  // TES_64
+static_assert(sizeof(ssize_t) == sizeof(size_t));
+}  // namespace tes
 
 #endif  // TES_CORE_CONFIG_H

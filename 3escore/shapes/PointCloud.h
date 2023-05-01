@@ -33,6 +33,9 @@ public:
   /// Destructor.
   ~PointCloud() override;
 
+  // Copy assignment is not threadsafe. Deleted.
+  PointCloud &operator=(const PointCloud &other) = delete;
+
   /// @copydoc MeshResource::id()
   [[nodiscard]] uint32_t id() const override;
 

@@ -29,13 +29,13 @@ struct CollatedPacketZip
   z_stream stream = {};
   bool inflate_mode = false;
 
-  inline CollatedPacketZip(bool inflate)
+  CollatedPacketZip(bool inflate)
     : inflate_mode(inflate)
   {}
 
-  inline ~CollatedPacketZip() { reset(); }
+  ~CollatedPacketZip() { reset(); }
 
-  inline void reset()
+  void reset()
   {
     // Ensure clean up
     if (!inflate_mode)
@@ -57,8 +57,11 @@ struct CollatedPacketZip
     memset(&stream, 0, sizeof(stream));
   }
 #else   // TES_ZLIB
-  inline CollatedPacketZip(bool) {}
-  inline void reset() {}
+  CollatedPacketZip(bool) {}
+  void reset() {}
 #endif  // TES_ZLIB
+
+  CollatedPacketZip(const CollatedPacketZip &other) = delete;
+  CollatedPacketZip &operator=(const CollatedPacketZip &other) = delete;
 };
 }  // namespace tes

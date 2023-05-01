@@ -8,49 +8,49 @@
 #include <iostream>
 
 /// Implement @c ExtensionPropertyAffordances for properties of @c Type .
-#define DEFINE_AFFORDANCES(Type)                                         \
-  class Type##Affordances : public ExtensionPropertyAffordances          \
-  {                                                                      \
-  public:                                                                \
-    Type##Affordances(const settings::Type &property)                    \
-      : _property(property)                                              \
-    {}                                                                   \
-                                                                         \
-    PropertyType type() const override                                   \
-    {                                                                    \
-      return PropertyType::Type;                                         \
-    }                                                                    \
-    const std::string &label() const override                            \
-    {                                                                    \
-      return _property.label();                                          \
-    }                                                                    \
-    const std::string &tip() const override                              \
-    {                                                                    \
-      return _property.tip();                                            \
-    }                                                                    \
-    IOCode read(const ryml::NodeRef &parent, std::ostream &log) override \
-    {                                                                    \
-      return priv::read(parent, _property, log);                         \
-    }                                                                    \
-    IOCode write(ryml::NodeRef &node, std::ostream &log) const override  \
-    {                                                                    \
-      return priv::write(node, _property, log);                          \
-    }                                                                    \
-    std::unique_ptr<ExtensionPropertyAffordances> clone() const override \
-    {                                                                    \
-      return std::make_unique<Type##Affordances>(_property);             \
-    }                                                                    \
-    void *property() override                                            \
-    {                                                                    \
-      return &_property;                                                 \
-    }                                                                    \
-    const void *property() const override                                \
-    {                                                                    \
-      return &_property;                                                 \
-    }                                                                    \
-                                                                         \
-  private:                                                               \
-    settings::Type _property;                                            \
+#define DEFINE_AFFORDANCES(Type)                                              \
+  class Type##Affordances : public ExtensionPropertyAffordances               \
+  {                                                                           \
+  public:                                                                     \
+    Type##Affordances(const settings::Type &property)                         \
+      : _property(property)                                                   \
+    {}                                                                        \
+                                                                              \
+    PropertyType type() const override                                        \
+    {                                                                         \
+      return PropertyType::Type;                                              \
+    }                                                                         \
+    const std::string &label() const override                                 \
+    {                                                                         \
+      return _property.label();                                               \
+    }                                                                         \
+    const std::string &tip() const override                                   \
+    {                                                                         \
+      return _property.tip();                                                 \
+    }                                                                         \
+    IOCode read(const ryml::ConstNodeRef &parent, std::ostream &log) override \
+    {                                                                         \
+      return priv::read(parent, _property, log);                              \
+    }                                                                         \
+    IOCode write(ryml::NodeRef &node, std::ostream &log) const override       \
+    {                                                                         \
+      return priv::write(node, _property, log);                               \
+    }                                                                         \
+    std::unique_ptr<ExtensionPropertyAffordances> clone() const override      \
+    {                                                                         \
+      return std::make_unique<Type##Affordances>(_property);                  \
+    }                                                                         \
+    void *property() override                                                 \
+    {                                                                         \
+      return &_property;                                                      \
+    }                                                                         \
+    const void *property() const override                                     \
+    {                                                                         \
+      return &_property;                                                      \
+    }                                                                         \
+                                                                              \
+  private:                                                                    \
+    settings::Type _property;                                                 \
   }
 
 namespace tes::view::settings

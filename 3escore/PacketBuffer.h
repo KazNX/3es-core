@@ -27,8 +27,15 @@ class TES_CORE_API PacketBuffer
 public:
   /// Constructors 2Kb buffer.
   PacketBuffer(size_t capacity = 2048u);
+
+  PacketBuffer(const PacketBuffer &) = delete;
+  PacketBuffer(PacketBuffer &&) = delete;
+
   /// Destructor.
   ~PacketBuffer();
+
+  PacketBuffer &operator=(const PacketBuffer &) = delete;
+  PacketBuffer &operator=(PacketBuffer &&) = delete;
 
   /// Adds @c bytes to the buffer.
   ///

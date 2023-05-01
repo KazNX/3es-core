@@ -14,14 +14,17 @@ namespace tes
 {
 void endianSwap(uint8_t *data, size_t size)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   auto *data_copy = reinterpret_cast<uint8_t *>(alloca(size));
   std::memcpy(data_copy, data, size);
   for (size_t i = 0; i < size / 2; ++i)
   {
     const auto index_a = i;
     const auto index_b = size - i - 1;
+    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     data[index_a] = data_copy[index_b];
     data[index_b] = data_copy[index_a];
+    // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   }
 }
 }  // namespace tes

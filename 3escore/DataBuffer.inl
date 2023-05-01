@@ -2,6 +2,7 @@
 // author: Kazys Stepanas
 //
 
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 namespace tes
 {
 inline DataBuffer::DataBuffer() = default;
@@ -78,7 +79,7 @@ inline DataBuffer::DataBuffer(const T *v, size_t count, size_t component_count,
 
 
 inline DataBuffer::DataBuffer(const Vector3f *v, size_t count)
-  : _stream(v ? v->storage().data() : nullptr)
+  : _stream(v ? v->storage().data() : null())
   , _count(int_cast<unsigned>(count))
   , _component_count(3)
   , _element_stride(int_cast<uint8_t>(sizeof(Vector3f) / sizeof(float)))
@@ -90,7 +91,7 @@ inline DataBuffer::DataBuffer(const Vector3f *v, size_t count)
 
 
 inline DataBuffer::DataBuffer(const Vector3d *v, size_t count)
-  : _stream(v ? v->storage().data() : nullptr)
+  : _stream(v ? v->storage().data() : null())
   , _count(int_cast<unsigned>(count))
   , _component_count(3)
   , _element_stride(int_cast<uint8_t>(sizeof(Vector3d) / sizeof(double)))
@@ -102,7 +103,7 @@ inline DataBuffer::DataBuffer(const Vector3d *v, size_t count)
 
 
 inline DataBuffer::DataBuffer(const Colour *c, size_t count)
-  : _stream(c ? c->storage().data() : nullptr)
+  : _stream(c ? c->storage().data() : null())
   , _count(int_cast<unsigned>(count))
   , _primitive_type_size(int_cast<uint8_t>(DataBufferPrimitiveTypeInfo<uint32_t>::size()))
   , _type(DctUInt32)
@@ -160,7 +161,7 @@ inline DataBuffer::DataBuffer(const std::vector<Colour> &colours)
 }
 
 inline DataBuffer::DataBuffer(DataBuffer &&other) noexcept
-  : _stream(std::exchange(other._stream, nullptr))
+  : _stream(std::move(other._stream))  // NOLINT(performance-move-const-arg)
   , _count(std::exchange(other._count, 0))
   , _component_count(std::exchange(other._component_count, 0))
   , _element_stride(std::exchange(other._element_stride, 0))
@@ -220,7 +221,7 @@ inline T DataBuffer::get(size_t element_index, size_t component_index) const
 {
   T datum{ 0 };
   _affordances->get(DataBufferPrimitiveTypeInfo<T>::type(), element_index, component_index, 1,
-                    _stream, _count, _component_count, _element_stride, &datum, 1);
+                    readPtr(), _count, _component_count, _element_stride, &datum, 1);
   return datum;
 }
 
@@ -230,20 +231,21 @@ inline size_t DataBuffer::get(size_t element_index, size_t element_count, T *dst
 {
   const size_t components_read = _affordances->get(
     DataBufferPrimitiveTypeInfo<T>::type(), element_index, 0, element_count * _component_count,
-    _stream, _count, _component_count, _element_stride, dst, capacity);
+    readPtr(), _count, _component_count, _element_stride, dst, capacity);
   return components_read / componentCount();
 }
 
 inline void DataBuffer::swap(DataBuffer &other) noexcept
 {
-  std::swap(_stream, other._stream);
-  std::swap(_count, other._count);
-  std::swap(_component_count, other._component_count);
-  std::swap(_element_stride, other._element_stride);
-  std::swap(_primitive_type_size, other._primitive_type_size);
-  std::swap(_type, other._type);
-  std::swap(_flags, other._flags);
-  std::swap(_affordances, other._affordances);
+  using std::swap;
+  swap(_stream, other._stream);
+  swap(_count, other._count);
+  swap(_component_count, other._component_count);
+  swap(_element_stride, other._element_stride);
+  swap(_primitive_type_size, other._primitive_type_size);
+  swap(_type, other._type);
+  swap(_flags, other._flags);
+  swap(_affordances, other._affordances);
 }
 
 inline DataBuffer &DataBuffer::operator=(DataBuffer &&other) noexcept
@@ -272,7 +274,7 @@ template <typename T>
 inline const T *DataBuffer::ptr(size_t element_index) const
 {
   TES_ASSERT2(DataBufferPrimitiveTypeInfo<T>::type() == _type, "Element type mismatch");
-  return &static_cast<const T *>(_stream)[element_index];
+  return &static_cast<const T *>(readPtr())[element_index];
 }
 
 template <typename T>
@@ -280,7 +282,7 @@ inline const T *DataBuffer::ptrAt(size_t element_index) const
 {
   if (DataBufferPrimitiveTypeInfo<T>::type() == _type)
   {
-    return &static_cast<const T *>(_stream)[element_index];
+    return &static_cast<const T *>(readPtr())[element_index];
   }
   return nullptr;
 }
@@ -312,66 +314,63 @@ DataBufferAffordances *DataBufferAffordancesT<T>::instance()
 }
 
 template <typename T>
-void DataBufferAffordancesT<T>::release(const void **stream_ptr, bool has_ownership) const
+void DataBufferAffordancesT<T>::release(const void *stream_ptr) const
 {
-  if (has_ownership)
-  {
-    delete reinterpret_cast<const T *>(*stream_ptr);
-    *stream_ptr = nullptr;
-  }
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+  delete static_cast<const T *>(stream_ptr);
 }
 
 template <typename T>
-void DataBufferAffordancesT<T>::takeOwnership(const void **stream_ptr, bool has_ownership,
-                                              const DataBuffer &stream) const
+void *DataBufferAffordancesT<T>::copyStream(const void *stream, const DataBuffer &buffer) const
 {
-  if (has_ownership || *stream_ptr == nullptr)
+  if (stream == nullptr)
   {
-    // Already has ownership
-    return;
+    // Nothing to copy.
+    return nullptr;
   }
 
   // Allocate a new array.
-  const T *src_array = static_cast<const T *>(*stream_ptr);
-  T *new_array = new T[static_cast<size_t>(stream.count()) * stream.elementStride()];
-  *stream_ptr = new_array;
-  std::copy(src_array, src_array + stream.count() * stream.elementStride(), new_array);
+  const T *src_array = static_cast<const T *>(stream);
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+  T *new_array = new T[static_cast<size_t>(buffer.count()) * buffer.elementStride()];
+  std::copy(src_array, src_array + buffer.count() * buffer.elementStride(), new_array);
+  return new_array;
 }
 
 template <typename T>
 uint32_t DataBufferAffordancesT<T>::write(PacketWriter &packet, uint32_t offset,
                                           DataStreamType write_as_type, unsigned byte_limit,
-                                          uint32_t receive_offset, const DataBuffer &stream,
+                                          uint32_t receive_offset, const DataBuffer &buffer,
                                           double quantisation_unit) const
 {
   switch (write_as_type)
   {
   case DctInt8:
-    return writeAs<int8_t>(packet, offset, write_as_type, byte_limit, receive_offset, stream);
+    return writeAs<int8_t>(packet, offset, write_as_type, byte_limit, receive_offset, buffer);
   case DctUInt8:
-    return writeAs<uint8_t>(packet, offset, write_as_type, byte_limit, receive_offset, stream);
+    return writeAs<uint8_t>(packet, offset, write_as_type, byte_limit, receive_offset, buffer);
   case DctInt16:
-    return writeAs<int16_t>(packet, offset, write_as_type, byte_limit, receive_offset, stream);
+    return writeAs<int16_t>(packet, offset, write_as_type, byte_limit, receive_offset, buffer);
   case DctUInt16:
-    return writeAs<uint16_t>(packet, offset, write_as_type, byte_limit, receive_offset, stream);
+    return writeAs<uint16_t>(packet, offset, write_as_type, byte_limit, receive_offset, buffer);
   case DctInt32:
-    return writeAs<int32_t>(packet, offset, write_as_type, byte_limit, receive_offset, stream);
+    return writeAs<int32_t>(packet, offset, write_as_type, byte_limit, receive_offset, buffer);
   case DctUInt32:
-    return writeAs<uint32_t>(packet, offset, write_as_type, byte_limit, receive_offset, stream);
+    return writeAs<uint32_t>(packet, offset, write_as_type, byte_limit, receive_offset, buffer);
   case DctInt64:
-    return writeAs<int64_t>(packet, offset, write_as_type, byte_limit, receive_offset, stream);
+    return writeAs<int64_t>(packet, offset, write_as_type, byte_limit, receive_offset, buffer);
   case DctUInt64:
-    return writeAs<uint64_t>(packet, offset, write_as_type, byte_limit, receive_offset, stream);
+    return writeAs<uint64_t>(packet, offset, write_as_type, byte_limit, receive_offset, buffer);
   case DctFloat32:
-    return writeAs<float>(packet, offset, write_as_type, byte_limit, receive_offset, stream);
+    return writeAs<float>(packet, offset, write_as_type, byte_limit, receive_offset, buffer);
   case DctFloat64:
-    return writeAs<double>(packet, offset, write_as_type, byte_limit, receive_offset, stream);
+    return writeAs<double>(packet, offset, write_as_type, byte_limit, receive_offset, buffer);
   case DctPackedFloat16:
     return writeAsPacked<float, int16_t>(packet, offset, write_as_type, byte_limit, receive_offset,
-                                         nullptr, static_cast<float>(quantisation_unit), stream);
+                                         nullptr, static_cast<float>(quantisation_unit), buffer);
   case DctPackedFloat32:
     return writeAsPacked<double, int32_t>(packet, offset, write_as_type, byte_limit, receive_offset,
-                                          nullptr, quantisation_unit, stream);
+                                          nullptr, quantisation_unit, buffer);
   default:
     // Throw?
     return 0;
@@ -382,9 +381,9 @@ template <typename T>
 template <typename WriteType>
 uint32_t DataBufferAffordancesT<T>::writeAs(PacketWriter &packet, uint32_t offset,
                                             DataStreamType write_as_type, unsigned byte_limit,
-                                            uint32_t receive_offset, const DataBuffer &stream) const
+                                            uint32_t receive_offset, const DataBuffer &buffer) const
 {
-  const unsigned item_size = static_cast<unsigned>(sizeof(WriteType)) * stream.componentCount();
+  const unsigned item_size = static_cast<unsigned>(sizeof(WriteType)) * buffer.componentCount();
 
   // Overhead: account for:
   // - uint32_t offset
@@ -399,9 +398,9 @@ uint32_t DataBufferAffordancesT<T>::writeAs(PacketWriter &packet, uint32_t offse
   byte_limit =
     (byte_limit) ? (byte_limit > overhead ? byte_limit - overhead : 0) : packet.bytesRemaining();
   uint16_t transfer_count = DataBuffer::estimateTransferCount(item_size, overhead, byte_limit);
-  if (transfer_count > stream.count() - offset)
+  if (transfer_count > buffer.count() - offset)
   {
-    transfer_count = static_cast<uint16_t>(stream.count() - offset);
+    transfer_count = static_cast<uint16_t>(buffer.count() - offset);
   }
 
   // Write header
@@ -409,7 +408,7 @@ uint32_t DataBufferAffordancesT<T>::writeAs(PacketWriter &packet, uint32_t offse
   ok =
     packet.writeElement(static_cast<uint32_t>(offset + receive_offset)) == sizeof(uint32_t) && ok;
   ok = packet.writeElement(static_cast<uint16_t>(transfer_count)) == sizeof(uint16_t) && ok;
-  ok = packet.writeElement(static_cast<uint8_t>(stream.componentCount())) == sizeof(uint8_t) && ok;
+  ok = packet.writeElement(static_cast<uint8_t>(buffer.componentCount())) == sizeof(uint8_t) && ok;
   ok = packet.writeElement(static_cast<uint8_t>(write_as_type)) == sizeof(uint8_t) && ok;
 
   if (!ok)
@@ -417,17 +416,18 @@ uint32_t DataBufferAffordancesT<T>::writeAs(PacketWriter &packet, uint32_t offse
     return 0;
   }
 
-  const T *src = stream.ptr<T>(static_cast<size_t>(offset) * stream.elementStride());
+  const T *src = buffer.ptr<T>(static_cast<size_t>(offset) * buffer.elementStride());
   unsigned write_count = 0;
   if (DataBufferPrimitiveTypeInfo<T>::type() == DataBufferPrimitiveTypeInfo<WriteType>::type() &&
-      stream.elementStride() == stream.componentCount())
+      buffer.elementStride() == buffer.componentCount())
   {
     // We can write the array directly if the T/WriteType types match and the source array is
     // densely packed (element stride matches component count).
     write_count += static_cast<unsigned>(packet.writeArray(
+                     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
                      reinterpret_cast<const WriteType *>(src),
-                     static_cast<size_t>(transfer_count) * stream.componentCount())) /
-                   stream.componentCount();
+                     static_cast<size_t>(transfer_count) * buffer.componentCount())) /
+                   buffer.componentCount();
   }
   else
   {
@@ -435,15 +435,15 @@ uint32_t DataBufferAffordancesT<T>::writeAs(PacketWriter &packet, uint32_t offse
     for (unsigned i = 0; i < transfer_count; ++i)
     {
       unsigned component_write_count = 0;
-      for (unsigned j = 0; j < stream.componentCount(); ++j)
+      for (unsigned j = 0; j < buffer.componentCount(); ++j)
       {
         // NOLINTNEXTLINE(bugprone-signed-char-misuse)
         const auto dst_value = static_cast<WriteType>(src[j]);
         component_write_count +=
           static_cast<unsigned>(packet.writeElement(dst_value) / sizeof(dst_value));
       }
-      write_count += component_write_count / stream.componentCount();
-      src += stream.elementStride();
+      write_count += component_write_count / buffer.componentCount();
+      src += buffer.elementStride();
     }
   }
 
@@ -463,13 +463,13 @@ uint32_t DataBufferAffordancesT<T>::writeAsPacked(PacketWriter &packet, uint32_t
                                                   uint32_t receive_offset,
                                                   const FloatType *packet_origin,
                                                   const FloatType quantisation_unit,
-                                                  const DataBuffer &stream) const
+                                                  const DataBuffer &buffer) const
 {
   // packet_origin is used to define the packing origin. That is, items are packed releative to
   // this. quantisation_unit is the divisor used to quantise data. packedType must be either
   // DctPackedFloat16 or DctPackedFloat32 Each component is packed as:
   //    PackedType((vertex[componentIndex] - packedOrigin[componentIndex]) / quantisation_unit)
-  const unsigned item_size = static_cast<unsigned>(sizeof(PackedType)) * stream.componentCount();
+  const unsigned item_size = static_cast<unsigned>(sizeof(PackedType)) * buffer.componentCount();
 
   // Overhead: account for:
   // - uint32_t offset
@@ -477,20 +477,20 @@ uint32_t DataBufferAffordancesT<T>::writeAsPacked(PacketWriter &packet, uint32_t
   // - uint8_t element stride
   // - uint8_t data type
   // - FloatType quantisation_unit
-  // - FloatType[stream.componentCount()] packet_origin
+  // - FloatType[buffer.componentCount()] packet_origin
   const auto overhead =
     int_cast<unsigned>(sizeof(uint32_t) +                             // offset
                        sizeof(uint16_t) +                             // count
                        sizeof(uint8_t) +                              // element stride
                        sizeof(uint8_t) +                              // data type
                        sizeof(quantisation_unit) +                    // quantisation_unit
-                       sizeof(FloatType) * stream.componentCount());  // packet_origin
+                       sizeof(FloatType) * buffer.componentCount());  // packet_origin
 
   byte_limit = (byte_limit) ? byte_limit : packet.bytesRemaining();
   uint16_t transfer_count = DataBuffer::estimateTransferCount(item_size, overhead, byte_limit);
-  if (transfer_count > stream.count() - offset)
+  if (transfer_count > buffer.count() - offset)
   {
-    transfer_count = static_cast<uint16_t>(stream.count() - offset);
+    transfer_count = static_cast<uint16_t>(buffer.count() - offset);
   }
 
   if (transfer_count == 0)
@@ -503,32 +503,32 @@ uint32_t DataBufferAffordancesT<T>::writeAsPacked(PacketWriter &packet, uint32_t
   ok =
     packet.writeElement(static_cast<uint32_t>(offset + receive_offset)) == sizeof(uint32_t) && ok;
   ok = packet.writeElement(static_cast<uint16_t>(transfer_count)) == sizeof(uint16_t) && ok;
-  ok = packet.writeElement(static_cast<uint8_t>(stream.componentCount())) == sizeof(uint8_t) && ok;
+  ok = packet.writeElement(static_cast<uint8_t>(buffer.componentCount())) == sizeof(uint8_t) && ok;
   ok = packet.writeElement(static_cast<uint8_t>(write_as_type)) == sizeof(uint8_t) && ok;
   const FloatType q_unit{ quantisation_unit };
   ok = packet.writeElement(q_unit) == sizeof(q_unit) && ok;
 
   if (packet_origin)
   {
-    ok = packet.writeArray(packet_origin, stream.componentCount()) == stream.componentCount() && ok;
+    ok = packet.writeArray(packet_origin, buffer.componentCount()) == buffer.componentCount() && ok;
   }
   else
   {
     const FloatType zero{ 0 };
-    for (unsigned i = 0; i < stream.componentCount(); ++i)
+    for (unsigned i = 0; i < buffer.componentCount(); ++i)
     {
       ok = packet.writeElement(zero) == sizeof(FloatType) && ok;
     }
   }
 
-  const T *src = stream.ptr<T>(static_cast<size_t>(offset) * stream.elementStride());
+  const T *src = buffer.ptr<T>(static_cast<size_t>(offset) * buffer.elementStride());
   unsigned write_count = 0;
 
   const FloatType quantisation_factor = FloatType{ 1 } / FloatType{ quantisation_unit };
   bool item_ok = true;
   for (unsigned i = 0; i < transfer_count; ++i)
   {
-    for (unsigned j = 0; j < stream.componentCount(); ++j)
+    for (unsigned j = 0; j < buffer.componentCount(); ++j)
     {
       auto dst_value = static_cast<FloatType>(src[j]);
       if (packet_origin)
@@ -545,7 +545,7 @@ uint32_t DataBufferAffordancesT<T>::writeAsPacked(PacketWriter &packet, uint32_t
       item_ok = item_ok && packet.writeElement(packed) == sizeof(packed);
     }
     write_count += !!item_ok;
-    src += stream.elementStride();
+    src += buffer.elementStride();
   }
 
   if (write_count == transfer_count)
@@ -560,11 +560,10 @@ uint32_t DataBufferAffordancesT<T>::writeAsPacked(PacketWriter &packet, uint32_t
 template <typename T>
 uint32_t DataBufferAffordancesT<T>::read(PacketReader &packet, void **stream_ptr,
                                          unsigned *stream_size, bool *has_ownership,
-                                         const DataBuffer &stream) const
+                                         const DataBuffer &buffer) const
 {
-  TES_UNUSED(stream);
-  uint32_t offset;
-  uint16_t count;
+  uint32_t offset = 0u;
+  uint16_t count = 0u;
 
   bool ok = true;
   ok = packet.readElement(offset) == sizeof(offset) && ok;
@@ -575,18 +574,17 @@ uint32_t DataBufferAffordancesT<T>::read(PacketReader &packet, void **stream_ptr
     return 0;
   }
 
-  return read(packet, stream_ptr, stream_size, has_ownership, stream, offset, count);
+  return read(packet, stream_ptr, stream_size, has_ownership, buffer, offset, count);
 }
 
 template <typename T>
 uint32_t DataBufferAffordancesT<T>::read(PacketReader &packet, void **stream_ptr,
                                          unsigned *stream_size, bool *has_ownership,
-                                         const DataBuffer &stream, unsigned offset,
+                                         const DataBuffer &buffer, unsigned offset,
                                          unsigned count) const
 {
-  TES_UNUSED(stream);
   bool ok = true;
-  uint8_t component_count = 0;  // stream.componentCount();;
+  uint8_t component_count = 0;  // buffer.componentCount();;
   uint8_t packet_type = 0;      // DataBufferPrimitiveTypeInfo<T>::type();
   ok = packet.readElement(component_count) == sizeof(component_count) && ok;
   ok = packet.readElement(packet_type) == sizeof(packet_type) && ok;
@@ -599,8 +597,9 @@ uint32_t DataBufferAffordancesT<T>::read(PacketReader &packet, void **stream_ptr
   T *new_ptr = nullptr;
   if (*stream_ptr == nullptr || !*has_ownership || *stream_size < (offset + count))
   {
-    // Current stream too small. Reallocate. Note we allocate with the stream's component count.
-    new_ptr = new T[static_cast<size_t>(offset + count) * stream.componentCount()];
+    // Current stream too small. Reallocate. Note we allocate with the buffer's component count.
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    new_ptr = new T[static_cast<size_t>(offset + count) * buffer.componentCount()];
   }
 
   if (new_ptr)
@@ -611,6 +610,7 @@ uint32_t DataBufferAffordancesT<T>::read(PacketReader &packet, void **stream_ptr
                 static_cast<const T *>(*stream_ptr) + (*stream_size) * component_count, new_ptr);
       if (*has_ownership)
       {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         delete[] static_cast<const T *>(*stream_ptr);
       }
     }
@@ -620,7 +620,7 @@ uint32_t DataBufferAffordancesT<T>::read(PacketReader &packet, void **stream_ptr
   }
 
   // We can only read what's available and what we have capacity for. Minimise the component count
-  component_count = std::min(component_count, static_cast<uint8_t>(stream.componentCount()));
+  component_count = std::min(component_count, static_cast<uint8_t>(buffer.componentCount()));
   switch (packet_type)
   {
   case DctInt8:
@@ -826,3 +826,5 @@ uint32_t DataBufferAffordancesT<T>::readAsPacked(PacketReader &packet, unsigned 
 }
 }  // namespace detail
 }  // namespace tes
+
+// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)

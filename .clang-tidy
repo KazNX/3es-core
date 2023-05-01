@@ -1,7 +1,7 @@
 # Run clang tidy general analysis, excluding variable naming checks.
 ---
 # * modernize-avoid-c-arrays covered by cppcoreguidelines-avoid-c-arrays
-# * readability-magic-numbers covered by cppcoreguidelines-avoid-magic-numbers
+# * readability-magic-numbers is covered by cppcoreguidelines-avoid-magic-numbers
 # * readability-identifier-length disabled since I could not get the ignore expressions working.
 # * readability-simplify-boolean-expr there are good debugging reasons to keep expanded versions.
 Checks: >

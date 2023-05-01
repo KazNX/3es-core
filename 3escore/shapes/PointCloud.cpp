@@ -19,7 +19,7 @@ struct PointCloudImp
   std::vector<Vector3f> vertices;
   std::vector<Vector3f> normals;
   std::vector<Colour> colours;
-  uint32_t id;
+  uint32_t id = 0;
   float draw_scale = 0.0f;
 
   PointCloudImp(uint32_t id)
@@ -47,7 +47,7 @@ PointCloud::PointCloud(uint32_t id)
 PointCloud::PointCloud(const PointCloud &other)
 {
   const std::scoped_lock guard(other._imp->lock);
-  _imp = other._imp;
+  _imp = other._imp;  // NOLINT(cppcoreguidelines-prefer-member-initializer)
 }
 
 

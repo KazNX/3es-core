@@ -36,8 +36,12 @@ struct TransferProgress;
 class TES_CORE_API Resource
 {
 public:
+  Resource();
+  Resource(const Resource &other) = delete;
   /// Virtual destructor (empty).
   virtual ~Resource();
+
+  Resource &operator=(const Resource &other) = delete;
 
   /// The resource ID. Unique among resources of the same @c typeId().
   /// @return The resource's ID.

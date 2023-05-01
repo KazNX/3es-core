@@ -25,8 +25,11 @@ public:
   TcpSocket();
   /// Constructor.
   TcpSocket(std::unique_ptr<TcpSocketDetail> &&detail);
+  TcpSocket(const TcpSocket &other) = delete;
   /// Destructor.
   ~TcpSocket();
+
+  TcpSocket &operator=(const TcpSocket &other) = delete;
 
   /// Open a connection to the target @p host and @p port (blocking).
   /// @param host The host IP address or host name.
@@ -109,6 +112,7 @@ public:
   /// @overload
   [[nodiscard]] inline int read(unsigned char *buffer, int buffer_length) const
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     return read(reinterpret_cast<char *>(buffer), buffer_length);
   }
 
@@ -122,6 +126,7 @@ public:
   /// @overload
   [[nodiscard]] inline int readAvailable(unsigned char *buffer, int buffer_length) const
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     return readAvailable(reinterpret_cast<char *>(buffer), buffer_length);
   }
 
@@ -135,6 +140,7 @@ public:
   /// @overload
   inline int write(const unsigned char *buffer, int buffer_length) const
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     return write(reinterpret_cast<const char *>(buffer), buffer_length);
   }
 

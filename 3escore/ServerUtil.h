@@ -34,7 +34,7 @@ template <class MESSAGE, unsigned BufferSize = 256>
 int sendMessage(Connection &connection, uint16_t routing_id, uint16_t message_id,
                 const MESSAGE &message, bool allow_collation = true)
 {
-  std::array<uint8_t, BufferSize> buffer;
+  std::array<uint8_t, BufferSize> buffer = {};
   PacketWriter writer(buffer.data(), BufferSize);
   writer.reset(routing_id, message_id);
   if (message.write(writer) && writer.finalise())

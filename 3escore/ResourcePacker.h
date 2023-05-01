@@ -41,8 +41,11 @@ public:
 
   /// Constructor.
   ResourcePacker();
+  ResourcePacker(const ResourcePacker &other) = delete;
   /// Destructor.
   ~ResourcePacker();
+
+  ResourcePacker &operator=(const ResourcePacker &other) = delete;
 
   /// Query the current resource being packed (if any).
   /// @return The current resource.

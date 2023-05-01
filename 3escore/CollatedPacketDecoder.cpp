@@ -23,6 +23,7 @@ constexpr size_t kDefaultBufferSize =
 
 unsigned getPacketSize(const uint8_t *bytes)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   const PacketReader reader(reinterpret_cast<const PacketHeader *>(bytes));
   if (reader.marker() != kPacketMarker)
   {
@@ -63,12 +64,13 @@ struct CollatedPacketDecoderDetail
     PacketReader reader(packet);
     if (reader.routingId() == MtCollatedPacket)
     {
-      CollatedPacketMessage msg;
+      CollatedPacketMessage msg = {};
       if (!msg.read(reader))
       {
         return false;
       }
 
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
       if (!initStream(msg.flags, msg.uncompressed_bytes, reader.payload() + reader.tell(),
                       reader.payloadSize() - reader.tell()))
       {
@@ -105,7 +107,7 @@ struct CollatedPacketDecoderDetail
     }
 
     ok = false;
-    if (message_flags & CPFCompress)  // NOLINT(hicpp-signed-bitwise)
+    if (message_flags & CPFCompress)
     {
 #ifdef TES_ZLIB
       ok = true;
@@ -118,7 +120,7 @@ struct CollatedPacketDecoderDetail
       ok = inflateInit2(&zip.stream,
                         CollatedPacketZip::WindowBits | CollatedPacketZip::GZipEncoding) == Z_OK;
       zip.stream.avail_in = stream_bytes;
-      // NOLINTNEXTLINE(google-readability-casting)
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
       zip.stream.next_in = (z_const Bytef *)stream;
 #endif  // TES_ZLIB
     }
@@ -151,6 +153,7 @@ struct CollatedPacketDecoderDetail
       return nextPacketCompressed();
     }
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     const unsigned packet_size = getPacketSize(stream + decoded_bytes);
     if (packet_size == 0)
     {
@@ -158,6 +161,7 @@ struct CollatedPacketDecoderDetail
       return nullptr;
     }
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-*)
     const auto *next_packet = reinterpret_cast<const PacketHeader *>(stream + decoded_bytes);
     decoded_bytes += packet_size;
 
@@ -204,6 +208,7 @@ private:
     if (buffer.size() < packet_size)
     {
       buffer.resize(packet_size);
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
       zip.stream.next_out = buffer.data() + sizeof(PacketHeader);
     }
 
@@ -223,6 +228,7 @@ private:
       return nullptr;
     }
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     PacketReader reader(reinterpret_cast<const PacketHeader *>(buffer.data()));
 
     // Now check the packet.
@@ -244,6 +250,7 @@ private:
       finishCurrent();
     }
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     return reinterpret_cast<const PacketHeader *>(buffer.data());
 #else   // TES_ZLIB
     // Compression not supported.

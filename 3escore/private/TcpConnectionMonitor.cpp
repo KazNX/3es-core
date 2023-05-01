@@ -8,11 +8,11 @@
 
 #include <3escore/CoreUtil.h>
 #include <3escore/FileConnection.h>
+#include <3escore/Log.h>
 #include <3escore/TcpListenSocket.h>
 #include <3escore/TcpSocket.h>
 
 #include <chrono>
-#include <cstdio>
 #include <mutex>
 
 namespace tes
@@ -139,8 +139,8 @@ void TcpConnectionMonitor::join()
   {
     if (!_quit_flag && (_mode == ConnectionMode::Asynchronous || _mode == ConnectionMode::None))
     {
-      fprintf(stderr, "ConnectionMonitor::join() called on asynchronous connection monitor without "
-                      "calling stop()\n");
+      log::error("ConnectionMonitor::join() called on asynchronous connection monitor without "
+                 "calling stop()");
     }
     _thread->join();
     _thread.reset();

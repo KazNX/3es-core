@@ -176,10 +176,10 @@ public:
   [[nodiscard]] bool isEqual(const Transform &other, double epsilon = Vector3d::kEpsilon) const;
 
 private:
-  Quaterniond _rotation;
-  Vector3d _position;
-  Vector3d _scale;
-  bool _prefer_double_precision;
+  Quaterniond _rotation = {};
+  Vector3d _position = {};
+  Vector3d _scale = {};
+  bool _prefer_double_precision = false;
 };
 
 /// A specialisation of @c Transform designed to work with shapes which have a length, direction and
@@ -261,7 +261,7 @@ public:
   template <typename Real>
   static Quaternion<Real> directionToRotation(const Vector3<Real> &direction)
   {
-    Quaternion<Real> rot;
+    Quaternion<Real> rot = {};
     const Vector3<Real> default_dir(DefaultDirection);
     const Real tolerance = static_cast<Real>(0.9998);
     if (direction.dot(default_dir) > -tolerance)

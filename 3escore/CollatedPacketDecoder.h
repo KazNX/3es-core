@@ -65,8 +65,14 @@ public:
   /// @param packet The first packet to decode.
   CollatedPacketDecoder(const PacketHeader *packet = nullptr);
 
+  CollatedPacketDecoder(const CollatedPacketDecoder &) = delete;
+  CollatedPacketDecoder(CollatedPacketDecoder &&) = delete;
+
   /// Destructor.
   ~CollatedPacketDecoder();
+
+  CollatedPacketDecoder &operator=(const CollatedPacketDecoder &) = delete;
+  CollatedPacketDecoder &operator=(CollatedPacketDecoder &&) = delete;
 
   /// Returns the number of bytes which have been decoded from the current primary packet.
   /// @return The number of decompressed bytes decoded.

@@ -23,6 +23,11 @@ using CrcType = uint16_t;
 constexpr size_t kMaxPacketSize = std::numeric_limits<decltype(PacketHeader::payload_size)>::max() +
                                   sizeof(PacketHeader) + sizeof(CrcType);
 
+// Casting and pointer arithmetic are fundamental the the PacketStream.
+// clang-format off
+// NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+// clang-format on
+
 /// A utility class used for managing read/write operations to a @c PacketHeader payload.
 ///
 /// The template type is intended to be either a @c PacketReader or a @c const @c PacketHeader
@@ -33,6 +38,7 @@ class PacketStream
 public:
   /// Defies the packet CRC type.
   using CrcType = tes::CrcType;
+  using Header = std::remove_const_t<HEADER>;
 
   /// Control values for seeking.
   enum SeekPos
@@ -60,6 +66,14 @@ public:
   /// Create a stream to read from beginning at @p packet.
   /// @param packet The beginning of the data packet.
   PacketStream(HEADER *packet);
+
+  PacketStream(const PacketStream<HEADER> &other) = delete;
+  PacketStream(PacketStream<HEADER> &&other) noexcept;
+
+  ~PacketStream() = default;
+
+  PacketStream<HEADER> &operator=(const PacketStream<HEADER> &other) = delete;
+  PacketStream<HEADER> &operator=(PacketStream<HEADER> &&other) noexcept;
 
   // PacketHeader member access. Ensures network endian swap as required.
   /// Fetch the marker bytes in local endian.
@@ -107,7 +121,13 @@ public:
   /// Fetch a pointer to the CRC bytes.
   /// Invalid for packets with the @c PFNoCrc flag set.
   /// @return A pointer to the CRC location.
-  [[nodiscard]] CrcType *crcPtr();
+  template <typename T = HEADER, std::enable_if_t<!std::is_const_v<T>, bool> = true>
+  [[nodiscard]] CrcType *crcPtr()
+  {
+    // CRC appears after the payload.
+    uint8_t *pos = reinterpret_cast<uint8_t *>(_packet) + sizeof(HEADER) + payloadSize();
+    return reinterpret_cast<CrcType *>(pos);
+  }
   /// @overload
   [[nodiscard]] const CrcType *crcPtr() const;
 
@@ -147,12 +167,22 @@ public:
   /// @return The start of the payload bytes.
   [[nodiscard]] const uint8_t *payload() const;
 
+  /// Swap the contents of this object with that of @p other .
+  /// @param other The object to swap with.
+  void swap(PacketStream<HEADER> &other) noexcept
+  {
+    using std::swap;
+    swap(_packet, other._packet);
+    swap(_status, other._status);
+    swap(_payload_position, other._payload_position);
+  }
+
 protected:
-  // NOLINTBEGIN(cppcoreguidlines-non-private-member-variables-in-classes)
+  // NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-classes)
   HEADER *_packet = nullptr;        ///< Packet header and buffer start address.
   uint16_t _status = Ok;            ///< @c Status bits.
   uint16_t _payload_position = 0u;  ///< Payload cursor.
-  // NOLINTEND(cppcoreguidlines-non-private-member-variables-in-classes)
+  // NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes)
 
   /// Type traits: is @c T const?
   template <class T>
@@ -184,6 +214,23 @@ PacketStream<HEADER>::PacketStream(HEADER *packet)
   {
     _status |= ReadOnly;
   }
+}
+
+
+template <class HEADER>
+PacketStream<HEADER>::PacketStream(PacketStream<HEADER> &&other) noexcept
+  : _packet(std::exchange(other._packet, nullptr))
+  , _status(std::exchange(other._status, Ok))
+  , _payload_position(std::exchange(_payload_position, 0u))
+{}
+
+
+// clang-format off
+template <class HEADER>
+PacketStream<HEADER> &PacketStream<HEADER>::operator=(PacketStream<HEADER> &&other) noexcept
+{
+  swap(other);
+  return *this;
 }
 
 
@@ -226,17 +273,6 @@ bool PacketStream<HEADER>::seek(int offset, SeekPos pos)
 
 
 template <class HEADER>
-typename PacketStream<HEADER>::CrcType *PacketStream<HEADER>::crcPtr()
-{
-  // CRC appears after the payload.
-  // TODO(KS): fix the const correctness of this.
-  uint8_t *pos = const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(_packet)) +
-                 sizeof(HEADER) + payloadSize();
-  return reinterpret_cast<CrcType *>(pos);
-}
-
-
-template <class HEADER>
 const typename PacketStream<HEADER>::CrcType *PacketStream<HEADER>::crcPtr() const
 {
   // CRC appears after the payload.
@@ -268,6 +304,18 @@ inline const uint8_t *PacketStream<HEADER>::payload() const
 {
   return reinterpret_cast<const uint8_t *>(_packet) + sizeof(HEADER);
 }
+
+
+template <class HEADER>
+inline void swap(PacketStream<HEADER> &a, PacketStream<HEADER> &b) noexcept
+{
+  a.swap(b);
+}
+
+// clang-format off
+// NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+// clang-format on
+
 }  // namespace tes
 
 #endif  // TES_CORE_HEADER_STREAM_H

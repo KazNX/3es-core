@@ -77,7 +77,6 @@ inline Text2D::Text2D(std::string text, const Id &id, const Spherical &pos)
 
 inline bool Text2D::inWorldSpace() const
 {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return (flags() & Text2DFWorldSpace) != 0;
 }
 

@@ -40,8 +40,12 @@ public:
   /// @param server The server owning this connection monitor.
   TcpConnectionMonitor(TcpServer &server);
 
+  TcpConnectionMonitor(const TcpConnectionMonitor &other) = delete;
+
   /// Destructor.
   ~TcpConnectionMonitor() final;
+
+  TcpConnectionMonitor &operator=(const TcpConnectionMonitor &other) = delete;
 
   /// Get the @c TcpServer which owns this @c ConnectionMonitor.
   /// @return The owning server.

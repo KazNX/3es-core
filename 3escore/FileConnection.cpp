@@ -11,7 +11,6 @@ namespace tes
 {
 FileConnection::FileConnection(const std::string &filename, const ServerSettings &settings)
   : BaseConnection(settings)
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   , _out_file(filename, std::ios::binary | std::ios::out | std::ios::in | std::ios::trunc)
   , _filename(filename)
 {}
@@ -22,6 +21,7 @@ FileConnection::FileConnection(const std::string &filename, const ServerSettings
 // throw. However, not closing the stream will cause other resource issues. So which is more
 // correct? Leaving the potential for an exception or leaving the potential for an incomplete
 // stream?
+// Do we just assume it won't happen and add noexcept?
 // NOLINTNEXTLINE(bugprone-exception-escape)
 FileConnection::~FileConnection()
 {
@@ -87,6 +87,7 @@ int FileConnection::updateFrame(float dt, bool flush)
 
 int FileConnection::writeBytes(const uint8_t *data, int byte_count)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   _out_file.write(reinterpret_cast<const char *>(data), byte_count);
   if (!_out_file.fail())
   {

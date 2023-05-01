@@ -89,7 +89,6 @@ inline Text3D &Text3D::setScreenFacing(bool screen_facing)
 
 inline bool Text3D::screenFacing() const
 {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return (flags() & Text3DFScreenFacing) != 0;
 }
 

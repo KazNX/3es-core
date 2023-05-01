@@ -89,7 +89,7 @@ public:
   virtual PropertyType type() const = 0;
   virtual const std::string &label() const = 0;
   virtual const std::string &tip() const = 0;
-  virtual IOCode read(const ryml::NodeRef &parent, std::ostream &log) = 0;
+  virtual IOCode read(const ryml::ConstNodeRef &parent, std::ostream &log) = 0;
   virtual IOCode write(ryml::NodeRef &parent, std::ostream &log) const = 0;
   virtual std::unique_ptr<ExtensionPropertyAffordances> clone() const = 0;
   virtual void *property() = 0;
@@ -145,7 +145,7 @@ public:
 
   const std::string &label() const { return _affordances->label(); }
   const std::string &tip() const { return _affordances->tip(); }
-  IOCode read(const ryml::NodeRef &parent, std::ostream &log)
+  IOCode read(const ryml::ConstNodeRef &parent, std::ostream &log)
   {
     return _affordances->read(parent, log);
   }

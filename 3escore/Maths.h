@@ -68,14 +68,12 @@ inline uint32_t nextLog2(uint32_t value)
 template <>
 inline int nextLog2(int value)
 {
-  // NOLINTBEGIN(hicpp-signed-bitwise)
   value--;
   value |= value >> 1;
   value |= value >> 2;
   value |= value >> 4;
   value |= value >> 8;
   value |= value >> 16;
-  // NOLINTEND(hicpp-signed-bitwise)
   value++;
   return value;
 }

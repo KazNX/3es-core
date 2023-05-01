@@ -64,6 +64,7 @@ namespace
 TimerData *getTimerData(std::array<char, Timer::kDataSize> &data)
 {
   static_assert(sizeof(TimerData) <= Timer::kDataSize, "Timer data storage is not large enough.");
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   auto *td = reinterpret_cast<TimerData *>(data.data());
   return td;
 }
@@ -71,6 +72,7 @@ TimerData *getTimerData(std::array<char, Timer::kDataSize> &data)
 const TimerData *getTimerData(const std::array<char, Timer::kDataSize> &data)
 {
   static_assert(sizeof(TimerData) <= Timer::kDataSize, "Timer data storage is not large enough.");
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   const auto *td = reinterpret_cast<const TimerData *>(data.data());
   return td;
 }
@@ -86,10 +88,27 @@ Timer::Timer()
 }
 
 
+Timer::Timer(const Timer &other)
+{
+  TimerData *td = getTimerData(_data);
+  const TimerData *od = getTimerData(other._data);
+  *td = *od;
+}
+
+
 Timer::~Timer()
 {
   TimerData *td = getTimerData(_data);
   td->~TimerData();
+}
+
+
+Timer &Timer::operator=(const Timer &other)
+{
+  TimerData *td = getTimerData(_data);
+  const TimerData *od = getTimerData(other._data);
+  *td = *od;
+  return *this;
 }
 
 
@@ -168,7 +187,7 @@ void Timer::split(int64_t time_ns, Timing &timing)
 {
   const int64_t us = time_ns / 1000ll;
   const int64_t ms = us / 1000ll;
-  timing.s = time_ns / 1'000'000'000ll;  // NOLINT(readability-magic-numbers)
+  timing.s = time_ns / 1'000'000'000ll;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
   timing.ms = static_cast<uint16_t>(ms % 1000ll);
   timing.us = static_cast<uint16_t>(us % 1000ll);
   timing.ns = static_cast<uint16_t>(time_ns % 1000ll);

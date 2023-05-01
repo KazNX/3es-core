@@ -25,7 +25,7 @@ struct VertexChange
     std::array<float, 2> uv;
     uint32_t colour;
   };
-  unsigned component_flag = 0;
+  unsigned component_flag;
   unsigned write_index;
 };
 
@@ -124,7 +124,7 @@ unsigned MutableMesh::setVertices(const UIntArg &at, const Vector3f *v, const UI
   unsigned target_index = at;
   const unsigned vertex_count = pendingVertexCount();
 
-  VertexChange delta;
+  VertexChange delta = {};
   delta.component_flag = SimpleMesh::Vertex;
   for (unsigned i = 0; i < count && target_index < vertex_count; ++i)
   {
@@ -154,7 +154,7 @@ unsigned MutableMesh::setIndices(const UIntArg &at, const uint32_t *idx, const U
   unsigned target_index = at;
   const unsigned index_count = pendingIndexCount();
 
-  IndexChange delta;
+  IndexChange delta = {};
   for (unsigned i = 0; i < count && target_index < index_count; ++i)
   {
     delta.write_index = target_index;
@@ -181,7 +181,7 @@ unsigned MutableMesh::setNormals(const UIntArg &at, const Vector3f *n, const UIn
   unsigned target_index = at;
   const unsigned vertex_count = pendingVertexCount();
 
-  VertexChange delta;
+  VertexChange delta = {};
   delta.component_flag = SimpleMesh::Normal;
   for (unsigned i = 0; i < count && target_index < vertex_count; ++i)
   {
@@ -211,7 +211,7 @@ unsigned MutableMesh::setColours(const UIntArg &at, const uint32_t *c, const UIn
   unsigned target_index = at;
   const unsigned vertex_count = pendingVertexCount();
 
-  VertexChange delta;
+  VertexChange delta = {};
   delta.component_flag = SimpleMesh::Colour;
   for (unsigned i = 0; i < count && target_index < vertex_count; ++i)
   {
@@ -239,7 +239,7 @@ unsigned MutableMesh::setUvs(const UIntArg &at, const float *uvs, const UIntArg 
   unsigned target_index = at;
   const unsigned vertex_count = pendingVertexCount();
 
-  VertexChange delta;
+  VertexChange delta = {};
   delta.component_flag = SimpleMesh::Uv;
   for (unsigned i = 0; i < count && target_index < vertex_count; ++i)
   {

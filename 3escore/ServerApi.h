@@ -138,7 +138,7 @@ inline ServerPtr createServer(const ServerSettings &settings, const ServerInfoMe
 inline ServerPtr createServer(const ServerSettings &settings, CoordinateFrame coordinate_frame,
                               uint64_t time_unit = 0, uint32_t default_frame_time = 0)
 {
-  tes::ServerInfoMessage info;
+  tes::ServerInfoMessage info = {};
   tes::initDefaultServerInfo(&info);
   info.coordinate_frame = coordinate_frame;
   info.time_unit = (time_unit) ? time_unit : info.time_unit;
@@ -423,7 +423,7 @@ inline void defineCategory(Connection *connection, const std::string &name, uint
   if (connection)
   {
     constexpr unsigned kMaxNameLength = 0xffffu;
-    tes::CategoryNameMessage msg;
+    tes::CategoryNameMessage msg = {};
     msg.category_id = static_cast<uint16_t>(category_id);
     msg.parent_id = static_cast<uint16_t>(parent_id);
     msg.default_active = (active) ? 1 : 0;
@@ -637,9 +637,23 @@ public:
     : ScopedShape(server.get(), std::forward(shape))
   {}
 
+  ScopedShape(const ScopedShape &other) = delete;
+  ScopedShape(ScopedShape &&other) noexcept
+    : connection(std::exchange(other.connection, nullptr))
+    , shape(std::move(other.shape))
+  {}
+
   /// Destruct, sending the destroy message for @p shape, provided it is not transient.
   /// Does nothing with a transient shape.
   ~ScopedShape() { destroy(); }
+
+  ScopedShape &operator=(const ScopedShape &other) = delete;
+  ScopedShape &operator=(ScopedShape &&other) noexcept
+  {
+    connection = std::exchange(other.connection, nullptr);
+    shape = std::move(other.shape);
+    return *this;
+  }
 
   /// Dereference operator, mapping function calls to the @c shape.
   /// @return A pointer to the @c shape.

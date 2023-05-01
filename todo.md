@@ -1,5 +1,11 @@
 # TODO
 
+- Add `Span.h` which imports a span header from where ever available
+  - C++ 20 stl
+  - gsl
+  - tcb-span
+- Use `span<T>` instead of pointer/count
+
 ## Protocol breaking changes
 
 ## Viewer

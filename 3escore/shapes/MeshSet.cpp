@@ -43,6 +43,17 @@ MeshSet::MeshSet(MeshSet &&other) noexcept = default;
 MeshSet::~MeshSet() = default;
 
 
+MeshSet &MeshSet::operator=(const MeshSet &other)
+{
+  Shape::operator=(other);
+  other.onClone(*this);
+  return *this;
+}
+
+
+MeshSet &MeshSet::operator=(MeshSet &&other) noexcept = default;
+
+
 bool MeshSet::writeCreate(PacketWriter &stream) const
 {
   if (!Shape::writeCreate(stream))
@@ -128,6 +139,7 @@ bool MeshSet::readCreate(PacketReader &stream)
     if (ok)
     {
       _parts[i].transform =
+        // NOLINTNEXTLINE(cppcoreguidlines-pro-bounds-array-to-pointer-decay)
         Transform(Vector3d(attr.position), Quaterniond(attr.rotation), Vector3d(attr.scale));
       _parts[i].transform.setPreferDoublePrecision(expect_double_precision);
       // We can only reference dummy resources here.

@@ -19,6 +19,10 @@
 #include <algorithm>
 #include <cstring>
 
+// clang-format off
+// NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+// clang-format on
+
 namespace tes
 {
 namespace
@@ -172,7 +176,6 @@ bool CollatedPacket::finalise()
     // params: stream,level, method, window bits, memLevel, strategy
     const int gzip_compression_level = tes::kTesToGZipCompressionLevel.at(_compression_level);
     deflateInit2(&_zip->stream, gzip_compression_level, Z_DEFLATED,
-                 // NOLINTNEXTLINE(hicpp-signed-bitwise)
                  CollatedPacketZip::WindowBits | CollatedPacketZip::GZipEncoding, 8,
                  Z_DEFAULT_STRATEGY);
     _zip->stream.next_out = reinterpret_cast<Bytef *>(_final_buffer.data() + InitialCursorOffset);
@@ -629,3 +632,7 @@ void CollatedPacket::expand(unsigned expand_by, std::vector<uint8_t> &buffer,
   buffer.resize(new_buffer_size);
 }
 }  // namespace tes
+
+// clang-format off
+// NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+// clang-format on

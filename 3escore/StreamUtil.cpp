@@ -33,7 +33,7 @@ PosType findPacketMarker(std::iostream &stream, size_t byte_read_limit = 1024u)
   std::array<char, sizeof(kPacketMarker)> marker_validation_bytes = {};
   std::memcpy(marker_validation_bytes.data(), &kPacketMarker, marker_validation_bytes.size());
   networkEndianSwap(marker_validation_bytes);
-  std::array<char, sizeof(kPacketMarker)> marker_bytes;
+  std::array<char, sizeof(kPacketMarker)> marker_bytes = {};
   static_assert(marker_validation_bytes.size() == marker_bytes.size());
   unsigned marker_bytes_checked = {};
   unsigned marker_bytes_validated = {};
@@ -50,10 +50,12 @@ PosType findPacketMarker(std::iostream &stream, size_t byte_read_limit = 1024u)
 
     for (size_t i = 0; i < marker_bytes.size() && stream.good(); ++i)
     {
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
       stream.read(&marker_bytes[i], 1);
       // We've checked another byte.
       ++marker_bytes_checked;
       // Check the result. Loop will end when this doesn't track marker_bytes_checked
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
       if (marker_bytes[i] == marker_validation_bytes[i])
       {
         ++marker_bytes_validated;
@@ -89,6 +91,7 @@ PosType findPacketMarker(std::iostream &stream, size_t byte_read_limit = 1024u)
 bool getPacketInfo(std::iostream &stream, PacketInfo &info, std::vector<uint8_t> &header_buffer)
 {
   info.stream_pos = stream.tellg();
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   stream.read(reinterpret_cast<char *>(header_buffer.data()), sizeof(PacketHeader));
   auto bytes_read = stream.tellg() - info.stream_pos;
   if (bytes_read != sizeof(PacketHeader))
@@ -96,6 +99,7 @@ bool getPacketInfo(std::iostream &stream, PacketInfo &info, std::vector<uint8_t>
     return false;
   }
 
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   const auto *network_endian_header = reinterpret_cast<const PacketHeader *>(header_buffer.data());
   info.routing_id = networkEndianSwapValue(network_endian_header->routing_id);
   info.message_id = networkEndianSwapValue(network_endian_header->message_id);
@@ -192,12 +196,14 @@ void finaliseServerInfo(std::iostream &stream, const ServerInfoMessage *server_i
   // Set PFNoCrc flag if required
   if (!server_message_info.with_crc)
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     auto *header = reinterpret_cast<PacketHeader *>(header_buffer.data());
     header->flags = networkEndianSwapValue<decltype(PacketHeader::flags)>(PFNoCrc);
   }
 
   server_info->write(packet);
   packet.finalise();
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   stream.write(reinterpret_cast<const char *>(header_buffer.data()), packet.packetSize());
   stream.flush();
 }
@@ -246,18 +252,17 @@ void finaliseFrameCount(std::iostream &stream, uint32_t frame_count,
   // Set PFNoCrc flag if required
   if (!frame_count_info.with_crc)
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     auto *header = reinterpret_cast<PacketHeader *>(header_buffer.data());
     header->flags = networkEndianSwapValue<decltype(PacketHeader::flags)>(PFNoCrc);
   }
 
-  ControlMessage frame_count_msg;
-
-  frame_count_msg.control_flags = 0;
+  ControlMessage frame_count_msg = {};
   frame_count_msg.value32 = frame_count;
-  frame_count_msg.value64 = 0;
 
   frame_count_msg.write(packet);
   packet.finalise();
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   stream.write(reinterpret_cast<const char *>(header_buffer.data()), packet.packetSize());
   stream.flush();
 }
@@ -282,6 +287,7 @@ bool initialiseStream(std::ostream &stream, const ServerInfoMessage *server_info
       return false;
     }
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     stream.write(reinterpret_cast<const char *>(packet.data()), packet.packetSize());
     if (!stream.good() || stream.fail())
     {
@@ -291,10 +297,7 @@ bool initialiseStream(std::ostream &stream, const ServerInfoMessage *server_info
 
   // Write a frame count control message place holder.
   packet.reset(MtControl, CIdFrameCount);
-  ControlMessage msg;
-  msg.control_flags = 0;
-  msg.value32 = 0;
-  msg.value64 = 0;
+  const ControlMessage msg = {};
 
   if (!msg.write(packet))
   {
@@ -306,6 +309,7 @@ bool initialiseStream(std::ostream &stream, const ServerInfoMessage *server_info
     return false;
   }
 
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   stream.write(reinterpret_cast<const char *>(packet.data()), packet.packetSize());
   return stream.good() && !stream.fail();
 }

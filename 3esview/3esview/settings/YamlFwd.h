@@ -8,6 +8,7 @@
 
 namespace c4::yml
 {
+class ConstNodeRef;
 class NodeRef;
 }  // namespace c4::yml
 

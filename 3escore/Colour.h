@@ -45,7 +45,7 @@ public:
 
   /// Construct a colour with the given numeric value.
   /// @param colour_value The integer colour representation: 0xRRGGBBAA.
-  Colour(uint32_t colour_value = 0xffffffffu) noexcept;  // NOLINT(readability-magic-numbers)
+  Colour(uint32_t colour_value = 0xffffffffu) noexcept;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
   /// Construct a colour the named colours.
   /// @param name The colour name enumeration value.
@@ -804,7 +804,6 @@ inline Colour Colour::fromHsv(float hue, float saturation, float value, float al
 
 inline uint32_t Colour::ConverterUInt32::operator()(const std::array<uint8_t, 4> &storage) const
 {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return (storage[kRedIndex] << kRedShift) | (storage[kGreenIndex] << kGreenShift) |
          (storage[kBlueIndex] << kBlueShift) | (storage[kAlphaIndex] << kAlphaShift);
 }

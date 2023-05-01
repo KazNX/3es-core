@@ -103,7 +103,7 @@ std::ostream &append(std::ostream &out)
 }
 
 
-IOCode load(const ryml::NodeRef &node, Camera &camera, std::ostream &log)
+IOCode load(const ryml::ConstNodeRef &node, Camera &camera, std::ostream &log)
 {
   auto code = IOCode::Ok;
   code = mergeCode(priv::read(node, camera.invert_y, log), code);
@@ -130,7 +130,7 @@ IOCode save(ryml::NodeRef node, const Camera &camera, std::ostream &log)
 }
 
 
-IOCode load(const ryml::NodeRef &node, Log &log_config, std::ostream &log)
+IOCode load(const ryml::ConstNodeRef &node, Log &log_config, std::ostream &log)
 {
   auto code = IOCode::Ok;
   code = mergeCode(priv::read(node, log_config.log_history, log), code);
@@ -147,7 +147,7 @@ IOCode save(ryml::NodeRef &node, const Log &log_settings, std::ostream &log)
 }
 
 
-IOCode load(const ryml::NodeRef &node, Playback &playback, std::ostream &log)
+IOCode load(const ryml::ConstNodeRef &node, Playback &playback, std::ostream &log)
 {
   auto code = IOCode::Ok;
   code = mergeCode(priv::read(node, playback.allow_key_frames, log), code);
@@ -161,7 +161,7 @@ IOCode load(const ryml::NodeRef &node, Playback &playback, std::ostream &log)
 }
 
 
-IOCode load(const ryml::NodeRef &node, Connection &connection, std::ostream &log)
+IOCode load(const ryml::ConstNodeRef &node, Connection &connection, std::ostream &log)
 {
   connection.history.clear();
   if (node.empty())
@@ -205,7 +205,7 @@ IOCode load(const ryml::NodeRef &node, Connection &connection, std::ostream &log
 }
 
 
-IOCode load(const ryml::NodeRef &node, Extension &extension, std::ostream &log)
+IOCode load(const ryml::ConstNodeRef &node, Extension &extension, std::ostream &log)
 {
   auto code = IOCode::Ok;
 
@@ -233,7 +233,7 @@ IOCode save(ryml::NodeRef &node, const Playback &playback, std::ostream &log)
 }
 
 
-IOCode load(const ryml::NodeRef &node, Render &render, std::ostream &log)
+IOCode load(const ryml::ConstNodeRef &node, Render &render, std::ostream &log)
 {
   auto code = IOCode::Ok;
   code = mergeCode(priv::read(node, render.use_edl_shader, log), code);

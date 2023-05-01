@@ -19,6 +19,7 @@
 #include <cinttypes>
 #include <memory>
 #include <utility>
+#include <variant>
 
 #define STREAM_TYPE_INFO(_type, _type_name) \
   template <>                               \
@@ -88,36 +89,33 @@ namespace detail
 class TES_CORE_API DataBufferAffordances
 {
 public:
-  /// Virtual destructor.
-  virtual ~DataBufferAffordances();
+  DataBufferAffordances() = default;
+  DataBufferAffordances(const DataBufferAffordances &other) = default;
 
-  /// Release the memory pointer at @p stream_ptr.
+  /// Virtual destructor.
+  virtual ~DataBufferAffordances() = default;
+
+  DataBufferAffordances &operator=(const DataBufferAffordances &other) = default;
+
+  /// Release the memory pointer at @p stream_ptr assuming it was allocated by this data buffer.
   ///
   /// This assumes that the pointer at @p stream_ptr was allocated by this affordance via
-  /// @c takeOwnership(). The underlying type is fixed by the affordances implementation.
-  /// This function is called even if the @p stream_ptr points to borrowed memory, in which case
-  /// the implementation must preserve the memory.
+  /// @c copyStream(). The underlying type is fixed by the affordances implementation.
+  /// This function is only ever called when @p stream_ptr addresses to owned memory.
   ///
-  /// @param stream_ptr A pointer to the memory pointer that should be released (note the
-  /// additional indirection). May be null.
-  /// @param has_ownership True if the pointer at @p stream_ptr is owned by the @c DataBuffer and
-  /// can be released.
-  virtual void release(const void **stream_ptr, bool has_ownership) const = 0;
+  /// @param stream_ptr A pointer to the memory pointer that should be released. May be null.
+  virtual void release(const void *stream_ptr) const = 0;
 
-  /// Called to take ownership of the data pointed to at the address of @p stream_ptr.
+  /// Called to create a copy of @p stream .
   ///
-  /// After this call the @p stream_ptr must addres to a pointer to a memory section which is
-  /// owned by the @c DataBuffer. More plainly, if @c has_ownership is false and @c *stream_ptr
-  /// (note the dereference operator) is not null, then a copy of what is currently at
-  /// @c *stream_ptr is made, then @c *stream_ptr updated to point to the copy.
+  /// This is used to allow a @c DataBuffer to take ownership of its data by copying the previously
+  /// borrowed data. The underlying @c stream type is assumed to match that expected by the
+  /// affordances.
   ///
-  /// @param[in,out] stream_ptr A pointer to the memory pointer that should be released (note the
-  /// additional indirection). May be null.
-  /// @param has_ownership True if we already have ownership of @c *stream_ptr. This function should
-  /// only perform it's copy operations when @p has_ownership is false.
-  /// @param stream The @p DataBuffer which will take ownership of @p stream_ptr.
-  virtual void takeOwnership(const void **stream_ptr, bool has_ownership,
-                             const DataBuffer &stream) const = 0;
+  /// @param stream A pointer to the memory pointer that should be copied.
+  /// @param buffer The @p DataBuffer which is having the @p stream copied from.
+  /// @return A copy of the @p stream .
+  virtual void *copyStream(const void *stream, const DataBuffer &buffer) const = 0;
 
   /// Write data from @p stream to @p packet ensuring we write data of the type specified by
   /// @p write_as_type.
@@ -140,14 +138,14 @@ public:
   /// @c DctPackedFloat32 operations.
   /// @return The number of elements written to @p packet. Zero on failure.
   virtual uint32_t write(PacketWriter &packet, uint32_t offset, DataStreamType write_as_type,
-                         unsigned byte_limit, uint32_t receive_offset, const DataBuffer &stream,
+                         unsigned byte_limit, uint32_t receive_offset, const DataBuffer &buffer,
                          double quantisation_unit) const = 0;
 
   /// @overload
   uint32_t write(PacketWriter &packet, uint32_t offset, DataStreamType write_as_type,
-                 unsigned byte_limit, uint32_t receive_offset, const DataBuffer &stream) const
+                 unsigned byte_limit, uint32_t receive_offset, const DataBuffer &buffer) const
   {
-    return write(packet, offset, write_as_type, byte_limit, receive_offset, stream, 0.0);
+    return write(packet, offset, write_as_type, byte_limit, receive_offset, buffer, 0.0);
   }
 
   /// Write data from @p packet into the address at @p stream_ptr ensuring we read data of the type
@@ -173,7 +171,7 @@ public:
   /// @p stream_size, @p has_ownership and this affordances object.
   /// @return The number of elements read from the @p packet. Zero on failure.
   virtual uint32_t read(PacketReader &packet, void **stream_ptr, unsigned *stream_size,
-                        bool *has_ownership, const DataBuffer &stream) const = 0;
+                        bool *has_ownership, const DataBuffer &buffer) const = 0;
   /// This overload skips reading @p offset and @p count from @p packet which are parameters
   /// instead.
   /// @param packet The data packet to read from.
@@ -188,7 +186,7 @@ public:
   /// @param count The number of elements in the @p packet.
   /// @return The number of elements read from the @p packet. Zero on failure.
   virtual uint32_t read(PacketReader &packet, void **stream_ptr, unsigned *stream_size,
-                        bool *has_ownership, const DataBuffer &stream, unsigned offset,
+                        bool *has_ownership, const DataBuffer &buffer, unsigned offset,
                         unsigned count) const = 0;
   /// This implements single element reads from a @c DataBuffer with type conversion.
   ///
@@ -235,16 +233,22 @@ public:
   /// @return Affordances singleton.
   static DataBufferAffordances *instance();
 
-  void release(const void **stream_ptr, bool has_ownership) const final;
-  void takeOwnership(const void **stream_ptr, bool has_ownership,
-                     const DataBuffer &stream) const final;
+  DataBufferAffordancesT() = default;
+  DataBufferAffordancesT(const DataBufferAffordancesT &other) = default;
+
+  ~DataBufferAffordancesT() override = default;
+
+  DataBufferAffordancesT &operator=(const DataBufferAffordancesT &other) = default;
+
+  void release(const void *stream_ptr) const final;
+  void *copyStream(const void *stream, const DataBuffer &buffer) const override;
   uint32_t write(PacketWriter &packet, uint32_t offset, DataStreamType write_as_type,
-                 unsigned byte_limit, uint32_t receive_offset, const DataBuffer &stream,
+                 unsigned byte_limit, uint32_t receive_offset, const DataBuffer &buffer,
                  double quantisation_unit) const final;
   uint32_t read(PacketReader &packet, void **stream_ptr, unsigned *stream_size, bool *has_ownership,
-                const DataBuffer &stream) const final;
+                const DataBuffer &buffer) const final;
   uint32_t read(PacketReader &packet, void **stream_ptr, unsigned *stream_size, bool *has_ownership,
-                const DataBuffer &stream, unsigned offset, unsigned count) const final;
+                const DataBuffer &buffer, unsigned offset, unsigned count) const final;
 
   size_t get(DataStreamType as_type, size_t element_index, size_t component_index,
              size_t component_read_count, const void *stream, size_t stream_element_count,
@@ -264,7 +268,7 @@ public:
   /// @return The number of elements written or zero on failure.
   template <typename WriteType>
   uint32_t writeAs(PacketWriter &packet, uint32_t offset, DataStreamType write_as_type,
-                   unsigned byte_limit, uint32_t receive_offset, const DataBuffer &stream) const;
+                   unsigned byte_limit, uint32_t receive_offset, const DataBuffer &buffer) const;
 
   /// Function function for writing packed ata.
   /// @tparam FloatType Either @c float or @c double matching the affordances type.
@@ -288,7 +292,7 @@ public:
   uint32_t writeAsPacked(PacketWriter &packet, uint32_t offset, DataStreamType write_as_type,
                          unsigned byte_limit, uint32_t receive_offset,
                          const FloatType *packet_origin, FloatType quantisation_unit,
-                         const DataBuffer &stream) const;
+                         const DataBuffer &buffer) const;
 
   /// Helper function to read data of type @p ReadType from @p packet into @p *stream_ptr.
   ///
@@ -396,6 +400,9 @@ extern template class TES_CORE_API DataBufferAffordancesT<double>;
 class TES_CORE_API DataBuffer
 {
 public:
+  /// Provides a @c nullptr typed as `const void *`.
+  static constexpr const void *null() { return nullptr; }
+
   /// Default constructor. The resulting @c DataBuffer is of @c type() @c DctNone and is not usable
   /// unless @c set() is called.
   DataBuffer();
@@ -584,7 +591,7 @@ public:
   /// and @c Colour are not supported. Use @c float or @c double for @c Vector<T> buffers and
   /// @c uint32_t for @c Colour
   template <typename T>
-  T get(size_t element_index, size_t component_index = 0) const;
+  [[nodiscard]] T get(size_t element_index, size_t component_index = 0) const;
 
   /// Read a block of data from the buffer. This reads from the @p element_index reading @c
   /// element_count data items into @p dst .
@@ -608,8 +615,7 @@ public:
   /// @tparam T Data type to read as. Must be a primitive type as supported by @c DataStreamType
   /// (see note above).
   /// @return The number of @c DataBuffer @em elements read. The number of @c T elements written to
-  /// @p dst will be
-  ///   this value times the @c componentCount() .
+  /// @p dst will be this value times the @c componentCount() .
   template <typename T>
   size_t get(size_t element_index, size_t element_count, T *dst, size_t capacity) const;
 
@@ -631,7 +637,7 @@ public:
   /// behaviour is undefined if the original memory has been released.
   ///
   /// @return True if the buffer has a valid pointer.
-  [[nodiscard]] bool isValid() const { return _stream != nullptr; }
+  [[nodiscard]] bool isValid() const { return readPtr() != nullptr; }
 
   /// Return the number of elements in the data buffer.
   /// @return The number of elements in the buffer.
@@ -835,9 +841,27 @@ private:
   /// a @c nullptr is given.
   ///
   /// @return The writable address, or @c nullptr when the buffer is not writable.
-  void *writePtr() { return (ownPointer()) ? const_cast<void *>(_stream) : nullptr; }
+  [[nodiscard]] void *writePtr() { return (ownPointer()) ? std::get<void *>(_stream) : nullptr; }
 
-  const void *_stream = nullptr;
+  /// Get a readable address for the data buffer.
+  ///
+  /// This is null only when the data buffer stream is null.
+  ///
+  /// @return The readable address or @c nullptr when the buffer doesn't have addressable content.
+  [[nodiscard]] const void *readPtr() const
+  {
+    return (ownPointer()) ? std::get<void *>(_stream) : std::get<const void *>(_stream);
+  }
+
+  /// Clear the stream pointer and clear the ownership flag.
+  void clearPtr()
+  {
+    _stream = static_cast<const void *>(nullptr);
+    _flags &= static_cast<uint8_t>(~Flag::OwnPointer);
+  }
+
+  using StreamPtr = std::variant<void *, const void *>;
+  StreamPtr _stream = null();
   unsigned _count = 0;  ///< Number of vertices in the @p _stream .
   /// Number of primitive type component elements in each vertex. E.g., Vector3 has 3.
   uint8_t _component_count = 1;

@@ -23,15 +23,22 @@ public:
   /// Creates a new packet reader for the given packet and its CRC.
   PacketReader(const PacketHeader *packet);
 
+  PacketReader(const PacketReader &other) = delete;
+
   /// Move constructor.
   /// @param other Packet to move
   PacketReader(PacketReader &&other) noexcept;
 
-  PacketReader &operator=(PacketReader &&other) noexcept;
+  ~PacketReader() = default;
+
+  PacketReader &operator=(const PacketReader &other) = delete;
+  PacketReader &operator=(PacketReader &&other) noexcept
+  {
+    other.swap(*this);
+    return *this;
+  }
 
   void swap(PacketReader &other) noexcept;
-
-  friend void swap(PacketReader &first, PacketReader &second) { first.swap(second); }
 
   /// Calculates the CRC value, returning true if it matches. This also sets
   /// @c isCrcValid() on success.
@@ -127,12 +134,14 @@ inline uint16_t PacketReader::bytesAvailable() const
 template <typename T>
 inline size_t PacketReader::readElement(T &element)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   return readElement(reinterpret_cast<uint8_t *>(&element), sizeof(T));
 }
 
 template <typename T>
 inline size_t PacketReader::readArray(T *elements, size_t element_count)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   return readArray(reinterpret_cast<uint8_t *>(elements), sizeof(T), element_count);
 }
 
@@ -155,6 +164,12 @@ inline PacketReader &PacketReader::operator>>(T &val)
   int read = readElement(val);
   _status |= !(read == sizeof(T)) * Fail;
   return *this;
+}
+
+
+inline void swap(PacketReader &a, PacketReader &b) noexcept
+{
+  a.swap(b);
 }
 }  // namespace tes
 

@@ -63,7 +63,12 @@ public:
   /// @todo It doens't make sense to use a @c std::shared_ptr to a @c std::istream . Convert to move
   /// semantics.
   PacketStreamReader(std::shared_ptr<std::istream> stream);
+
+  PacketStreamReader(const PacketStreamReader &) = delete;
+
   ~PacketStreamReader();
+
+  PacketStreamReader &operator=(const PacketStreamReader &) = delete;
 
   /// Check if the stream is ok for more reading.
   /// @return True if ok to read on.
@@ -110,7 +115,7 @@ private:
   size_t calcExpectedSize();
 
   std::shared_ptr<std::istream> _stream;
-  std::array<uint8_t, sizeof(tes::kPacketMarker)> _marker_bytes;
+  std::array<uint8_t, sizeof(tes::kPacketMarker)> _marker_bytes = {};
   std::vector<uint8_t> _buffer;
   size_t _chunk_size = 1024u;
   std::istream::pos_type _current_packet_pos = {};
