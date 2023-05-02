@@ -316,7 +316,7 @@ bool MeshResource::readTransfer(int message_type, PacketReader &packet)
   switch (message_type)
   {
   case MmtVertex: {
-    read_stream = DataBuffer(static_cast<Vector3d *>(nullptr), 0);
+    read_stream = DataBuffer(Vector3d(0.0));
     // Read the expected number of items.
     read_stream.read(packet, 0, count);
     ok = processVertices(msg, offset, read_stream) && ok;
@@ -339,7 +339,7 @@ bool MeshResource::readTransfer(int message_type, PacketReader &packet)
     break;
   }
   case MmtNormal: {
-    read_stream = DataBuffer(static_cast<Vector3d *>(nullptr), 0);
+    read_stream = DataBuffer(Vector3d(0.0));
     // Read the expected number of items.
     read_stream.read(packet, 0, count);
     ok = processNormals(msg, offset, read_stream) && ok;

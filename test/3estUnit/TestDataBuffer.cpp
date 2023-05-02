@@ -354,7 +354,7 @@ TEST(Buffer, Colour)
   DataBuffer buffer(colours);
   testBufferReadAsType<uint32_t>(buffer, reference, "std::vector<Colour>");
 
-  // Reinitialise the buffer from Vector3 pointer.
+  // Reinitialise the buffer from Colour pointer.
   buffer = DataBuffer(colours.data(), colours.size());
   testBufferReadAsType<uint32_t>(buffer, reference, "Colour*");
 

@@ -12,7 +12,6 @@ inline DataBuffer::DataBuffer(DataStreamType type, size_t component_count, size_
   : _component_count(int_cast<uint8_t>(component_count))
   , _element_stride(int_cast<uint8_t>(component_stride ? component_stride : component_count))
   , _type(type)
-  , _flags((type != DctNone) ? Flag::OwnPointer : Flag::Zero)
 {
   switch (type)
   {
@@ -66,16 +65,36 @@ inline DataBuffer::DataBuffer(DataStreamType type, size_t component_count, size_
 
 template <typename T>
 inline DataBuffer::DataBuffer(const T *v, size_t count, size_t component_count,
-                              size_t component_stride, bool own_pointer)
+                              size_t component_stride)
   : _stream(v)
   , _count(int_cast<unsigned>(count))
   , _component_count(int_cast<uint8_t>(component_count))
   , _element_stride(int_cast<uint8_t>(component_stride ? component_stride : component_count))
   , _primitive_type_size(int_cast<uint8_t>(DataBufferPrimitiveTypeInfo<T>::size()))
   , _type(DataBufferPrimitiveTypeInfo<T>::type())
-  , _flags(!!own_pointer * Flag::OwnPointer)
   , _affordances(detail::DataBufferAffordancesT<T>::instance())
 {}
+
+
+template <typename T, typename std::enable_if_t<!std::is_const_v<T>, bool>>
+inline DataBuffer::DataBuffer(bool own_pointer, T *v, size_t count, size_t component_count,
+                              size_t component_stride)
+  : _stream((own_pointer) ? v : const_cast<const T *>(v))  // Set const pointer if not owned.
+  , _count(int_cast<unsigned>(count))
+  , _component_count(int_cast<uint8_t>(component_count))
+  , _element_stride(int_cast<uint8_t>(component_stride ? component_stride : component_count))
+  , _primitive_type_size(int_cast<uint8_t>(DataBufferPrimitiveTypeInfo<T>::size()))
+  , _type(DataBufferPrimitiveTypeInfo<T>::type())
+  , _flags((own_pointer && v) ? Flag::OwnPointer : Flag::Zero)
+  , _affordances(detail::DataBufferAffordancesT<T>::instance())
+{
+  static_assert(typeid(std::remove_const_t<T>) != typeid(Vector3f),
+                "Unsupported mutable stream type. Use const T * constructor and duplicate()");
+  static_assert(typeid(std::remove_const_t<T>) != typeid(Vector3d),
+                "Unsupported mutable stream type. Use const T * constructor and duplicate()");
+  static_assert(typeid(std::remove_const_t<T>) != typeid(Colour),
+                "Unsupported mutable stream type. Use const T * constructor and duplicate()");
+}
 
 
 inline DataBuffer::DataBuffer(const Vector3f *v, size_t count)
@@ -189,9 +208,16 @@ inline DataBuffer::~DataBuffer()
 
 template <typename T>
 inline void DataBuffer::set(const T *v, size_t count, size_t component_count,
-                            size_t component_stride, bool own_pointer)
+                            size_t component_stride)
 {
-  *this = std::move(DataBuffer(v, count, component_count, component_stride, own_pointer));
+  *this = std::move(DataBuffer(v, count, component_count, component_stride));
+}
+
+template <typename T, typename std::enable_if_t<!std::is_const_v<T>, bool>>
+inline void DataBuffer::set(bool own_pointer, T *v, size_t count, size_t component_count,
+                            size_t component_stride)
+{
+  *this = std::move(DataBuffer(v, count, own_pointer, component_count, component_stride));
 }
 
 template <typename T>

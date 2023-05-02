@@ -327,6 +327,42 @@ public:
                         unsigned component_count, void **stream_ptr) const;
 };
 
+// template <>
+// class DataBufferAffordancesT<Colour> : public DataBufferAffordances
+// {
+//   static DataBufferAffordances *instance()
+//   {
+//     static_assert(
+//       false, "Unsupported DataBuffer API function for Colour. Use const Colour * and
+//       duplicate().");
+//     return nullptr;
+//   }
+// };
+
+// template <>
+// class DataBufferAffordancesT<Vector3f> : public DataBufferAffordances
+// {
+//   static DataBufferAffordances *instance()
+//   {
+//     static_assert(
+//       false,
+//       "Unsupported DataBuffer API function for Vector3f. Use const Vector3f * and duplicate().");
+//     return nullptr;
+//   }
+// };
+
+// template <>
+// class DataBufferAffordancesT<Vector3d> : public DataBufferAffordances
+// {
+//   static DataBufferAffordances *instance()
+//   {
+//     static_assert(
+//       false,
+//       "Unsupported DataBuffer API function for Vector3d. Use const Vector3d * and duplicate().");
+//     return nullptr;
+//   }
+// };
+
 extern template class TES_CORE_API DataBufferAffordancesT<int8_t>;
 extern template class TES_CORE_API DataBufferAffordancesT<uint8_t>;
 extern template class TES_CORE_API DataBufferAffordancesT<int16_t>;
@@ -421,21 +457,48 @@ public:
 
   /// Construct from a raw pointer array.
   /// @tparam T The array data type. See @em primitiveType restrictions in class comments.
+  /// @param v The vertex data array. A borrowed pointer is taken.
+  /// @param count Number of vertex elements in the array.
+  /// @param component_count Number of components of type @p T in each element.
+  /// @param component_stride Stride between elements in @p v. The stride is sized by @p T and must
+  /// be @c >= @p component_count excepting that a zero value implies
+  /// `component_stride = component_count`.
+  template <typename T>
+  DataBuffer(const T *v, size_t count, size_t component_count = 1, size_t component_stride = 0);
+
+  /// Construct from a raw pointer array.
+  /// @tparam T The array data type. See @em primitiveType restrictions in class comments.
+  /// @param own_pointer indicates wether to take ownership of the memory at @p v and use
+  /// @c delete to release it.
   /// @param v The vertex data array.
   /// @param count Number of vertex elements in the array.
   /// @param component_count Number of components of type @p T in each element.
   /// @param component_stride Stride between elements in @p v. The stride is sized by @p T and must
   /// be @c >= @p component_count excepting that a zero value implies
   /// `component_stride = component_count`.
-  /// @param own_pointer True to take ownership of the memory at @p v.
-  template <typename T>
-  DataBuffer(const T *v, size_t count, size_t component_count = 1, size_t component_stride = 0,
-             bool own_pointer = false);
+  template <typename T, typename std::enable_if_t<!std::is_const_v<T>, bool> = true>
+  DataBuffer(bool own_pointer, T *v, size_t count, size_t component_count = 1,
+             size_t component_stride = 0);
 
-  /// Construct a vertex data buffer from a @c Vector3f data type using borrowed memory.
+  /// Construct a vertex data buffer from a @c Vector3f data type using borrowed memory semantics.
   /// @param v The vertex array.
   /// @param count The number of vertex elements in @p v.
   DataBuffer(const Vector3f *v, size_t count);
+
+  /// Construct a vertex data buffer from a @c Vector3f data type using borrowed memory semantics.
+  /// @param v The vertex array.
+  /// @param count The number of vertex elements in @p v.
+  DataBuffer(Vector3f *c, size_t count)
+    : DataBuffer(const_cast<const Vector3f *>(c), count)
+  {}
+
+  /// Allocate an empty @c DataBuffer for reading @c Vector3f data into using @c read() functions.
+  /// @param empty Used only to set the buffer type.
+  DataBuffer(const Vector3f &empty)
+    : DataBuffer(static_cast<const Vector3f *>(nullptr), 0)
+  {
+    (void)empty;
+  }
 
   /// Construct a vertex data buffer from a @c Vector3f @c std::array using borrowed memory.
   /// @tparam Count The number of elements in @p v.
@@ -445,10 +508,25 @@ public:
     : DataBuffer(v.data(), Count)
   {}
 
-  /// Construct a vertex data buffer from a @c Vector3d data type using borrowed memory.
+  /// Construct a vertex data buffer from a @c Vector3d data type using borrowed memory semantics.
   /// @param v The vertex array.
   /// @param count The number of vertex elements in @p v.
   DataBuffer(const Vector3d *v, size_t count);
+
+  /// Construct a vertex data buffer from a @c Vector3d data type using borrowed memory semantics.
+  /// @param v The vertex array.
+  /// @param count The number of vertex elements in @p v.
+  DataBuffer(Vector3d *c, size_t count)
+    : DataBuffer(const_cast<const Vector3d *>(c), count)
+  {}
+
+  /// Allocate an empty @c DataBuffer for reading @c Vector3d data into using @c read() functions.
+  /// @param empty Used only to set the buffer type.
+  DataBuffer(const Vector3d &empty)
+    : DataBuffer(static_cast<const Vector3d *>(nullptr), 0)
+  {
+    (void)empty;
+  }
 
   /// Construct a vertex data buffer from a @c Vector3d @c std::array using borrowed memory.
   /// @tparam Count The number of elements in @p v.
@@ -458,13 +536,31 @@ public:
     : DataBuffer(v.data(), Count)
   {}
 
-  /// Construct from a @c Colour array using borrowed memory.
+  /// Construct from a @c Colour array using borrowed memory semantics.
   ///
   /// Each colour is represented by a single @c uint32_t value as encoded by @c Colour::colour32().
   ///
   /// @param c The colour array.
   /// @param count The number of elements in @p c.
   DataBuffer(const Colour *c, size_t count);
+
+  /// Construct from a @c Colour array using borrowed memory semantics.
+  ///
+  /// Each colour is represented by a single @c uint32_t value as encoded by @c Colour::colour32().
+  ///
+  /// @param c The colour array.
+  /// @param count The number of elements in @p c.
+  DataBuffer(Colour *v, size_t count)
+    : DataBuffer(const_cast<const Colour *>(v), count)
+  {}
+
+  /// Allocate an empty @c DataBuffer for reading @c Colour data into using @c read() functions.
+  /// @param empty Used only to set the buffer type.
+  DataBuffer(const Colour &empty)
+    : DataBuffer(static_cast<const Colour *>(nullptr), 0)
+  {
+    (void)empty;
+  }
 
   /// Construct from a @c Colour @c std::array using borrowed memory.
   ///
@@ -534,16 +630,31 @@ public:
   /// Existing memory is released as required.
   ///
   /// @tparam T The array data type. See @em primitiveType restrictions in class comments.
-  /// @param v The vertex data array.
+  /// @param v The vertex data array. A borrowed pointer is taken.
   /// @param count Number of vertex elements in the array.
   /// @param component_count Number of components of type @p T in each element.
   /// @param component_stride Stride between elements in @p v. The stride is sized by @p T and must
   /// be @c >=
   ///   @p component_count excepting that a zero value implies `component_stride = component_count`.
-  /// @param own_pointer True to take ownership of the memory at @p v.
   template <typename T>
-  void set(const T *v, size_t count, size_t component_count = 1, size_t component_stride = 0,
-           bool own_pointer = false);
+  void set(const T *v, size_t count, size_t component_count = 1, size_t component_stride = 0);
+
+  /// Set data from a raw pointer array.
+  ///
+  /// Existing memory is released as required.
+  ///
+  /// @tparam T The array data type. See @em primitiveType restrictions in class comments.
+  /// @param own_pointer Indicates whether to take ownership of the memory at @p v and use
+  /// @c delete to release it.
+  /// @param v The vertex data array.
+  /// @param count Number of vertex elements in the array.
+  /// @param component_count Number of components of type @p T in each element.
+  /// @param component_stride Stride between elements in @p v. The stride is sized by @p T and must
+  /// be `>= component_count` excepting that a zero value implies
+  /// `component_stride = component_count`.
+  template <typename T, typename std::enable_if_t<!std::is_const_v<T>, bool>>
+  void set(bool own_pointer, T *v, size_t count, size_t component_count = 1,
+           size_t component_stride = 0);
 
   /// Set data from a @c std::vector using borrowed memory.
   ///

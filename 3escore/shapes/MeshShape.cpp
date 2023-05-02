@@ -183,8 +183,7 @@ void expandVertices(DataBuffer &vertices, DataBuffer &indices)
     const size_t element_count = static_cast<size_t>(vertices.componentCount()) * indices.count();
     T *verts = new T[element_count];
     // Set vertices to hold the new pointer as soon as we can for RAII
-    vertices.set(verts, indices.count(), vertices.componentCount(), vertices.componentCount(),
-                 true);
+    vertices.set(verts, indices.count(), vertices.componentCount(), vertices.componentCount());
 
     T *dst = verts;
     for (unsigned i = 0; i < indices.count(); ++i)
