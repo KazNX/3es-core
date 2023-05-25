@@ -19,21 +19,24 @@ public:
   static const Quaternion<T> Identity;
 
   /// Default constructor: undefined initialisation behaviour.
-  Quaternion() noexcept = default;
+  constexpr Quaternion() noexcept = default;
 
   /// The identity constructor. The boolean parameter is ignored, being
   /// used only for overloading. General usage is to set it to true.
-  Quaternion(bool) noexcept { *this = Identity; }  // NOLINT(readability-named-parameter)
+  explicit constexpr Quaternion(bool) noexcept
+  {
+    *this = Identity;
+  }  // NOLINT(readability-named-parameter)
 
   /// Copy constructor.
   /// @param other Vector to copy the value of.
-  Quaternion(const Quaternion<T> &other) noexcept
+  explicit constexpr Quaternion(const Quaternion<T> &other) noexcept
     : _storage(other._storage)
   {}
   /// Copy constructor from a different numeric type.
   /// @param other Vector to copy the value of.
   template <typename U>
-  Quaternion(const Quaternion<U> &other) noexcept
+  constexpr Quaternion(const Quaternion<U> &other) noexcept
     : _storage({ static_cast<T>(other.x()), static_cast<T>(other.y()), static_cast<T>(other.z()),
                  static_cast<T>(other.w()) })
   {}
@@ -43,25 +46,25 @@ public:
   /// @param y The y coordinate.
   /// @param z The z coordinate.
   /// @param w The w coordinate.
-  Quaternion(const T &x, const T &y, const T &z, const T &w) noexcept
+  constexpr Quaternion(const T &x, const T &y, const T &z, const T &w) noexcept
     : _storage({ x, y, z, w })
   {}
   /// Vector plus scalar initialisation.
   /// @param v Values for x, y and z.
   /// @param w The w coordinate.
-  Quaternion(const Vector3<T> &v, const T &w) noexcept
+  constexpr Quaternion(const Vector3<T> &v, const T &w) noexcept
     : _storage({ v.x(), v.y(), v.z(), w })
   {}
 
   /// Initialisation from a array of at least length 4.
   /// @param array Array to initialise from.
-  Quaternion(const std::array<T, 4> &array) noexcept
+  constexpr Quaternion(const std::array<T, 4> &array) noexcept
     : _storage({ array[0], array[1], array[2], array[3] })
   {}
   /// Initialisation from a array of at least length 4.
   /// @param array Array to initialise from.
   template <typename U>
-  Quaternion(const std::array<U, 4> &array) noexcept
+  constexpr Quaternion(const std::array<U, 4> &array) noexcept
     : _storage({ static_cast<T>(array[0]), static_cast<T>(array[1]), static_cast<T>(array[2]),
                  static_cast<T>(array[3]) })
   {}
@@ -69,7 +72,7 @@ public:
   /// Initialisation from a array of at least length 4.
   /// No bounds checking is performed.
   /// @param array4 An array of at least length 4. Copies elements (0, 1, 2, 3).
-  Quaternion(
+  constexpr Quaternion(
     const T array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                                  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ array4[0], array4[1], array4[2], array4[3] })
@@ -78,7 +81,7 @@ public:
   /// No bounds checking is performed.
   /// @param array4 An array of at least length 4. Copies elements (0, 1, 2, 3).
   template <typename U>
-  Quaternion(const U array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
+  constexpr Quaternion(const U array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
     : _storage(
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         { static_cast<T>(array4[0]), static_cast<T>(array4[1]), static_cast<T>(array4[2]),

@@ -39,15 +39,15 @@ public:
   static const Vector3<T> AxisZ;
 
   /// Default constructor: undefined initialisation behaviour.
-  Vector3() noexcept = default;
+  constexpr Vector3() noexcept = default;
   /// Initialises all members to @p scalar.
   /// @param scalar The value for all members.
-  constexpr Vector3(const T &scalar) noexcept
+  explicit constexpr Vector3(const T &scalar) noexcept
     : _storage({ scalar, scalar, scalar })
   {}
   /// Copy constructor.
   /// @param other Vector to copy the value of.
-  Vector3(const Vector3<T> &other) noexcept
+  constexpr Vector3(const Vector3<T> &other) noexcept
     : _storage(other._storage)
   {}
 
@@ -63,21 +63,21 @@ public:
 
   /// Initialisation from a array of at least length 3.
   /// @param array Array to initialise from.
-  Vector3(const std::array<T, 3> &array) noexcept
+  constexpr Vector3(const std::array<T, 3> &array) noexcept
     : _storage(array)
   {}
 
   /// Initialisation from a array of at least length 3.
   /// @param array Array to initialise from.
   template <typename U>
-  Vector3(const std::array<U, 3> &array) noexcept
+  constexpr Vector3(const std::array<U, 3> &array) noexcept
     : _storage({ static_cast<T>(array[0]), static_cast<T>(array[1]), static_cast<T>(array[2]) })
   {}
 
   /// Initialisation from a array of at least length 3.
   /// No bounds checking is performed.
   /// @param array3 An array of at least length 3. Copies elements (0, 1, 2).
-  Vector3(
+  constexpr Vector3(
     const T array3[3]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                                  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ array3[0], array3[1], array3[2] })
@@ -87,7 +87,7 @@ public:
   /// No bounds checking is performed.
   /// @param array3 An array of at least length 3. Copies elements (0, 1, 2).
   template <typename U>
-  Vector3(
+  constexpr Vector3(
     const U array3[3]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                                  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ static_cast<T>(array3[0]), static_cast<T>(array3[1]), static_cast<T>(array3[2]) })
@@ -96,7 +96,7 @@ public:
   /// Copy constructor from a different numeric type.
   /// @param other Vector to copy the value of.
   template <typename U>
-  Vector3(const Vector3<U> &other) noexcept
+  constexpr Vector3(const Vector3<U> &other) noexcept
     : _storage({ static_cast<T>(other.x()), static_cast<T>(other.y()), static_cast<T>(other.z()) })
   {}
 
