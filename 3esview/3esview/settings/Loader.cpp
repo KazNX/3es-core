@@ -14,8 +14,8 @@
 
 #include <c4/format.hpp>
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -37,27 +37,27 @@ struct Tags
     static ryml::csubstr camera()
     {
       static const std::string str = "camera";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
     static ryml::csubstr log()
     {
       static const std::string str = "log";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
     static ryml::csubstr playback()
     {
       static const std::string str = "playback";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
     static ryml::csubstr render()
     {
       static const std::string str = "render";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
     static ryml::csubstr connection()
     {
       static const std::string str = "connection";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
   };
 
@@ -66,17 +66,17 @@ struct Tags
     static ryml::csubstr history()
     {
       static const std::string str = "history";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
     static ryml::csubstr host()
     {
       static const std::string str = "host";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
     static ryml::csubstr port()
     {
       static const std::string str = "port";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
   };
 };
@@ -302,7 +302,7 @@ IOCode save(ryml::NodeRef &node, const Extension &extension, std::ostream &log)
 
 std::filesystem::path userConfigPath()
 {
-  std::array<char, 1024> user_config_path;
+  std::array<char, 1024> user_config_path = {};
   get_user_config_file(user_config_path.data(), static_cast<unsigned>(user_config_path.size()),
                        "3rdEyeScene");
   std::filesystem::path path{ std::string(user_config_path.data()) };
@@ -331,7 +331,7 @@ IOResult load(Settings::Config &config, const std::filesystem::path &path)
   in_file.seekg(0, std::ios_base::beg);
 
   std::vector<char> content(byte_count);
-  in_file.read(content.data(), content.size());
+  in_file.read(content.data(), static_cast<std::streamsize>(content.size()));
 
   ryml::Tree doc = ryml::parse_in_place(ryml::to_substr(content));
 

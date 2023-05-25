@@ -14,7 +14,7 @@ SetCamera::SetCamera()
 
 bool SetCamera::checkAdmissible(Viewer &viewer) const
 {
-  const auto data_thread = viewer.dataThread();
+  const auto &data_thread = viewer.dataThread();
   return data_thread != nullptr && !data_thread->isLiveStream();
 }
 

@@ -5,14 +5,14 @@
 
 #include <3escore/Log.h>
 
+#include "Magnum/GL/Shader.h"
 #include <Magnum/GL/Context.h>
 #include <Magnum/GL/Extensions.h>
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/GL/Renderer.h>
-#include "Magnum/GL/Shader.h"
 #include <Magnum/GL/Version.h>
-#include <Magnum/Math/Matrix4.h>
 #include <Magnum/Math/Color.h>
+#include <Magnum/Math/Matrix4.h>
 
 #include <Corrade/Containers/Reference.h>
 #include <Corrade/Utility/Assert.h>
@@ -132,7 +132,8 @@ VoxelGeomProgram::VoxelGeomProgram()
    bindFragmentDataLocation() */
 #if !defined(MAGNUM_TARGET_GLES) || defined(MAGNUM_TARGET_GLES2)
 #ifndef MAGNUM_TARGET_GLES
-  // if (!GL::Context::current().isExtensionSupported<GL::Extensions::ARB::explicit_attrib_location>(version))
+  // if
+  // (!GL::Context::current().isExtensionSupported<GL::Extensions::ARB::explicit_attrib_location>(version))
 #endif
   {
     bindAttributeLocation(Position::Location, "position");
@@ -143,7 +144,8 @@ VoxelGeomProgram::VoxelGeomProgram()
   CORRADE_INTERNAL_ASSERT_OUTPUT(link());
 
 #ifndef MAGNUM_TARGET_GLES
-  // if (!GL::Context::current().isExtensionSupported<GL::Extensions::ARB::explicit_uniform_location>(version))
+  // if
+  // (!GL::Context::current().isExtensionSupported<GL::Extensions::ARB::explicit_uniform_location>(version))
 #endif
   {
     _model_matrix_uniform = uniformLocation("modelMatrix");

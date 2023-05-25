@@ -10,6 +10,7 @@
 
 namespace tes::view::settings
 {
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 struct Log
 {
   UInt log_history = { "Log history", 10000, 0, 1000000, "Size of the log history." };
@@ -21,6 +22,7 @@ struct Log
 
   [[nodiscard]] inline bool operator!=(const Log &other) const { return !operator==(other); }
 };
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }  // namespace tes::view::settings
 
 #endif  // TES_VIEW_SETTINGS_LOG_H

@@ -15,15 +15,15 @@
 #include <Magnum/Shaders/VertexColor.h>
 
 #include <iosfwd>
-#include <unordered_map>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 #include <vector>
 
 namespace tes
 {
 class MeshShape;
-}
+}  // namespace tes
 
 namespace tes::view::shaders
 {
@@ -92,7 +92,7 @@ protected:
 
   /// Create a @c RenderMesh entry for @p shape in @p _pending_shapes.
   /// @param shape The shape data to create for.
-  RenderMeshPtr create(std::shared_ptr<tes::MeshShape> shape);
+  static RenderMeshPtr create(std::shared_ptr<tes::MeshShape> shape);
 
   /// Update the shape matching @p shape_id with the given @p update .
   /// @param shape_id The ID of the shape to update.

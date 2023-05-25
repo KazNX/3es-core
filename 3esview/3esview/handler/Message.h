@@ -3,10 +3,11 @@
 
 #include <3esview/ViewConfig.h>
 
-#include <3esview/camera/Camera.h>
 #include <3esview/DrawParams.h>
 #include <3esview/FrameStamp.h>
 #include <3esview/painter/CategoryState.h>
+
+#include <3esview/camera/Camera.h>
 #include <3esview/util/Enum.h>
 
 #include <3escore/Messages.h>
@@ -94,23 +95,26 @@ public:
     Overlay
   };
 
-  Message(uint16_t routing_id, const std::string &name);
+  Message(uint16_t routing_id, std::string name);
+  Message(const Message &other) = delete;
   virtual ~Message();
+
+  Message &operator=(const Message &other) = delete;
 
   /// Returns the unique ID for the message handler. This identifies the type of
   /// handled and in some cases, such as Renderers, the type of object handled.
   /// ID ranges are described in the @c MessageTypeIDs enumeration.
-  inline uint16_t routingId() const { return _routing_id; }
+  [[nodiscard]] uint16_t routingId() const { return _routing_id; }
 
   /// Read the current @c ModeFlag values.
-  inline unsigned modeFlags() const { return _mode_flags; }
+  [[nodiscard]] unsigned modeFlags() const { return _mode_flags; }
   /// Set the @c ModeFlag values.
   /// @param flags New values.
-  inline void setModeFlags(unsigned flags) { _mode_flags = flags; }
+  void setModeFlags(unsigned flags) { _mode_flags = flags; }
 
   /// Get the handler name.
   /// @return The handler name.
-  inline const std::string &name() const { return _name; }
+  [[nodiscard]] const std::string &name() const { return _name; }
 
   /// Called to initialise the handler with various 3rd Eye Scene components.
   virtual void initialise() = 0;
@@ -128,7 +132,7 @@ public:
 
   /// Query the current server info.
   /// @return The current @c ServerInfoMessage .
-  inline ServerInfoMessage serverInfo() const { return _server_info; }
+  [[nodiscard]] const ServerInfoMessage &serverInfo() const { return _server_info; }
 
   /// Called from the main thread to prepare the next @c draw() calls following and @c endFrame()
   /// call.
@@ -196,6 +200,11 @@ public:
   static void decomposeTransform(const Magnum::Matrix4 &transform, ObjectAttributes &attrs);
 
 protected:
+  /// Update the server info.
+  /// @param info The new @c ServerInfoMessage .
+  void setServerInfo(ServerInfoMessage &info) { _server_info = info; }
+
+private:
   uint16_t _routing_id = 0u;
   unsigned _mode_flags = 0u;
   ServerInfoMessage _server_info = {};

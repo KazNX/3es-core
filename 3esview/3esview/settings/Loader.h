@@ -2,7 +2,7 @@
 // Author: Kazys Stepanas
 //
 #ifndef TES_VIEW_SETTINGS_LOADER_H
-#define TES_VIEW_SETTINGS_LOADER_h
+#define TES_VIEW_SETTINGS_LOADER_H
 
 #include <3esview/ViewConfig.h>
 
@@ -33,4 +33,4 @@ IOResult save(const Settings::Config &config);
 IOResult save(const Settings::Config &config, const std::filesystem::path &path);
 };  // namespace tes::view::settings
 
-#endif  // TES_VIEW_SETTINGS_LOADER_h
+#endif  // TES_VIEW_SETTINGS_LOADER_H

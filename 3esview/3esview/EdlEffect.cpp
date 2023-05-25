@@ -7,8 +7,10 @@
 #include <Magnum/GL/Renderer.h>
 #include <Magnum/GL/Texture.h>
 #include <Magnum/GL/TextureFormat.h>
-#include <Magnum/Math/Vector2.h>
 #include <Magnum/Math/Matrix4.h>
+#include <Magnum/Math/Vector2.h>
+
+#include <array>
 
 namespace tes::view
 {
@@ -41,21 +43,21 @@ EdlEffect::EdlEffect(const Magnum::Range2Di &viewport)
   struct QuadVertex
   {
     Magnum::Vector3 position;
-    Magnum::Vector2 textureCoordinates;
+    Magnum::Vector2 texture_coordinates;
   };
-  const QuadVertex vertices[]{
-    { { 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f } },  /* Bottom right */
-    { { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f } },   /* Top right */
-    { { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f } }, /* Bottom left */
-    { { -1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } }   /* Top left */
+  const std::array<QuadVertex, 4> vertices{
+    QuadVertex{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f } },  /* Bottom right */
+    QuadVertex{ { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f } },   /* Top right */
+    QuadVertex{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f } }, /* Bottom left */
+    QuadVertex{ { -1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } }   /* Top left */
   };
-  const Magnum::UnsignedInt indices[]{
+  const std::array<Magnum::UnsignedInt, 6> indices{
     // 3--1 1
     0, 1, 2,  // | / /|
     2, 1, 3   // |/ / |
   };          // 2 2--0
 
-  _imp->mesh.setCount(Magnum::Int(Magnum::Containers::arraySize(indices)))
+  _imp->mesh.setCount(Magnum::Int(indices.size()))
     .addVertexBuffer(Magnum::GL::Buffer{ vertices }, 0, shaders::Edl::Position{},
                      shaders::Edl::TextureCoordinates{})
     .setIndexBuffer(Magnum::GL::Buffer{ indices }, 0, Magnum::GL::MeshIndexType::UnsignedInt);
@@ -128,7 +130,7 @@ void EdlEffect::prepareFrame(const Magnum::Matrix4 &projection_matrix,
 
 void EdlEffect::completeFrame()
 {
-  Magnum::Matrix4 projection;  // Identity.
+  const Magnum::Matrix4 projection;  // Identity.
   _imp->shader.setProjectionMatrix(projection)
     .bindColourTexture(_imp->colour_texture)
     .bindDepthBuffer(_imp->depth_texture)

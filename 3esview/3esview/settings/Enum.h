@@ -6,9 +6,10 @@
 
 #include <3esview/ViewConfig.h>
 
+#include <algorithm>
 #include <initializer_list>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace tes::view::settings
@@ -23,6 +24,8 @@ public:
 
   Enum(const Enum &other) = default;
   Enum(Enum &&other) = default;
+
+  ~Enum() = default;
 
   Enum &operator=(const Enum &other) = default;
   Enum &operator=(Enum &&other) = default;
@@ -92,15 +95,15 @@ inline Enum::Enum(const std::string &label, E value, const std::string &tip,
 
 inline bool Enum::setValueByName(const std::string &name)
 {
-  for (const auto &[e, str] : _named_values)
-  {
-    if (name == str)
-    {
-      _value = e;
-      return true;
-    }
-  }
-  return false;
+  return std::any_of(_named_values.begin(), _named_values.end(),
+                     [&name, this](std::pair<int, std::string> &item) {
+                       if (name == item.second)
+                       {
+                         _value = item.first;
+                         return true;
+                       }
+                       return false;
+                     });
 }
 
 

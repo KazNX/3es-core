@@ -9,8 +9,9 @@
 
 namespace tes::view::painter
 {
-Cylinder::Cylinder(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders)
-  : ShapePainter(std::move(culler), std::move(shaders), { Part{ solidMesh() } }, { Part{ wireframeMesh() } },
+Cylinder::Cylinder(const std::shared_ptr<BoundsCuller> &culler,
+                   const std::shared_ptr<shaders::ShaderLibrary> &shaders)
+  : ShapePainter(culler, shaders, { Part{ solidMesh() } }, { Part{ wireframeMesh() } },
                  { Part{ solidMesh() } }, calculateBounds)
 {}
 
@@ -23,10 +24,11 @@ void Cylinder::calculateBounds(const Magnum::Matrix4 &transform, Bounds &bounds)
 
 Magnum::GL::Mesh Cylinder::solidMesh()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtTriangles, SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
+  static SimpleMesh build_mesh(0, 0, 0, DtTriangles,
+                               SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
   static std::mutex guard;
 
-  std::unique_lock<std::mutex> lock(guard);
+  const std::scoped_lock lock(guard);
 
   // Build with the tes tesselator.
   if (build_mesh.vertexCount() == 0)
@@ -35,7 +37,11 @@ Magnum::GL::Mesh Cylinder::solidMesh()
     std::vector<tes::Vector3f> normals;
     std::vector<unsigned> indices;
 
-    tes::cylinder::solid(vertices, indices, normals, Vector3f(0, 0, 1), 1.0f, 1.0f, 24);
+    constexpr Vector3f kAxis = { 0, 0, 1 };
+    constexpr float kHeight = 1.0f;
+    constexpr float kRadius = 1.0f;
+    constexpr unsigned kFacets = 24;
+    tes::cylinder::solid(vertices, indices, normals, kAxis, kHeight, kRadius, kFacets);
 
     build_mesh.setVertexCount(vertices.size());
     build_mesh.setIndexCount(indices.size());
@@ -54,14 +60,19 @@ Magnum::GL::Mesh Cylinder::wireframeMesh()
   static SimpleMesh build_mesh(0, 0, 0, DtLines, SimpleMesh::Vertex | SimpleMesh::Index);
   static std::mutex guard;
 
-  std::unique_lock<std::mutex> lock(guard);
+  const std::scoped_lock lock(guard);
 
   // Build with the tes tesselator.
   if (build_mesh.vertexCount() == 0)
   {
     std::vector<tes::Vector3f> vertices;
     std::vector<unsigned> indices;
-    tes::cylinder::wireframe(vertices, indices, Vector3f(0, 0, 1), 1.0f, 1.0f, 8);
+
+    constexpr Vector3f kAxis = { 0, 0, 1 };
+    constexpr float kHeight = 1.0f;
+    constexpr float kRadius = 1.0f;
+    constexpr unsigned kFacets = 8;
+    tes::cylinder::wireframe(vertices, indices, kAxis, kHeight, kRadius, kFacets);
 
     build_mesh.setVertexCount(vertices.size());
     build_mesh.setIndexCount(indices.size());

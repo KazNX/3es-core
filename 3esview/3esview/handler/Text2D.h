@@ -55,7 +55,7 @@ public:
   /// Construct using the given text painter interface.
   /// @param painter The text drawing API.
   Text2D(std::shared_ptr<painter::Text> painter)
-    : Super(SIdText2D, "text 2D", painter)
+    : Super(SIdText2D, "text 2D", std::move(painter))
   {}
 };
 }  // namespace tes::view::handler

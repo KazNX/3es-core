@@ -36,9 +36,9 @@
     {                                                                         \
       return priv::write(node, _property, log);                               \
     }                                                                         \
-    std::unique_ptr<ExtensionPropertyAffordances> clone() const override      \
+    ExtensionPropertyAffordances *clone() const override                      \
     {                                                                         \
-      return std::make_unique<Type##Affordances>(_property);                  \
+      return new Type##Affordances(_property);                                \
     }                                                                         \
     void *property() override                                                 \
     {                                                                         \
@@ -109,7 +109,7 @@ void ExtensionProperty::update(const ExtensionProperty &other)
   // Note(KS): this isn't very nice or efficient, but it's simple.
   if (other._affordances)
   {
-    _affordances = other._affordances->clone();
+    _affordances.reset(other._affordances->clone());
   }
   else
   {

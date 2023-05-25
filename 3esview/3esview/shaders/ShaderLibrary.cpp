@@ -36,16 +36,16 @@ ShaderLibrary::~ShaderLibrary() = default;
 
 std::string ShaderLibrary::shaderName(ID id)
 {
-  const unsigned idx = static_cast<unsigned>(id);
+  const auto idx = static_cast<unsigned>(id);
   const auto &names = shaderNames();
-  return (idx < names.size()) ? names[idx] : std::string();
+  return (idx < names.size()) ? names.at(idx) : std::string();
 }
 
 
 std::shared_ptr<Shader> ShaderLibrary::lookup(ID id) const
 {
-  const unsigned idx = static_cast<unsigned>(id);
-  return (idx < _core_shaders.size()) ? _core_shaders[idx] : nullptr;
+  const auto idx = static_cast<unsigned>(id);
+  return (idx < _core_shaders.size()) ? _core_shaders.at(idx) : nullptr;
 }
 
 
@@ -76,9 +76,9 @@ std::shared_ptr<Shader> ShaderLibrary::lookupForDrawType(DrawType draw_type) con
 }
 
 
-void ShaderLibrary::registerShader(ID id, std::shared_ptr<Shader> shader)
+void ShaderLibrary::registerShader(ID id, const std::shared_ptr<Shader> &shader)
 {
-  const unsigned idx = static_cast<unsigned>(id);
+  const auto idx = static_cast<unsigned>(id);
   _core_shaders[idx] = shader;
   _shaders.emplace(shaderName(id), shader);
 }
@@ -86,6 +86,6 @@ void ShaderLibrary::registerShader(ID id, std::shared_ptr<Shader> shader)
 
 void ShaderLibrary::registerShader(const std::string &name, std::shared_ptr<Shader> shader)
 {
-  _shaders.emplace(name, shader);
+  _shaders.emplace(name, std::move(shader));
 }
 }  // namespace tes::view::shaders

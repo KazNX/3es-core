@@ -27,8 +27,8 @@
 #include "settings/Loader.h"
 
 #include "shaders/Flat.h"
-#include "shaders/ShaderLibrary.h"
 #include "shaders/PointGeom.h"
+#include "shaders/ShaderLibrary.h"
 #include "shaders/VertexColour.h"
 #include "shaders/VoxelGeom.h"
 
@@ -87,7 +87,13 @@ ThirdEyeScene::ThirdEyeScene(const std::vector<settings::Extension> &extended_se
 
 ThirdEyeScene::~ThirdEyeScene()
 {
-  storeSettings();
+  try
+  {
+    // Try saving settings. Don't care about exceptions.
+    storeSettings();
+  }
+  catch (...)
+  {}
   // Need an ordered cleanup.
   _message_handlers.clear();
   _ordered_message_handlers.clear();
@@ -98,7 +104,7 @@ ThirdEyeScene::~ThirdEyeScene()
 }
 
 
-const std::unordered_map<uint32_t, std::string> ThirdEyeScene::defaultHandlerNames()
+const std::unordered_map<uint32_t, std::string> &ThirdEyeScene::defaultHandlerNames()
 {
   static const std::unordered_map<uint32_t, std::string> mappings = {
     { MtNull, "null" },
@@ -167,7 +173,7 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
   // It must ensure that there can be no additional handler::Message::endFrame() calls in between
   // calling handler::Message::prepareFrame() and handler::Message::draw()
   // After the draw calls we release the mutex while finalising the rendering.
-  std::unique_lock guard(_render_mutex);
+  const std::unique_lock guard(_render_mutex);
   if (_reset)
   {
     effectReset();
@@ -237,7 +243,7 @@ void ThirdEyeScene::updateToFrame(FrameNumber frame, camera::Camera &camera)
 {
   // Called from the data thread, not the main thread.
   // Must invoke endFrame() between prepareFrame() and draw() calls.
-  std::lock_guard guard(_render_mutex);
+  const std::lock_guard guard(_render_mutex);
   if (frame != _render_stamp.frame_number)
   {
     for (auto &handler : _ordered_message_handlers)
@@ -260,7 +266,7 @@ void ThirdEyeScene::updateToFrame(FrameNumber frame)
 
 void ThirdEyeScene::updateServerInfo(const ServerInfoMessage &server_info)
 {
-  std::lock_guard guard(_render_mutex);
+  const std::lock_guard guard(_render_mutex);
   _server_info = server_info;
   _new_server_info = true;
 }
@@ -317,7 +323,7 @@ std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(const std::filesystem::
   // Note(KS): The server settings are irrelevant for a file connection. We can use teh default.
   // Arguably this implies the Connection constructor should be refactored.
   FileConnection out(path.string(), ServerSettings());
-  const auto result = saveSnapshot(out, cancel_snapshot);
+  const auto result = saveSnapshot(out, std::move(cancel_snapshot));
   out.close();
   return result;
 }
@@ -341,7 +347,7 @@ std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(tes::Connection &connec
     return { false, 0 };
   }
 
-  Finally finally([this]() { _snapshot_wait.clear(); });
+  const Finally finally([this]() { _snapshot_wait.clear(); });
   _snapshot_wait.connection = &connection;
 
   // Block until signalled on the wait condition.
@@ -368,6 +374,7 @@ void ThirdEyeScene::createSampleShapes()
 {
   Magnum::Matrix4 shape_transform = {};
 
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   // Axis box markers
   _painters[SIdBox]->add(Id(2), painter::ShapePainter::Type::Solid,
                          Magnum::Matrix4::translation({ 10, 0, 0 }) * shape_transform,
@@ -489,6 +496,7 @@ void ThirdEyeScene::createSampleShapes()
   _painters[SIdPose]->add(Id(1), painter::ShapePainter::Type::Transparent,
                           Magnum::Matrix4::translation({ x, 2, 0 }) * shape_transform,
                           Magnum::Color4{ 1, 0, 1, 0.4f });
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 
   for (auto &painter : _painters)
   {
@@ -603,6 +611,7 @@ void ThirdEyeScene::initialiseShaders()
 }
 
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void ThirdEyeScene::bindFinalFrameBuffer()
 {
   Magnum::GL::defaultFramebuffer

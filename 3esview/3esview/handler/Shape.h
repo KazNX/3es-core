@@ -13,7 +13,7 @@
 namespace tes::view::painter
 {
 class ShapePainter;
-}
+}  // namespace tes::view::painter
 
 namespace tes::view::handler
 {
@@ -38,7 +38,7 @@ public:
   /// Compose the object transform from the given object attributes.
   /// @param attrs Object attributes as read from the message payload.
   /// @return The matrix transformation for the shape.
-  virtual Magnum::Matrix4 composeTransform(const ObjectAttributes &attrs) const;
+  [[nodiscard]] virtual Magnum::Matrix4 composeTransform(const ObjectAttributes &attrs) const;
   /// Decompose the object transform to the given object attributes.
   /// @param transform The transformation matrix to decompose.
   /// @param attrs Object attributes to write to.

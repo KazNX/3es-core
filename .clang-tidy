@@ -41,7 +41,6 @@ HeaderFilterRegex: "^.*(?!vcpkg_installed).*$"
 # HeaderFilterRegex: ".*"
 AnalyzeTemporaryDtors: false
 FormatStyle: none
-User: csiro
 CheckOptions:
   - key: bugprone-argument-comment.StrictMode
     value: "1"

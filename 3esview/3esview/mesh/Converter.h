@@ -3,15 +3,15 @@
 
 #include <3esview/ViewConfig.h>
 
-#include <3escore/Colour.h>
 #include <3escore/Bounds.h>
+#include <3escore/Colour.h>
 
 #include <Magnum/GL/Mesh.h>
 
 namespace tes
 {
 class MeshResource;
-}
+}  // namespace tes
 
 namespace tes::view::mesh
 {
@@ -29,7 +29,8 @@ struct TES_VIEWER_API ConvertOptions
 Magnum::GL::Mesh convert(const tes::MeshResource &mesh_resource, tes::Bounds<Magnum::Float> &bounds,
                          const ConvertOptions &options = {});
 
-inline Magnum::GL::Mesh convert(const tes::MeshResource &mesh_resource, const ConvertOptions &options = {})
+inline Magnum::GL::Mesh convert(const tes::MeshResource &mesh_resource,
+                                const ConvertOptions &options = {})
 {
   tes::Bounds<Magnum::Float> bounds;
   return convert(mesh_resource, bounds, options);

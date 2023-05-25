@@ -4,14 +4,15 @@
 #include "Flat.h"
 
 #include <Magnum/GL/Mesh.h>
-#include <Magnum/Math/Matrix4.h>
 #include <Magnum/Math/Color.h>
+#include <Magnum/Math/Matrix4.h>
 
 namespace tes::view::shaders
 {
 Flat::Flat()
-  : _shader(std::make_shared<Magnum::Shaders::Flat3D>(Magnum::Shaders::Flat3D::Flag::VertexColor |
-                                                      Magnum::Shaders::Flat3D::Flag::InstancedTransformation))
+  : _shader(std::make_shared<Magnum::Shaders::Flat3D>(
+      Magnum::Shaders::Flat3D::Flag::VertexColor |
+      Magnum::Shaders::Flat3D::Flag::InstancedTransformation))
 {}
 
 

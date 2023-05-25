@@ -147,7 +147,8 @@ void MeshSet::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &par
     if (_culler->isVisible(drawable.bounds_id) && categories.isActive(drawable.category_id))
     {
       const unsigned set_idx = (!drawable.owner->twoSided()) ? 0 : 1;
-      _draw_sets[set_idx].push_back({ drawable.resource_id, drawable.transform, drawable.colour });
+      _draw_sets.at(set_idx).push_back(
+        { drawable.resource_id, drawable.transform, drawable.colour });
     }
   }
 
@@ -176,7 +177,7 @@ void MeshSet::readMessage(PacketReader &reader)
     ok = handleCreate(reader);
     break;
   case OIdDestroy: {
-    DestroyMessage msg;
+    DestroyMessage msg = {};
     ok = msg.read(reader) && handleDestroy(msg, reader);
     break;
   }
@@ -278,8 +279,8 @@ bool MeshSet::handleCreate(PacketReader &reader)
 
 bool MeshSet::handleUpdate(PacketReader &reader)
 {
-  UpdateMessage update;
-  ObjectAttributesd attrs;
+  UpdateMessage update = {};
+  ObjectAttributesd attrs = {};
   if (!update.read(reader, attrs))
   {
     return false;

@@ -5,8 +5,8 @@
 #include <3esview/shaders/Shader.h>
 #include <3esview/shaders/ShaderLibrary.h>
 
-#include <3escore/Connection.h>
 #include <3escore/Colour.h>
+#include <3escore/Connection.h>
 #include <3escore/Debug.h>
 #include <3escore/Log.h>
 #include <3escore/PacketReader.h>
@@ -33,7 +33,7 @@ void MeshShape::initialise()
 
 void MeshShape::reset()
 {
-  std::lock_guard guard(_shapes_mutex);
+  const std::lock_guard guard(_shapes_mutex);
   _garbage_list = _transients;
   for (auto &[id, mesh] : _shapes)
   {
@@ -48,7 +48,7 @@ void MeshShape::reset()
 void MeshShape::prepareFrame(const FrameStamp &stamp)
 {
   (void)stamp;
-  std::lock_guard guard(_shapes_mutex);
+  const std::lock_guard guard(_shapes_mutex);
   // Release garbage assets.
   _garbage_list.clear();
   updateRenderAssets();
@@ -61,7 +61,7 @@ void MeshShape::endFrame(const FrameStamp &stamp)
   // Note: it would be ideal to do the render mesh creation here, but that happens on the background
   // thread and we can't create OpenGL resources from there. Instead, we do the work in
   // prepareFrame().
-  std::lock_guard guard(_shapes_mutex);
+  const std::lock_guard guard(_shapes_mutex);
 
   // Move transients to the garbage list for the main thread to clean up.
   std::copy(_transients.begin(), _transients.end(), std::back_inserter(_garbage_list));
@@ -109,7 +109,7 @@ void MeshShape::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &p
 {
   (void)pass;
   (void)stamp;
-  std::lock_guard guard(_shapes_mutex);
+  const std::lock_guard guard(_shapes_mutex);
 
   const auto update_shader_matrices = [&params](std::shared_ptr<shaders::Shader> &&shader) {
     if (shader)
@@ -158,7 +158,7 @@ void MeshShape::readMessage(PacketReader &reader)
     ok = handleCreate(reader);
     break;
   case OIdDestroy: {
-    DestroyMessage msg;
+    DestroyMessage msg = {};
     ok = msg.read(reader) && handleDestroy(msg, reader);
     break;
   }
@@ -183,7 +183,7 @@ void MeshShape::readMessage(PacketReader &reader)
 
 void MeshShape::serialise(Connection &out)
 {
-  std::lock_guard guard(_shapes_mutex);
+  const std::lock_guard guard(_shapes_mutex);
   const auto check = [](int wrote) {
     if (wrote < 0)
     {
@@ -277,7 +277,7 @@ bool MeshShape::handleData(PacketReader &reader)
   uint32_t id = 0;
   reader.peek(reinterpret_cast<uint8_t *>(&id), sizeof(id));
 
-  std::lock_guard guard(_shapes_mutex);
+  const std::lock_guard guard(_shapes_mutex);
   auto shape = getQueuedRenderMesh(Id(id));
   if (!shape)
   {
@@ -333,8 +333,8 @@ MeshShape::RenderMeshPtr MeshShape::create(std::shared_ptr<tes::MeshShape> shape
   // For this reason we always add shapes to _pending_shapes rather than to _transients or _shapes
   // directly.
   auto new_entry = std::make_shared<RenderMesh>();
-  new_entry->shape = shape;
   new_entry->category_id = shape->category();
+  new_entry->shape = std::move(shape);
   return new_entry;
 }
 

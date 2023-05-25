@@ -22,8 +22,8 @@ constexpr float Capsule::kDefaultRadius;
 constexpr float Capsule::kDefaultHeight;
 const Vector3f Capsule::kDefaultAxis = { 0.0f, 0.0f, 1.0f };
 
-Capsule::Capsule(std::shared_ptr<BoundsCuller> culler,
-                 std::shared_ptr<shaders::ShaderLibrary> shaders)
+Capsule::Capsule(const std::shared_ptr<BoundsCuller> &culler,
+                 const std::shared_ptr<shaders::ShaderLibrary> &shaders)
   : ShapePainter(culler, shaders, { Part{ solidMeshCylinder() } },
                  { Part{ wireframeMeshCylinder() } }, { Part{ solidMeshCylinder() } },
                  calculateBounds)

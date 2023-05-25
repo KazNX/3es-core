@@ -5,9 +5,9 @@
 
 namespace tes::view::handler
 {
-Message::Message(uint16_t routing_id, const std::string &name)
+Message::Message(uint16_t routing_id, std::string name)
   : _routing_id(routing_id)
-  , _name(name)
+  , _name(std::move(name))
 {}
 
 

@@ -30,23 +30,26 @@ public:
 
   /// Default constructor.
   Controller();
+  Controller(const Controller &other) = delete;
   /// Virtual destructor.
   virtual ~Controller();
 
+  Controller &operator=(const Controller &other) = delete;
+
   /// Get the current control flags.
-  inline Flag flags() const { return _flags; }
+  [[nodiscard]] Flag flags() const { return _flags; }
   /// Set the current control flags.
-  inline void setFlags(Flag flags) { _flags = flags; }
+  void setFlags(Flag flags) { _flags = flags; }
 
   /// Set the given control flag(s). The @p flag value may contain multiple flags, but is generally
   /// expected to be a single flag.
-  inline void set(Flag flag) { _flags = Flag(unsigned(_flags) | unsigned(flag)); }
+  void set(Flag flag) { _flags = Flag(unsigned(_flags) | unsigned(flag)); }
   /// Clear the given control flag(s). The @p flag value may contain multiple flags, but is
   /// generally expected to be a single flag.
-  inline void clear(Flag flag) { _flags = Flag(unsigned(_flags) & ~unsigned(flag)); }
+  void clear(Flag flag) { _flags = Flag(unsigned(_flags) & ~unsigned(flag)); }
   /// Check fi the given control flags are set. The @p flag value may contain multiple flags, but
   /// the return value is only true if *all* flag bits are set.
-  inline bool isSet(Flag flag) const
+  [[nodiscard]] bool isSet(Flag flag) const
   {
     return (unsigned(_flags) & unsigned(flag)) == unsigned(flag);
   }
@@ -71,7 +74,7 @@ public:
     updateKeys(dt, translate, Magnum::Vector3i(0), camera);
   }
 
-  inline static void clampRotation(Camera &camera)
+  static void clampRotation(Camera &camera)
   {
     camera.pitch = std::max(-float(0.5 * M_PI), std::min(camera.pitch, float(0.5 * M_PI)));
     while (camera.yaw >= float(2.0 * M_PI))
@@ -84,7 +87,7 @@ public:
     }
   }
 
-protected:
+private:
   Flag _flags = Flag::Zero;
 };
 }  // namespace tes::view::camera

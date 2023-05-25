@@ -10,38 +10,39 @@ namespace tes::view::camera
 class TES_VIEWER_API Fly : public Controller
 {
 public:
+  static constexpr float kDefaultMoveSpeed = 8.0f;
+  static constexpr float kDefaultTurnRateDegPerSec = 90.0f;
+  static constexpr float kDefaultMouseSensitivityDegPerPixel = 2.0f;
+
   Fly();
 
   /// Get the movement speed for key translation updates: m/s.
-  inline float moveSpeed() const { return _move_speed; }
+  [[nodiscard]] float moveSpeed() const { return _move_speed; }
   /// Set the movement speed for key translation updates: m/s.
-  inline void setMoveSpeed(float move_speed) { _move_speed = move_speed; }
+  void setMoveSpeed(float move_speed) { _move_speed = move_speed; }
   /// Get the rotation speed for key rotation updates: radians/s.
-  inline float rotationSpeed() const { return _rotation_speed; }
+  [[nodiscard]] float rotationSpeed() const { return _rotation_speed; }
   /// Set the rotation speed for key rotation updates: radians/s.
-  inline void setRotationSpeed(float rotation_speed) { _rotation_speed = rotation_speed; }
+  void setRotationSpeed(float rotation_speed) { _rotation_speed = rotation_speed; }
   /// Get the mouse sensitivity: radians/pixel.
-  inline float mouseSensitivity() const { return _mouse_sensitivity; }
+  [[nodiscard]] float mouseSensitivity() const { return _mouse_sensitivity; }
   /// Set the mouse sensitivity: radians/pixel.
-  inline void setMouseSensitivity(float mouse_sensitivity)
-  {
-    _mouse_sensitivity = mouse_sensitivity;
-  }
+  void setMouseSensitivity(float mouse_sensitivity) { _mouse_sensitivity = mouse_sensitivity; }
   /// Get the movement key speed multiplier.
-  inline float moveMultiplier() const { return _move_multiplier; }
+  [[nodiscard]] float moveMultiplier() const { return _move_multiplier; }
   /// Set the movement key speed multiplier.
-  inline void setMoveMultiplier(float move_multiplier) { _move_multiplier = move_multiplier; }
+  void setMoveMultiplier(float move_multiplier) { _move_multiplier = move_multiplier; }
   /// Get the rotation key speed multiplier.
-  inline float rotationMultiplier() const { return _rotation_multiplier; }
+  [[nodiscard]] float rotationMultiplier() const { return _rotation_multiplier; }
   /// Set the rotation key speed multiplier.
-  inline void setRotationMultiplier(float rotation_multiplier)
+  void setRotationMultiplier(float rotation_multiplier)
   {
     _rotation_multiplier = rotation_multiplier;
   }
   /// Get the mouse sensitivity multiplier.
-  inline float mouseMultiplier() const { return _mouse_multiplier; }
+  [[nodiscard]] float mouseMultiplier() const { return _mouse_multiplier; }
   /// Set the mouse sensitivity multiplier.
-  inline void setMouseMultiplier(float mouse_multiplier) { _mouse_multiplier = mouse_multiplier; }
+  void setMouseMultiplier(float mouse_multiplier) { _mouse_multiplier = mouse_multiplier; }
 
   void updateMouse(float dx, float dy, Camera &camera) override;
 
@@ -50,11 +51,11 @@ public:
 
 private:
   /// Movement speed for key translation updates: m/s.
-  float _move_speed = 8.0f;
+  float _move_speed = kDefaultMoveSpeed;
   /// Rotation speed for key rotation updates: radians/s.
-  float _rotation_speed = float(Magnum::Rad(Magnum::Deg(90.0f)));
+  float _rotation_speed = float(Magnum::Rad(Magnum::Deg(kDefaultTurnRateDegPerSec)));
   /// Mouse sensitivity: radians/pixel.
-  float _mouse_sensitivity = float(Magnum::Rad(Magnum::Deg(2.0f)));
+  float _mouse_sensitivity = float(Magnum::Rad(Magnum::Deg(kDefaultMouseSensitivityDegPerPixel)));
   /// Current movement multiplier.
   float _move_multiplier = 1.0f;
   /// Current rotation multiplier.

@@ -99,7 +99,7 @@ void Settings::addObserver(Category category, NotifyCallback callback)
   }
 
   const std::lock_guard guard(_observer_mutex);
-  _sub_observers[static_cast<unsigned>(category)].emplace_back(std::move(callback));
+  _sub_observers.at(static_cast<unsigned>(category)).emplace_back(std::move(callback));
 }
 
 
@@ -133,7 +133,7 @@ void Settings::notify(Category category, const Config &config)
   const std::lock_guard guard(_observer_mutex);
 
   // Sub observer notify.
-  const auto &sub_observers = _sub_observers[static_cast<unsigned>(category)];
+  const auto &sub_observers = _sub_observers.at(static_cast<unsigned>(category));
   for (const auto &observer : sub_observers)
   {
     observer(config);

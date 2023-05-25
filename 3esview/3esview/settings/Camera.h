@@ -10,6 +10,7 @@
 
 namespace tes::view::settings
 {
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 struct Camera
 {
   Bool invert_y = { "Invert Y", false, "Invert mouse Y axis?" };
@@ -30,6 +31,7 @@ struct Camera
 
   [[nodiscard]] inline bool operator!=(const Camera &other) const { return !operator==(other); }
 };
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }  // namespace tes::view::settings
 
 #endif  // TES_VIEW_SETTINGS_CAMERA_H

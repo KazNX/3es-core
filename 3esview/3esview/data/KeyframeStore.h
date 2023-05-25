@@ -62,10 +62,10 @@ public:
   /// @param target_frame The frame of interest.
   /// @param[out] keyframe Populated with details about the keyframe.
   /// @return True if @p keyframe is valid after the call.
-  bool lookupNearest(FrameNumber target_frame, Keyframe &keyframe) const;
+  [[nodiscard]] bool lookupNearest(FrameNumber target_frame, Keyframe &keyframe) const;
 
   /// Return the last keyframe details. Zeros if there are no keyframes.
-  Keyframe last() const;
+  [[nodiscard]] Keyframe last() const;
 
   /// Release all the current keyframes.
   void clear();
@@ -77,11 +77,11 @@ private:
   /// @p target_number .
   /// @param target_frame The desired frame number.
   /// @return A pair containing the index and true on success.
-  std::pair<size_t, bool> precedingKeyframeIndex(FrameNumber target_frame) const;
+  [[nodiscard]] std::pair<size_t, bool> precedingKeyframeIndex(FrameNumber target_frame) const;
   /// Search for a keyframe index exactly matching @p target_number .
   /// @param target_frame The desired frame number.
   /// @return A pair containing the index and true on success.
-  std::pair<size_t, bool> exactKeyframeIndex(FrameNumber target_frame) const;
+  [[nodiscard]] std::pair<size_t, bool> exactKeyframeIndex(FrameNumber target_frame) const;
 
   /// Keyframe set. Note we assume that keyframes are added sequentially and a new keyframe is
   /// always after the previous one in the timeline.

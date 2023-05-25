@@ -10,6 +10,7 @@ namespace tes::log
 namespace
 {
 // Clang tidy considers this a global variable. It should be more of a static variable.
+// FIXME(KS): Is there a better way than using a singleton? What about thread safety?
 // NOLINTNEXTLINE(readability-identifier-naming, cppcoreguidelines-avoid-non-const-global-variables)
 LogFunction s_log_function = {};
 
@@ -43,8 +44,16 @@ LogFunction logger()
 
 void setLogger(LogFunction logger)
 {
-  (void)tes::log::logger();  // Ensure initialisation.
-  s_log_function = std::move(logger);
+  std::ignore = tes::log::logger();  // Ensure initialisation.
+  if (logger)
+  {
+    s_log_function = std::move(logger);
+  }
+  else
+  {
+    // Make sure we can't end up with an empty logger.
+    s_log_function = defaultLogger;
+  }
 }
 
 
@@ -74,6 +83,7 @@ void log(Level level, const std::string &message)
 void fatal(const std::string &message)
 {
   log(Level::Fatal, message);
-  throw std::runtime_error(message);
+  exit(-1);
+  // throw std::runtime_error(message);
 }
 }  // namespace tes::log

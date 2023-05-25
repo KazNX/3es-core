@@ -42,7 +42,7 @@ public:
   Vector3() noexcept = default;
   /// Initialises all members to @p scalar.
   /// @param scalar The value for all members.
-  Vector3(const T &scalar) noexcept
+  constexpr Vector3(const T &scalar) noexcept
     : _storage({ scalar, scalar, scalar })
   {}
   /// Copy constructor.
@@ -56,7 +56,7 @@ public:
   /// @param x The x coordinate.
   /// @param y The y coordinate.
   /// @param z The z coordinate.
-  Vector3(const T &x, const T &y, const T &z) noexcept
+  constexpr Vector3(const T &x, const T &y, const T &z) noexcept
     : _storage({ x, y, z })
   {}
   // NOLINTEND(readability-identifier-length)

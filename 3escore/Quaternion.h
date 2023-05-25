@@ -78,11 +78,11 @@ public:
   /// No bounds checking is performed.
   /// @param array4 An array of at least length 4. Copies elements (0, 1, 2, 3).
   template <typename U>
-  Quaternion(
-    const U array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
-                                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    : _storage({ static_cast<T>(array4[0]), static_cast<T>(array4[1]), static_cast<T>(array4[2]),
-                 static_cast<T>(array4[3]) })
+  Quaternion(const U array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
+    : _storage(
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        { static_cast<T>(array4[0]), static_cast<T>(array4[1]), static_cast<T>(array4[2]),
+          static_cast<T>(array4[3]) })  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   {}
 
   /// Create the quaternion rotation transforming @p from => @p to.

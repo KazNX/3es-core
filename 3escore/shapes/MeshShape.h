@@ -22,13 +22,13 @@ namespace tes
 /// A @c Shape which uses vertices and indices to render.
 ///
 /// @c Use @c MeshSet for large data sets.
-class TES_CORE_API MeshShape : public Shape
+class TES_CORE_API MeshShape final : public Shape
 {
 public:
   /// Provides a @c MeshResource wrapper around a @c MeshShape object. This
   /// allows the details of the @c MeshShape to be read via the @c MeshResource
   /// API.
-  class TES_CORE_API Resource : public MeshResource
+  class TES_CORE_API Resource final : public MeshResource
   {
   public:
     /// Wraps a @c MeshShape with a @c MeshResource.
@@ -41,6 +41,13 @@ public:
     /// @param resource_id A user supplied resource id. Must be unique if the @c Resource is to
     /// be sent over a @c Connection.
     Resource(MeshShape &shape, uint32_t resource_id);
+    Resource(const Resource &other) = delete;
+    Resource(Resource &&other) noexcept = delete;
+
+    ~Resource() final = default;
+
+    Resource &operator=(const Resource &other) = delete;
+    Resource &operator=(Resource &&other) noexcept = delete;
 
     [[nodiscard]] uint32_t id() const final;
 
@@ -144,6 +151,14 @@ public:
 
   /// Destructor.
   ~MeshShape() override;
+
+  /// Copy assignment.
+  /// @param other Object to copy.
+  MeshShape &operator=(const MeshShape &other);
+
+  /// Move assignment.
+  /// @param other Object to move.
+  MeshShape &operator=(MeshShape &&other) noexcept;
 
   [[nodiscard]] const char *type() const override { return "meshShape"; }
 
@@ -270,6 +285,7 @@ public:
 protected:
   void onClone(MeshShape &copy) const;
 
+private:
   DataBuffer _vertices;  ///< Mesh vertices.
   /// Normal stream. Expect zero, one per vertex or one to apply to all vertices.
   DataBuffer _normals;

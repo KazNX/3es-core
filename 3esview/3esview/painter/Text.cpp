@@ -11,10 +11,10 @@
 #include <Corrade/Utility/Resource.h>
 
 #include <Magnum/GL/Renderer.h>
-#include <Magnum/Math/Vector2.h>
 #include <Magnum/Math/Matrix3.h>
 #include <Magnum/Math/Matrix4.h>
 #include <Magnum/Math/Quaternion.h>
+#include <Magnum/Math/Vector2.h>
 #include <Magnum/Text/AbstractFont.h>
 
 #include <cctype>
@@ -22,18 +22,20 @@
 
 namespace tes::view::painter
 {
-constexpr unsigned Text::kMaxTextLength;
-
 Text::Text(Corrade::PluginManager::Manager<Magnum::Text::AbstractFont> &font_manager,
            const std::string &font_resource_name, const std::string &fonts_resource_section,
            const std::string &font_plugin)
 {
   // TODO(KS): get resources strings passed in as it's the exe which must include the resources.
-  Corrade::Utility::Resource rs(fonts_resource_section);
-  _cache = std::make_unique<Magnum::Text::DistanceFieldGlyphCache>(Magnum::Vector2i(2048),
-                                                                   Magnum::Vector2i(512), 22);
+  const Corrade::Utility::Resource rs(fonts_resource_section);
+  constexpr auto kOriginalSize = Magnum::Vector2i{ 2048 };
+  constexpr auto kGlyphSize = Magnum::Vector2i{ 512 };
+  constexpr unsigned kRadius = 22;
+  constexpr float kFontSize = 180;
+  _cache =
+    std::make_unique<Magnum::Text::DistanceFieldGlyphCache>(kOriginalSize, kGlyphSize, kRadius);
   _font = font_manager.loadAndInstantiate(font_plugin);
-  if (_font && _font->openData(rs.getRaw(font_resource_name), 180.0f))
+  if (_font && _font->openData(rs.getRaw(font_resource_name), kFontSize))
   {
     std::string printable_characters;
     printable_characters.reserve(std::numeric_limits<char>::max());
@@ -45,9 +47,10 @@ Text::Text(Corrade::PluginManager::Manager<Magnum::Text::AbstractFont> &font_man
       }
     }
 
-    _font->fillGlyphCache(*_cache, printable_characters.c_str());
+    _font->fillGlyphCache(*_cache, printable_characters);
 
-    _renderer_2d = std::make_unique<Magnum::Text::Renderer2D>(*_font, *_cache, 32.0f,
+    constexpr float kCacheSize = 32.0f;
+    _renderer_2d = std::make_unique<Magnum::Text::Renderer2D>(*_font, *_cache, kCacheSize,
                                                               Magnum::Text::Alignment::MiddleLeft);
     _renderer_2d->reserve(kMaxTextLength, Magnum::GL::BufferUsage::DynamicDraw,
                           Magnum::GL::BufferUsage::StaticDraw);
@@ -197,7 +200,7 @@ void Text::draw3DText(const TextEntry &text, const DrawParams &params)
   }
 
   // Apply scaling for font size.
-  if (text.font_size)
+  if (text.font_size != 0)
   {
     text_transform = text_transform * Magnum::Matrix4::scaling(Magnum::Vector3(text.font_size));
   }
@@ -223,14 +226,17 @@ void Text::draw(const TextEntry &text, const Matrix &full_projection_matrix, Ren
   }
   else
   {
-    std::string truncated = text.text.substr(0, renderer.capacity());
+    const std::string truncated = text.text.substr(0, renderer.capacity());
     renderer.render(truncated);
   }
 
+  const auto outline_colour = 0x7f7f7f_rgbf;
+  constexpr auto kOutlineStart = 0.45f;
+  constexpr auto kOutlineEnd = 0.35f;
   shader.setTransformationProjectionMatrix(full_projection_matrix)
     .setColor(text.colour)
-    .setOutlineColor(0x7f7f7f_rgbf)
-    .setOutlineRange(0.45f, 0.35f)
+    .setOutlineColor(outline_colour)
+    .setOutlineRange(kOutlineStart, kOutlineEnd)
     // .setSmoothness(0.025f / _transformationRotatingText.uniformScaling())
     .draw(renderer.mesh());
 }

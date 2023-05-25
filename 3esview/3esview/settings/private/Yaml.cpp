@@ -35,27 +35,27 @@ struct Tags
     static ryml::csubstr trueStr()
     {
       static const std::string str = "true";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
     static ryml::csubstr falseStr()
     {
       static const std::string str = "false";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
     static ryml::csubstr red()
     {
       static const std::string str = "red";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
     static ryml::csubstr green()
     {
       static const std::string str = "green";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
     static ryml::csubstr blue()
     {
       static const std::string str = "blue";
-      return ryml::csubstr(str.c_str(), str.size());
+      return { str.c_str(), str.size() };
     }
   };
 };
@@ -164,12 +164,12 @@ IOCode read(const ryml::ConstNodeRef &parent, Colour &prop, std::ostream &log)
   auto colour = prop.value();
   for (size_t i = 0; i < nodes.size(); ++i)
   {
-    if (nodes[i].empty())
+    if (nodes.at(i).empty())
     {
       append(log) << "Error parsing colour prop: " << prop.label();
       return IOCode::Partial;
     }
-    const std::string str(nodes[i].val().data(), nodes[i].val().size());
+    const std::string str(nodes.at(i).val().data(), nodes.at(i).val().size());
     std::istringstream in(str);
     int channel = {};
     in >> channel;
@@ -179,7 +179,7 @@ IOCode read(const ryml::ConstNodeRef &parent, Colour &prop, std::ostream &log)
       return IOCode::Partial;
     }
 
-    colour.channel(channels[i]) = static_cast<uint8_t>(channel);
+    colour.channel(channels.at(i)) = static_cast<uint8_t>(channel);
   }
 
   prop.setValue(colour);
@@ -310,7 +310,7 @@ IOCode write(ryml::NodeRef &parent, const Colour &prop, std::ostream &log)
 {
   TES_UNUSED(log);
   const auto key = ryml::csubstr(prop.label().c_str(), prop.label().size());
-  auto node = parent[ryml::csubstr(prop.label().c_str(), prop.label().size())];
+  auto node = parent[key];
   node |= ryml::MAP;
 
   node[Tags::Common::red()] << static_cast<int>(prop.value().red());

@@ -7,8 +7,8 @@
 
 #include <Magnum/Magnum.h>
 
-#include <Magnum/Math/Vector3.h>
 #include <Magnum/Math/Color.h>
+#include <Magnum/Math/Vector3.h>
 #include <Magnum/MeshTools/Compile.h>
 #include <Magnum/Trade/MeshData.h>
 
@@ -51,8 +51,8 @@ using ArrayView = Corrade::Containers::ArrayView<T>;
 template <typename V>
 struct VertexMapper
 {
-  inline bool validate(const DataBuffer &src_vertices, const DataBuffer &src_normals,
-                       const DataBuffer &src_colours, const ConvertOptions &options) const
+  [[nodiscard]] bool validate(const DataBuffer &src_vertices, const DataBuffer &src_normals,
+                              const DataBuffer &src_colours, const ConvertOptions &options) const
   {
     (void)src_vertices;
     (void)src_normals;
@@ -71,17 +71,17 @@ struct VertexMapper
 template <>
 struct VertexMapper<VertexP>
 {
-  inline bool validate(const DataBuffer &src_vertices, const DataBuffer &src_normals,
-                       const DataBuffer &src_colours, const ConvertOptions &options) const
+  [[nodiscard]] static bool validate(const DataBuffer &src_vertices, const DataBuffer &src_normals,
+                                     const DataBuffer &src_colours, const ConvertOptions &options)
   {
     (void)src_normals;
     (void)src_colours;
     (void)options;
     return src_vertices.isValid();
   }
-  inline Magnum::Vector3 operator()(VertexP &vertex, size_t src_index,
-                                    const DataBuffer &src_vertices, const DataBuffer &src_normals,
-                                    const DataBuffer &src_colours, const ConvertOptions &options)
+  Magnum::Vector3 operator()(VertexP &vertex, size_t src_index, const DataBuffer &src_vertices,
+                             const DataBuffer &src_normals, const DataBuffer &src_colours,
+                             const ConvertOptions &options)
   {
     (void)src_normals;
     (void)src_colours;
@@ -93,7 +93,8 @@ struct VertexMapper<VertexP>
     return vertex.position;
   }
 
-  Array<Magnum::Trade::MeshAttributeData> attributes(const Array<VertexP> &vertices) const
+  [[nodiscard]] static Array<Magnum::Trade::MeshAttributeData> attributes(
+    const Array<VertexP> &vertices)
   {
     return Array<Magnum::Trade::MeshAttributeData>{
       Corrade::Containers::InPlaceInit,
@@ -109,16 +110,16 @@ struct VertexMapper<VertexP>
 template <>
 struct VertexMapper<VertexPN>
 {
-  inline bool validate(const DataBuffer &src_vertices, const DataBuffer &src_normals,
-                       const DataBuffer &src_colours, const ConvertOptions &options) const
+  [[nodiscard]] static bool validate(const DataBuffer &src_vertices, const DataBuffer &src_normals,
+                                     const DataBuffer &src_colours, const ConvertOptions &options)
   {
     (void)src_colours;
     (void)options;
     return src_vertices.isValid() && src_normals.isValid();
   }
-  inline Magnum::Vector3 operator()(VertexPN &vertex, size_t src_index,
-                                    const DataBuffer &src_vertices, const DataBuffer &src_normals,
-                                    const DataBuffer &src_colours, const ConvertOptions &options)
+  Magnum::Vector3 operator()(VertexPN &vertex, size_t src_index, const DataBuffer &src_vertices,
+                             const DataBuffer &src_normals, const DataBuffer &src_colours,
+                             const ConvertOptions &options)
   {
     (void)src_colours;
     (void)options;
@@ -133,7 +134,8 @@ struct VertexMapper<VertexPN>
     return vertex.position;
   }
 
-  Array<Magnum::Trade::MeshAttributeData> attributes(const Array<VertexPN> &vertices) const
+  [[nodiscard]] static Array<Magnum::Trade::MeshAttributeData> attributes(
+    const Array<VertexPN> &vertices)
   {
     return Array<Magnum::Trade::MeshAttributeData>{
       Corrade::Containers::InPlaceInit,
@@ -155,15 +157,15 @@ struct VertexMapper<VertexPN>
 template <>
 struct VertexMapper<VertexPC>
 {
-  inline bool validate(const DataBuffer &src_vertices, const DataBuffer &src_normals,
-                       const DataBuffer &src_colours, const ConvertOptions &options) const
+  [[nodiscard]] static bool validate(const DataBuffer &src_vertices, const DataBuffer &src_normals,
+                                     const DataBuffer &src_colours, const ConvertOptions &options)
   {
     (void)src_normals;
     return src_vertices.isValid() && (options.auto_colour || src_colours.isValid());
   }
-  inline Magnum::Vector3 operator()(VertexPC &vertex, size_t src_index,
-                                    const DataBuffer &src_vertices, const DataBuffer &src_normals,
-                                    const DataBuffer &src_colours, const ConvertOptions &options)
+  Magnum::Vector3 operator()(VertexPC &vertex, size_t src_index, const DataBuffer &src_vertices,
+                             const DataBuffer &src_normals, const DataBuffer &src_colours,
+                             const ConvertOptions &options)
   {
     (void)src_normals;
     const auto x = src_vertices.get<Magnum::Float>(src_index, 0);
@@ -176,7 +178,8 @@ struct VertexMapper<VertexPC>
     return vertex.position;
   }
 
-  Array<Magnum::Trade::MeshAttributeData> attributes(const Array<VertexPC> &vertices) const
+  [[nodiscard]] static Array<Magnum::Trade::MeshAttributeData> attributes(
+    const Array<VertexPC> &vertices)
   {
     return Array<Magnum::Trade::MeshAttributeData>{
       Corrade::Containers::InPlaceInit,
@@ -198,15 +201,15 @@ struct VertexMapper<VertexPC>
 template <>
 struct VertexMapper<VertexPNC>
 {
-  inline bool validate(const DataBuffer &src_vertices, const DataBuffer &src_normals,
-                       const DataBuffer &src_colours, const ConvertOptions &options) const
+  [[nodiscard]] static bool validate(const DataBuffer &src_vertices, const DataBuffer &src_normals,
+                                     const DataBuffer &src_colours, const ConvertOptions &options)
   {
     return src_vertices.isValid() && src_normals.isValid() &&
            (options.auto_colour || src_colours.isValid());
   }
-  inline Magnum::Vector3 operator()(VertexPNC &vertex, size_t src_index,
-                                    const DataBuffer &src_vertices, const DataBuffer &src_normals,
-                                    const DataBuffer &src_colours, const ConvertOptions &options)
+  Magnum::Vector3 operator()(VertexPNC &vertex, size_t src_index, const DataBuffer &src_vertices,
+                             const DataBuffer &src_normals, const DataBuffer &src_colours,
+                             const ConvertOptions &options)
   {
     const auto x = src_vertices.get<Magnum::Float>(src_index, 0);
     const auto y = src_vertices.get<Magnum::Float>(src_index, 1);
@@ -222,7 +225,8 @@ struct VertexMapper<VertexPNC>
     return vertex.position;
   }
 
-  Array<Magnum::Trade::MeshAttributeData> attributes(const Array<VertexPNC> &vertices) const
+  [[nodiscard]] static Array<Magnum::Trade::MeshAttributeData> attributes(
+    const Array<VertexPNC> &vertices)
   {
     return Array<Magnum::Trade::MeshAttributeData>{
       Corrade::Containers::InPlaceInit,
@@ -296,14 +300,14 @@ Magnum::GL::Mesh convert(const tes::MeshResource &mesh_resource, Magnum::MeshPri
 
   if (!indices.empty())
   {
-    Magnum::Trade::MeshData md(draw_type, Magnum::Trade::DataFlags{},
-                               ArrayView<const void>(indices),
-                               Magnum::Trade::MeshIndexData{ indices }, Magnum::Trade::DataFlags{},
-                               ArrayView<const void>(vertices), mapper.attributes(vertices));
+    const Magnum::Trade::MeshData md(
+      draw_type, Magnum::Trade::DataFlags{}, ArrayView<const void>(indices),
+      Magnum::Trade::MeshIndexData{ indices }, Magnum::Trade::DataFlags{},
+      ArrayView<const void>(vertices), mapper.attributes(vertices));
     return Magnum::MeshTools::compile(md);
   }
-  Magnum::Trade::MeshData md(draw_type, Magnum::Trade::DataFlags{}, ArrayView<const void>(vertices),
-                             mapper.attributes(vertices));
+  const Magnum::Trade::MeshData md(draw_type, Magnum::Trade::DataFlags{},
+                                   ArrayView<const void>(vertices), mapper.attributes(vertices));
   return Magnum::MeshTools::compile(md);
 }
 
@@ -337,7 +341,7 @@ Magnum::GL::Mesh convert(const tes::MeshResource &mesh_resource, tes::Bounds<Mag
     }
     return convert<VertexPN>(mesh_resource, primitive, bounds, options);
   }
-  else if (mesh_resource.colours().isValid() || options.auto_colour)
+  if (mesh_resource.colours().isValid() || options.auto_colour)
   {
     return convert<VertexPC>(mesh_resource, primitive, bounds, options);
   }

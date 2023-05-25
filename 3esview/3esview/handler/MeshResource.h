@@ -53,8 +53,8 @@ public:
 
     ~ResourceReference() = default;
 
-    inline bool isValid() const { return _resource != nullptr && _mesh != nullptr; }
-    inline operator bool() const { return isValid(); }
+    [[nodiscard]] bool isValid() const { return _resource != nullptr && _mesh != nullptr; }
+    [[nodiscard]] operator bool() const { return isValid(); }
 
     /// Get the mesh bounds.
     ///
@@ -63,9 +63,12 @@ public:
     /// each instance of this mesh.
     ///
     /// @return The mesh bounds.
-    inline const Bounds &bounds() const { return _bounds; }
-    inline const std::shared_ptr<const tes::MeshResource> &resource() const { return _resource; }
-    inline std::shared_ptr<Magnum::GL::Mesh> mesh() const { return _mesh; }
+    [[nodiscard]] const Bounds &bounds() const { return _bounds; }
+    [[nodiscard]] const std::shared_ptr<const tes::MeshResource> &resource() const
+    {
+      return _resource;
+    }
+    [[nodiscard]] std::shared_ptr<Magnum::GL::Mesh> mesh() const { return _mesh; }
 
   private:
     Bounds _bounds = {};
@@ -180,14 +183,13 @@ TES_ENUM_FLAGS(MeshResource::DrawFlag, unsigned);
 
 inline MeshResource::ResourceReference MeshResource::get(uint32_t id) const
 {
-  std::lock_guard guard(_resource_lock);
+  const std::lock_guard guard(_resource_lock);
   auto search = _resources.find(id);
   if (search != _resources.end())
   {
-    ResourceReference ref(search->second.bounds, search->second.current, search->second.mesh);
-    return ref;
+    return { search->second.bounds, search->second.current, search->second.mesh };
   }
-  return ResourceReference();
+  return {};
 }
 }  // namespace tes::view::handler
 

@@ -68,7 +68,8 @@ bool StreamThread::looping() const
 void StreamThread::setPlaybackSpeed(float speed)
 {
   const std::scoped_lock guard(_data_mutex);
-  _playback_speed = std::max(0.01f, speed);
+  const float min_speed = 0.01f;
+  _playback_speed = std::max(min_speed, speed);
 }
 
 
@@ -379,7 +380,7 @@ StreamThread::ProcessPacketResult StreamThread::processPacket(const PacketHeader
 StreamThread::Clock::duration StreamThread::processControlMessage(PacketReader &packet,
                                                                   bool ignore_frame_change)
 {
-  ControlMessage msg;
+  ControlMessage msg = {};
   if (!msg.read(packet))
   {
     log::error("Failed to decode control packet: ", packet.messageId());
@@ -399,8 +400,8 @@ StreamThread::Clock::duration StreamThread::processControlMessage(PacketReader &
       _tes->updateToFrame(current_frame);
       _frame.total = std::max(_frame.total.load(), current_frame);
     }
-    return std::chrono::microseconds(
-      static_cast<uint64_t>(_server_info.time_unit * dt / static_cast<double>(_playback_speed)));
+    return std::chrono::microseconds(static_cast<uint64_t>(
+      static_cast<double>(_server_info.time_unit * dt) / static_cast<double>(_playback_speed)));
   }
   case CIdCoordinateFrame:
     if (msg.value32 < CFCount)
@@ -424,9 +425,9 @@ StreamThread::Clock::duration StreamThread::processControlMessage(PacketReader &
     {
       _tes->updateToFrame(_frame.current);
     }
-    return std::chrono::microseconds(
-      static_cast<uint64_t>(_server_info.time_unit * _server_info.default_frame_time /
-                            static_cast<double>(_playback_speed)));
+    return std::chrono::microseconds(static_cast<uint64_t>(
+      static_cast<double>(_server_info.time_unit * _server_info.default_frame_time) /
+      static_cast<double>(_playback_speed)));
   case CIdReset:
     if (!ignore_frame_change)
     {

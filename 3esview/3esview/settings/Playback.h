@@ -10,6 +10,7 @@
 
 namespace tes::view::settings
 {
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 struct Playback
 {
   Bool allow_key_frames = {
@@ -44,6 +45,7 @@ struct Playback
 
   [[nodiscard]] inline bool operator!=(const Playback &other) const { return !operator==(other); }
 };
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }  // namespace tes::view::settings
 
 #endif  // TES_VIEW_SETTINGS_PLAYBACK_H

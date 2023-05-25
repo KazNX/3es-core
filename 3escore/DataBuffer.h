@@ -489,6 +489,7 @@ public:
   /// @param v The vertex array.
   /// @param count The number of vertex elements in @p v.
   DataBuffer(Vector3f *c, size_t count)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     : DataBuffer(const_cast<const Vector3f *>(c), count)
   {}
 
@@ -517,6 +518,7 @@ public:
   /// @param v The vertex array.
   /// @param count The number of vertex elements in @p v.
   DataBuffer(Vector3d *c, size_t count)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     : DataBuffer(const_cast<const Vector3d *>(c), count)
   {}
 
@@ -551,6 +553,7 @@ public:
   /// @param c The colour array.
   /// @param count The number of elements in @p c.
   DataBuffer(Colour *v, size_t count)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     : DataBuffer(const_cast<const Colour *>(v), count)
   {}
 

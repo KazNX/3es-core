@@ -21,11 +21,11 @@ public:
 
   /// Calculate the average time taken to display each frame.
   /// @return The average frame time (seconds).
-  float averageFrameTime() const;
+  [[nodiscard]] float averageFrameTime() const;
 
   /// Calculate the average frames per second over the window.
   /// @return A frames per second average.
-  float fps() const;
+  [[nodiscard]] float fps() const;
 
 private:
   std::vector<float> _window;

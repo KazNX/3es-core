@@ -88,12 +88,12 @@ void Shape::readMessage(PacketReader &reader)
   switch (reader.messageId())
   {
   case OIdCreate: {
-    CreateMessage msg;
+    CreateMessage msg = {};
     ok = msg.read(reader, attrs) && handleCreate(msg, attrs, reader);
     break;
   }
   case OIdDestroy: {
-    DestroyMessage msg;
+    DestroyMessage msg = {};
     ok = msg.read(reader);
     if (ok)
     {
@@ -103,14 +103,14 @@ void Shape::readMessage(PacketReader &reader)
     break;
   }
   case OIdUpdate: {
-    UpdateMessage msg;
+    UpdateMessage msg = {};
     ok = msg.read(reader, attrs) && handleUpdate(msg, attrs, reader);
     break;
   }
   case OIdData: {
     // We only expect data messages for multi-shape messages where the create message does not
     // contain all the shapes.
-    DataMessage msg;
+    DataMessage msg = {};
     ok = msg.read(reader) && handleData(msg, reader);
     break;
   }
@@ -129,7 +129,7 @@ void Shape::readMessage(PacketReader &reader)
 
 void Shape::serialise(Connection &out)
 {
-  std::array<uint8_t, (1u << 16u) - 1> buffer;
+  std::array<uint8_t, (1u << 16u) - 1> buffer = {};
   PacketWriter writer(buffer.data(), uint16_t(buffer.size()));
   CreateMessage create = {};
   ObjectAttributes attrs = {};
@@ -169,8 +169,8 @@ void Shape::serialise(Connection &out)
       if (shape->child_count)
       {
         // Handle multi shape
-        uint32_t child_count = shape->child_count;
-        writer.writeElement(child_count) == sizeof(child_count) && ok;
+        const uint32_t child_count = shape->child_count;
+        ok = writer.writeElement(child_count) == sizeof(child_count) && ok;
 
         for (uint32_t i = 0; i < child_count; ++i)
         {
@@ -274,7 +274,11 @@ bool Shape::handleUpdate(const UpdateMessage &msg, const ObjectAttributes &attrs
   if (msg.flags & UFUpdateMode)
   {
     ObjectAttributes cur_attrs = {};
-    _painter->readShape(id, transform, colour);
+    if (!_painter->readShape(id, transform, colour))
+    {
+      return false;
+    }
+
     if (msg.flags & (UFPosition | UFRotation | UFScale))
     {
       decomposeTransform(transform, cur_attrs);
@@ -355,7 +359,7 @@ bool Shape::handleData(const DataMessage &msg, PacketReader &reader)
 
   // Things to resolve.
   auto draw_type = painter::ShapePainter::Type::Solid;
-  painter::ShapePainter::ParentId parent_id = _painter->lookup(Id(msg.id), draw_type);
+  const painter::ShapePainter::ParentId parent_id = _painter->lookup(Id(msg.id), draw_type);
 
   uint16_t block_count = 0;
   ok = reader.readElement(block_count) == sizeof(block_count) && ok;

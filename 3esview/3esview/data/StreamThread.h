@@ -45,7 +45,10 @@ public:
   using Clock = std::chrono::steady_clock;
 
   StreamThread(std::shared_ptr<ThirdEyeScene> tes, std::shared_ptr<std::istream> stream);
+  StreamThread(const StreamThread &other) = delete;
   ~StreamThread() override;
+
+  StreamThread &operator=(const StreamThread &other) = delete;
 
   /// Reports whether the current stream is a live connection or a replay.
   ///
@@ -321,7 +324,7 @@ private:
   /// The scene manager.
   std::shared_ptr<ThirdEyeScene> _tes;
   std::thread _thread;
-  ServerInfoMessage _server_info;
+  ServerInfoMessage _server_info = {};
   bool _have_server_info = false;
   Keyframes _keyframes;
 };

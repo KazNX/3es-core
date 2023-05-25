@@ -19,8 +19,8 @@
 #include <Magnum/Text/DistanceFieldGlyphCache.h>
 #include <Magnum/Text/Renderer.h>
 
-#include <memory>
 #include <functional>
+#include <memory>
 
 namespace Magnum::Text
 {
@@ -114,7 +114,7 @@ public:
 
   /// Check if we are able to render text.
   /// @return True if text rendering is availabe.
-  bool isAvailable() const;
+  [[nodiscard]] bool isAvailable() const;
 
   /// Draw a collection of 2D @c TextEntry items.
   ///

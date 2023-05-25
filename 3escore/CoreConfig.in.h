@@ -7,8 +7,6 @@
 
 #include "CoreExport.h"
 
-#include <3escore/Meta.h>
-
 #ifdef TES_STATIC
 /// Macro for defining extern templates. Only use extern for static library.
 #define TES_EXTERN extern
@@ -131,5 +129,7 @@ using ssize_t = int32_t;  // NOLINT(readability-identifier-naming)
 #endif  // TES_64
 static_assert(sizeof(ssize_t) == sizeof(size_t));
 }  // namespace tes
+
+#include <3escore/Meta.h>
 
 #endif  // TES_CORE_CONFIG_H

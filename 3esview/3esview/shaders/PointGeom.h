@@ -6,8 +6,8 @@
 
 #include <3esview/ViewConfig.h>
 
-#include "Shader.h"
 #include "Pvm.h"
+#include "Shader.h"
 
 #include <Magnum/GL/AbstractShaderProgram.h>
 #include <Magnum/Shaders/Generic.h>
@@ -24,13 +24,19 @@ class TES_VIEWER_API PointGeom : public Shader
 public:
   /// Constructor.
   PointGeom();
+  PointGeom(const PointGeom &other) = delete;
   /// Destructor.
-  ~PointGeom();
+  ~PointGeom() override;
 
-  Feature features() const override { return Feature::Transparent | Feature::Tint | Feature::DrawScale; }
+  PointGeom &operator=(const PointGeom &other) = delete;
 
-  std::shared_ptr<Magnum::GL::AbstractShaderProgram> shader() const override;
-  std::shared_ptr<PointGeomProgram> typedShader() const { return _shader; }
+  [[nodiscard]] Feature features() const override
+  {
+    return Feature::Transparent | Feature::Tint | Feature::DrawScale;
+  }
+
+  [[nodiscard]] std::shared_ptr<Magnum::GL::AbstractShaderProgram> shader() const override;
+  [[nodiscard]] std::shared_ptr<PointGeomProgram> typedShader() const { return _shader; }
 
   Shader &setProjectionMatrix(const Magnum::Matrix4 &matrix) override;
   Shader &setViewMatrix(const Magnum::Matrix4 &matrix) override;
@@ -75,7 +81,7 @@ public:
   };
 
   explicit PointGeomProgram();
-  explicit PointGeomProgram(Magnum::NoCreateT) noexcept
+  explicit PointGeomProgram([[maybe_unused]] Magnum::NoCreateT no_create) noexcept
     : AbstractShaderProgram(Magnum::NoCreate)
   {}
 
@@ -83,6 +89,8 @@ public:
   PointGeomProgram(PointGeomProgram &&) noexcept = default;
   PointGeomProgram &operator=(const PointGeomProgram &) = delete;
   PointGeomProgram &operator=(PointGeomProgram &&) noexcept = default;
+
+  ~PointGeomProgram() override = default;
 
   /// Set just the projection matrix.
   /// @param matrix

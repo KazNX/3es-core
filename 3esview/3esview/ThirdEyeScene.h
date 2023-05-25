@@ -3,12 +3,14 @@
 
 #include "3esview/ViewConfig.h"
 
-#include "camera/Fly.h"
-
 #include "BoundsCuller.h"
 #include "FramesPerSecondWindow.h"
 #include "FrameStamp.h"
+
+#include "camera/Fly.h"
+
 #include "painter/ShapeCache.h"
+
 #include "settings/Settings.h"
 
 #include <3escore/Messages.h>
@@ -74,12 +76,15 @@ public:
   /// Constructor. Must be created on the main thread only - the thread which manages the render
   /// resource - i.e., the OpenGL context.
   explicit ThirdEyeScene(const std::vector<settings::Extension> &extended_settings = {});
+  ThirdEyeScene(const ThirdEyeScene &other) = delete;
   /// Destructor.
   ~ThirdEyeScene();
 
+  ThirdEyeScene &operator=(const ThirdEyeScene &other) = delete;
+
   /// Get the list of names of known message handlers, keyed by routing ID.
   /// @return The known routing ID names.
-  [[nodiscard]] static const std::unordered_map<uint32_t, std::string> defaultHandlerNames();
+  [[nodiscard]] static const std::unordered_map<uint32_t, std::string> &defaultHandlerNames();
 
   /// Return the last rendered frame stamp.
   /// @return The last frame stamp.

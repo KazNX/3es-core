@@ -8,7 +8,7 @@
 
 namespace tes::view::data
 {
-KeyframeStore::~KeyframeStore()
+KeyframeStore::~KeyframeStore() noexcept
 {
   clear();
 }
@@ -39,7 +39,7 @@ bool KeyframeStore::remove(FrameNumber keyframe_number)
     // Ignore errors deleting files
   }
   // Remove the record.
-  _keyframes.erase(_keyframes.begin() + index);
+  _keyframes.erase(_keyframes.begin() + index);  // NOLINT(cppcoreguidelines-narrowing-conversions)
   return true;
 }
 

@@ -26,13 +26,13 @@ public:
       mutex.lock();
     }
     CategoriesRef(const CategoriesRef &other) = delete;
-    CategoriesRef(CategoriesRef &&other)
+    CategoriesRef(CategoriesRef &&other) noexcept
       : _mutex(std::exchange(other._mutex, nullptr))
       , _state(std::exchange(other._state, nullptr))
     {}
 
     CategoriesRef &operator=(const CategoriesRef &other) = delete;
-    CategoriesRef &operator=(CategoriesRef &&other)
+    CategoriesRef &operator=(CategoriesRef &&other) noexcept
     {
       _mutex = std::exchange(other._mutex, _mutex);
       _state = std::exchange(other._state, _state);
@@ -69,7 +69,7 @@ public:
   /// @c painter::CategoryState for longer running operations.
   ///
   /// @return A reference to the internal category state.
-  CategoriesRef categories() { return CategoriesRef(_mutex, _categories); }
+  CategoriesRef categories() { return { _mutex, _categories }; }
 
   void initialise() override;
   void reset() override;

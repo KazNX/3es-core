@@ -48,11 +48,11 @@ public:
 
   /// Get the number of arguments available.
   /// @return The number of arguments set.
-  size_t count() const { return _args.size(); }
+  [[nodiscard]] size_t count() const { return _args.size(); }
 
   /// Check if the argument set is empty.
   /// @return True when empty.
-  bool empty() const { return _args.empty(); }
+  [[nodiscard]] bool empty() const { return _args.empty(); }
 
   /// Get the argument at the given index s the given type.
   ///
@@ -64,7 +64,7 @@ public:
   /// @param index The argument index.
   /// @return The argument value.
   template <typename T>
-  T at(size_t index) const
+  [[nodiscard]] T at(size_t index) const
   {
     return std::any_cast<T>(_args.at(index));
   }
@@ -75,7 +75,7 @@ public:
   ///
   /// @param index The index of the argument.
   /// @return The @c typeid of the argument at @p index.
-  const std::type_info &typeAt(size_t index) const { return _args.at(index).type(); }
+  [[nodiscard]] const std::type_info &typeAt(size_t index) const { return _args.at(index).type(); }
 
   /// Unpack a single argument into @p arg .
   ///
@@ -154,7 +154,7 @@ private:
   {
     while (_args.size() < index + 1)
     {
-      _args.emplace_back(std::any());
+      _args.emplace_back();
     }
     _args[index] = arg;
     return index + 1;

@@ -14,12 +14,12 @@ ViewerLog::View::const_iterator ViewerLog::View::beginFiltered(log::Level filter
   }
   // Find the first relevant item.
   const_iterator iter(_log, _log->beginIndex(), !_log->_lines.empty());
-  const auto end = this->end();
+  auto end = this->end();
   for (; iter != end && !iter.isRelevant(filter_level); ++iter)
-    ;
+  {}
   if (iter != end && iter.isRelevant(filter_level))
   {
-    return const_iterator(iter, filter_level);
+    return { iter, filter_level };
   }
   return end;
 }

@@ -13,7 +13,7 @@ DataThread::~DataThread() = default;
 
 bool DataThread::processServerInfo(PacketReader &reader, ServerInfoMessage &server_info)
 {
-  ServerInfoMessage msg;
+  ServerInfoMessage msg = {};
   if (msg.read(reader))
   {
     server_info = msg;
@@ -23,4 +23,4 @@ bool DataThread::processServerInfo(PacketReader &reader, ServerInfoMessage &serv
   log::error("Failed to decode server info.");
   return false;
 }
-}  // namespace tes::view
+}  // namespace tes::view::data

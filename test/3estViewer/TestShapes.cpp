@@ -127,7 +127,7 @@ private:
     float expect_z = 0;
 
     // Check the parent.
-    _painter->readShape(_shape_id, transform, colour);
+    EXPECT_TRUE(_painter->readShape(_shape_id, transform, colour));
     auto pos = transform[3].xyz();
     const float epsilon = 1e-5f;
     EXPECT_NEAR(pos.x(), expect_x, epsilon);
@@ -141,16 +141,16 @@ private:
       // Check child.
       expect_x = float(i);
       // Read without parent transform.
-      _painter->readChildShape(painter::ShapePainter::ChildId(_shape_id, i), false, transform,
-                               colour);
+      EXPECT_TRUE(_painter->readChildShape(painter::ShapePainter::ChildId(_shape_id, i), false,
+                                           transform, colour));
       pos = transform[3].xyz();
       const float epsilon = 1e-5f;
       EXPECT_NEAR(pos.x(), expect_x, epsilon);
       EXPECT_NEAR(pos.y(), 0, epsilon);
       EXPECT_NEAR(pos.z(), expect_z, epsilon);
       // Read with parent transform.
-      _painter->readChildShape(painter::ShapePainter::ChildId(_shape_id, i), true, transform,
-                               colour);
+      EXPECT_TRUE(_painter->readChildShape(painter::ShapePainter::ChildId(_shape_id, i), true,
+                                           transform, colour));
       pos = transform[3].xyz();
       EXPECT_NEAR(pos.x(), expect_x, epsilon);
       EXPECT_NEAR(pos.y(), expect_y, epsilon);

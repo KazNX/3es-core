@@ -70,7 +70,7 @@ public:
   /// Construct using the given text painter interface.
   /// @param painter The text drawing API.
   Text3D(std::shared_ptr<painter::Text> painter)
-    : Super(SIdText3D, "text 3D", painter)
+    : Super(SIdText3D, "text 3D", std::move(painter))
   {}
 };
 }  // namespace tes::view::handler

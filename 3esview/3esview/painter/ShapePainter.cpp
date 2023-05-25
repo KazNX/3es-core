@@ -8,21 +8,21 @@
 
 namespace tes::view::painter
 {
-ShapePainter::ShapePainter(std::shared_ptr<BoundsCuller> culler,
-                           std::shared_ptr<shaders::ShaderLibrary> shaders,
+ShapePainter::ShapePainter(const std::shared_ptr<BoundsCuller> &culler,
+                           const std::shared_ptr<shaders::ShaderLibrary> &shaders,
                            std::initializer_list<Part> solid_mesh,
                            std::initializer_list<Part> wireframe_mesh,
                            std::initializer_list<Part> transparent_mesh,
-                           BoundsCalculator bounds_calculator)
-  : ShapePainter(std::move(culler), std::move(shaders), std::vector<Part>(std::move(solid_mesh)),
-                 std::vector<Part>(std::move(wireframe_mesh)),
-                 std::vector<Part>(std::move(transparent_mesh)), std::move(bounds_calculator))
+                           const BoundsCalculator &bounds_calculator)
+  : ShapePainter(culler, shaders, std::vector<Part>(solid_mesh), std::vector<Part>(wireframe_mesh),
+                 std::vector<Part>(transparent_mesh), bounds_calculator)
 {}
 
-ShapePainter::ShapePainter(std::shared_ptr<BoundsCuller> culler,
-                           std::shared_ptr<shaders::ShaderLibrary> shaders,
+ShapePainter::ShapePainter(const std::shared_ptr<BoundsCuller> &culler,
+                           const std::shared_ptr<shaders::ShaderLibrary> &shaders,
                            const std::vector<Part> &solid, const std::vector<Part> &wireframe,
-                           const std::vector<Part> &transparent, BoundsCalculator bounds_calculator)
+                           const std::vector<Part> &transparent,
+                           const BoundsCalculator &bounds_calculator)
 {
   auto shader = shaders->lookup(shaders::ShaderLibrary::ID::Flat);
   _solid_cache = std::make_unique<ShapeCache>(culler, shader, solid);
@@ -51,7 +51,7 @@ void ShapePainter::reset()
 ShapePainter::ParentId ShapePainter::add(const Id &id, Type type, const Magnum::Matrix4 &transform,
                                          const Magnum::Color4 &colour, bool hidden)
 {
-  util::ResourceListId index = addShape(id, type, transform, colour, hidden);
+  const util::ResourceListId index = addShape(id, type, transform, colour, hidden);
   if (!id.isTransient())
   {
     // Handle re-adding a shape which is already pending removal.
@@ -87,7 +87,7 @@ ShapePainter::ParentId ShapePainter::lookup(const Id &id, Type &type) const
   }
 
   // Transient shape lookup. We should return the last transient item added.
-  return ParentId();
+  return {};
 }
 
 
@@ -97,7 +97,7 @@ ShapePainter::ChildId ShapePainter::addChild(const ParentId &parent_id, Type typ
 {
   unsigned child_index = 0;
   addShape(parent_id.shapeId(), type, transform, colour, false, parent_id, &child_index);
-  return ChildId(parent_id.shapeId(), child_index);
+  return { parent_id.shapeId(), child_index };
 }
 
 
@@ -114,7 +114,7 @@ util::ResourceListId ShapePainter::addShape(const Id &shape_id, Type type,
     flags |= (hidden) ? ShapeCache::ShapeFlag::Hidden : ShapeCache::ShapeFlag::None;
     return cache->add(shape_id, transform, colour, flags, parent_id.resourceId(), child_index);
   }
-  return ~0u;
+  return util::kNullResource;
 }
 
 

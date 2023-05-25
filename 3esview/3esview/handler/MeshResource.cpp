@@ -359,18 +359,18 @@ void MeshResource::calculateNormals(SimpleMesh &mesh, bool force)
 
   // Loop the triangles
   const auto index_count = mesh.indexCount();
-  std::array<Vector3f, 3> tri;
+  std::array<Vector3f, 3> tri = {};
   for (unsigned i = 0; i < index_count; i += 3)
   {
-    tri[0] = vertices[indices[i + 0]];
-    tri[1] = vertices[indices[i + 1]];
-    tri[2] = vertices[indices[i + 2]];
+    tri.at(0) = vertices[indices[i + 0]];
+    tri.at(1) = vertices[indices[i + 1]];
+    tri.at(2) = vertices[indices[i + 2]];
 
     // Sum the normal from this trinagle into the respective triangle normals.
     const auto normal = trigeom::normal(tri);
-    normals[indices[i + 0]] += normal;
-    normals[indices[i + 1]] += normal;
-    normals[indices[i + 2]] += normal;
+    normals.at(indices[i + 0]) += normal;
+    normals.at(indices[i + 1]) += normal;
+    normals.at(indices[i + 2]) += normal;
   }
 
   // Normalise the results.

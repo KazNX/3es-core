@@ -9,10 +9,10 @@
 
 namespace tes::view::painter
 {
-Pose::Pose(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders)
-  : ShapePainter(std::move(culler), std::move(shaders), { Part{ solidMesh() } },
-                 { Part{ wireframeMesh() } }, { Part{ solidMesh() } },
-                 ShapeCache::calcSphericalBounds)
+Pose::Pose(const std::shared_ptr<BoundsCuller> &culler,
+           const std::shared_ptr<shaders::ShaderLibrary> &shaders)
+  : ShapePainter(culler, shaders, { Part{ solidMesh() } }, { Part{ wireframeMesh() } },
+                 { Part{ solidMesh() } }, ShapeCache::calcSphericalBounds)
 {}
 
 Magnum::GL::Mesh Pose::solidMesh()
@@ -22,7 +22,7 @@ Magnum::GL::Mesh Pose::solidMesh()
     SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Colour | SimpleMesh::Index);
   static std::mutex guard;
 
-  std::unique_lock<std::mutex> lock(guard);
+  const std::scoped_lock lock(guard);
 
   // Build with the tes tesselator.
   if (build_mesh.vertexCount() == 0)
@@ -41,7 +41,7 @@ Magnum::GL::Mesh Pose::solidMesh()
     const float length = 1.0f;
     const float body_length = 0.81f;
 
-    unsigned base_index = unsigned(vertices.size());
+    auto base_index = static_cast<unsigned>(vertices.size());
     arrow::solid(vertices_part, indices_part, normals_part, facets, head_radius, body_radius,
                  body_length, length, Vector3f(1, 0, 0));
 
@@ -118,7 +118,7 @@ Magnum::GL::Mesh Pose::wireframeMesh()
   static SimpleMesh build_mesh(0, 0, 0, DtLines, SimpleMesh::Vertex | SimpleMesh::Index);
   static std::mutex guard;
 
-  std::unique_lock<std::mutex> lock(guard);
+  const std::scoped_lock lock(guard);
 
   // Build with the tes tesselator.
   if (build_mesh.vertexCount() == 0)

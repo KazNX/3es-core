@@ -11,6 +11,7 @@
 
 namespace tes::view::settings
 {
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 struct Connection
 {
   /// Max items for history.
@@ -27,6 +28,7 @@ struct Connection
 
   [[nodiscard]] inline bool operator!=(const Connection &other) const { return !operator==(other); }
 };
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }  // namespace tes::view::settings
 
 #endif  // TES_VIEW_SETTINGS_CONNECTION_H

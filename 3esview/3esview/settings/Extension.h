@@ -6,9 +6,9 @@
 
 #include <3esview/ViewConfig.h>
 
+#include "Colour.h"
 #include "Enum.h"
 #include "IOResult.h"
-#include "Colour.h"
 #include "Numeric.h"
 #include "YamlFwd.h"
 
@@ -84,16 +84,19 @@ struct TES_VIEWER_API PropertyTypeValueOf<settings::Double>
 class TES_VIEWER_API ExtensionPropertyAffordances
 {
 public:
+  ExtensionPropertyAffordances() = default;
+  ExtensionPropertyAffordances(const ExtensionPropertyAffordances &other) = default;
   virtual ~ExtensionPropertyAffordances();
+  ExtensionPropertyAffordances &operator=(const ExtensionPropertyAffordances &other) = default;
 
-  virtual PropertyType type() const = 0;
-  virtual const std::string &label() const = 0;
-  virtual const std::string &tip() const = 0;
+  [[nodiscard]] virtual PropertyType type() const = 0;
+  [[nodiscard]] virtual const std::string &label() const = 0;
+  [[nodiscard]] virtual const std::string &tip() const = 0;
   virtual IOCode read(const ryml::ConstNodeRef &parent, std::ostream &log) = 0;
   virtual IOCode write(ryml::NodeRef &parent, std::ostream &log) const = 0;
-  virtual std::unique_ptr<ExtensionPropertyAffordances> clone() const = 0;
-  virtual void *property() = 0;
-  virtual const void *property() const = 0;
+  [[nodiscard]] virtual ExtensionPropertyAffordances *clone() const = 0;
+  [[nodiscard]] virtual void *property() = 0;
+  [[nodiscard]] virtual const void *property() const = 0;
 };
 }  // namespace detail
 
@@ -125,9 +128,11 @@ public:
   {
     if (other._affordances)
     {
-      _affordances = other._affordances->clone();
+      _affordances.reset(other._affordances->clone());
     }
   }
+
+  ~ExtensionProperty() = default;
 
   ExtensionProperty &operator=(ExtensionProperty &&other) = default;
   ExtensionProperty &operator=(const ExtensionProperty &other)
@@ -137,14 +142,14 @@ public:
       _affordances = nullptr;
       if (other._affordances)
       {
-        _affordances = other._affordances->clone();
+        _affordances.reset(other._affordances->clone());
       }
     }
     return *this;
   }
 
-  const std::string &label() const { return _affordances->label(); }
-  const std::string &tip() const { return _affordances->tip(); }
+  [[nodiscard]] const std::string &label() const { return _affordances->label(); }
+  [[nodiscard]] const std::string &tip() const { return _affordances->tip(); }
   IOCode read(const ryml::ConstNodeRef &parent, std::ostream &log)
   {
     return _affordances->read(parent, log);
@@ -156,13 +161,13 @@ public:
 
   void update(const ExtensionProperty &other);
 
-  bool operator==(const ExtensionProperty &other) const;
-  bool operator!=(const ExtensionProperty &other) const { return !operator==(other); }
+  [[nodiscard]] bool operator==(const ExtensionProperty &other) const;
+  [[nodiscard]] bool operator!=(const ExtensionProperty &other) const { return !operator==(other); }
 
   template <typename T>
-  T *getProperty();
+  [[nodiscard]] T *getProperty();
   template <typename T>
-  const T *getProperty() const;
+  [[nodiscard]] const T *getProperty() const;
 
 private:
   std::unique_ptr<detail::ExtensionPropertyAffordances> _affordances;
@@ -183,29 +188,29 @@ public:
   Extension &operator=(const Extension &other) = default;
   Extension &operator=(Extension &&other) = default;
 
-  const std::string &name() const { return _name; }
+  [[nodiscard]] const std::string &name() const { return _name; }
 
   void add(const ExtensionProperty &property);
 
-  const Properties &properties() const { return _properties; }
+  [[nodiscard]] const Properties &properties() const { return _properties; }
 
-  Properties::iterator begin() { return _properties.begin(); }
-  Properties::const_iterator begin() const { return _properties.begin(); }
-  Properties::iterator end() { return _properties.end(); }
-  Properties::const_iterator end() const { return _properties.end(); }
+  [[nodiscard]] Properties::iterator begin() { return _properties.begin(); }
+  [[nodiscard]] Properties::const_iterator begin() const { return _properties.begin(); }
+  [[nodiscard]] Properties::iterator end() { return _properties.end(); }
+  [[nodiscard]] Properties::const_iterator end() const { return _properties.end(); }
 
   void update(const Extension &other);
 
-  [[nodiscard]] inline bool operator==(const Extension &other) const
+  [[nodiscard]] bool operator==(const Extension &other) const
   {
     return _name == other._name && _properties == other._properties;
   }
 
-  [[nodiscard]] inline bool operator!=(const Extension &other) const { return !operator==(other); }
+  [[nodiscard]] bool operator!=(const Extension &other) const { return !operator==(other); }
 
-  bool hasProperty(const std::string &key) const;
-  const ExtensionProperty &operator[](const std::string &key) const;
-  ExtensionProperty &operator[](const std::string &key);
+  [[nodiscard]] bool hasProperty(const std::string &key) const;
+  [[nodiscard]] const ExtensionProperty &operator[](const std::string &key) const;
+  [[nodiscard]] ExtensionProperty &operator[](const std::string &key);
 
 private:
   Properties _properties;

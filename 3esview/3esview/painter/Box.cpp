@@ -9,17 +9,19 @@
 
 namespace tes::view::painter
 {
-Box::Box(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders)
-  : ShapePainter(std::move(culler), std::move(shaders), { Part{ solidMesh() } }, { Part{ wireframeMesh() } },
+Box::Box(const std::shared_ptr<BoundsCuller> &culler,
+         const std::shared_ptr<shaders::ShaderLibrary> &shaders)
+  : ShapePainter(culler, shaders, { Part{ solidMesh() } }, { Part{ wireframeMesh() } },
                  { Part{ solidMesh() } }, ShapeCache::calcSphericalBounds)
 {}
 
 Magnum::GL::Mesh Box::solidMesh()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtTriangles, SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
+  static SimpleMesh build_mesh(0, 0, 0, DtTriangles,
+                               SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
   static std::mutex guard;
 
-  std::unique_lock<std::mutex> lock(guard);
+  const std::scoped_lock lock(guard);
 
   // Build with the tes tesselator.
   if (build_mesh.vertexCount() == 0)
@@ -46,7 +48,7 @@ Magnum::GL::Mesh Box::wireframeMesh()
   static SimpleMesh build_mesh(0, 0, 0, DtLines, SimpleMesh::Vertex | SimpleMesh::Index);
   static std::mutex guard;
 
-  std::unique_lock<std::mutex> lock(guard);
+  const std::scoped_lock lock(guard);
 
   // Build with the tes tesselator.
   if (build_mesh.vertexCount() == 0)

@@ -16,7 +16,6 @@
 #include <array>
 #include <functional>
 #include <mutex>
-#include <array>
 #include <vector>
 
 namespace tes::view::settings

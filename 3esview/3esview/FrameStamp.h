@@ -3,8 +3,8 @@
 
 #include "3esview/ViewConfig.h"
 
-#include <cinttypes>
 #include <atomic>
+#include <cinttypes>
 
 namespace tes::view
 {
@@ -14,11 +14,12 @@ using FrameNumberAtomic = std::atomic_uint32_t;
 
 /// The @c FrameStamp represents a rendered moment in time.
 ///
-/// The @c frame_number identifies the logical frame being rendered as dictated by the data stream. This value is only
-/// monotonic increasing during normal playback, but can jump around during step back and skip operations.
+/// The @c frame_number identifies the logical frame being rendered as dictated by the data stream.
+/// This value is only monotonic increasing during normal playback, but can jump around during step
+/// back and skip operations.
 ///
-/// The @c render_mark is a monotonic increasing value which changes with every rendering of the scene to the current
-/// camera, even when the logical frame stays fixed.
+/// The @c render_mark is a monotonic increasing value which changes with every rendering of the
+/// scene to the current camera, even when the logical frame stays fixed.
 struct TES_VIEWER_API FrameStamp
 {
   /// The logical frame number as dictated by the data stream.
