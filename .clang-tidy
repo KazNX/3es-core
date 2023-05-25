@@ -37,7 +37,8 @@ Checks: >
   -readability-identifier-length,
   -readability-simplify-boolean-expr
 WarningsAsErrors: ""
-HeaderFilterRegex: ".*"
+HeaderFilterRegex: "^.*(?!vcpkg_installed).*$"
+# HeaderFilterRegex: ".*"
 AnalyzeTemporaryDtors: false
 FormatStyle: none
 User: csiro
