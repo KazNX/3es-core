@@ -5,6 +5,12 @@
   - gsl
   - tcb-span
 - Use `span<T>` instead of pointer/count
+- Review `VectorHash` to avoid C style casting.
+- Refactor
+  - ShapePainter protected members to private
+  - `tes::view::handler::MeshResource::readMessage` - complexity, pointer use
+  - `tes::ObjectAttribute` - use `std::array` for position, etc
+  - `tes::view::handler::MeshShape` protected members
 
 ## Protocol breaking changes
 
