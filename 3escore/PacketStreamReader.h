@@ -75,6 +75,10 @@ public:
   [[nodiscard]] bool isOk() const { return _stream && (!_buffer.empty() || _stream->good()); }
 
   /// Check if the stream is at the end of file.
+  ///
+  /// Note that this may report false, and allow @c extractPacket() to return @c Status::End before
+  /// this value reports true.
+  ///
   /// @return True if at end of file.
   [[nodiscard]] bool isEof() const { return !_stream || (_buffer.empty() && _stream->eof()); }
 
