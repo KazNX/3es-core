@@ -4,7 +4,8 @@
 
 namespace tes
 {
-const unsigned MultiShape::BlockCountLimitSingle = 1024u;
+constexpr unsigned MultiShape::BlockCountLimitSingle;
+constexpr unsigned MultiShape::BlockCountLimitDouble;
 
 MultiShape::~MultiShape() = default;
 
@@ -50,7 +51,7 @@ int MultiShape::writeData(PacketWriter &stream, unsigned &progress_marker) const
     return 0;
   }
 
-  DataMessage msg;
+  DataMessage msg = {};
   msg.id = data().id;
   stream.reset(routingId(), DataMessage::MessageId);
   bool ok = msg.write(stream);

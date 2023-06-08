@@ -520,7 +520,10 @@ void BaseConnection::flushCollatedPacketUnguarded()
 {
   if (_collation->collatedBytes())
   {
-    _collation->finalise();
+    if (!_collation->finalise())
+    {
+      log::error("Failed to finalise collation");
+    }
     unsigned byte_count = 0;
     const uint8_t *bytes = _collation->buffer(byte_count);
     if (bytes && byte_count)
