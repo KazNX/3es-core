@@ -107,8 +107,10 @@ public:
   void seek(std::istream::pos_type position);
 
 private:
+  using MarkerBytes = std::array<uint8_t, sizeof(tes::kPacketMarker)>;
+
   size_t readMore(size_t more_count);
-  bool checkMarker(std::vector<uint8_t> &buffer, size_t i);
+  bool checkMarker(const std::vector<uint8_t> &buffer, size_t i);
   /// Consume the packet at the head of the buffer (if valid and able).
   void consume();
 
@@ -119,7 +121,7 @@ private:
   size_t calcExpectedSize();
 
   std::shared_ptr<std::istream> _stream;
-  std::array<uint8_t, sizeof(tes::kPacketMarker)> _marker_bytes = {};
+  MarkerBytes _marker_bytes = {};
   std::vector<uint8_t> _buffer;
   size_t _chunk_size = 1024u;
   std::istream::pos_type _current_packet_pos = {};
