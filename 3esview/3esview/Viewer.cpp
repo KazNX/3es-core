@@ -136,8 +136,9 @@ bool Viewer::open(const std::filesystem::path &path)
 
   const auto config = _tes->settings().config();
   _data_thread =
-    std::make_shared<StreamThread>(_tes, std::make_shared<std::ifstream>(std::move(file)));
+    std::make_shared<data::StreamThread>(_tes, std::make_shared<std::ifstream>(std::move(file)));
   _data_thread->setLooping(config.playback.looping.value());
+  updateStreamThreadKeyframesConfig(config.playback);
   return true;
 }
 
@@ -146,7 +147,7 @@ bool Viewer::connect(const std::string &host, uint16_t port, bool allow_reconnec
 {
   closeOrDisconnect();
   _tes->reset();
-  auto net_thread = std::make_shared<NetworkThread>(_tes, host, port, allow_reconnect);
+  auto net_thread = std::make_shared<data::NetworkThread>(_tes, host, port, allow_reconnect);
   _data_thread = net_thread;
   if (!allow_reconnect)
   {
@@ -412,6 +413,7 @@ void Viewer::onPlaybackSettingsChange(const settings::Settings::Config &config)
   if (_data_thread)
   {
     _data_thread->setLooping(config.playback.looping.value());
+    updateStreamThreadKeyframesConfig(config.playback);
   }
 }
 
@@ -663,5 +665,16 @@ bool Viewer::handleStartupArgs(const Arguments &arguments)
   }
 
   return true;
+}
+
+
+void Viewer::updateStreamThreadKeyframesConfig(const settings::Playback &config)
+{
+  if (auto stream_thread = std::dynamic_pointer_cast<data::StreamThread>(_data_thread))
+  {
+    stream_thread->setAllowKeyframes(config.allow_key_frames.value());
+    stream_thread->setKeyframeInterval(config.keyframe_every_frames.value());
+    stream_thread->setKeyframeSizeInterval(config.keyframe_every_mib.value());
+  }
 }
 }  // namespace tes::view

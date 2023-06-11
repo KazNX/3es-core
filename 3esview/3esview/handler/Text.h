@@ -74,7 +74,7 @@ public:
   void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
             const painter::CategoryState &categories) override;
   void readMessage(PacketReader &reader) override;
-  void serialise(Connection &out, ServerInfoMessage &info) override;
+  void serialise(Connection &out) override;
 
 private:
   /// Handle creation for a new shape.
@@ -258,9 +258,8 @@ void Text<TextShape, Affordances>::readMessage(PacketReader &reader)
 
 
 template <typename TextShape, typename Affordances>
-void Text<TextShape, Affordances>::serialise(Connection &out, ServerInfoMessage &info)
+void Text<TextShape, Affordances>::serialise(Connection &out)
 {
-  TES_UNUSED(info);
   TextShape shape;
 
   const auto write_shape = [&out, &shape](uint32_t id, const TextEntry &text) {

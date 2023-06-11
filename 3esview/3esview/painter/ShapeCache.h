@@ -325,7 +325,12 @@ public:
                    util::ResourceList<Shape>::const_iterator &&end)
       : _cursor(std::move(cursor))
       , _end(std::move(end))
-    {}
+    {
+      if (_cursor != _end)
+      {
+        _view = View{ _cursor->shape_id, _cursor->current, _cursor->child_count };
+      }
+    }
     /// Copy constructor.
     /// @param other Iterator to copy.
     const_iterator(const const_iterator &other) = default;
@@ -484,10 +489,10 @@ TES_ENUM_FLAGS(ShapeCache::ShapeFlag, unsigned);
 
 inline void ShapeCache::const_iterator::next()
 {
-  while (_cursor != _end && (_cursor->flags & ShapeFlag::Pending) == ShapeFlag::Pending)
+  do
   {
     ++_cursor;
-  }
+  } while (_cursor != _end && (_cursor->flags & ShapeFlag::Pending) == ShapeFlag::Pending);
   if (_cursor != _end)
   {
     _view = View{ _cursor->shape_id, _cursor->current, _cursor->child_count };

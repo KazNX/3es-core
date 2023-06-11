@@ -12,7 +12,7 @@
 #include <cinttypes>
 #include <vector>
 
-namespace tes::view
+namespace tes::view::data
 {
 NetworkThread::NetworkThread(std::shared_ptr<ThirdEyeScene> tes, const std::string &host,
                              uint16_t port, bool allow_reconnect)
@@ -61,7 +61,7 @@ void NetworkThread::unpause()
 
 void NetworkThread::join()
 {
-  _quitFlag = true;
+  _quit_flag = true;
   _allow_reconnect = false;
   _thread.join();
 }
@@ -89,7 +89,7 @@ void NetworkThread::run()
     configureSocket(*socket);
     runWith(*socket);
     socket->close();
-  } while (_allow_reconnect || !_quitFlag);
+  } while (_allow_reconnect || !_quit_flag);
 }
 
 
@@ -112,13 +112,13 @@ void NetworkThread::runWith(TcpSocket &socket)
   PacketBuffer packet_buffer;
   std::vector<uint8_t> read_buffer(2 * 1024u);
 
-  _currentFrame = 0;
+  _current_frame = 0;
   _total_frames = 0;
 
   // Make sure we reset from any previous connection.
   _tes->reset();
 
-  while (socket.isConnected() && !_quitFlag)
+  while (socket.isConnected() && !_quit_flag)
   {
     auto bytes_read = socket.readAvailable(read_buffer.data(), int(read_buffer.size()));
     if (bytes_read <= 0)
@@ -175,7 +175,7 @@ void NetworkThread::processControlMessage(PacketReader &packet)
   case CIdNull:
     break;
   case CIdFrame: {
-    const auto current_frame = ++_currentFrame;
+    const auto current_frame = ++_current_frame;
     // Frame ending.
     _tes->updateToFrame(current_frame);
     _total_frames = std::max(current_frame, _total_frames);
@@ -196,12 +196,12 @@ void NetworkThread::processControlMessage(PacketReader &packet)
     _total_frames = msg.value32;
     break;
   case CIdForceFrameFlush:
-    _tes->updateToFrame(_currentFrame);
+    _tes->updateToFrame(_current_frame);
     break;
   case CIdReset:
     // This doesn't seem right any more. Need to check what the Unity viewer did with this. It may
     // be an artifact of the main thread needing to do so much work in Unity.
-    _currentFrame = msg.value32;
+    _current_frame = msg.value32;
     _tes->reset();
     break;
   case CIdKeyframe:
@@ -213,4 +213,4 @@ void NetworkThread::processControlMessage(PacketReader &packet)
     break;
   }
 }
-}  // namespace tes::view
+}  // namespace tes::view::data

@@ -127,10 +127,8 @@ void Shape::readMessage(PacketReader &reader)
 }
 
 
-void Shape::serialise(Connection &out, ServerInfoMessage &info)
+void Shape::serialise(Connection &out)
 {
-  (void)info;
-  info = _server_info;
   std::array<uint8_t, (1u << 16u) - 1> buffer;
   PacketWriter writer(buffer.data(), uint16_t(buffer.size()));
   CreateMessage create = {};
@@ -146,8 +144,8 @@ void Shape::serialise(Connection &out, ServerInfoMessage &info)
     auto end = _painter->end(shape_type);
     for (auto shape = _painter->begin(shape_type); shape != end; ++shape)
     {
-      const auto transform = shape->transform;
-      const auto colour = shape->colour;
+      auto transform = shape->attributes.transform;
+      auto colour = shape->attributes.colour;
 
       create.id = shape->id.id();
       create.category = shape->id.category();
@@ -176,6 +174,9 @@ void Shape::serialise(Connection &out, ServerInfoMessage &info)
 
         for (uint32_t i = 0; i < child_count; ++i)
         {
+          const auto child_view = shape.getChild(i);
+          transform = child_view.attributes.transform;
+          colour = child_view.attributes.colour;
           decomposeTransform(transform, attrs);
           attrs.colour = Colour(colour.x(), colour.y(), colour.z(), colour.w()).colour32();
           ok = attrs.write(writer) && ok;

@@ -104,7 +104,7 @@ public:
   void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
             const painter::CategoryState &categories) override;
   void readMessage(PacketReader &reader) override;
-  void serialise(Connection &out, ServerInfoMessage &info) override;
+  void serialise(Connection &out) override;
 
   /// Draw any number of mesh resource. Does not consider culling (cull before calling).
   ///

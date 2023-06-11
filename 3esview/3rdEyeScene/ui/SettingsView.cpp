@@ -119,7 +119,7 @@ bool SettingsView::show(unsigned idx, settings::Playback &config)
     dirty = showProperty(idx++, config.allow_key_frames) || dirty;
     dirty = showProperty(idx++, config.keyframe_every_mib) || dirty;
     dirty = showProperty(idx++, config.keyframe_every_frames) || dirty;
-    dirty = showProperty(idx++, config.keyframe_skip_forward_frames) || dirty;
+    dirty = showProperty(idx++, config.keyframe_min_separation) || dirty;
     dirty = showProperty(idx++, config.keyframe_compression) || dirty;
     dirty = showProperty(idx++, config.looping) || dirty;
     dirty = showProperty(idx++, config.pause_on_error) || dirty;

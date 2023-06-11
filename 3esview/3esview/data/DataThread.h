@@ -11,7 +11,7 @@ class PacketReader;
 struct ServerInfoMessage;
 }  // namespace tes
 
-namespace tes::view
+namespace tes::view::data
 {
 /// Base class TES_VIEWER_API for thread objects used as message sources.
 ///
@@ -85,6 +85,6 @@ protected:
 
 private:
 };
-}  // namespace tes::view
+}  // namespace tes::view::data
 
 #endif  // TES_VIEW_DATA_THREAD_H

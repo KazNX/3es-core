@@ -31,7 +31,10 @@ class TcpSocket;
 namespace tes::view
 {
 class ThirdEyeScene;
+}  // namespace tes::view
 
+namespace tes::view::data
+{
 /// A @c DataThread implementation which reads and processes packets form a live network connection.
 class TES_VIEWER_API NetworkThread : public DataThread
 {
@@ -88,9 +91,9 @@ public:
   FrameNumber targetFrame() const override;
 
   /// Get the current frame number.
-  FrameNumber currentFrame() const override { return _currentFrame; }
+  FrameNumber currentFrame() const override { return _current_frame; }
 
-  FrameNumber totalFrames() const override { return _currentFrame; }
+  FrameNumber totalFrames() const override { return _current_frame; }
 
   void setLooping(bool loop) override { (void)loop; }
   bool looping() const override { return false; }
@@ -101,14 +104,14 @@ public:
   /// Request the thread to quit. The thread may then be joined.
   void stop() override
   {
-    _quitFlag = true;
+    _quit_flag = true;
     _allow_reconnect = false;
     unpause();
   }
 
   /// Check if a quit has been requested.
   /// @return True when a quit has been requested.
-  bool stopping() const { return _quitFlag; }
+  bool stopping() const { return _quit_flag; }
 
   /// Check if playback is paused.
   /// @return True if playback is paused.
@@ -135,14 +138,14 @@ private:
   /// next frame.
   ///
   /// Handles the following messages:
-  /// - @c CIdFrame increments @p _currentFrame and @c _total_frames if less than current, then
+  /// - @c CIdFrame increments @p _current_frame and @c _total_frames if less than current, then
   /// calls
   ///   @c ThirdEyeScene::updateToFrame() .
   /// - @c CIdCoordinateFrame updates @c _server_info then calls @c
   /// ThirdEyeScene::updateServerInfo() .
   /// - @c CIdFrameCount updates @c _total_frames.
-  /// - @c CIdForceFrameFlush calls @c ThirdEyeScene::updateToFrame() with the @p _currentFrame.
-  /// - @c CIdReset resets the @c _currentFrame and calls @c ThirdEyeScene::reset() .
+  /// - @c CIdForceFrameFlush calls @c ThirdEyeScene::updateToFrame() with the @p _current_frame.
+  /// - @c CIdReset resets the @c _current_frame and calls @c ThirdEyeScene::reset() .
   /// - @c CIdKeyframe - irrelevant for a live stream.
   /// - @c CIdEnd - irrelevant for a live stream.
   ///
@@ -152,11 +155,11 @@ private:
   mutable std::mutex _data_mutex;
   std::mutex _notify_mutex;
   std::condition_variable _notify;
-  std::atomic_bool _quitFlag = false;
+  std::atomic_bool _quit_flag = false;
   std::atomic_bool _connected = false;
   std::atomic_bool _connection_attempted = false;
   std::atomic_bool _allow_reconnect = true;
-  FrameNumberAtomic _currentFrame = 0;
+  FrameNumberAtomic _current_frame = 0;
   /// The total number of frames in the stream, if know. Zero when unknown.
   FrameNumber _total_frames = 0;
   std::string _host;
@@ -166,6 +169,6 @@ private:
   std::thread _thread;
   ServerInfoMessage _server_info = {};
 };
-}  // namespace tes::view
+}  // namespace tes::view::data
 
 #endif  // TES_VIEW_NETWORK_THREAD_H

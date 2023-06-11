@@ -2,6 +2,7 @@
 list(APPEND PUBLIC_HEADERS
   # General headers
   AssertRange.h
+  BaseConnection.h
   Bounds.h
   CollatedPacket.h
   CollatedPacketDecoder.h
@@ -16,6 +17,7 @@ list(APPEND PUBLIC_HEADERS
   Endian.h
   Exception.h
   Feature.h
+  FileConnection.h
   IntArg.h
   Log.h
   Maths.h
@@ -101,6 +103,7 @@ list(APPEND PUBLIC_TESSELLATE_HEADERS
 
 
 list(APPEND SOURCES
+  BaseConnection.cpp
   Bounds.cpp
   CollatedPacket.cpp
   CollatedPacketDecoder.cpp
@@ -111,6 +114,7 @@ list(APPEND SOURCES
   Endian.cpp
   Exception.cpp
   Feature.cpp
+  FileConnection.cpp
   Log.cpp
   MathsManip.cpp
   Matrix3.cpp
@@ -170,12 +174,8 @@ list(APPEND SOURCES
 )
 
 list(APPEND PRIVATE_SOURCES
-  private/BaseConnection.cpp
-  private/BaseConnection.h
   private/CollatedPacketZip.cpp
   private/CollatedPacketZip.h
-  private/FileConnection.cpp
-  private/FileConnection.h
   private/TcpConnection.cpp
   private/TcpConnection.h
   private/TcpConnectionMonitor.cpp

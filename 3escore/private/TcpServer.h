@@ -4,7 +4,7 @@
 #ifndef TES_CORE_PRIVATE_TCP_SERVER_H
 #define TES_CORE_PRIVATE_TCP_SERVER_H
 
-#include "../Server.h"
+#include <3escore/Server.h>
 
 //
 #include <3escore/MeshMessages.h>

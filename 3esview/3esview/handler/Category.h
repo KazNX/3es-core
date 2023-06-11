@@ -78,7 +78,7 @@ public:
   void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
             const painter::CategoryState &categories) override;
   void readMessage(PacketReader &reader) override;
-  void serialise(Connection &out, ServerInfoMessage &info) override;
+  void serialise(Connection &out) override;
 
 private:
   /// Ensure the root category is present and has a name.

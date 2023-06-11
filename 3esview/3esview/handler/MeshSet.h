@@ -34,7 +34,7 @@ public:
             const painter::CategoryState &categories) override;
 
   void readMessage(PacketReader &reader) override;
-  void serialise(Connection &out, ServerInfoMessage &info) override;
+  void serialise(Connection &out) override;
 
   /// Compose the object transform from the given object attributes.
   /// @param attrs Object attributes as read from the message payload.

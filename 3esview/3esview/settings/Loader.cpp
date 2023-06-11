@@ -119,37 +119,69 @@ struct Tags
 };
 
 
-bool parse(const ryml::NodeRef &parent, const std::string &key, std::string &value)
+/// Merge to IO codes into the appropriate collective result.
+/// @param a The first code.
+/// @param b The second code.
+/// @return The merged code.
+IOCode mergeCode(IOCode a, IOCode b)
 {
-  if (parent.empty())
-  {
-    return true;
-  }
-
-  const auto key2 = ryml::csubstr(key.c_str(), key.size());
-  const auto node = parent[key2];
-  if (node.empty())
-  {
-    return false;
-  }
-
-  value = std::string(node.val().data(), node.val().size());
-  return true;
+  return static_cast<IOCode>(std::max(static_cast<unsigned>(a), static_cast<unsigned>(b)));
 }
 
 
-bool parse(const ryml::NodeRef &parent, Bool &value)
+std::ostream &append(std::ostream &out)
+{
+  out.flush();
+  if (out.tellp() != 0)
+  {
+    out << "\n";
+  }
+  return out;
+}
+
+
+IOCode parse(const ryml::NodeRef &parent, const std::string &key, std::string &value,
+             std::ostream &log)
 {
   if (parent.empty())
   {
-    return true;
+    append(log) << "Empty parent for: " << key;
+    return IOCode::Partial;
+  }
+
+  const auto key2 = ryml::csubstr(key.c_str(), key.size());
+  if (!parent.has_child(key2))
+  {
+    append(log) << "Missing node: " << key;
+    return IOCode::Partial;
+  }
+
+  const auto node = parent[key2];
+  if (node.empty())
+  {
+    append(log) << "Empty node: " << key;
+    return IOCode::Partial;
+  }
+
+  value = std::string(node.val().data(), node.val().size());
+  return IOCode::Ok;
+}
+
+
+IOCode parse(const ryml::NodeRef &parent, Bool &value, std::ostream &log)
+{
+  if (parent.empty())
+  {
+    append(log) << "Empty parent for: " << value.label();
+    return IOCode::Partial;
   }
 
   const auto key = ryml::csubstr(value.label().c_str(), value.label().size());
   const auto node = parent[key];
   if (node.empty())
   {
-    return false;
+    append(log) << "Empty node: " << value.label();
+    return IOCode::Partial;
   }
 
   std::string str(node.val().data(), node.val().size());
@@ -158,30 +190,34 @@ bool parse(const ryml::NodeRef &parent, Bool &value)
       Tags::Common::trueSet().end())
   {
     value.setValue(true);
-    return true;
+    return IOCode::Ok;
   }
   if (std::find(Tags::Common::falseSet().begin(), Tags::Common::falseSet().end(), str) !=
       Tags::Common::falseSet().end())
   {
     value.setValue(false);
-    return true;
+    return IOCode::Ok;
   }
-  return false;
+
+  append(log) << "Parse error for boolean node: " << value.label() << " <- " << str;
+  return IOCode::Partial;
 }
 
 
-bool parse(const ryml::NodeRef &parent, Colour &value)
+IOCode parse(const ryml::NodeRef &parent, Colour &value, std::ostream &log)
 {
   if (parent.empty())
   {
-    return true;
+    append(log) << "Empty parent for: " << value.label();
+    return IOCode::Partial;
   }
 
   const auto key = ryml::csubstr(value.label().c_str(), value.label().size());
   const auto node = parent[key];
   if (node.empty() || !node.type().is_map())
   {
-    return false;
+    append(log) << "Empty node: " << value.label();
+    return IOCode::Partial;
   }
 
   std::array<ryml::NodeRef, 3> nodes = {
@@ -197,7 +233,8 @@ bool parse(const ryml::NodeRef &parent, Colour &value)
   {
     if (nodes[i].empty())
     {
-      return false;
+      append(log) << "Error parsing colour value: " << value.label();
+      return IOCode::Partial;
     }
     const std::string str(nodes[i].val().data(), nodes[i].val().size());
     std::istringstream in(str);
@@ -205,7 +242,8 @@ bool parse(const ryml::NodeRef &parent, Colour &value)
     in >> channel;
     if (in.bad())
     {
-      return false;
+      append(log) << "Error parsing colour value: " << value.label();
+      return IOCode::Partial;
     }
 
     colour.channel(channels[i]) = static_cast<uint8_t>(channel);
@@ -213,23 +251,32 @@ bool parse(const ryml::NodeRef &parent, Colour &value)
 
   value.setValue(colour);
 
-  return true;
+  return IOCode::Ok;
 }  // namespace
 
 
 template <typename T>
-bool parse(const ryml::NodeRef &parent, Numeric<T> &value)
+IOCode parse(const ryml::NodeRef &parent, Numeric<T> &value, std::ostream &log)
 {
   if (parent.empty())
   {
-    return true;
+    append(log) << "Empty parent for: " << value.label();
+    return IOCode::Partial;
   }
 
+
   const auto key = ryml::csubstr(value.label().c_str(), value.label().size());
+  if (!parent.has_child(key))
+  {
+    append(log) << "Missing node: " << value.label();
+    return IOCode::Partial;
+  }
+
   const auto node = parent[key];
   if (node.empty())
   {
-    return false;
+    append(log) << "Empty node: " << value.label();
+    return IOCode::Partial;
   }
 
   const std::string str(node.val().data(), node.val().size());
@@ -240,26 +287,35 @@ bool parse(const ryml::NodeRef &parent, Numeric<T> &value)
   if (!in.bad())
   {
     value.setValue(temp);
-    return true;
+    return IOCode::Ok;
   }
 
-  return false;
+  log << "Error parsing numeric value for: " << value.label() << " <- " << str;
+  return IOCode::Partial;
 }
 
 
 template <typename E>
-bool parse(const ryml::NodeRef &parent, Enum<E> &value)
+IOCode parse(const ryml::NodeRef &parent, Enum<E> &value, std::ostream &log)
 {
   if (parent.empty())
   {
-    return true;
+    append(log) << "Empty parent for: " << value.label();
+    return IOCode::Partial;
   }
 
   const auto key = ryml::csubstr(value.label().c_str(), value.label().size());
+  if (!parent.has_child(key))
+  {
+    append(log) << "Missing node: " << value.label();
+    return IOCode::Partial;
+  }
+
   const auto node = parent[key];
   if (node.empty())
   {
-    return false;
+    append(log) << "Empty node: " << value.label();
+    return IOCode::Partial;
   }
 
   // use case insensitive compare for enum
@@ -274,32 +330,41 @@ bool parse(const ryml::NodeRef &parent, Enum<E> &value)
     if (str == name)
     {
       value.setValue(named_values[i].first);
-      return true;
+      return IOCode::Ok;
     }
   }
+
+  log << "Error parsing enum value for: " << value.label() << " <- " << str << '\n';
+  log << "Allowed values:\n";
+  std::copy(named_values.begin(), named_values.end(),
+            std::ostream_iterator<std::string>(log, "\n"));
+
   return false;
 }
 
 
 template <typename T>
-bool write(ryml::NodeRef &parent, const T &prop)
+IOCode write(ryml::NodeRef &parent, const T &prop, std::ostream &log)
 {
+  TES_UNUSED(log);
   const auto key = ryml::csubstr(prop.label().c_str(), prop.label().size());
   parent[key] << prop.value();
-  return true;
+  return IOCode::Ok;
 }
 
 
-bool write(ryml::NodeRef &parent, const Bool &prop)
+IOCode write(ryml::NodeRef &parent, const Bool &prop, std::ostream &log)
 {
+  TES_UNUSED(log);
   const auto key = ryml::csubstr(prop.label().c_str(), prop.label().size());
   parent[key] << (prop.value() ? Tags::Common::trueStr() : Tags::Common::falseStr());
-  return true;
+  return IOCode::Ok;
 }
 
 
-bool write(ryml::NodeRef &parent, const Colour &prop)
+IOCode write(ryml::NodeRef &parent, const Colour &prop, std::ostream &log)
 {
+  TES_UNUSED(log);
   const auto key = ryml::csubstr(prop.label().c_str(), prop.label().size());
   auto node = parent[ryml::csubstr(prop.label().c_str(), prop.label().size())];
   node |= ryml::MAP;
@@ -308,159 +373,163 @@ bool write(ryml::NodeRef &parent, const Colour &prop)
   node[Tags::Common::green()] << static_cast<int>(prop.value().green());
   node[Tags::Common::blue()] << static_cast<int>(prop.value().blue());
 
-  return true;
+  return IOCode::Ok;
 }
 
 template <typename T>
-bool parse(const ryml::NodeRef &parent, T &prop)
+IOCode parse(const ryml::NodeRef &parent, T &prop, std::ostream &log)
 {
-  return parse(parent[prop.label()], prop);
+  return parse(parent[prop.label()], prop, log);
 }
 
 
-bool load(const ryml::NodeRef &node, Camera &camera)
+IOCode load(const ryml::NodeRef &node, Camera &camera, std::ostream &log)
 {
-  bool ok = true;
-  ok = parse(node, camera.invert_y) && ok;
-  ok = parse(node, camera.allow_remote_settings) && ok;
-  ok = parse(node, camera.near_clip) && ok;
-  ok = parse(node, camera.far_clip) && ok;
-  ok = parse(node, camera.fov) && ok;
+  auto code = IOCode::Ok;
+  code = mergeCode(parse(node, camera.invert_y, log), code);
+  code = mergeCode(parse(node, camera.allow_remote_settings, log), code);
+  code = mergeCode(parse(node, camera.near_clip, log), code);
+  code = mergeCode(parse(node, camera.far_clip, log), code);
+  code = mergeCode(parse(node, camera.fov, log), code);
 
-  return ok;
+  return code;
 }
 
 
-bool save(ryml::NodeRef node, const Camera &camera)
+IOCode save(ryml::NodeRef node, const Camera &camera, std::ostream &log)
 {
-  bool ok = true;
+  auto code = IOCode::Ok;
   node |= ryml::MAP;
-  ok = write(node, camera.invert_y) && ok;
-  ok = write(node, camera.allow_remote_settings) && ok;
-  ok = write(node, camera.near_clip) && ok;
-  ok = write(node, camera.far_clip) && ok;
-  ok = write(node, camera.fov) && ok;
+  code = mergeCode(write(node, camera.invert_y, log), code);
+  code = mergeCode(write(node, camera.allow_remote_settings, log), code);
+  code = mergeCode(write(node, camera.near_clip, log), code);
+  code = mergeCode(write(node, camera.far_clip, log), code);
+  code = mergeCode(write(node, camera.fov, log), code);
 
-  return ok;
+  return code;
 }
 
 
-bool load(const ryml::NodeRef &node, Log &log)
+IOCode load(const ryml::NodeRef &node, Log &log_config, std::ostream &log)
 {
-  bool ok = true;
-  ok = parse(node, log.log_window_size) && ok;
-  return ok;
+  auto code = IOCode::Ok;
+  code = mergeCode(parse(node, log_config.log_window_size, log), code);
+  return code;
 }
 
 
-bool save(ryml::NodeRef &node, const Log &log)
+IOCode save(ryml::NodeRef &node, const Log &log_settings, std::ostream &log)
 {
-  bool ok = true;
+  auto code = IOCode::Ok;
   node |= ryml::MAP;
-  ok = write(node, log.log_window_size) && ok;
-  return ok;
+  code = mergeCode(write(node, log_settings.log_window_size, log), code);
+  return code;
 }
 
 
-bool load(const ryml::NodeRef &node, Playback &playback)
+IOCode load(const ryml::NodeRef &node, Playback &playback, std::ostream &log)
 {
-  bool ok = true;
-  ok = parse(node, playback.allow_key_frames) && ok;
-  ok = parse(node, playback.keyframe_every_mib) && ok;
-  ok = parse(node, playback.keyframe_every_frames) && ok;
-  ok = parse(node, playback.keyframe_skip_forward_frames) && ok;
-  ok = parse(node, playback.keyframe_compression) && ok;
-  ok = parse(node, playback.looping) && ok;
-  ok = parse(node, playback.pause_on_error) && ok;
-  return ok;
+  auto code = IOCode::Ok;
+  code = mergeCode(parse(node, playback.allow_key_frames, log), code);
+  code = mergeCode(parse(node, playback.keyframe_every_mib, log), code);
+  code = mergeCode(parse(node, playback.keyframe_every_frames, log), code);
+  code = mergeCode(parse(node, playback.keyframe_min_separation, log), code);
+  code = mergeCode(parse(node, playback.keyframe_compression, log), code);
+  code = mergeCode(parse(node, playback.looping, log), code);
+  code = mergeCode(parse(node, playback.pause_on_error, log), code);
+  return code;
 }
 
 
-bool load(const ryml::NodeRef &node, Connection &connection)
+IOCode load(const ryml::NodeRef &node, Connection &connection, std::ostream &log)
 {
-  bool ok = true;
-
   connection.history.clear();
-  if (!node.empty())
+  if (node.empty())
   {
-    if (node.has_child(Tags::Connection::history()))
+    append(log) << "Empty node: " << Tags::Root::connection().data();
+    return IOCode::Partial;
+  }
+
+  auto code = IOCode::Ok;
+  if (node.has_child(Tags::Connection::history()))
+  {
+    const auto history_node = node[Tags::Connection::history()];
+    // Read history sequence.
+    if (history_node.empty() && history_node.is_seq())
     {
-      const auto history_node = node[Tags::Connection::history()];
-      // Read history sequence.
-      if (!history_node.empty() && history_node.is_seq())
-      {
-        for (auto &&child : history_node.children())
-        {
-          std::string host;
-          UInt port = { Tags::Connection::port().data(), 0, "" };
-          bool item_ok = true;
-          item_ok = parse(child, Tags::Connection::host().data(), host) && item_ok;
-          item_ok = parse(child, port) && item_ok;
-
-          if (!item_ok)
-          {
-            ok = false;
-            continue;
-          }
-
-          connection.history.emplace_back(host, static_cast<uint16_t>(port.value()));
-        }
-      }
+      code = mergeCode(IOCode::Partial, code);
+      append(log) << "Empty node: " << Tags::Connection::history().data();
     }
     else
     {
-      ok = false;
+      for (auto &&child : history_node.children())
+      {
+        std::string host;
+        UInt port = { Tags::Connection::port().data(), 0, "" };
+        auto item_code = IOCode::Ok;
+        item_code = mergeCode(parse(child, Tags::Connection::host().data(), host, log), item_code);
+        item_code = mergeCode(parse(child, port, log), item_code);
+
+        if (item_code == IOCode::Ok)
+        {
+          connection.history.emplace_back(host, static_cast<uint16_t>(port.value()));
+        }
+
+        code = mergeCode(item_code, code);
+      }
     }
   }
 
-  return ok;
+  return code;
 }
 
 
-bool save(ryml::NodeRef &node, const Playback &playback)
+IOCode save(ryml::NodeRef &node, const Playback &playback, std::ostream &log)
 {
-  bool ok = true;
+  auto code = IOCode::Ok;
   node |= ryml::MAP;
-  ok = write(node, playback.allow_key_frames) && ok;
-  ok = write(node, playback.keyframe_every_mib) && ok;
-  ok = write(node, playback.keyframe_every_frames) && ok;
-  ok = write(node, playback.keyframe_skip_forward_frames) && ok;
-  ok = write(node, playback.keyframe_compression) && ok;
-  ok = write(node, playback.looping) && ok;
-  ok = write(node, playback.pause_on_error) && ok;
-  return ok;
+  code = mergeCode(write(node, playback.allow_key_frames, log), code);
+  code = mergeCode(write(node, playback.keyframe_every_mib, log), code);
+  code = mergeCode(write(node, playback.keyframe_every_frames, log), code);
+  code = mergeCode(write(node, playback.keyframe_min_separation, log), code);
+  code = mergeCode(write(node, playback.keyframe_compression, log), code);
+  code = mergeCode(write(node, playback.looping, log), code);
+  code = mergeCode(write(node, playback.pause_on_error, log), code);
+  return code;
 }
 
 
-bool load(const ryml::NodeRef &node, Render &render)
+IOCode load(const ryml::NodeRef &node, Render &render, std::ostream &log)
 {
-  bool ok = true;
-  ok = parse(node, render.use_edl_shader) && ok;
-  ok = parse(node, render.edl_radius) && ok;
-  ok = parse(node, render.edl_exponential_scale) && ok;
-  ok = parse(node, render.edl_linear_scale) && ok;
-  ok = parse(node, render.point_size) && ok;
-  ok = parse(node, render.background_colour) && ok;
-  return ok;
+  auto code = IOCode::Ok;
+  code = mergeCode(parse(node, render.use_edl_shader, log), code);
+  code = mergeCode(parse(node, render.edl_radius, log), code);
+  code = mergeCode(parse(node, render.edl_exponential_scale, log), code);
+  code = mergeCode(parse(node, render.edl_linear_scale, log), code);
+  code = mergeCode(parse(node, render.point_size, log), code);
+  code = mergeCode(parse(node, render.background_colour, log), code);
+  return code;
 }
 
 
-bool save(ryml::NodeRef &node, const Render &render)
+IOCode save(ryml::NodeRef &node, const Render &render, std::ostream &log)
 {
-  bool ok = true;
+  auto code = IOCode::Ok;
   node |= ryml::MAP;
-  ok = write(node, render.use_edl_shader) && ok;
-  ok = write(node, render.edl_radius) && ok;
-  ok = write(node, render.edl_exponential_scale) && ok;
-  ok = write(node, render.edl_linear_scale) && ok;
-  ok = write(node, render.point_size) && ok;
-  ok = write(node, render.background_colour) && ok;
-  return ok;
+  code = mergeCode(write(node, render.use_edl_shader, log), code);
+  code = mergeCode(write(node, render.edl_radius, log), code);
+  code = mergeCode(write(node, render.edl_exponential_scale, log), code);
+  code = mergeCode(write(node, render.edl_linear_scale, log), code);
+  code = mergeCode(write(node, render.point_size, log), code);
+  code = mergeCode(write(node, render.background_colour, log), code);
+  return code;
 }
 
-bool save(ryml::NodeRef &node, const Connection &connection)
+
+IOCode save(ryml::NodeRef &node, const Connection &connection, std::ostream &log)
 {
-  bool ok = true;
+  TES_UNUSED(log);
+  auto code = IOCode::Ok;
 
   node |= ryml::MAP;
 
@@ -478,8 +547,10 @@ bool save(ryml::NodeRef &node, const Connection &connection)
     }
   }
 
-  return ok;
+  return code;
 }
+
+
 std::filesystem::path userConfigPath()
 {
   std::array<char, 1024> user_config_path;
@@ -492,18 +563,18 @@ std::filesystem::path userConfigPath()
 }  // namespace
 
 
-bool load(Settings::Config &config)
+IOResult load(Settings::Config &config)
 {
   return load(config, userConfigPath());
 }
 
 
-bool load(Settings::Config &config, const std::filesystem::path &path)
+IOResult load(Settings::Config &config, const std::filesystem::path &path)
 {
   std::ifstream in_file(path.c_str(), std::ios::binary);
   if (!in_file.is_open())
   {
-    return false;
+    return { IOCode::Error, "Failed to read file " + path.string() };
   }
 
   in_file.seekg(0, std::ios_base::end);
@@ -517,71 +588,76 @@ bool load(Settings::Config &config, const std::filesystem::path &path)
 
   if (doc.empty())
   {
-    return true;
+    return { IOCode::Ok, {} };
   }
 
   const auto root = doc.rootref();
   if (root.empty())
   {
-    return true;
+    return { IOCode::Ok, {} };
   }
 
-  bool ok = true;
+  IOCode code = IOCode::Ok;
+  std::ostringstream log_stream;
   if (root.has_child(Tags::Root::camera()))
   {
-    ok = load(root[Tags::Root::camera()], config.camera) && ok;
+    code = mergeCode(load(root[Tags::Root::camera()], config.camera, log_stream), code);
   }
   if (root.has_child(Tags::Root::log()))
   {
-    ok = load(root[Tags::Root::log()], config.log) && ok;
+    code = mergeCode(load(root[Tags::Root::log()], config.log, log_stream), code);
   }
   if (root.has_child(Tags::Root::playback()))
   {
-    ok = load(root[Tags::Root::playback()], config.playback) && ok;
+    code = mergeCode(load(root[Tags::Root::playback()], config.playback, log_stream), code);
   }
   if (root.has_child(Tags::Root::render()))
   {
-    ok = load(root[Tags::Root::render()], config.render) && ok;
+    code = mergeCode(load(root[Tags::Root::render()], config.render, log_stream), code);
   }
   if (root.has_child(Tags::Root::connection()))
   {
-    ok = load(root[Tags::Root::connection()], config.connection) && ok;
+    code = mergeCode(load(root[Tags::Root::connection()], config.connection, log_stream), code);
   }
-  return ok;
+
+  log_stream.flush();
+  return { code, log_stream.str() };
 }
 
 
-bool save(const Settings::Config &config)
+IOResult save(const Settings::Config &config)
 {
   return save(config, userConfigPath());
 }
 
 
-bool save(const Settings::Config &config, const std::filesystem::path &path)
+IOResult save(const Settings::Config &config, const std::filesystem::path &path)
 {
   std::ofstream out_file(path.c_str(), std::ios::binary);
   if (!out_file.is_open())
   {
-    return false;
+    return { IOCode::Error, "Unable to write settings file " + path.string() };
   }
 
   ryml::Tree doc;
-  bool ok = true;
+  auto code = IOCode::Ok;
+  std::ostringstream log_stream;
 
   auto root = doc.rootref();
   // Mark root as a map.
   root |= ryml::MAP;
 
-  ok = save(root[Tags::Root::camera()], config.camera) && ok;
-  ok = save(root[Tags::Root::log()], config.log) && ok;
-  ok = save(root[Tags::Root::playback()], config.playback) && ok;
-  ok = save(root[Tags::Root::render()], config.render) && ok;
-  ok = save(root[Tags::Root::connection()], config.connection) && ok;
+  code = mergeCode(save(root[Tags::Root::camera()], config.camera, log_stream), code);
+  code = mergeCode(save(root[Tags::Root::log()], config.log, log_stream), code);
+  code = mergeCode(save(root[Tags::Root::playback()], config.playback, log_stream), code);
+  code = mergeCode(save(root[Tags::Root::render()], config.render, log_stream), code);
+  code = mergeCode(save(root[Tags::Root::connection()], config.connection, log_stream), code);
 
   out_file << doc;
   out_file.flush();
   out_file.close();
 
-  return ok;
+  log_stream.flush();
+  return { code, log_stream.str() };
 }
 }  // namespace tes::view::settings

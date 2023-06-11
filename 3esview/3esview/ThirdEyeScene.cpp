@@ -32,6 +32,7 @@
 #include "shaders/VertexColour.h"
 #include "shaders/VoxelGeom.h"
 
+#include <3escore/FileConnection.h>
 #include <3escore/Log.h>
 
 #include <Magnum/GL/Context.h>
@@ -182,14 +183,20 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
       _new_server_info = false;
     }
 
-    _render_stamp.frame_number = _new_frame;
-    _have_new_frame = false;
-
-    for (auto &handler : _ordered_message_handlers)
+    if (_have_new_frame)
     {
-      handler->prepareFrame(_render_stamp);
+      _render_stamp.frame_number = _new_frame;
+      _have_new_frame = false;
+
+      for (auto &handler : _ordered_message_handlers)
+      {
+        handler->prepareFrame(_render_stamp);
+      }
     }
   }
+
+  // Handle any waiting snapshot.
+  handlePendingSnapshot();
 
   const auto categories = *_category_handler->categories();
   const DrawParams params(_camera, window_size);
@@ -274,6 +281,52 @@ void ThirdEyeScene::processMessage(PacketReader &packet)
     }
     _unknown_handlers.emplace(packet.routingId());
   }
+}
+
+
+void ThirdEyeScene::handlePendingSnapshot()
+{
+  std::unique_lock guard(_snapshot_wait.mutex);
+  if (_snapshot_wait.waiting == SnapshotState::Waiting)
+  {
+    _snapshot_wait.frame_number = _render_stamp.frame_number;
+    if (saveCurrentFrameSnapshot(_snapshot_wait.path))
+    {
+      _snapshot_wait.waiting = SnapshotState::Success;
+    }
+    else
+    {
+      _snapshot_wait.waiting = SnapshotState::Failed;
+    }
+
+    guard.unlock();
+    _snapshot_wait.signal.notify_all();
+  }
+}
+
+
+std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(const std::filesystem::path &path)
+{
+  std::unique_lock guard(_snapshot_wait.mutex);
+  if (std::this_thread::get_id() == _main_thread_id)
+  {
+    // Main thread. Save now.
+    const bool ok = saveCurrentFrameSnapshot(path);
+    return { ok, _render_stamp.frame_number };
+  }
+
+  // Block until signalled on the wait condition.
+  _snapshot_wait.path = path;
+  _snapshot_wait.waiting = SnapshotState::Waiting;
+  while (_snapshot_wait.waiting == SnapshotState::Waiting)
+  {
+    _snapshot_wait.signal.wait(
+      guard, [this]() { return _snapshot_wait.waiting != SnapshotState::Waiting; });
+  }
+
+  const bool ok = _snapshot_wait.waiting == SnapshotState::Success;
+  _snapshot_wait.waiting = SnapshotState::None;
+  return { ok, _snapshot_wait.frame_number };
 }
 
 
@@ -574,12 +627,39 @@ void ThirdEyeScene::onCameraConfigChange(const settings::Settings::Config &confi
 }
 
 
+bool ThirdEyeScene::saveCurrentFrameSnapshot(const std::filesystem::path &path)
+{
+  // Note(KS): The server settings are irrelevant for a file connection. We can use teh default.
+  // Arguably this implies the Connection constructor should be refactored.
+  FileConnection out(path.string(), ServerSettings());
+  // Write the server info message. We don't need a frame count.
+  out.sendServerInfo(_server_info);
+  for (const auto &handler : _ordered_message_handlers)
+  {
+    handler->serialise(out);
+  }
+  out.updateTransfers(0);
+  out.updateFrame(0.0f, true);
+  out.close();
+  return true;
+}
+
+
 void ThirdEyeScene::restoreSettings()
 {
   settings::Settings::Config config = {};
-  if (settings::load(config))
+  const auto io_result = settings::load(config);
+  if (io_result.code != settings::IOCode::Error)
   {
+    if (!io_result.message.empty())
+    {
+      tes::log::info(io_result.message);
+    }
     _settings.update(config);
+  }
+  else if (!io_result.message.empty())
+  {
+    tes::log::warn(io_result.message);
   }
 }
 
@@ -587,6 +667,17 @@ void ThirdEyeScene::restoreSettings()
 void ThirdEyeScene::storeSettings()
 {
   const auto config = _settings.config();
-  settings::save(config);
+  const auto io_result = settings::save(config);
+  if (!io_result.message.empty())
+  {
+    if (io_result.code == settings::IOCode::Ok)
+    {
+      tes::log::info(io_result.message);
+    }
+    else
+    {
+      tes::log::warn(io_result.message);
+    }
+  }
 }
 }  // namespace tes::view

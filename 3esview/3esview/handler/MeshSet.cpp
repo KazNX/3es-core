@@ -198,9 +198,8 @@ void MeshSet::readMessage(PacketReader &reader)
 }
 
 
-void MeshSet::serialise(Connection &out, ServerInfoMessage &info)
+void MeshSet::serialise(Connection &out)
 {
-  (void)info;
   const std::lock_guard guard(_mutex);
 
   for (auto &[id, shape] : _shapes)

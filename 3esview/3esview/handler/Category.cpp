@@ -91,9 +91,8 @@ void Category::readMessage(PacketReader &reader)
 }
 
 
-void Category::serialise(Connection &out, ServerInfoMessage &info)
+void Category::serialise(Connection &out)
 {
-  (void)info;
   std::lock_guard guard(_mutex);
   CategoryNameMessage msg = {};
   const std::string error_str = "<error>";

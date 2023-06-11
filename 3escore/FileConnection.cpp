@@ -3,7 +3,7 @@
 //
 #include "FileConnection.h"
 
-#include <3escore/StreamUtil.h>
+#include "StreamUtil.h"
 
 #include <mutex>
 
