@@ -8,7 +8,14 @@
 #include "ThirdEyeScene.h"
 
 #include <filesystem>
+#include <functional>
 #include <optional>
+
+namespace cxxopts
+{
+class Options;
+class ParseResult;
+}  // namespace cxxopts
 
 namespace tes::view
 {
@@ -33,17 +40,117 @@ class DataThread;
 
 class ViewerLog;
 
-class TES_VIEWER_API Viewer : public Magnum::Platform::Application
+/// Structure into which we parse command line options.
+///
+/// This can be dervied for @c Viewer derivations to add their own command line options.
+///
+/// On constructing the @c Viewer, a @c CommandLineOptions object is created in the @c ViewArguments
+/// according to the factory function passed to in - either an instance of this class or a
+/// derivation thereof.
+///
+/// Once created, a @c CommandLineOptions object as the @c parse() function called. This calls the
+/// @c addOptions() virtual function to add command line options. Derivations should override this
+/// function, first calling the super class version, then adding their own command line options.
+///
+/// After parsing the @c validate() function is called to ensure the configuration is correct.
+struct TES_VIEWER_API CommandLineOptions
 {
-public:
-  using Clock = std::chrono::steady_clock;
+  /// Indicates how to start the @c Viewer application.
+  enum class StartupMode
+  {
+    /// An error has occured parsing the command line options. Best to show help and quit.
+    Error,
+    /// Normal UI startup mode.
+    Normal,
+    /// Show help and exit.
+    Help,
+    /// Start the UI and open a file.
+    File,
+    /// Start the UI and open a network connection.
+    Host
+  };
+
+  struct ServerEndPoint
+  {
+    std::string host;
+    uint16_t port = CommandLineOptions::defaultPort();
+  };
 
   /// Get the default 3es server port.
   /// @return The default server port for 3es.
   [[nodiscard]] static uint16_t defaultPort();
 
-  explicit Viewer(const Arguments &arguments);
-  Viewer(const Arguments &arguments, const std::vector<settings::Extension> &extended_settings);
+  std::string filename;
+  ServerEndPoint server;
+
+  log::Level console_log_level = log::Level::Warn;
+
+  CommandLineOptions() = default;
+  CommandLineOptions(const CommandLineOptions &other) = default;
+  CommandLineOptions(CommandLineOptions &&other) = default;
+  virtual ~CommandLineOptions() = default;
+
+  CommandLineOptions &operator=(const CommandLineOptions &other) = default;
+  CommandLineOptions &operator=(CommandLineOptions &&other) = default;
+
+  /// Called to parse the command line options.
+  /// @param argc Command line option count - from @c main().
+  /// @param argv Command line arguments - from @c main().
+  /// @return The startup mode for the viewer.
+  StartupMode parse(int argc, char **argv);
+
+protected:
+  virtual void addOptions(cxxopts::Options &parser);
+  virtual bool validate(const cxxopts::ParseResult &parsed);
+};
+
+/// Command line arguments handler for @c Viewer.
+///
+/// This class is responsile for creating a @c CommandLineOptions object matching the command line
+/// arguments.
+///
+/// The default implementation parses and returns a @c CommandLineOptions object. @c Viewer
+/// derivations needing specialised @c CommandLineOptions should:
+///
+/// 1. Derive this class and implement a constructor @c MyViewArguments(int&,char**) which invokes
+///   @c ViewArguments(int&,char**,OptionFactory)
+/// 2. Pass an @c OptionFactory to the constructor above which creates the appropriate derivation of
+///    @c CommandLineOptions
+/// 3. Implement @c MyViewArguments::addOptions() and @c MyViewArguments::validate() .
+/// 4. Implement the dervied @c Viewer constructor with the signature
+///    `MyViewer(const MyViewArguments &)`.
+struct TES_VIEWER_API ViewArguments : Magnum::Platform::Application::Arguments
+{
+  using Super = Magnum::Platform::Application::Arguments;
+  using OptionFactory = std::function<std::unique_ptr<CommandLineOptions>()>;
+
+  ViewArguments(int &argc, char **argv) noexcept
+    : ViewArguments(argc, argv, []() { return std::make_unique<CommandLineOptions>(); })
+  {}
+
+  ViewArguments(int &argc, char **argv, OptionFactory option_factory) noexcept
+    : Super(argc, argv)
+    , _option_factory(std::move(option_factory))
+  {}
+
+  std::unique_ptr<CommandLineOptions> parseArgs(CommandLineOptions::StartupMode &startup_mode) const
+  {
+    auto opts = _option_factory();
+    startup_mode = opts->parse(argc, argv);
+    return opts;
+  }
+
+private:
+  OptionFactory _option_factory;
+};
+
+class TES_VIEWER_API Viewer : public Magnum::Platform::Application
+{
+public:
+  using Clock = std::chrono::steady_clock;
+
+  explicit Viewer(const ViewArguments &arguments);
+  Viewer(const ViewArguments &arguments, const std::vector<settings::Extension> &extended_settings);
   ~Viewer();
 
   [[nodiscard]] std::shared_ptr<ThirdEyeScene> tes() const { return _tes; }
@@ -70,6 +177,11 @@ public:
 
   [[nodiscard]] ViewerLog &logger() { return *_logger; }
   [[nodiscard]] const ViewerLog &logger() const { return *_logger; }
+
+  [[nodiscard]] const CommandLineOptions &commandLineOptions() const
+  {
+    return *_command_line_options;
+  }
 
 protected:
   /// Return value for @c onDrawStart()
@@ -118,28 +230,6 @@ private:
     Radius
   };
 
-  struct CommandLineOptions
-  {
-    std::string filename;
-    std::string host;
-    uint16_t port = Viewer::defaultPort();
-  };
-
-  /// Return values from @c handleStartupArgs() which indicate what how to start.
-  enum class StartupMode
-  {
-    /// An error has occured parsing the command line options. Best to show help and quit.
-    Error,
-    /// Normal UI startup mode.
-    Normal,
-    /// Show help and exit.
-    Help,
-    /// Start the UI and open a file.
-    File,
-    /// Start the UI and open a network connection.
-    Host
-  };
-
   bool checkEdlKeys(KeyEvent &event);
 
   void updateCamera(float dt, bool allow_user_input);
@@ -148,8 +238,7 @@ private:
   void checkShortcuts(KeyEvent &event);
   static bool checkShortcut(const command::Shortcut &shortcut, const KeyEvent &event);
 
-  StartupMode parseStartupArgs(const Arguments &arguments, CommandLineOptions &opt);
-  bool handleStartupArgs(const Arguments &arguments);
+  bool handleStartupArgs(CommandLineOptions::StartupMode startup_mode);
 
   /// Update keyframes to the @c _data_thread if it's a @c StreamThread .
   /// @param config New playback settings. Only keyframe settings are used.
@@ -184,6 +273,8 @@ private:
 
   std::vector<KeyAxis> _move_keys;
   std::vector<KeyAxis> _rotate_keys;
+
+  std::unique_ptr<CommandLineOptions> _command_line_options;
 };
 }  // namespace tes::view
 

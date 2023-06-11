@@ -33,7 +33,7 @@ public:
     /// Check if this entry is relevant at the given log level.
     /// @param filter_level The log level of interest.
     /// @return True if relevant.
-    inline bool isRelevant(log::Level filter_level) const
+    [[nodiscard]] bool isRelevant(log::Level filter_level) const
     {
       return static_cast<int>(level) <= static_cast<int>(filter_level);
     }
@@ -106,14 +106,14 @@ public:
 
       /// Dereference operator.
       /// @return The current log @c Entry.
-      const Entry &operator*() const { return _log->_lines[_cursor]; }
+      [[nodiscard]] const Entry &operator*() const { return _log->_lines[_cursor]; }
       /// Dereference operator.
       /// @return The current log @c Entry.
-      const Entry *operator->() const { return &_log->_lines[_cursor]; }
+      [[nodiscard]] const Entry *operator->() const { return &_log->_lines[_cursor]; }
 
       /// Check if the current entry is relevant at the specified @p filter_level.
       /// @param filter_level The filter level of interest.
-      bool isRelevant(log::Level filter_level) const
+      [[nodiscard]] bool isRelevant(log::Level filter_level) const
       {
         return _log->_lines[_cursor].isRelevant(filter_level);
       }
@@ -139,7 +139,7 @@ public:
       /// @param count The number of items to move on by. Must be >= 1
       void next(size_t count = 1);
       /// True if the @c end item has been reached.
-      bool atEnd() const { return !_begin && _cursor == _log->endIndex(); }
+      [[nodiscard]] bool atEnd() const { return !_begin && _cursor == _log->endIndex(); }
 
       const ViewerLog *_log = nullptr;
       size_t _cursor = 0;
@@ -184,14 +184,14 @@ public:
 
     /// Is this a valid view - i.e., does it have a target log?
     /// @return True when valid.
-    inline bool isValid() const { return _log != nullptr; }
+    [[nodiscard]] bool isValid() const { return _log != nullptr; }
 
     /// Get an iterator to the first item in the log.
     ///
     /// The view filter is installed if used, ensuring the first item is the first relevant item.
     /// @return An iterator to the first item. Matches @c end() when the log is empty or there are
     /// no relevant items at the current filter level.
-    const_iterator begin() const
+    [[nodiscard]] const_iterator begin() const
     {
       if (_filter_level == log::Level::Trace)
       {
@@ -203,14 +203,20 @@ public:
 
     /// Get an iterator to the end item.
     /// @return The end iterator.
-    const_iterator end() const { return const_iterator(_log, _log->endIndex(), false); }
+    [[nodiscard]] const_iterator end() const
+    {
+      return const_iterator(_log, _log->endIndex(), false);
+    }
 
     /// Return the number of (relevant filtered) items in the log view.
     ///
     /// The filtered log size is calcualted on first call.
     ///
     /// @return The number of items in the view.
-    size_t size() const { return (_filtered_size != kInvalidSize) ? kInvalidSize : calcSize(); }
+    [[nodiscard]] size_t size() const
+    {
+      return (_filtered_size != kInvalidSize) ? kInvalidSize : calcSize();
+    }
 
     /// Release the view, unlocking the log mutex and invalidating the view.
     ///
@@ -257,19 +263,73 @@ public:
                  size_t max_items) const;
 
   /// Attain a view into the log. This locks the log from writing or further viewing.
-  View view() const { return View(*this); }
+  [[nodiscard]] View view() const { return View(*this); }
 
   /// Attain a filtered log view showing only messages up to the given level.
-  View view(log::Level filter_level) const { return View(*this, filter_level); }
+  [[nodiscard]] View view(log::Level filter_level) const { return View(*this, filter_level); }
 
   /// Change the lost history size to the given number of lines.
   void setMaxLines(size_t new_max_lines);
   /// Query the log history size as a maximum number of lines to store.
-  size_t maxLines() const { return _max_lines; }
+  [[nodiscard]] size_t maxLines() const { return _max_lines; }
+
+  /// Set console logging flag.
+  ///
+  /// This uses @c stdout and @c stderr .
+  ///
+  /// @param level The minimum logging level to output to console.
+  void setConsoleLogLevel(log::Level level) { _console_log_level = level; }
+  /// Check if console logging is on.
+  [[nodiscard]] log::Level consoleLogLevel() const { return _console_log_level; }
 
 private:
   friend View;
   friend View::const_iterator;
+
+  /// Log level stored as an atomic variable; may be used for thread safe read/write of a log level
+  /// variable.
+  ///
+  /// The class supports implicit conversion to/from @c log::Level .
+  class LogLevel
+  {
+  public:
+    /// Default constructor: initialises to @c log::Level::Fatal .
+    LogLevel() = default;
+    /// Construct from a @c log::Level .
+    ///
+    /// This constructor is delibrately not @c explicit to allow implicit conversion.
+    /// @param log_level The log level to initialise with.
+    LogLevel(log::Level log_level)  // NOLINT(google-explicit-constructor)
+      : level(static_cast<int>(log_level))
+    {}
+    LogLevel(const LogLevel &other) = default;
+    LogLevel(LogLevel &&other) = default;
+    ~LogLevel() = default;
+
+    LogLevel &operator=(const LogLevel &other) = default;
+    LogLevel &operator=(LogLevel &&other) = default;
+
+    /// Assignment from a @c log::Level .
+    /// @param log_level The log level to assign.
+    /// @return @c *this
+    LogLevel &operator=(log::Level log_level)
+    {
+      level = static_cast<int>(log_level);
+      return *this;
+    }
+
+    /// Cast operator to a @c log::Level.
+    /// @return The curent log level.
+    operator log::Level() const { return toEnum(); }
+
+    /// Explicit function conversion to a @c log::Level.
+    /// @return The curent log level.
+    log::Level toEnum() const { return static_cast<log::Level>(level.load()); }
+
+  private:
+    /// Atomic integer storing the log level. Direct read/write is not advised.
+    std::atomic_int level = static_cast<int>(log::Level::Fatal);
+  };
 
   /// Get the index of the @c begin entry.
   size_t beginIndex() const { return (_count < _max_lines) ? 0 : _next_index; }
@@ -289,6 +349,8 @@ private:
   /// Maximum number of lines allowed.
   size_t _max_lines = kDefaultMaxLines;
   mutable std::mutex _mutex;
+  /// Minimum allowed log level to console
+  LogLevel _console_log_level = { log::Level::Warn };
 };
 
 

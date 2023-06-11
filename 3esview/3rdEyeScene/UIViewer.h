@@ -21,7 +21,50 @@ class Panel;
 
 namespace tes::view
 {
-class TES_VIEWER_API UIViewer : public Viewer
+/// Command line option extensions for @c UIViewer.
+struct UICommandLineOptions : CommandLineOptions
+{
+  using Super = CommandLineOptions;
+
+  struct Window
+  {
+    Magnum::Vector2i size = {};
+    bool use_height = false;
+    bool use_width = false;
+  };
+
+  Window window = {};
+
+  UICommandLineOptions() = default;
+  UICommandLineOptions(const UICommandLineOptions &other) = default;
+  UICommandLineOptions(UICommandLineOptions &&other) = default;
+  ~UICommandLineOptions() override = default;
+
+  UICommandLineOptions &operator=(const UICommandLineOptions &other) = default;
+  UICommandLineOptions &operator=(UICommandLineOptions &&other) = default;
+
+protected:
+  void addOptions(cxxopts::Options &parser) override;
+  bool validate(const cxxopts::ParseResult &parsed) override;
+};
+
+struct UIViewArguments : ViewArguments
+{
+  using Super = ViewArguments;
+
+  UIViewArguments(int &argc, char **argv) noexcept
+    : UIViewArguments(argc, argv, []() -> std::unique_ptr<CommandLineOptions> {
+      return std::make_unique<UICommandLineOptions>();
+    })
+  {}
+
+  UIViewArguments(int &argc, char **argv, ViewArguments::OptionFactory option_factory) noexcept
+    : Super(argc, argv, std::move(option_factory))
+  {}
+};
+
+/// A @c Viewer extension that uses the @c Magnum integration of @c ImGui for UI rendering.
+class UIViewer : public Viewer
 {
 public:
   class GuiContext
@@ -43,7 +86,7 @@ public:
     ImGuiContext *_restore = nullptr;
   };
 
-  explicit UIViewer(const Arguments &arguments);
+  explicit UIViewer(const UIViewArguments &arguments);
   ~UIViewer();
 
   [[nodiscard]] bool uiEnabled() const { return _ui_enabled; }
@@ -68,7 +111,13 @@ private:
   void initialiseHud();
   void initialiseIconBarUi();
   void initialisePlaybackUi();
-  void updateWindowSize(const settings::Settings::Config &config);
+  void updateWindowSize(const settings::Settings::Config &config,
+                        const UICommandLineOptions *command_line_options);
+  void updateWindowSize(const settings::Settings::Config &config)
+  {
+    updateWindowSize(config, nullptr);
+  }
+
 
   Magnum::ImGuiIntegration::Context _imgui{ Magnum::NoCreate };
   std::vector<std::shared_ptr<ui::Panel>> _panels;

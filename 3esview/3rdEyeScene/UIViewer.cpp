@@ -19,6 +19,10 @@
 #include <3esview/ThirdEyeScene.h>
 #include <3esview/settings/Settings.h>
 
+#include <cxxopts.hpp>
+
+#include <iostream>
+
 namespace tes::view
 {
 namespace
@@ -76,6 +80,45 @@ protected:
 };
 
 
+void UICommandLineOptions::addOptions(cxxopts::Options &parser)
+{
+  Super::addOptions(parser);
+
+  // clang-format off
+  parser.add_options("Window")
+    ("height", "Initial window width.", cxxopts::value(window.size.y()))
+    ("width", "Initial window height.", cxxopts::value(window.size.x()))
+    ;
+  // clang-format on
+}
+
+
+bool UICommandLineOptions::validate(const cxxopts::ParseResult &parsed)
+{
+  if (!Super::validate(parsed))
+  {
+    return false;
+  }
+
+  window.use_height = parsed.count("height") > 0;
+  window.use_width = parsed.count("width") > 0;
+
+  if (window.use_width && window.size.x() <= 0)
+  {
+    std::cerr << "Invalid window width: " << window.size.x() << std::endl;
+    return false;
+  }
+
+  if (window.use_height && window.size.y() <= 0)
+  {
+    std::cerr << "Invalid window height: " << window.size.y() << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+
 UIViewer::GuiContext::GuiContext(ImGuiContext *context)
   : _current(context)
 {
@@ -90,7 +133,7 @@ UIViewer::GuiContext::~GuiContext()
 }
 
 
-UIViewer::UIViewer(const Arguments &arguments)
+UIViewer::UIViewer(const UIViewArguments &arguments)
   : Viewer(arguments, buildExtendedSettings())
 {
   _imgui = Magnum::ImGuiIntegration::Context(Magnum::Vector2{ windowSize() } / dpiScaling(),
@@ -99,7 +142,7 @@ UIViewer::UIViewer(const Arguments &arguments)
   commands()->registerCommand(std::make_shared<ToggleUI>(), command::Shortcut("F2"));
   const auto config = tes()->settings().config();
   // Settings will have been restored at this point. Set the window size.
-  updateWindowSize(config);
+  updateWindowSize(config, dynamic_cast<const UICommandLineOptions *>(&commandLineOptions()));
   tes()->settings().addObserver(
     [this](const settings::Settings::Config &config) { updateWindowSize(config); });
 }
@@ -370,16 +413,31 @@ void UIViewer::textInputEvent(TextInputEvent &event)
 }
 
 
-void UIViewer::updateWindowSize(const settings::Settings::Config &config)
+void UIViewer::updateWindowSize(const settings::Settings::Config &config,
+                                const UICommandLineOptions *command_line_options)
 {
   for (auto iter = config.extentions.begin(); iter != config.extentions.end(); ++iter)
   {
     if (iter->name() == kWindowSettingsName)
     {
       const auto &window_settings = *iter;
+      // Default to settings.
       _expected_window_size = Magnum::Vector2i(
         window_settings[kWindowSettingsHorizontal].getProperty<WindowSizeProperty>()->value(),
         window_settings[kWindowSettingsVertical].getProperty<WindowSizeProperty>()->value());
+
+      // Override with command line options.
+      if (command_line_options)
+      {
+        if (command_line_options->window.use_width)
+        {
+          _expected_window_size.x() = command_line_options->window.size.x();
+        }
+        if (command_line_options->window.use_height)
+        {
+          _expected_window_size.y() = command_line_options->window.size.y();
+        }
+      }
       break;
     }
   }

@@ -3,6 +3,8 @@
 //
 #include "ViewerLog.h"
 
+#include <iostream>
+
 namespace tes::view
 {
 ViewerLog::View::const_iterator ViewerLog::View::beginFiltered(log::Level filter_level) const
@@ -62,19 +64,35 @@ ViewerLog::ViewerLog(size_t max_lines)
 void ViewerLog::log(log::Level level, const std::string &msg)
 {
   // TODO(KS): assess the latency of this function.
-  const std::lock_guard guard(_mutex);
-  if (_count == _max_lines)
   {
-    // Full ring buffer. Remove the next item.
-    // Replace the first item.
-    _lines[_next_index] = Entry{ level, msg };
+    const std::lock_guard guard(_mutex);
+    if (_count == _max_lines)
+    {
+      // Full ring buffer. Remove the next item.
+      // Replace the first item.
+      _lines[_next_index] = Entry{ level, msg };
+    }
+    else
+    {
+      _lines[_next_index] = Entry{ level, msg };
+      ++_count;
+    }
+    _next_index = (_next_index + 1) % _max_lines;
   }
-  else
+
+  // Log to console outside of the mutex lock. cout and cerr are threadsafe, though the << operator
+  // may interleave between threads.
+  if (level <= consoleLogLevel())
   {
-    _lines[_next_index] = Entry{ level, msg };
-    ++_count;
+    if (level > log::Level::Error)
+    {
+      std::cout << msg << std::flush;
+    }
+    else
+    {
+      std::cerr << msg << std::flush;
+    }
   }
-  _next_index = (_next_index + 1) % _max_lines;
 }
 
 
