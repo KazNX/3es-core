@@ -30,6 +30,60 @@ enum class Level
 /// @param message The message to log.
 using LogFunction = std::function<void(Level level, const std::string &message)>;
 
+/// Comparison operator for @c tes::log::Level .
+/// @param a First argument to compare.
+/// @param b Second argument to compare
+/// @return True if `a < b`.
+[[nodiscard]] inline bool operator<(Level a, Level b)
+{
+  return static_cast<int>(a) < static_cast<int>(b);
+}
+
+/// Comparison operator for @c tes::log::Level .
+/// @param a First argument to compare.
+/// @param b Second argument to compare
+/// @return True if `a <= b`.
+[[nodiscard]] inline bool operator<=(Level a, Level b)
+{
+  return static_cast<int>(a) <= static_cast<int>(b);
+}
+
+/// Comparison operator for @c tes::log::Level .
+/// @param a First argument to compare.
+/// @param b Second argument to compare
+/// @return True if `a == b`.
+[[nodiscard]] inline bool operator==(Level a, Level b)
+{
+  return static_cast<int>(a) == static_cast<int>(b);
+}
+
+/// Comparison operator for @c tes::log::Level .
+/// @param a First argument to compare.
+/// @param b Second argument to compare
+/// @return True if `a != b`.
+[[nodiscard]] inline bool operator!=(Level a, Level b)
+{
+  return static_cast<int>(a) != static_cast<int>(b);
+}
+
+/// Comparison operator for @c tes::log::Level .
+/// @param a First argument to compare.
+/// @param b Second argument to compare
+/// @return True if `a >= b`.
+[[nodiscard]] inline bool operator>=(Level a, Level b)
+{
+  return static_cast<int>(a) >= static_cast<int>(b);
+}
+
+/// Comparison operator for @c tes::log::Level .
+/// @param a First argument to compare.
+/// @param b Second argument to compare
+/// @return True if `a > b`.
+[[nodiscard]] inline bool operator>(Level a, Level b)
+{
+  return static_cast<int>(a) > static_cast<int>(b);
+}
+
 /// The default logging function.
 /// @param level The logging level. This is provided for information purposes; any logging prefix
 /// will already be added.

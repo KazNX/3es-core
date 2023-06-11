@@ -5,7 +5,7 @@
 namespace tes::view::command::connection
 {
 OpenTcp::OpenTcp()
-  : Command("openTcp", Args(std::string(), Viewer::defaultPort(), true))
+  : Command("openTcp", Args(std::string(), CommandLineOptions::defaultPort(), true))
 {}
 
 
@@ -23,7 +23,8 @@ CommandResult OpenTcp::invoke(Viewer &viewer, const ExecInfo &info, const Args &
   const auto allow_reconnect = arg<bool>(2, args);
   if (!viewer.connect(host, port, allow_reconnect))
   {
-    return { CommandResult::Code::Failed, "Failed to connect to " + host + ":" + std::to_string(port) };
+    return { CommandResult::Code::Failed,
+             "Failed to connect to " + host + ":" + std::to_string(port) };
   }
   return { CommandResult::Code::Ok };
 }

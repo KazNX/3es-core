@@ -39,6 +39,67 @@
 // Things to implement:
 // - mesh renderer
 
+namespace
+{
+/// Streaming operator to support command line parsing.
+std::istream &operator>>(std::istream &in, tes::log::Level &log_level)
+{
+  using Level = tes::log::Level;
+  std::string str;
+  in >> str;
+  std::transform(str.begin(), str.end(), str.begin(),
+                 [](char ch) { return static_cast<char>(tolower(ch)); });
+  if (str == "trace")
+  {
+    log_level = Level::Trace;
+  }
+  else if (str == "info")
+  {
+    log_level = Level::Info;
+  }
+  else if (str == "warn")
+  {
+    log_level = Level::Warn;
+  }
+  else if (str == "error")
+  {
+    log_level = Level::Error;
+    ;
+  }
+  else
+  {
+    throw cxxopts::exceptions::parsing("Invalid log level " + str);
+  }
+
+  return in;
+}
+
+std::ostream &operator<<(std::ostream &out, tes::log::Level log_level)
+{
+  using Level = tes::log::Level;
+  switch (log_level)
+  {
+  case Level::Fatal:
+    out << "fatal";
+    break;
+  case Level::Error:
+    out << "error";
+    break;
+  case Level::Warn:
+    out << "warn";
+    break;
+  case Level::Info:
+    out << "info";
+    break;
+  case Level::Trace:
+    out << "trace";
+    break;
+  }
+
+  return out;
+}
+}  // namespace
+
 namespace tes::view
 {
 namespace
@@ -55,17 +116,83 @@ void focusCallback(GLFWwindow *window, int focused)
 }
 }  // namespace
 
-uint16_t Viewer::defaultPort()
+
+uint16_t CommandLineOptions::defaultPort()
 {
   return ServerSettings().listen_port;
 }
 
-Viewer::Viewer(const Arguments &arguments)
+CommandLineOptions::StartupMode CommandLineOptions::parse(int argc, char **argv)
+{
+  const auto program_name = std::filesystem::path(argv[0]).filename().string();
+  cxxopts::Options opt_parse(program_name, "3rd Eye Scene viewer.");
+
+  addOptions(opt_parse);
+
+  try
+  {
+    cxxopts::ParseResult parsed = opt_parse.parse(argc, argv);
+
+    if (parsed.count("help"))
+    {
+      std::cout << opt_parse.help() << std::endl;
+      // Help already shown.
+      return StartupMode::Help;
+    }
+
+    if (!validate(parsed))
+    {
+      std::cerr << "Argument validation error." << std::endl;
+      return StartupMode::Error;
+    }
+  }
+  catch (const cxxopts::exceptions::parsing &e)
+  {
+    std::cerr << "Argument error\n" << e.what() << std::endl;
+    return StartupMode::Error;
+  }
+
+  if (!filename.empty())
+  {
+    return StartupMode::File;
+  }
+
+  if (!server.host.empty())
+  {
+    return StartupMode::Host;
+  }
+
+  return StartupMode::Normal;
+}
+
+
+bool CommandLineOptions::validate([[maybe_unused]] const cxxopts::ParseResult &parsed)
+{
+  // Noting to validate in the base implementation.
+  return true;
+}
+
+
+void CommandLineOptions::addOptions(cxxopts::Options &parser)
+{
+  // clang-format off
+  parser.add_options()
+    ("help", "Show command line help.")
+    ("file", "Start the UI and open this file for playback. Takes precedence over --host.", cxxopts::value(filename))
+    ("host", "Start the UI and open a connection to this host URL/IP. Use --port to select the port number.", cxxopts::value(server.host))
+    ("port", "The port number to use with --host", cxxopts::value(server.port)->default_value(std::to_string(server.port)))
+    ("log-level", "Minimum logging level to display: [trace, info, warn, error].", cxxopts::value(console_log_level))
+    ;
+  // clang-format on
+}
+
+
+Viewer::Viewer(const ViewArguments &arguments)
   : Viewer(arguments, {})
 {}
 
 
-Viewer::Viewer(const Arguments &arguments,
+Viewer::Viewer(const ViewArguments &arguments,
                const std::vector<settings::Extension> &extended_settings)
   : Magnum::Platform::Application{ arguments,
                                    Configuration{}
@@ -98,7 +225,9 @@ Viewer::Viewer(const Arguments &arguments,
   _edl_effect = std::make_shared<EdlEffect>(Magnum::GL::defaultFramebuffer.viewport());
   command::registerDefaultCommands(*_commands);
 
-  if (!handleStartupArgs(arguments))
+  CommandLineOptions::StartupMode startup_mode;
+  _command_line_options = arguments.parseArgs(startup_mode);
+  if (!handleStartupArgs(startup_mode))
   {
     exit();
   }
@@ -130,6 +259,7 @@ Viewer::Viewer(const Arguments &arguments,
   // Install the logger function.
   log::setLogger(
     [this](log::Level level, const std::string &message) { _logger->log(level, message); });
+  _logger->setConsoleLogLevel(_command_line_options->console_log_level);
 }
 
 
@@ -619,56 +749,9 @@ bool Viewer::checkShortcut(const command::Shortcut &shortcut, const KeyEvent &ev
 }
 
 
-Viewer::StartupMode Viewer::parseStartupArgs(const Arguments &arguments, CommandLineOptions &opt)
+bool Viewer::handleStartupArgs(CommandLineOptions::StartupMode startup_mode)
 {
-  const auto program_name = std::filesystem::path(arguments.argv[0]).filename().string();
-  cxxopts::Options opt_parse(program_name, "3rd Eye Scene viewer.");
-
-  try
-  {
-    // clang-format off
-    opt_parse.add_options()
-      ("help", "Show command line help.")
-      ("file", "Start the UI and open this file for playback. Takes precedence over --host.", cxxopts::value(opt.filename))
-      ("host", "Start the UI and open a connection to this host URL/IP. Use --port to select the port number.", cxxopts::value(opt.host))
-      ("port", "The port number to use with --host", cxxopts::value(opt.port)->default_value(std::to_string(opt.port)))
-      ;
-    // clang-format on
-
-    cxxopts::ParseResult parsed = opt_parse.parse(arguments.argc, arguments.argv);
-
-    if (parsed.count("help"))
-    {
-      std::cout << opt_parse.help() << std::endl;
-      // Help already shown.
-      return StartupMode::Help;
-    }
-  }
-  catch (const cxxopts::exceptions::parsing &e)
-  {
-    std::cerr << "Argument error\n" << e.what() << std::endl;
-    return StartupMode::Error;
-  }
-
-  if (!opt.filename.empty())
-  {
-    return StartupMode::File;
-  }
-
-  if (!opt.host.empty())
-  {
-    return StartupMode::Host;
-  }
-
-  return StartupMode::Normal;
-}
-
-
-bool Viewer::handleStartupArgs(const Arguments &arguments)
-{
-  CommandLineOptions opt;
-  const auto startup_mode = parseStartupArgs(arguments, opt);
-
+  using StartupMode = CommandLineOptions::StartupMode;
   switch (startup_mode)
   {
   case StartupMode::Error:
@@ -678,11 +761,11 @@ bool Viewer::handleStartupArgs(const Arguments &arguments)
   case StartupMode::Normal:
     break;
   case StartupMode::File:
-    open(opt.filename);
+    open(_command_line_options->filename);
     break;
   case StartupMode::Host: {
     // Extract a port number if possible.
-    connect(opt.host, opt.port, true);
+    connect(_command_line_options->server.host, _command_line_options->server.port, true);
     break;
   default:
     break;
