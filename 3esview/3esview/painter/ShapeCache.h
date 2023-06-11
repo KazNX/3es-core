@@ -317,6 +317,8 @@ public:
       ShapeInstance attributes;
       /// Number of child shapes this has.
       unsigned child_count = 0;
+      /// True if this is a child item.
+      bool is_child = false;
     };
 
     /// Default constructor.
@@ -331,7 +333,8 @@ public:
     {
       if (_cursor != _end)
       {
-        _view = View{ _cursor->shape_id, _cursor->current, _cursor->child_count };
+        _view =
+          View{ _cursor->shape_id, _cursor->current, _cursor->child_count, _cursor->isChild() };
       }
     }
     /// Copy constructor.
@@ -503,7 +506,7 @@ inline void ShapeCache::const_iterator::next()
   } while (_cursor != _end && (_cursor->flags & ShapeFlag::Pending) == ShapeFlag::Pending);
   if (_cursor != _end)
   {
-    _view = View{ _cursor->shape_id, _cursor->current, _cursor->child_count };
+    _view = View{ _cursor->shape_id, _cursor->current, _cursor->child_count, _cursor->isChild() };
   }
   else
   {

@@ -34,7 +34,9 @@ class TES_CORE_API MultiShape : public Shape
 public:
   /// Maximum number of shapes in a multi shape packet using single precision. Halve for double
   /// precision. Packet is too large otherwise.
-  static const unsigned BlockCountLimitSingle;  // = 1024u;
+  static constexpr unsigned BlockCountLimitSingle = 1024u;
+  /// As per @c BlockCountLimitSingle but for using double precision attributes.
+  static constexpr unsigned BlockCountLimitDouble = BlockCountLimitSingle / 2;
   using ShapePtr = Ptr<const Shape>;
 
   /// Create a new multi-shape with the given set of @p shapes. The @c routingId(), @c id() and @c
@@ -114,7 +116,7 @@ inline MultiShape::MultiShape(MultiShape &&other) noexcept
 
 inline unsigned MultiShape::blockCountLimit() const
 {
-  return (doublePrecision()) ? BlockCountLimitSingle / 2 : BlockCountLimitSingle;
+  return (doublePrecision()) ? BlockCountLimitDouble : BlockCountLimitSingle;
 }
 }  // namespace tes
 

@@ -41,6 +41,9 @@ std::vector<settings::Extension> buildExtendedSettings()
 }
 }  // namespace
 
+/// Command which toggles UI rendering.
+///
+/// See @c UIViewer::setUiEnabled()
 class ToggleUI : public command::Command
 {
 public:

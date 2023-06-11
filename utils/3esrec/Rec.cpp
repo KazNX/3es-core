@@ -474,7 +474,7 @@ std::string TesRec::generateNewOutputFile()
     bool path_ok = _overwrite;
     if (!path_ok)
     {
-      const std::ifstream in_test(output_path.c_str());
+      const std::ifstream in_test(output_path.c_str(), std::ios::binary);
       path_ok = !in_test.is_open();
     }
 

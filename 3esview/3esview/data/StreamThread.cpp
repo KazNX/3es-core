@@ -586,7 +586,7 @@ void StreamThread::skipToClosestKeyframe(FrameNumber target_frame)
 
 bool StreamThread::loadSnapshot(const std::filesystem::path &snapshot_path)
 {
-  auto stream = std::make_shared<std::ifstream>(snapshot_path.string().c_str());
+  auto stream = std::make_shared<std::ifstream>(snapshot_path.string().c_str(), std::ios::binary);
   if (!stream->is_open())
   {
     return false;
@@ -601,8 +601,11 @@ bool StreamThread::loadSnapshot(const std::filesystem::path &snapshot_path)
     auto [packet_header, status, stream_pos] = reader.extractPacket();
     if (!packet_header)
     {
-      ok = false;
-      log::warn("Failed to load snapshot packet.");
+      if (status != PacketStreamReader::Status::End)
+      {
+        ok = false;
+        log::warn("Failed to load snapshot packet.");
+      }
       continue;
     }
 

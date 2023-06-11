@@ -8,12 +8,14 @@
 #include <3escore/Log.h>
 #include <3escore/PacketReader.h>
 
+#include <3escore/shapes/MultiShape.h>
+
 namespace tes::view::handler
 {
-bool readMultiShape(const Shape &shape, painter::ShapePainter &painter,
-                    const painter::ShapePainter::ParentId &parent_id,
-                    painter::ShapePainter::Type draw_type, unsigned shape_count,
-                    PacketReader &reader, bool double_precision)
+[[nodiscard]] bool readMultiShape(const Shape &shape, painter::ShapePainter &painter,
+                                  const painter::ShapePainter::ParentId &parent_id,
+                                  painter::ShapePainter::Type draw_type, unsigned shape_count,
+                                  PacketReader &reader, bool double_precision)
 {
   Shape::ObjectAttributes multi_attrs = {};
   for (unsigned i = 0; i < shape_count; ++i)
@@ -129,6 +131,10 @@ void Shape::readMessage(PacketReader &reader)
 
 void Shape::serialise(Connection &out)
 {
+  const bool serialise_double_precision = sizeof(ObjectAttributes) == sizeof(ObjectAttributesd);
+  const auto MultiShapeBlockCount = (serialise_double_precision) ?
+                                      tes::MultiShape::BlockCountLimitDouble :
+                                      tes::MultiShape::BlockCountLimitSingle;
   std::array<uint8_t, (1u << 16u) - 1> buffer = {};
   PacketWriter writer(buffer.data(), uint16_t(buffer.size()));
   CreateMessage create = {};
@@ -141,13 +147,19 @@ void Shape::serialise(Connection &out)
 
   for (auto shape_type : shape_types)
   {
-    auto end = _painter->end(shape_type);
+    const auto end = _painter->end(shape_type);
     for (auto shape = _painter->begin(shape_type); shape != end; ++shape)
     {
+      if (shape->is_child)
+      {
+        continue;
+      }
+
       auto transform = shape->attributes.transform;
       auto colour = shape->attributes.colour;
 
-      create.id = shape->id.id();
+      const auto viewed_id = shape->id;
+      create.id = viewed_id.id();
       create.category = shape->id.category();
       create.flags = 0;
       if (shape_type == painter::ShapePainter::Type::Transparent)
@@ -159,27 +171,67 @@ void Shape::serialise(Connection &out)
         create.flags |= OFWire;
       }
 
+      if (serialise_double_precision)
+      {
+        create.flags |= OFDoublePrecision;
+      }
+
+      if (shape->child_count)
+      {
+        create.flags |= OFMultiShape;
+      }
+
       decomposeTransform(transform, attrs);
       attrs.colour = Colour(colour.x(), colour.y(), colour.z(), colour.w()).colour32();
 
-      writer.reset(routingId(), OIdCreate);
       bool ok = true;
+      writer.reset(routingId(), CreateMessage::MessageId);
       ok = create.write(writer, attrs) && ok;
 
       if (shape->child_count)
       {
         // Handle multi shape
-        const uint32_t child_count = shape->child_count;
+        // Write total number of items.
+        const auto child_count = static_cast<uint32_t>(shape->child_count);
         ok = writer.writeElement(child_count) == sizeof(child_count) && ok;
-
-        for (uint32_t i = 0; i < child_count; ++i)
+        for (unsigned block_index = 0; block_index < shape->child_count;
+             block_index += MultiShapeBlockCount)
         {
-          const auto child_view = shape.getChild(i);
-          transform = child_view.attributes.transform;
-          colour = child_view.attributes.colour;
-          decomposeTransform(transform, attrs);
-          attrs.colour = Colour(colour.x(), colour.y(), colour.z(), colour.w()).colour32();
-          ok = attrs.write(writer) && ok;
+          const auto write_child_count =
+            std::min<uint16_t>(child_count - block_index, MultiShapeBlockCount);
+          // Write block count
+          ok = writer.writeElement(write_child_count) == sizeof(write_child_count) && ok;
+
+          for (uint32_t i = 0; ok && i < write_child_count; ++i)
+          {
+            const auto child_index = block_index + i;
+            const auto child_view = shape.getChild(child_index);
+            transform = child_view.attributes.transform;
+            colour = child_view.attributes.colour;
+            decomposeTransform(transform, attrs);
+            attrs.colour = Colour(colour.x(), colour.y(), colour.z(), colour.w()).colour32();
+            ok = attrs.write(writer, serialise_double_precision) && ok;
+          }
+
+          // Write the block and start a new block if more blocks are needed.
+          if (block_index + write_child_count < child_count)
+          {
+            // Not the last block. Write the current message.
+            ok = writer.finalise() && ok;
+            if (ok)
+            {
+              out.send(writer.data(), writer.packetSize());
+              writer.reset(routingId(), DataMessage::MessageId);
+              DataMessage data = {};
+              data.id = shape->id.id();
+              ok = data.write(writer) && ok;
+            }
+            else
+            {
+              log::error("Failed to serialise shapes: ", name());
+              break;
+            }
+          }
         }
       }
 
@@ -237,6 +289,7 @@ bool Shape::handleCreate(const CreateMessage &msg, const ObjectAttributes &attrs
   const auto parent_id = _painter->add(id, draw_type, transform,
                                        Magnum::Color4(c.rf(), c.gf(), c.bf(), c.af()), multi_shape);
 
+  bool ok = true;
   if (multi_shape)
   {
     // Multi shape message.
@@ -244,8 +297,9 @@ bool Shape::handleCreate(const CreateMessage &msg, const ObjectAttributes &attrs
     uint16_t create_count = 0;  // Current packet items.
     reader.readElement(shape_count);
     reader.readElement(create_count);
-    readMultiShape(*this, *_painter, parent_id, draw_type, create_count, reader,
-                   (msg.flags & OFDoublePrecision) != 0);
+    ok = readMultiShape(*this, *_painter, parent_id, draw_type, create_count, reader,
+                        (msg.flags & OFDoublePrecision) != 0) &&
+         ok;
 
     const MultiShapeInfo info = { shape_count, (msg.flags & OFDoublePrecision) != 0 };
     if (msg.id)
@@ -258,7 +312,7 @@ bool Shape::handleCreate(const CreateMessage &msg, const ObjectAttributes &attrs
     }
   }
 
-  return true;
+  return ok;
 }
 
 

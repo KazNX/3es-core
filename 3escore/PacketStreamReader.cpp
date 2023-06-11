@@ -97,6 +97,12 @@ PacketStreamReader::ExtractedPacket PacketStreamReader::extractPacket()
         if (_buffer.size() < target_size)
         {
           // Failed to read enough.
+          if (_stream->eof())
+          {
+            // Failed to read enough and we've reached the end of the stream.
+            // We are done.
+            _buffer.clear();
+          }
           return { nullptr, Status::Incomplete, 0 };
         }
       }
@@ -149,7 +155,7 @@ size_t PacketStreamReader::readMore(size_t more_count)
 }
 
 
-bool PacketStreamReader::checkMarker(std::vector<uint8_t> &buffer, size_t i)
+bool PacketStreamReader::checkMarker(const std::vector<uint8_t> &buffer, size_t i)
 {
   for (size_t j = 0; j < _marker_bytes.size() && i + j < buffer.size(); ++j)
   {
@@ -181,12 +187,13 @@ void PacketStreamReader::consume()
   if (_buffer.size() >= target_size)
   {
     // Update cursor.
-    _current_packet_pos += static_cast<ssize_t>(_buffer.size() - target_size);
+    _current_packet_pos += target_size;
     // Consume.
     std::copy(_buffer.begin() + static_cast<ssize_t>(target_size), _buffer.end(), _buffer.begin());
     _buffer.resize(_buffer.size() - target_size);
   }
 }
+
 
 size_t PacketStreamReader::calcExpectedSize()
 {
