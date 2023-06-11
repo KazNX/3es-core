@@ -42,6 +42,18 @@ public:
   /// @param other Object to move.
   Star(Star &&other) noexcept = default;
 
+  ~Star() override = default;
+
+  /// Copy assignment.
+  /// @param other The object to copy.
+  /// @return @c *this
+  Star &operator=(const Star &other) noexcept = default;
+
+  /// Move assignment.
+  /// @param other The object to move.
+  /// @return @c *this
+  Star &operator=(Star &&other) noexcept = default;
+
   [[nodiscard]] const char *type() const override { return "star"; }
 
   /// Set the star radial extents.

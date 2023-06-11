@@ -43,6 +43,18 @@ public:
   /// @param other Object to move.
   Arrow(Arrow &&other) noexcept = default;
 
+  ~Arrow() override = default;
+
+  /// Copy assignment.
+  /// @param other The object to copy.
+  /// @return @c *this
+  Arrow &operator=(const Arrow &other) noexcept = default;
+
+  /// Move assignment.
+  /// @param other The object to move.
+  /// @return @c *this
+  Arrow &operator=(Arrow &&other) noexcept = default;
+
   [[nodiscard]] const char *type() const override { return "arrow"; }
 
   /// Set the arrow radius.

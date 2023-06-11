@@ -80,18 +80,16 @@ inline Text3D::Text3D(std::string text, const Id &id, const Directional &transfo
 
 inline Text3D &Text3D::setScreenFacing(bool screen_facing)
 {
-  // NOLINTBEGIN(hicpp-signed-bitwise)
-  _data.flags = static_cast<uint16_t>(_data.flags & ~Text3DFScreenFacing);
-  _data.flags = static_cast<uint16_t>(_data.flags | Text3DFScreenFacing * !!screen_facing);
-  // NOLINTEND(hicpp-signed-bitwise)
+  auto new_flags = static_cast<uint16_t>(flags() & ~Text3DFScreenFacing);
+  new_flags = static_cast<uint16_t>(new_flags | Text3DFScreenFacing * !!screen_facing);
+  setFlags(new_flags);
   return *this;
 }
 
 
 inline bool Text3D::screenFacing() const
 {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  return (_data.flags & Text3DFScreenFacing) != 0;
+  return (flags() & Text3DFScreenFacing) != 0;
 }
 
 
@@ -122,13 +120,15 @@ inline Vector3d Text3D::facing() const
 
 inline double Text3D::fontSize() const
 {
-  return _attributes.scale[2];
+  return scale()[2];
 }
 
 
 inline Text3D &Text3D::setFontSize(double size)
 {
-  _attributes.scale[2] = size;
+  auto scale = this->scale();
+  scale[2] = size;
+  setScale(scale);
   return *this;
 }
 }  // namespace tes

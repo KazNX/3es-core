@@ -9,7 +9,7 @@ namespace tes
 template <typename T>
 Matrix3<T> operator*(const Matrix3<T> &a, const Matrix3<T> &b)
 {
-  Matrix3<T> m;
+  Matrix3<T> m = {};
   m(0, 0) = a(0, 0) * b(0, 0) + a(0, 1) * b(1, 0) + a(0, 2) * b(2, 0);
   m(0, 1) = a(0, 0) * b(0, 1) + a(0, 1) * b(1, 1) + a(0, 2) * b(2, 1);
   m(0, 2) = a(0, 0) * b(0, 2) + a(0, 1) * b(1, 2) + a(0, 2) * b(2, 2);
@@ -28,7 +28,7 @@ Matrix3<T> operator*(const Matrix3<T> &a, const Matrix3<T> &b)
 template <typename T>
 Vector3<T> operator*(const Matrix3<T> &a, const Vector3<T> &v)
 {
-  Vector3<T> r;
+  Vector3<T> r = {};
 
   r.x() = a(0, 0) * v[0] + a(0, 1) * v[1] + a(0, 2) * v[2];
   r.y() = a(1, 0) * v[0] + a(1, 1) * v[1] + a(1, 2) * v[2];
@@ -44,10 +44,11 @@ template <typename T>
 const Matrix3<T> Matrix3<T>::Identity(1, 0, 0, 0, 1, 0, 0, 0, 1);
 
 template <typename T>
-Matrix3<T>::Matrix3(const T array9[9])  // NOLINT(modernize-avoid-c-arrays)
+Matrix3<T>::Matrix3(const T array9[9])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
   for (int i = 0; i < 9; ++i)
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     _storage[i] = array9[i];
   }
 }
@@ -158,7 +159,7 @@ Matrix3<T> Matrix3<T>::lookAt(const Vector3<T> &eye, const Vector3<T> &target,
     return Identity;
   }
 
-  std::array<Vector3<T>, 3> axes;
+  std::array<Vector3<T>, 3> axes = {};
   int side_axis_index = 0;
   if (forward_axis_index == 1 && up_axis_index == 2 ||
       up_axis_index == 1 && forward_axis_index == 2)
@@ -175,14 +176,14 @@ Matrix3<T> Matrix3<T>::lookAt(const Vector3<T> &eye, const Vector3<T> &target,
   {
     side_axis_index = 2;
   }
-  axes[forward_axis_index] = (target - eye).normalised();
-  axes[side_axis_index] = axes[forward_axis_index].cross(axis_up).normalised();
-  axes[up_axis_index] = axes[side_axis_index].cross(axes[forward_axis_index]);
+  axes.at(forward_axis_index) = (target - eye).normalised();
+  axes.at(side_axis_index) = axes.at(forward_axis_index).cross(axis_up).normalised();
+  axes.at(up_axis_index) = axes.at(side_axis_index).cross(axes.at(forward_axis_index));
 
   Matrix3<T> m = Identity;
-  m.setAxis(side_axis_index, axes[side_axis_index]);
-  m.setAxis(forward_axis_index, axes[forward_axis_index]);
-  m.setAxis(up_axis_index, axes[up_axis_index]);
+  m.setAxis(side_axis_index, axes.at(side_axis_index));
+  m.setAxis(forward_axis_index, axes.at(forward_axis_index));
+  m.setAxis(up_axis_index, axes.at(up_axis_index));
 
   return m;
 }
@@ -216,7 +217,7 @@ inline Matrix3<T> Matrix3<T>::transposed() const
 template <typename T>
 Matrix3<T> &Matrix3<T>::invert()
 {
-  Matrix3<T> adj;
+  Matrix3<T> adj = {};
   const T det = getAdjoint(adj);
   const T det_inv = static_cast<T>(1) / det;
 
@@ -231,7 +232,7 @@ Matrix3<T> &Matrix3<T>::invert()
 template <typename T>
 Matrix3<T> Matrix3<T>::inverse() const
 {
-  Matrix3<T> inv;
+  Matrix3<T> inv = {};
   const T det = getAdjoint(inv);
   const T det_inv = static_cast<T>(1) / det;
 
@@ -367,7 +368,7 @@ inline Vector3<T> Matrix3<T>::transform(const Vector3<T> &v) const
 template <typename T>
 inline Vector3<T> Matrix3<T>::rotate(const Vector3<T> &v) const
 {
-  Vector3<T> r;
+  Vector3<T> r = {};
 
   r.x() = (*this)(0, 0) * v[0] + (*this)(0, 1) * v[1] + (*this)(0, 2) * v[2];
   r.y() = (*this)(1, 0) * v[0] + (*this)(1, 1) * v[1] + (*this)(1, 2) * v[2];

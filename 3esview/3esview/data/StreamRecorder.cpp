@@ -40,11 +40,11 @@ void StreamRecorder::recordCamera(const camera::Camera &camera)
 {
   // Add a message for the camera state.
   // Size it large enough, plus some extra space by doubling the header size.
-  std::array<uint8_t, 2 * sizeof(PacketHeader) + sizeof(CameraMessage) + sizeof(CrcType)> buffer;
+  std::array<uint8_t, 2 * sizeof(PacketHeader) + sizeof(CameraMessage) + sizeof(CrcType)> buffer{};
   PacketWriter writer(buffer.data(), buffer.size());
 
-  Magnum::Vector3 world_fwd = convert(worldForward<float>());
-  Magnum::Vector3 world_up = convert(worldUp<float>());
+  const Magnum::Vector3 world_fwd = convert(worldForward<float>());
+  const Magnum::Vector3 world_up = convert(worldUp<float>());
   Magnum::Vector3 cam_fwd = {};
   Magnum::Vector3 cam_up = {};
 

@@ -29,7 +29,11 @@ class TES_CORE_API MutableMesh
 public:
   MutableMesh(uint32_t id, DrawType draw_type = DtTriangles,
               unsigned components = SimpleMesh::Vertex | SimpleMesh::Index);
+  MutableMesh(const MutableMesh &other) = delete;
+
   ~MutableMesh();
+
+  MutableMesh &operator=(const MutableMesh &other) = delete;
 
   /// Exposes the internal mesh data.
   [[nodiscard]] const SimpleMesh &meshResource() const;

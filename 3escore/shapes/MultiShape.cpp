@@ -51,7 +51,7 @@ int MultiShape::writeData(PacketWriter &stream, unsigned &progress_marker) const
   }
 
   DataMessage msg;
-  msg.id = _data.id;
+  msg.id = data().id;
   stream.reset(routingId(), DataMessage::MessageId);
   bool ok = msg.write(stream);
 

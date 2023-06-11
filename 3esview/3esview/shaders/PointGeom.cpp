@@ -5,14 +5,14 @@
 
 #include <3escore/Log.h>
 
+#include "Magnum/GL/Shader.h"
 #include <Magnum/GL/Context.h>
 #include <Magnum/GL/Extensions.h>
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/GL/Renderer.h>
-#include "Magnum/GL/Shader.h"
 #include <Magnum/GL/Version.h>
-#include <Magnum/Math/Matrix4.h>
 #include <Magnum/Math/Color.h>
+#include <Magnum/Math/Matrix4.h>
 
 #include <Corrade/Containers/Reference.h>
 #include <Corrade/Utility/Assert.h>

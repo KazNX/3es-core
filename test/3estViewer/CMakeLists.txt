@@ -36,6 +36,8 @@ find_package(Magnum CONFIG REQUIRED
 configure_file(TestViewerConfig.in.h "${CMAKE_CURRENT_BINARY_DIR}/3estViewer/TestViewerConfig.h")
 
 set(SOURCES
+  TestLog.cpp
+  TestSettings.cpp
   TestShapes.cpp
   TestUtil.cpp
   TestViewer.cpp

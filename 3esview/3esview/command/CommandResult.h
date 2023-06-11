@@ -40,16 +40,16 @@ public:
     : _code(code)
   {}
 
-  CommandResult(Code code, const std::string &reason)
+  CommandResult(Code code, std::string reason)
     : _code(code)
-    , _reason(reason)
+    , _reason(std::move(reason))
   {}
 
-  std::string reason() const { return _reason; }
-  Code code() const { return _code; }
+  [[nodiscard]] std::string reason() const { return _reason; }
+  [[nodiscard]] Code code() const { return _code; }
 
-  operator bool() const { return _code == Code::Ok; }
-  bool operator!() const { return _code != Code::Ok; }
+  [[nodiscard]] operator bool() const { return _code == Code::Ok; }
+  [[nodiscard]] bool operator!() const { return _code != Code::Ok; }
 
 private:
   Code _code = Code::Invalid;

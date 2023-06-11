@@ -7,6 +7,7 @@
 #include "ui/ConnectView.h"
 #include "ui/Hud.h"
 #include "ui/IconBar.h"
+#include "ui/LogView.h"
 #include "ui/Playback.h"
 #include "ui/SettingsView.h"
 #include "ui/command/ToggleCategories.h"
@@ -15,9 +16,31 @@
 #include "ui/command/ToggleSettings.h"
 
 #include <3esview/command/Set.h>
+#include <3esview/ThirdEyeScene.h>
+#include <3esview/settings/Settings.h>
 
 namespace tes::view
 {
+namespace
+{
+constexpr const char *kWindowSettingsName = "Window";
+constexpr const char *kWindowSettingsHorizontal = "Horizontal";
+constexpr const char *kWindowSettingsVertical = "Vertical";
+using WindowSizeProperty = settings::UInt;
+
+std::vector<settings::Extension> buildExtendedSettings()
+{
+  std::vector<settings::Extension> extensions;
+  extensions.emplace_back(settings::Extension{ kWindowSettingsName });
+  auto &window_settings = extensions.back();
+  window_settings.add(settings::ExtensionProperty{ WindowSizeProperty{
+    kWindowSettingsHorizontal, 800u, 0u, 10000u, "Horizontal pixel resolution." } });
+  window_settings.add(settings::ExtensionProperty{ WindowSizeProperty{
+    kWindowSettingsVertical, 600u, 0u, 10000u, "Vertical pixel resolution." } });
+  return extensions;
+}
+}  // namespace
+
 class ToggleUI : public command::Command
 {
 public:
@@ -65,13 +88,21 @@ UIViewer::GuiContext::~GuiContext()
 
 
 UIViewer::UIViewer(const Arguments &arguments)
-  : Viewer(arguments)
+  : Viewer(arguments, buildExtendedSettings())
 {
   _imgui = Magnum::ImGuiIntegration::Context(Magnum::Vector2{ windowSize() } / dpiScaling(),
                                              windowSize(), framebufferSize());
   initialiseUi();
   commands()->registerCommand(std::make_shared<ToggleUI>(), command::Shortcut("F2"));
+  const auto config = tes()->settings().config();
+  // Settings will have been restored at this point. Set the window size.
+  updateWindowSize(config);
+  tes()->settings().addObserver(
+    [this](const settings::Settings::Config &config) { updateWindowSize(config); });
 }
+
+
+UIViewer::~UIViewer() = default;
 
 
 UIViewer::DrawMode UIViewer::onDrawStart(float dt)
@@ -89,6 +120,22 @@ UIViewer::DrawMode UIViewer::onDrawStart(float dt)
   }
 
   return isTextInputActive() ? DrawMode::Modal : DrawMode::Normal;
+}
+
+
+void UIViewer::drawEvent()
+{
+  Viewer::drawEvent();
+  const auto window_size = windowSize();
+  if (_expected_window_size != window_size)
+  {
+    // Copy the window size as we can end up modifying it again.
+    // Hack: adjust for dpiScaling() const windowSize() doesn't consider it, but setWindowSize()
+    // does.
+    const auto new_size =
+      (Magnum::Vector2(_expected_window_size) / dpiScaling()) + Magnum::Vector2(0.5f, 0.5f);
+    setWindowSize(Magnum::Vector2i(new_size));
+  }
 }
 
 
@@ -141,6 +188,29 @@ void UIViewer::viewportEvent(ViewportEvent &event)
   Viewer::viewportEvent(event);
   _imgui.relayout(Magnum::Vector2{ event.windowSize() } / event.dpiScaling(), event.windowSize(),
                   event.framebufferSize());
+  // Update settings if required.
+  if (event.windowSize() != _expected_window_size)
+  {
+    _expected_window_size = event.windowSize();
+    auto config = tes()->settings().config();
+    for (auto iter = config.extentions.begin(); iter != config.extentions.end(); ++iter)
+    {
+      if (iter->name() == kWindowSettingsName)
+      {
+        auto *hsize = (*iter)[kWindowSettingsHorizontal].getProperty<WindowSizeProperty>();
+        auto *vsize = (*iter)[kWindowSettingsVertical].getProperty<WindowSizeProperty>();
+
+        if (hsize->value() != _expected_window_size.x() ||
+            vsize->value() != _expected_window_size.y())
+        {
+          hsize->setValue(_expected_window_size.x());
+          vsize->setValue(_expected_window_size.y());
+          tes()->settings().update(config);
+        }
+        break;
+      }
+    }
+  }
 }
 
 
@@ -207,6 +277,7 @@ void UIViewer::initialiseIconBarUi()
   command = std::make_shared<ui::command::ToggleLog>(*icon_bar);
   command_set->registerCommand(command);
   icon_bar->registerCommand(ui::IconBar::View::Log, command);
+  icon_bar->registerView(ui::IconBar::View::Log, std::make_shared<ui::LogView>(*this));
 
   command = std::make_shared<ui::command::ToggleSettings>(*icon_bar);
   command_set->registerCommand(command);
@@ -293,5 +364,21 @@ void UIViewer::textInputEvent(TextInputEvent &event)
     return;
   }
   // Viewer::textInputEvent(event);
+}
+
+
+void UIViewer::updateWindowSize(const settings::Settings::Config &config)
+{
+  for (auto iter = config.extentions.begin(); iter != config.extentions.end(); ++iter)
+  {
+    if (iter->name() == kWindowSettingsName)
+    {
+      const auto &window_settings = *iter;
+      _expected_window_size = Magnum::Vector2i(
+        window_settings[kWindowSettingsHorizontal].getProperty<WindowSizeProperty>()->value(),
+        window_settings[kWindowSettingsVertical].getProperty<WindowSizeProperty>()->value());
+      break;
+    }
+  }
 }
 }  // namespace tes::view

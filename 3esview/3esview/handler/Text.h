@@ -115,7 +115,7 @@ void Text<TextShape, Affordances>::initialise()
 template <typename TextShape, typename Affordances>
 void Text<TextShape, Affordances>::reset()
 {
-  std::lock_guard guard(_mutex);
+  const std::lock_guard guard(_mutex);
   _pending_queue.clear();
   _transient.clear();
   _text.clear();
@@ -133,7 +133,7 @@ template <typename TextShape, typename Affordances>
 void Text<TextShape, Affordances>::endFrame(const FrameStamp &stamp)
 {
   TES_UNUSED(stamp);
-  std::lock_guard guard(_mutex);
+  const std::lock_guard guard(_mutex);
   _transient.clear();
   for (const auto &action : _pending_queue)
   {

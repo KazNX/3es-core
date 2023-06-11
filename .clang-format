@@ -73,6 +73,7 @@ NamespaceIndentation: None
 # PenaltyReturnTypeOnItsOwnLine: <int>
 PointerAlignment: Right
 ReflowComments: true
+ShortNamespaceLines: 0
 # Disable sort includes - later versions do no respect line breaks to signify sorting groups.
 SortIncludes: false
 SortUsingDeclarations: true

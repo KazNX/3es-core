@@ -5,6 +5,12 @@
 
 namespace tes::view::settings
 {
+Settings::Settings(const std::vector<settings::Extension> &extended_settings)
+{
+  _config.extentions = extended_settings;
+}
+
+
 Settings::Config Settings::config() const
 {
   const std::lock_guard guard(_mutex);
@@ -64,6 +70,20 @@ void Settings::update(const Connection &config)
 }
 
 
+void Settings::update(const Extension &extension)
+{
+  const std::lock_guard guard(_mutex);
+  auto iter =
+    std::find_if(_config.extentions.begin(), _config.extentions.end(),
+                 [&extension](const Extension &e) { return extension.name() == e.name(); });
+  if (iter != _config.extentions.end())
+  {
+    iter->update(extension);
+    notify(_config);
+  }
+}
+
+
 void Settings::addObserver(NotifyCallback callback)
 {
   const std::lock_guard guard(_observer_mutex);
@@ -79,7 +99,7 @@ void Settings::addObserver(Category category, NotifyCallback callback)
   }
 
   const std::lock_guard guard(_observer_mutex);
-  _sub_observers[static_cast<unsigned>(category)].emplace_back(std::move(callback));
+  _sub_observers.at(static_cast<unsigned>(category)).emplace_back(std::move(callback));
 }
 
 
@@ -113,7 +133,7 @@ void Settings::notify(Category category, const Config &config)
   const std::lock_guard guard(_observer_mutex);
 
   // Sub observer notify.
-  const auto &sub_observers = _sub_observers[static_cast<unsigned>(category)];
+  const auto &sub_observers = _sub_observers.at(static_cast<unsigned>(category));
   for (const auto &observer : sub_observers)
   {
     observer(config);

@@ -3,12 +3,14 @@
 
 #include "3esview/ViewConfig.h"
 
-#include "camera/Fly.h"
-
 #include "BoundsCuller.h"
 #include "FramesPerSecondWindow.h"
 #include "FrameStamp.h"
+
+#include "camera/Fly.h"
+
 #include "painter/ShapeCache.h"
+
 #include "settings/Settings.h"
 
 #include <3escore/Messages.h>
@@ -73,13 +75,16 @@ public:
 
   /// Constructor. Must be created on the main thread only - the thread which manages the render
   /// resource - i.e., the OpenGL context.
-  ThirdEyeScene();
+  explicit ThirdEyeScene(const std::vector<settings::Extension> &extended_settings = {});
+  ThirdEyeScene(const ThirdEyeScene &other) = delete;
   /// Destructor.
   ~ThirdEyeScene();
 
+  ThirdEyeScene &operator=(const ThirdEyeScene &other) = delete;
+
   /// Get the list of names of known message handlers, keyed by routing ID.
   /// @return The known routing ID names.
-  [[nodiscard]] static const std::unordered_map<uint32_t, std::string> defaultHandlerNames();
+  [[nodiscard]] static const std::unordered_map<uint32_t, std::string> &defaultHandlerNames();
 
   /// Return the last rendered frame stamp.
   /// @return The last frame stamp.
@@ -123,6 +128,12 @@ public:
     }
     return {};
   }
+
+  /// Query the current frame rate : frames per second.
+  [[nodiscard]] float fps() const { return _fps.fps(); }
+
+  /// Access the FPS window calculator.
+  [[nodiscard]] FramesPerSecondWindow fpsWindow() const { return _fps; }
 
   /// Reset the current state, clearing all the currently visible data.
   ///
@@ -177,14 +188,20 @@ public:
   /// main thread is able to save the snapshot after the next @c prepareFrame() .
   ///
   /// @param path The path to save the snapshot to.
+  /// @param cancel_snapshot Cancellation function. This should return true if the snapshot request
+  /// is cancelled by the requesting thread.
   /// @return A pair containing a boolean success indicator and the frame number which has been
   /// saved.
-  std::pair<bool, FrameNumber> saveSnapshot(const std::filesystem::path &path);
+  std::pair<bool, FrameNumber> saveSnapshot(const std::filesystem::path &path,
+                                            std::function<bool()> cancel_snapshot);
   /// This overload of @c saveSnapshot() writes the snapshot to the given @p connection.
   /// @param connection The connection to write to.
+  /// @param cancel_snapshot Cancellation function. This should return true if the snapshot request
+  /// is cancelled by the requesting thread.
   /// @return A pair containing a boolean success indicator and the frame number which has been
   /// saved.
-  std::pair<bool, FrameNumber> saveSnapshot(tes::Connection &connection);
+  std::pair<bool, FrameNumber> saveSnapshot(tes::Connection &connection,
+                                            std::function<bool()> cancel_snapshot);
 
   void createSampleShapes();
 
@@ -194,6 +211,9 @@ private:
   void initialiseFont();
   void initialiseHandlers();
   void initialiseShaders();
+
+  /// Bind and active the final frame buffer target.
+  void bindFinalFrameBuffer();
 
   /// Primary drawing pass. Draws _main_draw_handlers with the FBO effect active.
   /// @param dt Time since last render (seconds).
@@ -210,7 +230,7 @@ private:
   /// @param drawers What to draw.
   void draw(float dt, const DrawParams &params, const painter::CategoryState &categories,
             const std::vector<std::shared_ptr<handler::Message>> &drawers);
-  void updateFpsDisplay(float dt, const DrawParams &params);
+  void updateFps(float dt);
 
   void onCameraConfigChange(const settings::Settings::Config &config);
 
@@ -222,7 +242,16 @@ private:
   /// @return True on success.
   bool saveCurrentFrameSnapshot(tes::Connection &connection);
 
+  /// Load the @c Settings from the default config location for the current platform.
   void restoreSettings();
+  /// Save the @c Settings from the default config location for the current platform.
+  ///
+  /// Settings location depends on platform:
+  ///
+  /// - Windows: `$env:APPDATA/3rdEyeScene.yaml`
+  /// - Linux: `TODO`
+  ///
+  /// @todo Identify the default config locations.
   void storeSettings();
 
   std::shared_ptr<FboEffect> _active_fbo_effect;

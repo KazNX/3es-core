@@ -80,10 +80,15 @@ enum class ConnectionMode
 class TES_CORE_API ConnectionMonitor
 {
 protected:
+  ConnectionMonitor() = default;
+
+public:
+  ConnectionMonitor(const ConnectionMonitor &other) = delete;
+  ConnectionMonitor &operator=(const ConnectionMonitor &other) = delete;
+
   /// Protected virtual destructor.
   virtual ~ConnectionMonitor();
 
-public:
   /// Report the port being used by the connection monitor.
   ///
   /// This may be TCP specific.

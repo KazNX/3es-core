@@ -55,11 +55,11 @@ struct PendingAction
   /// to update - see @c tes::UpdateFlag .
   struct Update
   {
-    Vector3d position;     ///< New position if @c UFPosition is set.
-    Quaterniond rotation;  ///< New rotation if @c UFRotation is set.
-    Vector3d scale;        ///< New scale if @c UFScale is set.
-    Colour colour;         ///< New colour if @c UFColour is set.
-    unsigned flags = 0;    ///< Flags indicating what to update - see @c tes::UpdateFlag .
+    Vector3d position = {};     ///< New position if @c UFPosition is set.
+    Quaterniond rotation = {};  ///< New rotation if @c UFRotation is set.
+    Vector3d scale = {};        ///< New scale if @c UFScale is set.
+    Colour colour = {};         ///< New colour if @c UFColour is set.
+    unsigned flags = 0;         ///< Flags indicating what to update - see @c tes::UpdateFlag .
   };
 
   /// Details specific to a destroy action: @c PendingAction::Destroy .
@@ -80,6 +80,8 @@ struct PendingAction
   PendingAction(PendingAction &&other) noexcept = default;
   PendingAction &operator=(const PendingAction &other) = default;
   PendingAction &operator=(PendingAction &&other) noexcept = default;
+
+  ~PendingAction() = default;
 };
 }  // namespace tes::view::util
 

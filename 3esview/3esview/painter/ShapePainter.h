@@ -60,18 +60,20 @@ public:
     ParentId(const ParentId &other) = default;
     ParentId(ParentId &&other) = default;
 
+    ~ParentId() = default;
+
     ParentId &operator=(const ParentId &other) = default;
     ParentId &operator=(ParentId &&other) = default;
 
-    Id shapeId() const { return _shape_id; }
+    [[nodiscard]] Id shapeId() const { return _shape_id; }
 
     /// Internal ID value.
     /// @return Internal value.
-    util::ResourceListId resourceId() const { return _resource_id; }
+    [[nodiscard]] util::ResourceListId resourceId() const { return _resource_id; }
 
     /// Check if this id is valid.
     /// @return True when valid.
-    bool isValid() const { return _resource_id != util::kNullResource; }
+    [[nodiscard]] bool isValid() const { return _resource_id != util::kNullResource; }
 
   private:
     Id _shape_id;
@@ -91,8 +93,13 @@ public:
     ChildId(const ChildId &other) = default;
     ChildId(ChildId &&other) = default;
 
-    Id shapeId() const { return _shape_id; }
-    unsigned index() const { return _index; }
+    ~ChildId() = default;
+
+    ChildId &operator=(const ChildId &other) = default;
+    ChildId &operator=(ChildId &&other) = default;
+
+    [[nodiscard]] Id shapeId() const { return _shape_id; }
+    [[nodiscard]] unsigned index() const { return _index; }
 
   private:
     /// The primary shape id.
@@ -107,17 +114,22 @@ public:
   /// @param wireframe Mesh used for wireframe rendering (line based).
   /// @param transparent Mesh used for transparent rendering.
   /// @param bounds_calculator Bounds calculation function.
-  ShapePainter(std::shared_ptr<BoundsCuller> culler,
-               std::shared_ptr<shaders::ShaderLibrary> shaders, std::initializer_list<Part> solid,
-               std::initializer_list<Part> wireframe, std::initializer_list<Part> transparent,
-               BoundsCalculator bounds_calculator);
+  ShapePainter(const std::shared_ptr<BoundsCuller> &culler,
+               const std::shared_ptr<shaders::ShaderLibrary> &shaders,
+               std::initializer_list<Part> solid, std::initializer_list<Part> wireframe,
+               std::initializer_list<Part> transparent, const BoundsCalculator &bounds_calculator);
   /// @overload
-  ShapePainter(std::shared_ptr<BoundsCuller> culler,
-               std::shared_ptr<shaders::ShaderLibrary> shaders, const std::vector<Part> &solid,
-               const std::vector<Part> &wireframe, const std::vector<Part> &transparent,
-               BoundsCalculator bounds_calculator);
+  ShapePainter(const std::shared_ptr<BoundsCuller> &culler,
+               const std::shared_ptr<shaders::ShaderLibrary> &shaders,
+               const std::vector<Part> &solid, const std::vector<Part> &wireframe,
+               const std::vector<Part> &transparent, const BoundsCalculator &bounds_calculator);
+
+  ShapePainter(const ShapePainter &other) = delete;
+
   /// Destructor.
-  ~ShapePainter();
+  virtual ~ShapePainter();
+
+  ShapePainter &operator=(const ShapePainter &other) = delete;
 
   /// Clear the painter, removing all shapes.
   virtual void reset();
@@ -145,10 +157,10 @@ public:
   /// @param id The object ID to lookup.
   /// @param[out] type Set to the shape @c Type .
   /// @return The parent ID for the given ID.
-  virtual ParentId lookup(const Id &id, Type &type) const;
+  [[nodiscard]] virtual ParentId lookup(const Id &id, Type &type) const;
 
   /// @overload
-  ParentId lookup(const Id &id) const
+  [[nodiscard]] ParentId lookup(const Id &id) const
   {
     Type t = Type::Solid;
     return lookup(id, t);
@@ -201,7 +213,8 @@ public:
   /// @param[out] transform Transform output. Does not include any parent transform.
   /// @param[out] colour Colour output.
   /// @return True if @p id is valid.
-  virtual bool readShape(const Id &id, Magnum::Matrix4 &transform, Magnum::Color4 &colour) const;
+  [[nodiscard]] virtual bool readShape(const Id &id, Magnum::Matrix4 &transform,
+                                       Magnum::Color4 &colour) const;
 
   /// Read the current properties for a shape instance as of the last @c commit().
   /// @param id Shape id of interest.
@@ -209,8 +222,9 @@ public:
   /// @param[out] transform Transform output. Does not include any parent transform.
   /// @param[out] colour Colour output.
   /// @return True if @p id is valid.
-  virtual bool readChildShape(const ChildId &child_id, bool include_parent_transform,
-                              Magnum::Matrix4 &transform, Magnum::Color4 &colour) const;
+  [[nodiscard]] virtual bool readChildShape(const ChildId &child_id, bool include_parent_transform,
+                                            Magnum::Matrix4 &transform,
+                                            Magnum::Color4 &colour) const;
 
   /// Render the current opaque (solid & wireframe) shapes set.
   /// @param stamp The frame stamp to draw at.
@@ -269,37 +283,39 @@ public:
         }
       }
     }
+    ~const_iterator() = default;
+
     /// Copy constructor.
     /// @param other Iterator to copy.
-    inline const_iterator(const const_iterator &other) = default;
+    const_iterator(const const_iterator &other) = default;
     /// Copy constructor.
     /// @param other Iterator to move.
-    inline const_iterator(const_iterator &&other) = default;
+    const_iterator(const_iterator &&other) = default;
 
     /// Copy assignment operator.
     /// @param other Iterator to copy.
     /// @return @c *this
-    inline const_iterator &operator=(const const_iterator &other) = default;
+    const_iterator &operator=(const const_iterator &other) = default;
     /// Move assignment operator.
     /// @param other Iterator to move.
     /// @return @c *this
-    inline const_iterator &operator=(const_iterator &&other) = default;
+    const_iterator &operator=(const_iterator &&other) = default;
 
     /// Equality test. Only compares the cursor.
     /// @param other Iterator to compare.
     /// @return True if the iterators are semantically equivalent.
-    inline bool operator==(const const_iterator &other) const
+    bool operator==(const const_iterator &other) const
     {
       return _cache == other._cache && _cache_type == other._cache_type && _cursor == other._cursor;
     }
     /// Inequality test. Only compares the cursor.
     /// @param other Iterator to compare.
     /// @return True unless the iterators are semantically equivalent.
-    inline bool operator!=(const const_iterator &other) const { return !operator==(other); }
+    bool operator!=(const const_iterator &other) const { return !operator==(other); }
 
     /// Prefix increment
     /// @return @c *this
-    inline const_iterator &operator++()
+    const_iterator &operator++()
     {
       next();
       return *this;
@@ -307,7 +323,7 @@ public:
 
     /// Postfix increment
     /// @return An iterator before incrementing.
-    inline const_iterator operator++(int)
+    const_iterator operator++(int)
     {
       auto iter = *this;
       next();
@@ -316,15 +332,15 @@ public:
 
     /// Dereference to a @c View.
     /// @return A @c View to the current item.
-    inline const View &operator*() const { return *_cursor; }
+    const View &operator*() const { return *_cursor; }
     /// Dereference to a @c View.
     /// @return A @c View to the current item.
-    inline const View *operator->() const { return &*_cursor; }
+    const View *operator->() const { return &*_cursor; }
 
     /// Get a @c View to the child at @p child_index.
     /// @param child_index The index of the child to retrieve.
     /// @return The child @c View.
-    View getChild(unsigned child_index) const
+    [[nodiscard]] View getChild(unsigned child_index) const
     {
       View view = *_cursor;
       view.child_count = 0;
@@ -350,17 +366,11 @@ public:
   /// Begin iteration of the shapes of @p type.
   /// @param type The @c Type of shape to iterate.
   /// @return The starting iterator.
-  inline const_iterator begin(Type type) const
-  {
-    return const_iterator(type, cacheForType(type), true);
-  }
+  [[nodiscard]] const_iterator begin(Type type) const { return { type, cacheForType(type), true }; }
   /// End iterator for shapes of @p type.
   /// @param type The @c Type of shape to iterate.
   /// @return The end iterator.
-  inline const_iterator end(Type type) const
-  {
-    return const_iterator(type, cacheForType(type), false);
-  }
+  [[nodiscard]] const_iterator end(Type type) const { return { type, cacheForType(type), false }; }
 
 protected:
   /// Identifies a shape type and index into the associated @c ShapeCache .
@@ -385,8 +395,8 @@ protected:
     return addShape(shape_id, type, transform, colour, hidden, ParentId(), nullptr);
   }
 
-  ShapeCache *cacheForType(Type type);
-  const ShapeCache *cacheForType(Type type) const;
+  [[nodiscard]] ShapeCache *cacheForType(Type type);
+  [[nodiscard]] const ShapeCache *cacheForType(Type type) const;
 
   /// Solid shape rendering cache.
   std::unique_ptr<ShapeCache> _solid_cache;

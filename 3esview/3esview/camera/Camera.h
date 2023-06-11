@@ -13,14 +13,18 @@ namespace tes::view::camera
 {
 struct TES_VIEWER_API Camera
 {
-  Magnum::Vector3 position;
+  static constexpr float kDefaultFov = 70.0f;
+  static constexpr float kDefaultClipNear = 0.1f;
+  static constexpr float kDefaultClipFar = 1000.0f;
+
+  Magnum::Vector3 position = {};
   float pitch = 0;
   float yaw = 0;
-  float fov_horizontal_deg = 70.0f;
-  float clip_near = 0.1f;
-  float clip_far = 1000.0f;
+  float fov_horizontal_deg = kDefaultFov;
+  float clip_near = kDefaultClipNear;
+  float clip_far = kDefaultClipFar;
   // TODO: apply this frame. For now just use XYZ.
-  tes::CoordinateFrame frame;
+  tes::CoordinateFrame frame = tes::CoordinateFrame::XYZ;
 };
 
 /// Calculate the camera world transform. This is in X right, Y forward, Z up.
@@ -64,10 +68,10 @@ inline Magnum::Matrix4 projection(const Camera &camera, const Magnum::Vector2i &
 /// Generate the camera projection * view matrix.
 inline Magnum::Matrix4 viewProjection(const Camera &camera, const Magnum::Vector2i &view_size)
 {
-  Magnum::Matrix4 projection = Magnum::Matrix4::perspectiveProjection(
+  const Magnum::Matrix4 projection = Magnum::Matrix4::perspectiveProjection(
     Magnum::Math::Deg(camera.fov_horizontal_deg), Magnum::Vector2(view_size).aspectRatio(),
     camera.clip_near, camera.clip_far);
-  Magnum::Matrix4 camera_transform = view(camera);
+  const Magnum::Matrix4 camera_transform = view(camera);
   return projection * camera_transform;
 }
 

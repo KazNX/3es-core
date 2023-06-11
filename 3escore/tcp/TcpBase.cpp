@@ -254,7 +254,7 @@ void dumpSocketOptions(int socket)
     int opt;
   };
   // Array size varies from platform, so no std::array.
-  static const DebugInfo dopt[] =  // NOLINT(modernize-avoid-c-arrays)
+  static const DebugInfo dopt[] =  // NOLINT(cppcoreguidelines-avoid-c-arrays)
     {
       { "SO_DEBUG", SO_DEBUG },
       { "SO_ACCEPTCONN", SO_ACCEPTCONN },

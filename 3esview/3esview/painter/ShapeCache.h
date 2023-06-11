@@ -4,15 +4,15 @@
 #include <3esview/ViewConfig.h>
 
 #include <3esview/BoundsCuller.h>
-#include <3esview/util/ResourceList.h>
 #include <3esview/util/Enum.h>
+#include <3esview/util/ResourceList.h>
 
 #include <3escore/shapes/Id.h>
 
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/Magnum.h>
-#include <Magnum/Math/Matrix4.h>
 #include <Magnum/Math/Color.h>
+#include <Magnum/Math/Matrix4.h>
 #include <Magnum/Shaders/Flat.h>
 #include <Magnum/Shaders/MeshVisualizer.h>
 
@@ -152,6 +152,8 @@ public:
       : Part(std::make_shared<Magnum::GL::Mesh>(std::move(mesh)), transform)
     {}
 
+    ~Part() = default;
+
     Part &operator=(const Part &other) = default;
     Part &operator=(Part &&other) = default;
   };
@@ -201,7 +203,7 @@ public:
   /// @param[out] halfExtents Calculated bounds half extents.
   void calcBounds(const Magnum::Matrix4 &transform, Bounds &bounds) const;
 
-  std::shared_ptr<shaders::Shader> shader() const { return _shader; }
+  [[nodiscard]] std::shared_ptr<shaders::Shader> shader() const { return _shader; }
 
   /// Set the bounds calculation function.
   /// @param bounds_calculator New bounds calculation function.
@@ -212,7 +214,7 @@ public:
 
   /// Get the active transform modifier. May be empty.
   /// @return The transform modifier function.
-  const TransformModifier &transformModifier() const { return _transform_modifier; }
+  [[nodiscard]] const TransformModifier &transformModifier() const { return _transform_modifier; }
   /// Set the active transform modifier. May be empty.
   ///
   /// Applied when finalising the render transform for a shape. The @c transform passed to the @p
@@ -277,7 +279,8 @@ public:
   /// @param child_index The index of the child.
   /// @return The resource id of the child shape, or @c util::kNullResource if the id arguments are
   /// invalid.
-  util::ResourceListId getChildId(util::ResourceListId parent_id, unsigned child_index) const;
+  [[nodiscard]] util::ResourceListId getChildId(util::ResourceListId parent_id,
+                                                unsigned child_index) const;
 
   /// Expire all shapes which were viewable before, but not at @p before_frame .
   /// @param before_frame The frame before which to expire shapes.
@@ -338,6 +341,8 @@ public:
     /// @param other Iterator to move.
     const_iterator(const_iterator &&other) = default;
 
+    ~const_iterator() = default;
+
     /// Copy assignment operator.
     /// @param other Iterator to copy.
     /// @return @c *this
@@ -350,11 +355,14 @@ public:
     /// Equality test. Only compares the cursor.
     /// @param other Iterator to compare.
     /// @return True if the iterators are semantically equivalent.
-    bool operator==(const const_iterator &other) const { return _cursor == other._cursor; }
+    [[nodiscard]] bool operator==(const const_iterator &other) const
+    {
+      return _cursor == other._cursor;
+    }
     /// Inequality test. Only compares the cursor.
     /// @param other Iterator to compare.
     /// @return True unless the iterators are semantically equivalent.
-    bool operator!=(const const_iterator &other) const { return !operator==(other); }
+    [[nodiscard]] bool operator!=(const const_iterator &other) const { return !operator==(other); }
 
     /// Prefix increment
     /// @return @c *this
@@ -375,14 +383,14 @@ public:
 
     /// Dereference to a @c View.
     /// @return A @c View to the current item.
-    const View &operator*() const { return _view; }
+    [[nodiscard]] const View &operator*() const { return _view; }
     /// Dereference to a @c View.
     /// @return A @c View to the current item.
-    const View *operator->() const { return &_view; }
+    [[nodiscard]] const View *operator->() const { return &_view; }
 
     /// Get the internal resource ID of the current item.
     /// @return
-    util::ResourceListId rid() const { return _cursor.id(); }
+    [[nodiscard]] util::ResourceListId rid() const { return _cursor.id(); }
 
   private:
     /// Iterate to the next item.
@@ -395,10 +403,10 @@ public:
 
   /// Begin iteration of the shapes in the cache.
   /// @return The starting iterator.
-  const_iterator begin() const { return const_iterator(_shapes.begin(), _shapes.end()); }
+  [[nodiscard]] const_iterator begin() const { return { _shapes.begin(), _shapes.end() }; }
   /// End iterator.
   /// @return The end iterator.
-  const_iterator end() const { return const_iterator(_shapes.end(), _shapes.end()); }
+  [[nodiscard]] const_iterator end() const { return { _shapes.end(), _shapes.end() }; }
 
 private:
   friend const_iterator;
@@ -433,10 +441,10 @@ private:
 
     /// Check if this is a parent shape.
     /// @return True for a parent shape.
-    bool isParent() const { return parent_rid == kListEnd && next != kListEnd; }
+    [[nodiscard]] bool isParent() const { return parent_rid == kListEnd && next != kListEnd; }
     /// Check if this is a child shape.
     /// @return True for a child shape.
-    bool isChild() const { return parent_rid != kListEnd; }
+    [[nodiscard]] bool isChild() const { return parent_rid != kListEnd; }
   };
 
   /// Instance buffer used to render shapes. Only valid during the @c draw() call.

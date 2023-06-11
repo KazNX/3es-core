@@ -7,8 +7,8 @@
 
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/GL/Renderer.h>
-#include <Magnum/Math/Matrix4.h>
 #include <Magnum/Math/Color.h>
+#include <Magnum/Math/Matrix4.h>
 
 namespace tes::view::shaders
 {
@@ -63,7 +63,8 @@ Shader &VertexColour::draw(Magnum::GL::Mesh &mesh)
   return *this;
 }
 
-Shader &VertexColour::draw(Magnum::GL::Mesh &mesh, Magnum::GL::Buffer &buffer, size_t instance_count)
+Shader &VertexColour::draw(Magnum::GL::Mesh &mesh, Magnum::GL::Buffer &buffer,
+                           size_t instance_count)
 {
   (void)mesh;
   (void)buffer;

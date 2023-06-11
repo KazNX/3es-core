@@ -51,6 +51,9 @@ public:
   /// Destructor.
   ~SimpleMesh() override;
 
+  // Copy assignment is not threadsafe. Deleted.
+  SimpleMesh &operator=(const SimpleMesh &other) = delete;
+
   /// Reset this mesh to a simple mesh with only @c Vertex and @c Index components.
   virtual void clear();
 

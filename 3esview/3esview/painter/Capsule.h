@@ -10,7 +10,7 @@
 namespace tes
 {
 class SimpleMesh;
-}
+}  // namespace tes
 
 namespace tes::view::painter
 {
@@ -20,7 +20,8 @@ class TES_VIEWER_API Capsule : public ShapePainter
 public:
   /// Constructor.
   /// @param culler Bounds culler
-  Capsule(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders);
+  Capsule(const std::shared_ptr<BoundsCuller> &culler,
+          const std::shared_ptr<shaders::ShaderLibrary> &shaders);
 
   void reset() override;
 

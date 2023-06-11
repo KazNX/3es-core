@@ -11,7 +11,7 @@ bool Text2D::writeCreate(PacketWriter &stream) const
 {
   bool ok = true;
   stream.reset(routingId(), CreateMessage::MessageId);
-  ok = _data.write(stream, _attributes) && ok;
+  ok = data().write(stream, attributes()) && ok;
 
   // Write line count and lines.
   const uint16_t text_length = textLength();

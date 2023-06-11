@@ -24,7 +24,7 @@ void Category::initialise()
 
 void Category::reset()
 {
-  std::lock_guard guard(_mutex);
+  const std::lock_guard guard(_mutex);
   _categories.clear();
   ensureRoot();
 }
@@ -32,14 +32,14 @@ void Category::reset()
 
 void Category::prepareFrame(const FrameStamp &stamp)
 {
-  (void)stamp;
+  std::ignore = stamp;
 }
 
 
 void Category::endFrame(const FrameStamp &stamp)
 {
-  (void)stamp;
-  std::lock_guard guard(_mutex);
+  std::ignore = stamp;
+  const std::lock_guard guard(_mutex);
   for (const auto &info : _pending)
   {
     _categories.updateCategory(info);
@@ -64,8 +64,8 @@ void Category::readMessage(PacketReader &reader)
   switch (reader.messageId())
   {
   case CategoryNameMessage::MessageId: {
-    CategoryNameMessage msg;
-    std::array<char, 8 * 1024u> name;
+    CategoryNameMessage msg = {};
+    std::array<char, 8192u> name = {};
     ok = msg.read(reader, name.data(), name.size());
     if (ok)
     {
@@ -93,7 +93,7 @@ void Category::readMessage(PacketReader &reader)
 
 void Category::serialise(Connection &out)
 {
-  std::lock_guard guard(_mutex);
+  const std::lock_guard guard(_mutex);
   CategoryNameMessage msg = {};
   const std::string error_str = "<error>";
   bool ok = true;
@@ -101,7 +101,7 @@ void Category::serialise(Connection &out)
   const uint16_t buffer_size = 1024u;
   std::vector<uint8_t> packet_buffer(buffer_size, 0u);
   PacketWriter writer(packet_buffer.data(), buffer_size);
-  for (auto &[id, info] : _categories.map())
+  for (const auto &[id, info] : _categories.map())
   {
     msg.category_id = info.id;
     msg.parent_id = info.parent_id;

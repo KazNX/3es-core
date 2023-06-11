@@ -22,7 +22,7 @@ Camera::Camera()
 
 size_t Camera::enumerate(std::vector<CameraId> &camera_ids) const
 {
-  std::lock_guard guard(_mutex);
+  const std::lock_guard guard(_mutex);
   camera_ids.clear();
   for (size_t i = 0; i < _cameras.size(); ++i)
   {
@@ -36,7 +36,7 @@ size_t Camera::enumerate(std::vector<CameraId> &camera_ids) const
 
 bool Camera::lookup(CameraId camera_id, camera::Camera &camera) const
 {
-  std::lock_guard guard(_mutex);
+  const std::lock_guard guard(_mutex);
   camera = _cameras[camera_id].first;
   return _cameras[camera_id].second;
 }
@@ -48,7 +48,7 @@ void Camera::initialise()
 
 void Camera::reset()
 {
-  std::lock_guard guard(_mutex);
+  const std::lock_guard guard(_mutex);
   // Clear validity flags.
   for (auto &camera : _cameras)
   {
@@ -67,7 +67,7 @@ void Camera::prepareFrame(const FrameStamp &stamp)
 void Camera::endFrame(const FrameStamp &stamp)
 {
   (void)stamp;
-  std::lock_guard guard(_mutex);
+  const std::lock_guard guard(_mutex);
   for (auto &[id, camera] : _pending_cameras)
   {
     if (id < _cameras.size())
@@ -116,14 +116,14 @@ void Camera::readMessage(PacketReader &reader)
                     Magnum::Vector3(msg.upX, msg.upY, msg.upZ), ref_dir, ref_up, camera.pitch,
                     camera.yaw);
 
-  std::lock_guard guard(_mutex);
-  _pending_cameras.emplace_back(std::pair(msg.camera_id, camera));
+  const std::lock_guard guard(_mutex);
+  _pending_cameras.emplace_back(msg.camera_id, camera);
 }
 
 
 void Camera::serialise(Connection &out)
 {
-  std::lock_guard guard(_mutex);
+  const std::lock_guard guard(_mutex);
   CameraMessage msg = {};
   const std::string error_str = "<error>";
   bool ok = true;
@@ -273,7 +273,8 @@ void Camera::calculatePitchYaw(const Magnum::Vector3 &camera_fwd, const Magnum::
   // Pitch
   Magnum::Vector3 ref_fwd;
   auto fwd_up_dot = Magnum::Math::dot(camera_fwd, world_up);
-  if (std::abs(std::abs(fwd_up_dot) - 1.0f) > 1e-6f)
+  const float epsilon = 1e-6f;
+  if (std::abs(std::abs(fwd_up_dot) - 1.0f) > epsilon)
   {
     // Calculate pitch as the angle between the camera and world forward vectors.
     // First calculate a world vector which is aligned with the camera forward (2D forward).
@@ -288,7 +289,8 @@ void Camera::calculatePitchYaw(const Magnum::Vector3 &camera_fwd, const Magnum::
   {
     // Edge case: forward ~ +-up
     // Pitch angle is 90 degrees. Sign is added in the outer scope.
-    pitch = static_cast<Magnum::Float>(Magnum::Rad(Magnum::Deg(90.0f)));
+    const auto right_angle = Magnum::Rad(Magnum::Deg(90.0f));
+    pitch = static_cast<Magnum::Float>(right_angle);
     // We need to use the up vector to get the yaw as the pitch won't yield useful info.
     ref_fwd = camera_up;
   }

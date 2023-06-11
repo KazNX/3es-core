@@ -15,12 +15,12 @@ struct QuaternionArg
 {
   /// Single precision pointer constructor.
   /// @param q Quaternion array.
-  QuaternionArg(const float q[4])  // NOLINT(modernize-avoid-c-arrays)
+  QuaternionArg(const float q[4])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
     : q(q)
   {}
   /// Double precision pointer constructor.
   /// @param q Quaternion array.
-  QuaternionArg(const double q[4])  // NOLINT(modernize-avoid-c-arrays)
+  QuaternionArg(const double q[4])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
     : q(Quaterniond(q))
   {}
   /// Single precision quaternion constructor.

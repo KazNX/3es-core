@@ -9,17 +9,19 @@
 
 namespace tes::view::painter
 {
-Cone::Cone(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders)
-  : ShapePainter(std::move(culler), std::move(shaders), { Part{ solidMesh() } }, { Part{ wireframeMesh() } },
+Cone::Cone(const std::shared_ptr<BoundsCuller> &culler,
+           const std::shared_ptr<shaders::ShaderLibrary> &shaders)
+  : ShapePainter(culler, shaders, { Part{ solidMesh() } }, { Part{ wireframeMesh() } },
                  { Part{ solidMesh() } }, ShapeCache::calcSphericalBounds)
 {}
 
 Magnum::GL::Mesh Cone::solidMesh()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtTriangles, SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
+  static SimpleMesh build_mesh(0, 0, 0, DtTriangles,
+                               SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
   static std::mutex guard;
 
-  std::unique_lock<std::mutex> lock(guard);
+  const std::scoped_lock lock(guard);
 
   // Build with the tes tesselator.
   if (build_mesh.vertexCount() == 0)
@@ -35,15 +37,16 @@ Magnum::GL::Mesh Cone::solidMesh()
     //      r
     // a = atan(r/h)
     // r = h * tan(a)
-    const float coneLength = 1.0f;
-    const float coneRadius = 1.0f;
-    const float coneAngle = std::atan(coneRadius / coneLength);
+    constexpr float kConeLength = 1.0f;
+    constexpr float kConeRadius = 1.0f;
+    const float cone_angle = std::atan(kConeRadius / kConeLength);
+    constexpr unsigned kFacets = 24;
 
     std::vector<tes::Vector3f> vertices;
     std::vector<tes::Vector3f> normals;
     std::vector<unsigned> indices;
-    tes::cone::solid(vertices, indices, normals, Vector3f(0, 0, coneLength), Vector3f(0, 0, coneLength), coneLength,
-                     coneAngle, 24);
+    tes::cone::solid(vertices, indices, normals, Vector3f(0, 0, kConeLength),
+                     Vector3f(0, 0, kConeLength), kConeLength, cone_angle, kFacets);
 
     build_mesh.setVertexCount(vertices.size());
     build_mesh.setIndexCount(indices.size());
@@ -62,7 +65,7 @@ Magnum::GL::Mesh Cone::wireframeMesh()
   static SimpleMesh build_mesh(0, 0, 0, DtLines, SimpleMesh::Vertex | SimpleMesh::Index);
   static std::mutex guard;
 
-  std::unique_lock<std::mutex> lock(guard);
+  const std::scoped_lock lock(guard);
 
   // Build with the tes tesselator.
   if (build_mesh.vertexCount() == 0)
@@ -78,13 +81,14 @@ Magnum::GL::Mesh Cone::wireframeMesh()
     //      r
     // a = atan(r/h)
     // r = h * tan(a)
-    const float coneLength = 1.0f;
-    const float coneRadius = 1.0f;
-    const float coneAngle = std::atan(coneRadius / coneLength);
+    constexpr float kConeLength = 1.0f;
+    constexpr float kConeRadius = 1.0f;
+    const float cone_angle = std::atan(kConeRadius / kConeLength);
+    constexpr unsigned kFacets = 16;
     std::vector<tes::Vector3f> vertices;
     std::vector<unsigned> indices;
-    tes::cone::wireframe(vertices, indices, Vector3f(0, 0, coneLength), Vector3f(0, 0, coneLength), coneLength,
-                         coneAngle, 16);
+    tes::cone::wireframe(vertices, indices, Vector3f(0, 0, kConeLength),
+                         Vector3f(0, 0, kConeLength), kConeLength, cone_angle, kFacets);
 
     build_mesh.setVertexCount(vertices.size());
     build_mesh.setIndexCount(indices.size());

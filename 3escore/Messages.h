@@ -16,7 +16,7 @@
 
 namespace tes
 {
-// NOLINTBEGIN(modernize-use-auto, modernize-avoid-c-arrays, modernize-loop-convert,
+// NOLINTBEGIN(modernize-use-auto, cppcoreguidelines-avoid-c-arrays, modernize-loop-convert,
 // google-readability-casting)
 
 /// List of routing IDs of common, built in message handlers.
@@ -187,7 +187,6 @@ enum MeshShapeFlag : unsigned
 /// Flags controlling the creation and appearance of an object.
 enum UpdateFlag : unsigned
 {
-  // NOLINTBEGIN(hicpp-signed-bitwise)
   /// This flag indicates that the @c UpdateMessage only contains data for specific items.
   /// Combined with `{UFPosition, UFRotation, UFScale, UFColour}` to indicate what data are present.
   ///
@@ -199,7 +198,6 @@ enum UpdateFlag : unsigned
   UFScale = (OFExtended << 4u),     ///< Update scale data.
   UFColour = (OFExtended << 5u),    ///< Update colour data.
   UFPosRotScaleColour = UFPosition | UFRotation | UFScale | UFColour,
-  // NOLINTEND(hicpp-signed-bitwise)
 };
 
 /// Flags for @c CollatedPacketMessage.
@@ -266,7 +264,7 @@ struct TES_CORE_API ServerInfoMessage
   uint8_t coordinate_frame;
   /// Reserved for future use. Must be zero.
   /// Aiming to pad out to a total of 64-bytes in the packet.
-  uint8_t reserved[35];  // NOLINT(readability-magic-numbers)
+  uint8_t reserved[35];  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
   /// Read this message from @p reader.
   /// @param reader The data source.
@@ -849,7 +847,7 @@ struct TES_CORE_API CameraMessage
   }
 };
 
-// NOLINTEND(modernize-use-auto, modernize-avoid-c-arrays, modernize-loop-convert,
+// NOLINTEND(modernize-use-auto, cppcoreguidelines-avoid-c-arrays, modernize-loop-convert,
 // google-readability-casting)
 }  // namespace tes
 

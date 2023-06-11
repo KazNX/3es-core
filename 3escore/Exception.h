@@ -19,6 +19,9 @@ public:
   /// @param filename File name where the exception was thrown from, if available.
   /// @param line_number Line nubmer where the exception was thrown, if available.
   Exception(const char *msg = nullptr, const char *filename = nullptr, int line_number = 0);
+  /// Copy constructor.
+  /// @param other
+  Exception(const Exception &other);
   /// Move constructor.
   /// @param other
   Exception(Exception &&other) noexcept;
@@ -32,11 +35,17 @@ public:
   /// Copy/move assignment.
   /// @param other Object to copy/move.
   /// @return @c *this
-  Exception &operator=(Exception other)
+  Exception &operator=(const Exception &other)
   {
-    other.swap(*this);
+    Exception local(other);
+    local.swap(*this);
     return *this;
   }
+
+  /// Move assignment.
+  /// @param other Object to copy/move.
+  /// @return @c *this
+  Exception &operator=(Exception &&other) noexcept;
 
   /// Swap the contents of @c this with @p other.
   /// @param other Object to swap with.

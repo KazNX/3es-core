@@ -142,7 +142,7 @@ MeshShape::MeshShape(const MeshShape &other)
 
 
 MeshShape::MeshShape(MeshShape &&other) noexcept
-  : Shape(other)
+  : Shape(std::move(other))
   , _vertices(std::move(other._vertices))
   , _normals(std::move(other._normals))
   , _colours(std::move(other._colours))
@@ -154,6 +154,32 @@ MeshShape::MeshShape(MeshShape &&other) noexcept
 
 
 MeshShape::~MeshShape() = default;
+
+
+MeshShape &MeshShape::operator=(const MeshShape &other)
+{
+  if (this != &other)
+  {
+    Shape::operator=(other);
+    other.onClone(*this);
+  }
+  return *this;
+}
+
+/// Move assignment.
+/// @param other Object to move.
+MeshShape &MeshShape::operator=(MeshShape &&other) noexcept
+{
+  _vertices = std::move(other._vertices);
+  _normals = std::move(other._normals);
+  _colours = std::move(other._colours);
+  _indices = std::move(other._indices);
+  _quantisation_unit = std::exchange(other._quantisation_unit, 0.0);
+  _draw_scale = std::exchange(other._draw_scale, 0.0f);
+  _draw_type = std::exchange(other._draw_type, DtPoints);
+  Shape::operator=(std::move(other));
+  return *this;
+}
 
 
 MeshShape &MeshShape::setNormals(const DataBuffer &normals)
@@ -181,10 +207,9 @@ void expandVertices(DataBuffer &vertices, DataBuffer &indices)
   {
     // First unpack all vertices and stop indexing.
     const size_t element_count = static_cast<size_t>(vertices.componentCount()) * indices.count();
-    T *verts = new T[element_count];
+    T *verts = new T[element_count];  // NOLINT(cppcoreguidelines-owning-memory)
     // Set vertices to hold the new pointer as soon as we can for RAII
-    vertices.set(verts, indices.count(), vertices.componentCount(), vertices.componentCount(),
-                 true);
+    vertices.set(verts, indices.count(), vertices.componentCount(), vertices.componentCount());
 
     T *dst = verts;
     for (unsigned i = 0; i < indices.count(); ++i)
@@ -192,6 +217,7 @@ void expandVertices(DataBuffer &vertices, DataBuffer &indices)
       for (unsigned j = 0; j < vertices.componentCount(); ++j)
       {
         const unsigned vind = *indices.ptr<unsigned>(i);
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         *dst = vertices.ptr<T>(vind)[j];
       }
     }
@@ -250,7 +276,7 @@ int MeshShape::writeData(PacketWriter &packet, unsigned &progress_marker) const
 {
   bool ok = true;
   DataMessage msg = {};
-  msg.id = _data.id;
+  msg.id = id();
   packet.reset(routingId(), DataMessage::MessageId);
   ok = msg.write(packet);
 
@@ -270,9 +296,9 @@ int MeshShape::writeData(PacketWriter &packet, unsigned &progress_marker) const
   // While progress_marker is greater than or equal to the sum of the previous phase counts and the
   // current phase count. Also terminate of out of phases.
   while (phase_index < phases.size() &&
-         progress_marker >= previous_phase_offset + phases[phase_index].stream->count())
+         progress_marker >= previous_phase_offset + phases.at(phase_index).stream->count())
   {
-    previous_phase_offset += phases[phase_index].stream->count();
+    previous_phase_offset += phases.at(phase_index).stream->count();
     ++phase_index;
   }
 
@@ -366,7 +392,7 @@ bool MeshShape::readCreate(PacketReader &packet)
 
 bool MeshShape::readData(PacketReader &packet)
 {
-  DataMessage msg;
+  DataMessage msg = {};
   uint16_t data_type = 0;
   bool ok = true;
 
@@ -418,7 +444,6 @@ std::shared_ptr<Shape> MeshShape::clone() const
 {
   auto triangles = std::make_shared<MeshShape>();
   onClone(*triangles);
-  triangles->_data = _data;
   return triangles;
 }
 

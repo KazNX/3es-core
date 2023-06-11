@@ -22,8 +22,11 @@ class TES_CORE_API TcpListenSocket
 public:
   /// Constructor.
   TcpListenSocket();
+  TcpListenSocket(const TcpListenSocket &other) = delete;
   /// Destructor.
   ~TcpListenSocket();
+
+  TcpListenSocket &operator=(const TcpListenSocket &other) = delete;
 
   /// The port on which the socket is listening, or zero when not listening.
   /// @return The TCP listen port.

@@ -44,11 +44,13 @@ public:
   };
 
   explicit UIViewer(const Arguments &arguments);
+  ~UIViewer();
 
   [[nodiscard]] bool uiEnabled() const { return _ui_enabled; }
   void setUiEnabled(bool enable) { _ui_enabled = enable; }
 
 protected:
+  void drawEvent() override;
   DrawMode onDrawStart(float dt) override;
   void onDrawComplete(float dt) override;
   void viewportEvent(ViewportEvent &event) override;
@@ -66,9 +68,14 @@ private:
   void initialiseHud();
   void initialiseIconBarUi();
   void initialisePlaybackUi();
+  void updateWindowSize(const settings::Settings::Config &config);
 
   Magnum::ImGuiIntegration::Context _imgui{ Magnum::NoCreate };
   std::vector<std::shared_ptr<ui::Panel>> _panels;
+  /// Window size in sync with settings. Window may be resized on the next update if changed.
+  /// This is a bit of an initialisation hack to make sure the virtual viewport functions are
+  /// correctly called.
+  Magnum::Vector2i _expected_window_size;
   bool _ui_enabled = true;
 };
 }  // namespace tes::view

@@ -36,10 +36,11 @@ public:
   /// @param view_size The size of the target viewport in pixels.
   /// @param near_clip The near clip plane distance.
   /// @param far_clip The far clip plane distance.
-  void prepareFrame(const Magnum::Matrix4 &projection_matrix, ProjectionType projection_type, float near_clip,
-                    float far_clip) override;
+  void prepareFrame(const Magnum::Matrix4 &projection_matrix, ProjectionType projection_type,
+                    float near_clip, float far_clip) override;
 
-  /// Complete rendering of the frame. This must blit back to the active frame buffer, normally the default.
+  /// Complete rendering of the frame. This must blit back to the active frame buffer, normally the
+  /// default.
   void completeFrame() override;
 
   /// Called when the viewport changes. Allows the frame buffer to resize if required.

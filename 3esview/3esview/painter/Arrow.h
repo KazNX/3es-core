@@ -14,7 +14,8 @@ class TES_VIEWER_API Arrow : public ShapePainter
 public:
   /// Constructor.
   /// @param culler Bounds culler
-  Arrow(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders);
+  Arrow(const std::shared_ptr<BoundsCuller> &culler,
+        const std::shared_ptr<shaders::ShaderLibrary> &shaders);
 
   /// Solid mesh creation function.
   /// @return A solid (or transparent) mesh representation.

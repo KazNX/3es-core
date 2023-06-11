@@ -64,8 +64,10 @@ public:
   void setId(const void *id_ptr)
   {
 #ifdef TES_64
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     _id = static_cast<uint32_t>(reinterpret_cast<size_t>(id_ptr));
 #else   // TES_64
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     _id = static_cast<size_t>(id_ptr);
 #endif  // TES_64
   }

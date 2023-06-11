@@ -43,6 +43,18 @@ public:
   /// @param other Object to move.
   Cylinder(Cylinder &&other) noexcept = default;
 
+  ~Cylinder() override = default;
+
+  /// Copy assignment.
+  /// @param other The object to copy.
+  /// @return @c *this
+  Cylinder &operator=(const Cylinder &other) noexcept = default;
+
+  /// Move assignment.
+  /// @param other The object to move.
+  /// @return @c *this
+  Cylinder &operator=(Cylinder &&other) noexcept = default;
+
   [[nodiscard]] const char *type() const override { return "cylinder"; }
 
   /// Set the cylinder body radius.

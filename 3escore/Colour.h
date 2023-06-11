@@ -45,7 +45,7 @@ public:
 
   /// Construct a colour with the given numeric value.
   /// @param colour_value The integer colour representation: 0xRRGGBBAA.
-  Colour(uint32_t colour_value = 0xffffffffu) noexcept;  // NOLINT(readability-magic-numbers)
+  Colour(uint32_t colour_value = 0xffffffffu) noexcept;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
   /// Construct a colour the named colours.
   /// @param name The colour name enumeration value.
@@ -93,16 +93,18 @@ public:
   /// @param alpha Alpha channel value [0, 1].
   Colour(float red, float green, float blue, float alpha = 1.0f) noexcept;
 
+  ~Colour() = default;
+
   /// Access the specified colour channel for read/write.
   /// @param channel The channel to access.
   /// @return A reference to the colour channel value.
-  uint8_t &channel(Channel channel) { return _storage[static_cast<int>(channel)]; }
+  uint8_t &channel(Channel channel) { return _storage.at(static_cast<int>(channel)); }
   /// Access the specified colour channel for read-only.
   /// @param channel The channel to access.
   /// @return The colour channel value.
   [[nodiscard]] uint8_t channel(Channel channel) const
   {
-    return _storage[static_cast<int>(channel)];
+    return _storage.at(static_cast<int>(channel));
   }
 
   /// Return the internal data storage. Used for buffer packing and network transfer.
@@ -693,13 +695,13 @@ inline void Colour::setAf(float value)
 
 inline void Colour::setf(float value, Channel channel)
 {
-  _storage[static_cast<int>(channel)] = static_cast<uint8_t>(value * 255.0f);
+  _storage.at(static_cast<int>(channel)) = static_cast<uint8_t>(value * 255.0f);
 }
 
 
 inline float Colour::getf(Channel channel) const
 {
-  return static_cast<float>(_storage[static_cast<int>(channel)]) / 255.0f;
+  return static_cast<float>(_storage.at(static_cast<int>(channel))) / 255.0f;
 }
 
 
@@ -802,7 +804,6 @@ inline Colour Colour::fromHsv(float hue, float saturation, float value, float al
 
 inline uint32_t Colour::ConverterUInt32::operator()(const std::array<uint8_t, 4> &storage) const
 {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return (storage[kRedIndex] << kRedShift) | (storage[kGreenIndex] << kGreenShift) |
          (storage[kBlueIndex] << kBlueShift) | (storage[kAlphaIndex] << kAlphaShift);
 }

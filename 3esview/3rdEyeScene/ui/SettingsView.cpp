@@ -23,46 +23,38 @@ void SettingsView::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &wi
 {
   TES_UNUSED(ui);
   TES_UNUSED(window);
-  auto config = _viewer.tes()->settings().config();
+  if (!_editing_config)
+  {
+    _cached_config = _viewer.tes()->settings().config();
+  }
+
   if (ImGui::BeginTable("SettingsSplit", 2,
                         ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable))
   {
     unsigned idx = 0;
 
-    const bool camera_dirty = show(idx++, config.camera);
-    const bool render_dirty = show(idx++, config.render);
-    const bool playback_dirty = show(idx++, config.playback);
-    // const bool log_dirty = show(idx++,config.log);
+    ViewStatus status = {};
+    status += show(idx++, _cached_config.camera);
+    status += show(idx++, _cached_config.render);
+    status += show(idx++, _cached_config.playback);
+    status += show(idx++, _cached_config.log);
 
-    // If more than two things are dirty, then update everything. Really should never happen as we
-    // can only modify one property at a time.
-    unsigned dirty_count = 0;
-    dirty_count += !!camera_dirty;
-    dirty_count += !!render_dirty;
-    dirty_count += !!playback_dirty;
-    // dirty_count += !!log_dirty;
-    if (dirty_count == 1)
+    for (auto &extension : _cached_config.extentions)
     {
-      if (camera_dirty)
-      {
-        _viewer.tes()->settings().update(config.camera);
-      }
-      else if (render_dirty)
-      {
-        _viewer.tes()->settings().update(config.render);
-      }
-      else if (playback_dirty)
-      {
-        _viewer.tes()->settings().update(config.playback);
-      }
-      // else if (log_dirty)
-      // {
-      //   _viewer.tes()->settings().update(config.log);
-      // }
+      status += show(idx++, extension);
     }
-    else if (dirty_count > 1)
+
+    if (status.dirty)
     {
-      _viewer.tes()->settings().update(config);
+      // Mark config being edited.
+      _editing_config = true;
+    }
+    else if (!status.active && _editing_config)
+    {
+      // Done editing.
+      _editing_config = false;
+      // Notify of changes.
+      _viewer.tes()->settings().update(_cached_config);
     }
 
     ImGui::EndTable();
@@ -70,204 +62,271 @@ void SettingsView::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &wi
 }
 
 
-bool SettingsView::show(unsigned idx, settings::Camera &config)
+SettingsView::ViewStatus SettingsView::show(unsigned idx, settings::Camera &config)
 {
   const bool open = beginBranch(idx, "Camera");
-  bool dirty = false;
+  ViewStatus status = {};
 
   if (open)
   {
     unsigned idx = 0;
-    dirty = showProperty(idx++, config.invert_y) || dirty;
-    dirty = showProperty(idx++, config.allow_remote_settings) || dirty;
-    dirty = showProperty(idx++, config.near_clip) || dirty;
-    dirty = showProperty(idx++, config.far_clip) || dirty;
-    dirty = showProperty(idx++, config.fov) || dirty;
+    status += showProperty(idx++, config.invert_y);
+    status += showProperty(idx++, config.allow_remote_settings);
+    status += showProperty(idx++, config.near_clip);
+    status += showProperty(idx++, config.far_clip);
+    status += showProperty(idx++, config.fov);
   }
 
   endBranch(open);
 
-  return dirty;
+  return status;
 }
 
 
-bool SettingsView::show(unsigned idx, settings::Log &config)
+SettingsView::ViewStatus SettingsView::show(unsigned idx, settings::Log &config)
 {
   const bool open = beginBranch(idx, "Log");
-  bool dirty = false;
+  ViewStatus status = {};
 
   if (open)
   {
     unsigned idx = 0;
-    dirty = showProperty(idx++, config.log_window_size) || dirty;
+    status += showProperty(idx++, config.log_history);
   }
 
   endBranch(open);
 
-  return dirty;
+  return status;
 }
 
 
-bool SettingsView::show(unsigned idx, settings::Playback &config)
+SettingsView::ViewStatus SettingsView::show(unsigned idx, settings::Playback &config)
 {
   const bool open = beginBranch(idx, "Playback");
-  bool dirty = false;
+  ViewStatus status = {};
 
   if (open)
   {
     unsigned idx = 0;
-    dirty = showProperty(idx++, config.allow_key_frames) || dirty;
-    dirty = showProperty(idx++, config.keyframe_every_mib) || dirty;
-    dirty = showProperty(idx++, config.keyframe_every_frames) || dirty;
-    dirty = showProperty(idx++, config.keyframe_min_separation) || dirty;
-    dirty = showProperty(idx++, config.keyframe_compression) || dirty;
-    dirty = showProperty(idx++, config.looping) || dirty;
-    dirty = showProperty(idx++, config.pause_on_error) || dirty;
+    status += showProperty(idx++, config.allow_key_frames);
+    status += showProperty(idx++, config.keyframe_every_mib);
+    status += showProperty(idx++, config.keyframe_every_frames);
+    status += showProperty(idx++, config.keyframe_min_separation);
+    status += showProperty(idx++, config.keyframe_compression);
+    status += showProperty(idx++, config.looping);
+    status += showProperty(idx++, config.pause_on_error);
   }
 
   endBranch(open);
 
-  return dirty;
+  return status;
 }
 
 
-bool SettingsView::show(unsigned idx, settings::Render &config)
+SettingsView::ViewStatus SettingsView::show(unsigned idx, settings::Render &config)
 {
   const bool open = beginBranch(idx, "Render");
-  bool dirty = false;
+  ViewStatus status = {};
 
   if (open)
   {
     unsigned idx = 0;
-    dirty = showProperty(idx++, config.use_edl_shader) || dirty;
-    dirty = showProperty(idx++, config.edl_radius) || dirty;
-    dirty = showProperty(idx++, config.edl_exponential_scale) || dirty;
-    dirty = showProperty(idx++, config.edl_linear_scale) || dirty;
-    dirty = showProperty(idx++, config.point_size) || dirty;
-    dirty = showProperty(idx++, config.background_colour) || dirty;
+    status += showProperty(idx++, config.use_edl_shader);
+    status += showProperty(idx++, config.edl_radius);
+    status += showProperty(idx++, config.edl_exponential_scale);
+    status += showProperty(idx++, config.edl_linear_scale);
+    status += showProperty(idx++, config.point_size);
+    status += showProperty(idx++, config.background_colour);
   }
 
   endBranch(open);
 
-  return dirty;
+  return status;
 }
 
 
-bool SettingsView::showProperty(unsigned idx, settings::Bool &prop)
+SettingsView::ViewStatus SettingsView::show(unsigned idx, settings::Extension &config)
+{
+  const bool open = beginBranch(idx, config.name());
+  ViewStatus status = {};
+
+  if (open)
+  {
+    // Show all properties.
+    unsigned idx = 0;
+    for (auto &property : config)
+    {
+      // Brute force solution: try convert each property to each of the available types.
+      // Show the one which works.
+      if (auto *prop = property.getProperty<settings::Bool>())
+      {
+        status += showProperty(idx++, *prop);
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::Colour>())
+      {
+        status += showProperty(idx++, *prop);
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::Enum>())
+      {
+        status += showProperty(idx++, *prop);
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::Int>())
+      {
+        status += showProperty(idx++, *prop);
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::UInt>())
+      {
+        status += showProperty(idx++, *prop);
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::Float>())
+      {
+        status += showProperty(idx++, *prop);
+        continue;
+      }
+      if (auto *prop = property.getProperty<settings::Double>())
+      {
+        status += showProperty(idx++, *prop);
+        continue;
+      }
+      log::warn("Extension property ", property.label(), " has unknown type");
+    }
+  }
+
+  endBranch(open);
+
+  return status;
+}
+
+
+SettingsView::ViewStatus SettingsView::showProperty(unsigned idx, settings::Bool &prop)
 {
   beginLeaf(idx, prop.label(), prop.tip());
   bool value = prop.value();
-  const auto dirty = ImGui::Checkbox(prop.label().c_str(), &value);
-  if (dirty)
+  ViewStatus status = {};
+  status.dirty = ImGui::Checkbox(prop.label().c_str(), &value);
+  if (status.dirty)
   {
     prop.setValue(value);
   }
+  status.active = ImGui::IsItemActive();
   endLeaf();
-  return dirty;
+  return status;
 }
 
 
-bool SettingsView::showProperty(unsigned idx, settings::Int &prop)
+SettingsView::ViewStatus SettingsView::showProperty(unsigned idx, settings::Int &prop)
 {
   beginLeaf(idx, prop.label(), prop.tip());
   int value = prop.value();
-  const bool dirty = ImGui::InputInt(prop.label().c_str(), &value);
-  if (dirty)
+  ViewStatus status = {};
+  status.dirty = ImGui::InputInt(prop.label().c_str(), &value);
+  if (status.dirty)
   {
     prop.setValue(value);
   }
+  status.active = ImGui::IsItemActive();
   endLeaf();
-  return dirty;
+  return status;
 }
 
 
-bool SettingsView::showProperty(unsigned idx, settings::UInt &prop)
+SettingsView::ViewStatus SettingsView::showProperty(unsigned idx, settings::UInt &prop)
 {
   beginLeaf(idx, prop.label(), prop.tip());
   unsigned value = prop.value();
-  const bool dirty = ImGui::InputInt(prop.label().c_str(), reinterpret_cast<int *>(&value));
-  if (dirty)
+  ViewStatus status = {};
+  status.dirty = ImGui::InputInt(prop.label().c_str(), reinterpret_cast<int *>(&value));
+  if (status.dirty)
   {
     prop.setValue(value);
   }
+  status.active = ImGui::IsItemActive();
   endLeaf();
-  return dirty;
+  return status;
 }
 
 
-bool SettingsView::showProperty(unsigned idx, settings::Float &prop)
+SettingsView::ViewStatus SettingsView::showProperty(unsigned idx, settings::Float &prop)
 {
   beginLeaf(idx, prop.label(), prop.tip());
   float value = prop.value();
-  const bool dirty = ImGui::InputFloat(prop.label().c_str(), &value);
-  if (dirty)
+  ViewStatus status = {};
+  status.dirty = ImGui::InputFloat(prop.label().c_str(), &value);
+  if (status.dirty)
   {
     prop.setValue(value);
   }
+  status.active = ImGui::IsItemActive();
   endLeaf();
-  return dirty;
+  return status;
 }
 
 
-bool SettingsView::showProperty(unsigned idx, settings::Double &prop)
+SettingsView::ViewStatus SettingsView::showProperty(unsigned idx, settings::Double &prop)
 {
   beginLeaf(idx, prop.label(), prop.tip());
   double value = prop.value();
-  const bool dirty = ImGui::InputDouble(prop.label().c_str(), &value);
-  if (dirty)
+  ViewStatus status = {};
+  status.dirty = ImGui::InputDouble(prop.label().c_str(), &value);
+  if (status.dirty)
   {
     prop.setValue(value);
   }
+  status.active = ImGui::IsItemActive();
   endLeaf();
-  return dirty;
+  return status;
 }
 
 
-bool SettingsView::showProperty(unsigned idx, settings::Colour &prop)
+SettingsView::ViewStatus SettingsView::showProperty(unsigned idx, settings::Colour &prop)
 {
   beginLeaf(idx, prop.label(), prop.tip());
   auto value = prop.value();
   std::array<float, 3> rgb_f = { prop.value().rf(), prop.value().gf(), prop.value().bf() };
-  const bool dirty = ImGui::ColorEdit3(prop.label().c_str(), rgb_f.data());
-  if (dirty)
+  ViewStatus status = {};
+  status.dirty = ImGui::ColorEdit3(prop.label().c_str(), rgb_f.data());
+  if (status.dirty)
   {
     value.setRf(rgb_f[0]);
     value.setGf(rgb_f[1]);
     value.setBf(rgb_f[2]);
     prop.setValue(value);
   }
+  status.active = ImGui::IsItemActive();
   endLeaf();
-  return dirty;
+  return status;
 }
 
 
-template <typename E>
-bool SettingsView::showProperty(unsigned idx, settings::Enum<E> &prop)
+SettingsView::ViewStatus SettingsView::showProperty(unsigned idx, settings::Enum &prop)
 {
   beginLeaf(idx, prop.label(), prop.tip());
-  bool dirty = false;
+  ViewStatus status = {};
   auto value = prop.value();
-  if (ImGui::BeginCombo(prop.label().c_str(), prop.valueName().c_str()))
+  const auto named_values = prop.namedValues();
+  int value_index = 0;
+  std::vector<const char *> names(named_values.size());
+  for (int i = 0; i < static_cast<int>(named_values.size()); ++i)
   {
-    const auto named_values = prop.namedValues();
-    int value_index = 0;
-    std::vector<const char *> names(named_values.size());
-    for (int i = 0; i < static_cast<int>(named_values.size()); ++i)
+    names[i] = named_values[i].second.c_str();
+    if (value == named_values[i].first)
     {
-      names[i] = named_values[i].second.c_str();
-      if (value == named_values[i])
-      {
-        value_index = i;
-      }
-    }
-    if (Combo(name.c_str(), &value_index, names.c_str(), static_cast<int>(names.size())))
-    {
-      prop.setValueByName(names[value_index]);
-      dirty = true;
+      value_index = i;
     }
   }
-  ImGui::EndCombo();
+  if (ImGui::Combo(prop.label().c_str(), &value_index, names.data(),
+                   static_cast<int>(names.size())))
+  {
+    prop.setValueByName(names[value_index]);
+    status.dirty = true;
+  }
+  status.active = ImGui::IsItemActive();
   endLeaf();
-  return dirty;
+  return status;
 }
 }  // namespace tes::view::ui

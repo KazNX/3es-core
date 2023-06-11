@@ -659,7 +659,7 @@ int main(int argc, char **argvNonConst)
   std::vector<unsigned> sphereIndices;
 
   // Use a large sphere to ensure we need multiple data packets to transfer the vertices.
-  sphere::solid(sphereVerts, sphereIndices, 2.1f, 4);
+  sphere::solid(sphereVerts, sphereIndices, 2.1f, Vector3f(0.0f), 4);
 
   addShape(createPointsMesh(nextId++, sphereVerts), server, shapes, "-points");
   addShape(createLinesMesh(nextId++, sphereVerts, sphereIndices), server, shapes, "-lines");

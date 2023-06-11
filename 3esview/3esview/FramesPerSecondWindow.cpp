@@ -11,7 +11,7 @@ FramesPerSecondWindow::FramesPerSecondWindow(unsigned window_size)
 
 void FramesPerSecondWindow::push(float dt)
 {
-  const unsigned max_count = unsigned(_window.size());
+  const auto max_count = static_cast<unsigned>(_window.size());
   _window[_next] = dt;
   _next = (_next + 1) % max_count;
   _count = std::min(_count + 1, max_count);

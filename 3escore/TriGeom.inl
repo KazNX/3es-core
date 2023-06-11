@@ -120,8 +120,8 @@ template <typename T>
 bool planeBoxOverlap(const Vector3<T> &normal, const Vector3<T> &vert,
                      const Vector3<T> &maxbox)  // -NJMP-
 {
-  Vector3<T> vmin;
-  Vector3<T> vmax;
+  Vector3<T> vmin = {};
+  Vector3<T> vmax = {};
 
   vmin.x() = (normal.x() > 0.0f) ? -maxbox.x() - vert.x() : maxbox.x() - vert.x();  // -NJMP-
   vmax.x() = (normal.x() > 0.0f) ? maxbox.x() - vert.x() : -maxbox.x() - vert.x();  // -NJMP-
@@ -299,11 +299,11 @@ bool intersectRayT(T *hit_time, const Vector3<T> &v0, const Vector3<T> &v1, cons
                    const Vector3<T> &origin, const Vector3<T> &dir, const T epsilon)
 {
   // From https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-  Vector3<T> e0;  // Edge0
-  Vector3<T> e1;  // Edge1
-  Vector3<T> vec_p;
-  Vector3<T> vec_q;
-  Vector3<T> vec_tt;
+  Vector3<T> e0 = {};  // Edge0
+  Vector3<T> e1 = {};  // Edge1
+  Vector3<T> vec_p = {};
+  Vector3<T> vec_q = {};
+  Vector3<T> vec_tt = {};
   T det = {};
   T inv_det = {};
   T u = {};
@@ -370,9 +370,9 @@ bool intersectTrianglesT(const Vector3<T> &a0, const Vector3<T> &a1, const Vecto
   // From: Thomas Moller, "A Fast Triangle-Triangle Intersection test"
   // http://web.stanford.edu/class/cs277/resources/papers/Moller1997b.pdf
   // 1. Build triangle planes
-  Vector4<T> plane_a;
-  Vector4<T> plane_b;
-  Vector3<T> line_d;
+  Vector4<T> plane_a = {};
+  Vector4<T> plane_b = {};
+  Vector3<T> line_d = {};
   std::array<T, 3> dist = { 0, 0, 0 };
   std::array<T, 3> proj = { 0, 0, 0 };
   std::array<T, 3> signs = { 0, 0, 0 };
@@ -381,7 +381,7 @@ bool intersectTrianglesT(const Vector3<T> &a0, const Vector3<T> &a1, const Vecto
   T ta2 = {};
   T tb1 = {};
   T tb2 = {};
-  std::array<int, 3> refinds;
+  std::array<int, 3> refinds = {};
   bool overlap_a = false;
   bool overlap_b = false;
 
@@ -457,6 +457,7 @@ bool intersectTrianglesT(const Vector3<T> &a0, const Vector3<T> &a1, const Vecto
       refinds[2] = 1;
     }
 
+    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
     // t[1] = p[V1[0]] + (p[V1[1]] - p[V1[0]]) * ( d[V1[0]] / (d[V1[0]] - d[V1[1]]) )
     ta1 = proj[refinds[0]] + (proj[refinds[1]] - proj[refinds[0]]) *
                                (dist[refinds[0]] / (dist[refinds[0]] - dist[refinds[1]]));
@@ -464,6 +465,7 @@ bool intersectTrianglesT(const Vector3<T> &a0, const Vector3<T> &a1, const Vecto
     // t[2] = p[V1[2]] + (p[V1[1]] - p[V1[2]]) * ( d[V1[2]] / (d[V1[2]] - d[V1[1]]) )
     ta2 = proj[refinds[2]] + (proj[refinds[1]] - proj[refinds[2]]) *
                                (dist[refinds[2]] / (dist[refinds[2]] - dist[refinds[1]]));
+    // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 
     // Now we make the same calculation for triangle 2 on 1.
     dist[0] = plane_a.xyz().dot(b0) + plane_a.w();
@@ -504,6 +506,7 @@ bool intersectTrianglesT(const Vector3<T> &a0, const Vector3<T> &a1, const Vecto
       refinds[2] = 1;
     }
 
+    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
     // t[1] = p[V1[0]] + (p[V1[1]] - p[V1[0]]) * ( d[V1[0]] / (d[V1[0]] - d[V1[1]]) )
     tb1 = proj[refinds[0]] + (proj[refinds[1]] - proj[refinds[0]]) *
                                (dist[refinds[0]] / (dist[refinds[0]] - dist[refinds[1]]));
@@ -511,6 +514,7 @@ bool intersectTrianglesT(const Vector3<T> &a0, const Vector3<T> &a1, const Vecto
     // t[2] = p[V1[2]] + (p[V1[1]] - p[V1[2]]) * ( d[V1[2]] / (d[V1[2]] - d[V1[1]]) )
     tb2 = proj[refinds[2]] + (proj[refinds[1]] - proj[refinds[2]]) *
                                (dist[refinds[2]] / (dist[refinds[2]] - dist[refinds[1]]));
+    // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 
     // Intersect if ta1/2 and tb1/2 intervals overlap.
     if (ta1 <= tb1 && tb1 <= ta2 || ta1 <= tb2 && tb2 <= ta2 || tb1 <= ta1 && ta1 <= tb2 ||
@@ -598,13 +602,13 @@ bool intersectAABBT(const std::array<Vector3<T>, 3> &tri, const std::array<Vecto
   //       this gives 3x3=9 more tests
   const Vector3<T> half_extents = static_cast<T>(0.5) * (aabb[1] - aabb[0]);
   const Vector3<T> centre = static_cast<T>(0.5) * (aabb[1] + aabb[0]);
-  Vector3<T> v0;
-  Vector3<T> v1;
-  Vector3<T> v2;
-  Vector3<T> normal;
-  Vector3<T> e0;
-  Vector3<T> e1;
-  Vector3<T> e2;
+  Vector3<T> v0 = {};
+  Vector3<T> v1 = {};
+  Vector3<T> v2 = {};
+  Vector3<T> normal = {};
+  Vector3<T> e0 = {};
+  Vector3<T> e1 = {};
+  Vector3<T> e2 = {};
   T minval = {};
   T maxval = {};
   T fex = {};
@@ -690,8 +694,9 @@ inline Vector3f centre(const std::array<Vector3f, 3> &tri)
 }
 
 
-inline Vector3f centre(const Vector3f tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector3f centre(const Vector3f tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return centreT(std::array<Vector3f, 3>{ tri[0], tri[1], tri[2] });
 }
 
@@ -708,8 +713,9 @@ inline Vector3f normal(const std::array<Vector3f, 3> &tri)
 }
 
 
-inline Vector3f normal(const Vector3f tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector3f normal(const Vector3f tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return normalT(tri[0], tri[1], tri[2]);
 }
 
@@ -727,8 +733,9 @@ inline Vector4f plane(const std::array<Vector3f, 3> &tri)
 }
 
 
-inline Vector4f plane(const Vector3f tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector4f plane(const Vector3f tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return planeT(std::array<Vector3f, 3>{ tri[0], tri[1], tri[2] });
 }
 
@@ -746,9 +753,10 @@ inline bool isDegenerate(const std::array<Vector3f, 3> &tri, const float epsilon
 }
 
 
-inline bool isDegenerate(const Vector3f tri[3],  // NOLINT(modernize-avoid-c-arrays)
+inline bool isDegenerate(const Vector3f tri[3],  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                          const float epsilon)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return isDegenerateT(tri[0], tri[1], tri[2], epsilon);
 }
 
@@ -768,8 +776,9 @@ inline bool isPointInside(const Vector3f &point, const std::array<Vector3f, 3> &
 
 
 inline bool isPointInside(const Vector3f &point,
-                          const Vector3f tri[3])  // NOLINT(modernize-avoid-c-arrays)
+                          const Vector3f tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return isPointInsideT(point, std::array<Vector3f, 3>{ tri[0], tri[1], tri[2] });
 }
 
@@ -789,8 +798,9 @@ inline Vector3f nearestPoint(const Vector3f &point, const std::array<Vector3f, 3
 
 
 inline Vector3f nearestPoint(const Vector3f &point,
-                             const Vector3f tri[3])  // NOLINT(modernize-avoid-c-arrays)
+                             const Vector3f tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return nearestPointT(point, std::array<Vector3f, 3>{ tri[0], tri[1], tri[2] });
 }
 
@@ -816,11 +826,13 @@ inline bool intersectAABB(const std::array<Vector3f, 3> &tri, const std::array<V
 }
 
 
-inline bool intersectAABB(const Vector3f tri[3],   // NOLINT(modernize-avoid-c-arrays)
-                          const Vector3f aabb[2])  // NOLINT(modernize-avoid-c-arrays)
+inline bool intersectAABB(const Vector3f tri[3],   // NOLINT(cppcoreguidelines-avoid-c-arrays)
+                          const Vector3f aabb[2])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return intersectAABBT(std::array<Vector3f, 3>{ tri[0], tri[1], tri[2] },
                         std::array<Vector3f, 2>{ aabb[0], aabb[1] });
+  // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 
@@ -840,8 +852,9 @@ inline Vector3d centre(const std::array<Vector3d, 3> &tri)
 }
 
 
-inline Vector3d centre(const Vector3d tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector3d centre(const Vector3d tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return centreT(std::array<Vector3d, 3>{ tri[0], tri[1], tri[2] });
 }
 
@@ -858,8 +871,9 @@ inline Vector3d normal(const std::array<Vector3d, 3> &tri)
 }
 
 
-inline Vector3d normal(const Vector3d tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector3d normal(const Vector3d tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return normalT(tri[0], tri[1], tri[2]);
 }
 
@@ -877,8 +891,9 @@ inline Vector4d plane(const std::array<Vector3d, 3> &tri)
 }
 
 
-inline Vector4d plane(const Vector3d tri[3])  // NOLINT(modernize-avoid-c-arrays)
+inline Vector4d plane(const Vector3d tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return planeT(std::array<Vector3d, 3>{ tri[0], tri[1], tri[2] });
 }
 
@@ -896,9 +911,10 @@ inline bool isDegenerate(const std::array<Vector3d, 3> &tri, const double epsilo
 }
 
 
-inline bool isDegenerate(const Vector3d tri[3],  // NOLINT(modernize-avoid-c-arrays)
+inline bool isDegenerate(const Vector3d tri[3],  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                          const double epsilon)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return isDegenerateT(tri[0], tri[1], tri[2], epsilon);
 }
 
@@ -918,8 +934,9 @@ inline bool isPointInside(const Vector3d &point, const std::array<Vector3d, 3> &
 
 
 inline bool isPointInside(const Vector3d &point,
-                          const Vector3d tri[3])  // NOLINT(modernize-avoid-c-arrays)
+                          const Vector3d tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return isPointInsideT(point, std::array<Vector3d, 3>{ tri[0], tri[1], tri[2] });
 }
 
@@ -939,8 +956,9 @@ inline Vector3d nearestPoint(const Vector3d &point, const std::array<Vector3d, 3
 
 
 inline Vector3d nearestPoint(const Vector3d &point,
-                             const Vector3d tri[3])  // NOLINT(modernize-avoid-c-arrays)
+                             const Vector3d tri[3])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return nearestPointT(point, std::array<Vector3d, 3>{ tri[0], tri[1], tri[2] });
 }
 
@@ -966,10 +984,12 @@ inline bool intersectAABB(const std::array<Vector3d, 3> &tri, const std::array<V
 }
 
 
-inline bool intersectAABB(const Vector3d tri[3],   // NOLINT(modernize-avoid-c-arrays)
-                          const Vector3d aabb[2])  // NOLINT(modernize-avoid-c-arrays)
+inline bool intersectAABB(const Vector3d tri[3],   // NOLINT(cppcoreguidelines-avoid-c-arrays)
+                          const Vector3d aabb[2])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
+  // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   return intersectAABBT(std::array<Vector3d, 3>{ tri[0], tri[1], tri[2] },
                         std::array<Vector3d, 2>{ aabb[0], aabb[1] });
+  // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 }  // namespace tes::trigeom

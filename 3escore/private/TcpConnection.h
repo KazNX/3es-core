@@ -26,8 +26,12 @@ public:
   /// @param settings Various server settings to initialise with.
   TcpConnection(std::shared_ptr<TcpSocket> client_socket, const ServerSettings &settings);
 
+  TcpConnection(const TcpConnection &other) = delete;
+
   /// Destructor.s
   ~TcpConnection() final;
+
+  TcpConnection &operator=(const TcpConnection &other) = delete;
 
   /// Close the socket connection.
   void close() final;

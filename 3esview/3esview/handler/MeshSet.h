@@ -11,9 +11,9 @@
 #include <3escore/shapes/MeshSet.h>
 #include <3esview/util/PendingAction.h>
 
+#include <Magnum/GL/Mesh.h>
 #include <Magnum/Math/Color.h>
 #include <Magnum/Math/Quaternion.h>
-#include <Magnum/GL/Mesh.h>
 
 namespace tes::view::handler
 {

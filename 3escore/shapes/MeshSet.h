@@ -50,6 +50,16 @@ public:
   /// Destructor.
   ~MeshSet() override;
 
+  /// Copy assignment.
+  /// @param other The object to copy.
+  /// @return @c *this
+  MeshSet &operator=(const MeshSet &other);
+
+  /// Move assignment.
+  /// @param other The object to move.
+  /// @return @c *this
+  MeshSet &operator=(MeshSet &&other) noexcept;
+
   [[nodiscard]] const char *type() const override { return "meshSet"; }
 
   /// Get the number of parts to this shape.

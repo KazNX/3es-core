@@ -39,8 +39,17 @@ public:
 
   /// Constructor. Verifies data size.
   Timer();
+
+  /// Copy constructor.
+  /// @param other Object to copy.
+  Timer(const Timer &other);
+
   /// Destructor.
   ~Timer();
+
+  /// Copy assignment.
+  /// @param other Object to copy.
+  Timer &operator=(const Timer &other);
 
   /// Starts the timer by recording the current time.
   void start();
@@ -120,10 +129,23 @@ public:
   /// @return The elapsed time in microseconds.
   [[nodiscard]] int64_t elapsedUS() const;
 
+  friend void swap(Timer &a, Timer &b);
+
 private:
   /// Internal data allocation.
-  std::array<char, kDataSize> _data;
+  std::array<char, kDataSize> _data = {};
 };
+
+
+/// Swap two timer objects.
+/// @param a First object to swap.
+/// @param b Second object to swap.
+inline void swap(Timer &a, Timer &b)
+{
+  using std::swap;
+  swap(a._data, b._data);
+}
+
 
 /// Converts a @c Timer to a time string indicating the elapsed time.
 ///

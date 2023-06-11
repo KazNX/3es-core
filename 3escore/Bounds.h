@@ -43,6 +43,8 @@ public:
   /// @param point The point to set as both min and max extents.
   explicit Bounds(const Vector3<T> &point);
 
+  ~Bounds() = default;
+
   /// Create a bounds structure from centre and half extents values.
   /// @param centre The bounds centre.
   /// @param half_extents Bounds half extents.

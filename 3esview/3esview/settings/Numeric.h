@@ -17,36 +17,38 @@ template <typename T>
 class Numeric
 {
 public:
-  Numeric(const std::string &label, T value, const std::string &tip)
-    : _label(label)
+  Numeric(std::string label, T value, std::string tip)
+    : _label(std::move(label))
     , _value(value)
-    , _tip(tip)
+    , _tip(std::move(tip))
   {}
-  Numeric(const std::string &label, T value, T minimum, const std::string &tip)
-    : _label(label)
+  Numeric(std::string label, T value, T minimum, std::string tip)
+    : _label(std::move(label))
     , _value(value)
     , _minimum(minimum)
-    , _tip(tip)
+    , _tip(std::move(tip))
   {}
-  Numeric(const std::string &label, T value, const std::string &tip, T maximum)
-    : _label(label)
+  Numeric(std::string label, T value, std::string tip, T maximum)
+    : _label(std::move(label))
     , _value(value)
     , _maximum(maximum)
-    , _tip(tip)
+    , _tip(std::move(tip))
   {}
-  Numeric(const std::string &label, T value, T minimum, T maximum, const std::string &tip)
-    : _label(label)
+  Numeric(std::string label, T value, T minimum, T maximum, std::string tip)
+    : _label(std::move(label))
     , _value(value)
     , _minimum(minimum)
     , _maximum(maximum)
-    , _tip(tip)
+    , _tip(std::move(tip))
   {}
 
   Numeric(const Numeric<T> &other) = default;
-  Numeric(Numeric<T> &&other) = default;
+  Numeric(Numeric<T> &&other) noexcept = default;
+
+  ~Numeric() = default;
 
   Numeric<T> &operator=(const Numeric<T> &other) = default;
-  Numeric<T> &operator=(Numeric<T> &&other) = default;
+  Numeric<T> &operator=(Numeric<T> &&other) noexcept = default;
 
   [[nodiscard]] const std::string &label() const { return _label; }
   [[nodiscard]] const std::string &tip() const { return _tip; }
@@ -54,13 +56,27 @@ public:
   [[nodiscard]] const T &value() const { return _value; }
   void setValue(T value) { _value = std::max(minimum(), std::min(value, maximum())); }
 
-  bool hasMinimum() const { return _minimum.has_value(); }
-  T minimum() const { return (hasMinimum()) ? *_minimum : std::numeric_limits<T>::min(); }
+  [[nodiscard]] bool hasMinimum() const { return _minimum.has_value(); }
+  [[nodiscard]] T minimum() const
+  {
+    return (hasMinimum()) ? *_minimum : std::numeric_limits<T>::lowest();
+  }
   void setMinimum(T minimum) { _minimum = minimum; }
 
-  bool hasMaximum() const { return _maximum.has_value(); }
-  T maximum() const { return (hasMaximum()) ? *_maximum : std::numeric_limits<T>::max(); }
+  [[nodiscard]] bool hasMaximum() const { return _maximum.has_value(); }
+  [[nodiscard]] T maximum() const
+  {
+    return (hasMaximum()) ? *_maximum : std::numeric_limits<T>::max();
+  }
   void setMaximum(T maximum) { _maximum = maximum; }
+
+  [[nodiscard]] bool operator==(const Numeric<T> &other) const
+  {
+    return _value == other._value && _minimum == other._minimum && _maximum == other._maximum &&
+           _label == other._label && _tip == other._tip;
+  }
+
+  [[nodiscard]] bool operator!=(const Numeric<T> &other) const { return !operator==(other); }
 
 private:
   T _value = {};
@@ -78,14 +94,16 @@ using Double = Numeric<double>;
 class TES_VIEWER_API Bool
 {
 public:
-  Bool(const std::string &label, bool value, const std::string &tip)
-    : _label(label)
+  Bool(std::string label, bool value, std::string tip)
+    : _label(std::move(label))
     , _value(value)
-    , _tip(tip)
+    , _tip(std::move(tip))
   {}
 
   Bool(const Bool &other) = default;
   Bool(Bool &&other) = default;
+
+  ~Bool() = default;
 
   Bool &operator=(const Bool &other) = default;
   Bool &operator=(Bool &&other) = default;
@@ -95,6 +113,13 @@ public:
 
   [[nodiscard]] bool value() const { return _value; }
   void setValue(bool value) { _value = value; }
+
+  [[nodiscard]] bool operator==(const Bool &other) const
+  {
+    return _value == other._value && _label == other._label && _tip == other._tip;
+  }
+
+  [[nodiscard]] bool operator!=(const Bool &other) const { return !operator==(other); }
 
 private:
   bool _value = false;

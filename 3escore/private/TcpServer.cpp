@@ -24,14 +24,11 @@ TcpServer::TcpServer(const ServerSettings &settings, const ServerInfoMessage *se
   : _monitor(nullptr)
   , _settings(settings)
   , _active(true)
+  , _server_info(server_info ? *server_info : ServerInfoMessage())
 {
   _monitor = std::make_shared<TcpConnectionMonitor>(*this);
 
-  if (server_info)
-  {
-    std::memcpy(&_server_info, server_info, sizeof(_server_info));
-  }
-  else
+  if (!server_info)
   {
     initDefaultServerInfo(&_server_info);
   }

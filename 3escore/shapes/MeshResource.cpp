@@ -39,7 +39,7 @@ uint16_t MeshResource::typeId() const
 
 int MeshResource::create(PacketWriter &packet) const
 {
-  MeshCreateMessage msg;
+  MeshCreateMessage msg = {};
   ObjectAttributesd attributes = {};
   const Transform transform = this->transform();
 
@@ -98,7 +98,7 @@ int MeshResource::create(PacketWriter &packet) const
 
 int MeshResource::destroy(PacketWriter &packet) const
 {
-  MeshDestroyMessage destroy;
+  MeshDestroyMessage destroy = {};
   packet.reset(typeId(), MeshDestroyMessage::MessageId);
   destroy.mesh_id = id();
   destroy.write(packet);
@@ -124,7 +124,7 @@ int MeshResource::transfer(PacketWriter &packet, unsigned byte_limit,
   }
 
   packet.reset(typeId(), int_cast<uint16_t>(progress.phase));
-  MeshComponentMessage msg;
+  MeshComponentMessage msg = {};
   msg.mesh_id = id();
   msg.write(packet);
 
@@ -229,7 +229,7 @@ int MeshResource::transfer(PacketWriter &packet, unsigned byte_limit,
     break;
 
   case MmtFinalise: {
-    MeshFinaliseMessage msg;
+    MeshFinaliseMessage msg = {};
     packet.reset(typeId(), MeshFinaliseMessage::MessageId);
     msg.mesh_id = id();
     msg.flags = (!normals(0).isValid()) ? MffCalculateNormals : 0u;
@@ -270,7 +270,7 @@ int MeshResource::transfer(PacketWriter &packet, unsigned byte_limit,
 
 bool MeshResource::readCreate(PacketReader &packet)
 {
-  MeshCreateMessage msg;
+  MeshCreateMessage msg = {};
   ObjectAttributesd attributes;
   bool ok = true;
   ok = ok && msg.read(packet, attributes);
@@ -285,7 +285,7 @@ bool MeshResource::readCreate(PacketReader &packet)
 
 bool MeshResource::readTransfer(int message_type, PacketReader &packet)
 {
-  MeshComponentMessage msg;
+  MeshComponentMessage msg = {};
   bool ok = true;
 
   if (!msg.read(packet))
@@ -303,7 +303,7 @@ bool MeshResource::readTransfer(int message_type, PacketReader &packet)
 
   // If we need to peek the stream data type and component count we can do by invoking
   // peek_stream_info(). On success, component_count and packet_type will be valid.
-  std::array<uint8_t, 2> component_count_and_packet_type;
+  std::array<uint8_t, 2> component_count_and_packet_type = {};
   const uint8_t &component_count = component_count_and_packet_type[0];
   const uint8_t &packet_type = component_count_and_packet_type[1];
   const auto peek_stream_info = [&packet, &component_count_and_packet_type] {
@@ -316,7 +316,7 @@ bool MeshResource::readTransfer(int message_type, PacketReader &packet)
   switch (message_type)
   {
   case MmtVertex: {
-    read_stream = DataBuffer(static_cast<Vector3d *>(nullptr), 0);
+    read_stream = DataBuffer(Vector3d(0.0));
     // Read the expected number of items.
     read_stream.read(packet, 0, count);
     ok = processVertices(msg, offset, read_stream) && ok;
@@ -339,7 +339,7 @@ bool MeshResource::readTransfer(int message_type, PacketReader &packet)
     break;
   }
   case MmtNormal: {
-    read_stream = DataBuffer(static_cast<Vector3d *>(nullptr), 0);
+    read_stream = DataBuffer(Vector3d(0.0));
     // Read the expected number of items.
     read_stream.read(packet, 0, count);
     ok = processNormals(msg, offset, read_stream) && ok;

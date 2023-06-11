@@ -40,6 +40,8 @@ public:
     : Super(point)
   {}
 
+  ~Bounds() = default;
+
   /// Create a bounds structure from centre and half extents values.
   /// @param centre The bounds centre.
   /// @param half_extents Bounds half extents.
@@ -122,8 +124,11 @@ public:
 
   /// Constructor.
   BoundsCuller();
+  BoundsCuller(const BoundsCuller &other) = delete;
   /// Destructor.
   ~BoundsCuller();
+
+  BoundsCuller &operator=(const BoundsCuller &other) = delete;
 
   /// Check if a bounds entry is visible at a particular @p render_mark .
   /// @param id Bounds entry ID to check visibility of. Must be a valid entry or behaviour is

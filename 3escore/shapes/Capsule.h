@@ -43,6 +43,18 @@ public:
   /// @param other Object to move.
   Capsule(Capsule &&other) noexcept = default;
 
+  ~Capsule() override = default;
+
+  /// Copy assignment.
+  /// @param other The object to copy.
+  /// @return @c *this
+  Capsule &operator=(const Capsule &other) noexcept = default;
+
+  /// Move assignment.
+  /// @param other The object to move.
+  /// @return @c *this
+  Capsule &operator=(Capsule &&other) noexcept = default;
+
   [[nodiscard]] const char *type() const override { return "capsule"; }
 
   /// Set the capsule body radius.

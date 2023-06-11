@@ -5,5 +5,6 @@
 
 namespace tes
 {
+Resource::Resource() = default;
 Resource::~Resource() = default;
 }  // namespace tes

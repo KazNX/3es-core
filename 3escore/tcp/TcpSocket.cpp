@@ -4,6 +4,7 @@
 #include <3escore/TcpSocket.h>
 
 #include <3escore/CoreUtil.h>
+#include <3escore/Log.h>
 
 #include "TcpBase.h"
 #include "TcpDetail.h"
@@ -98,18 +99,19 @@ bool TcpSocket::open(const char *host, uint16_t port)
   }
 
   // Connect to server
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   if (::connect(_detail->socket, reinterpret_cast<struct sockaddr *>(&_detail->address),
                 sizeof(_detail->address)) != 0)
   {
     const int err = errno;
     if (err && err != ECONNREFUSED)
     {
-      fprintf(stderr, "errno : %d -> %s\n", err, socketErrorString(err));
+      log::error("errno : ", err, " -> ", socketErrorString(err));
     }
 
     if (err == EAGAIN)
     {
-      fprintf(stderr, "...\n");
+      log::error("...");
     }
     close();
     return false;
@@ -307,7 +309,7 @@ int TcpSocket::write(const char *buffer, int buffer_length) const
 #ifdef __linux__
     flags = MSG_NOSIGNAL;
 #endif  // __linux__
-    int sent;
+    int sent = 0;
     bool retry = true;
 
 
@@ -315,7 +317,7 @@ int TcpSocket::write(const char *buffer, int buffer_length) const
     {
       retry = false;
       sent = static_cast<int>(::send(_detail->socket,
-                                     reinterpret_cast<const char *>(buffer) + bytes_sent,
+                                     reinterpret_cast<const char *>(buffer) + bytes_sent,  // NOLINT
                                      buffer_length - bytes_sent, flags));
 #ifdef WIN32
       if (sent < 0 && WSAGetLastError() == WSAEWOULDBLOCK)
@@ -326,7 +328,7 @@ int TcpSocket::write(const char *buffer, int buffer_length) const
         // Send buffer full. Wait and retry.
         std::this_thread::yield();
         fd_set wfds;
-        struct timeval tv;
+        struct timeval tv = {};
         FD_ZERO(&wfds);
         FD_SET(_detail->socket, &wfds);
 

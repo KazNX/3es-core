@@ -3,6 +3,8 @@
 
 #include <3esview/ViewConfig.h>
 
+#include <3escore/Log.h>
+
 #include <atomic>
 #include <mutex>
 #include <utility>
@@ -59,11 +61,11 @@ public:
   {
   public:
     /// Default constructor: the resulting object is not valid.
-    inline ResourceRefBase() = default;
+    ResourceRefBase() = default;
     /// Construct a resource for the given @p id and @p resource_list .
     /// @param id The resource Id.
     /// @param resource_list The resource list which we are referencing into.
-    inline ResourceRefBase(Id id, List *resource_list)
+    ResourceRefBase(Id id, List *resource_list)
       : _id(id)
       , _resource_list(resource_list)
     {
@@ -77,22 +79,22 @@ public:
         _resource_list = nullptr;
       }
     }
-    inline ResourceRefBase(const ResourceRefBase<Item, List> &) = delete;
+    ResourceRefBase(const ResourceRefBase<Item, List> &) = delete;
     /// Move constructor.
     /// @param other Object to move.
-    inline ResourceRefBase(ResourceRefBase<Item, List> &&other)
+    ResourceRefBase(ResourceRefBase<Item, List> &&other) noexcept
       : _id(std::exchange(other._id, kNullResource))
       , _resource_list(std::exchange(other._resource_list, nullptr))
     {}
 
     /// Releases the resource reference, releasing a @c ResourceList lock.
-    inline ~ResourceRefBase() { release(); }
+    ~ResourceRefBase() { release(); }
 
-    inline ResourceRefBase &operator=(const ResourceRefBase<Item, List> &) = delete;
+    ResourceRefBase &operator=(const ResourceRefBase<Item, List> &) = delete;
     /// Move assignment.
     /// @param other Object to move; can match @c this .
     /// @return @c *this
-    inline ResourceRefBase &operator=(ResourceRefBase<Item, List> &&other)
+    ResourceRefBase &operator=(ResourceRefBase<Item, List> &&other) noexcept
     {
       if (this != &other)
       {
@@ -105,7 +107,7 @@ public:
     /// Check if this resource reference is valid. A valid reference has a valid @c Id and addresses
     /// a @c ResourceList .
     /// @return
-    inline bool isValid() const
+    [[nodiscard]] bool isValid() const
     {
       return _resource_list != nullptr &&
              _resource_list->_items[_id].next_free == kAllocatedResource;
@@ -113,18 +115,18 @@ public:
 
     /// Dereference the resource.
     /// @return The references resource entry.
-    inline const Item &operator*() const { return _resource_list->_items[_id].resource; }
+    [[nodiscard]] const Item &operator*() const { return _resource_list->_items[_id].resource; }
     /// Dereference the resource.
     /// @return The references resource entry.
-    inline const Item *operator->() const { return &_resource_list->_items[_id].resource; }
+    [[nodiscard]] const Item *operator->() const { return &_resource_list->_items[_id].resource; }
 
     /// Get the resource entry @c Id . This can be stored in order to later access the resource via
     /// @c ResourceList indexing functions.
     /// @return The resource Id.
-    inline Id id() const { return _id; }
+    [[nodiscard]] Id id() const { return _id; }
 
     /// Explicitly release the current resource (if any). Safe to call if not valid.
-    inline void release()
+    void release()
     {
       if (_resource_list)
       {
@@ -135,32 +137,37 @@ public:
     }
 
   protected:
+    // NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-classes)
     Id _id = kNullResource;
     List *_resource_list = nullptr;
+    // NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes)
   };
 
-  class ResourceRef : public ResourceRefBase<T, ResourceList<T>>
+  class ResourceRef final : public ResourceRefBase<T, ResourceList<T>>
   {
   public:
     using Super = ResourceRefBase<T, ResourceList<T>>;
 
     /// Default constructor: the resulting object is not valid.
-    inline ResourceRef() = default;
+    ResourceRef() = default;
     /// Construct a resource for the given @p id and @p resource_list .
     /// @param id The resource Id.
     /// @param resource_list The resource list which we are referencing into.
-    inline ResourceRef(Id id, ResourceList<T> *resource_list)
+    ResourceRef(Id id, ResourceList<T> *resource_list)
       : Super(id, resource_list)
     {}
 
-    inline ResourceRef(const ResourceRef &) = delete;
+    ResourceRef(const ResourceRef &other) = delete;
     /// Move constructor.
     /// @param other Object to move.
-    inline ResourceRef(ResourceRef &&other)
+    ResourceRef(ResourceRef &&other) noexcept
       : Super(std::move(other))
     {}
 
-    inline ResourceRef &operator=(ResourceRef &&other)
+    ~ResourceRef() = default;
+
+    ResourceRef &operator=(const ResourceRef &other) = delete;
+    ResourceRef &operator=(ResourceRef &&other) noexcept
     {
       if (this != &other)
       {
@@ -172,8 +179,8 @@ public:
 
     /// Dereference the resource.
     /// @return The references resource entry.
-    inline T &operator*() { return Super::_resource_list->_items[Super::_id].resource; }
-    inline T *operator->() { return &Super::_resource_list->_items[Super::_id].resource; }
+    [[nodiscard]] T &operator*() { return Super::_resource_list->_items[Super::_id].resource; }
+    [[nodiscard]] T *operator->() { return &Super::_resource_list->_items[Super::_id].resource; }
   };
 
   using ResourceConstRef = ResourceRefBase<const T, const ResourceList<T>>;
@@ -181,13 +188,16 @@ public:
   /// Construct a resource list optionally specifying the initial capacity.
   /// @param capacity The initial resource capacity.
   ResourceList(size_t capacity = 0);
+  ResourceList(const ResourceList &other) = delete;
   /// Destructor
-  ~ResourceList() noexcept(false);
+  ~ResourceList() noexcept;
 
-  inline iterator begin() { return iterator(this, firstValid()); }
-  inline iterator end() { return iterator(this, kNullResource); }
-  inline const_iterator begin() const { return const_iterator(this, firstValid()); }
-  inline const_iterator end() const { return const_iterator(this, kNullResource); }
+  ResourceList &operator=(const ResourceList &other) = delete;
+
+  [[nodiscard]] iterator begin() { return iterator(this, firstValid()); }
+  [[nodiscard]] iterator end() { return iterator(this, kNullResource); }
+  [[nodiscard]] const_iterator begin() const { return const_iterator(this, firstValid()); }
+  [[nodiscard]] const_iterator end() const { return const_iterator(this, kNullResource); }
 
   /// Allocate a new resource.
   ///
@@ -228,7 +238,7 @@ public:
   {
   public:
     using ResourceListT = R;
-    BaseIterator() {}
+    BaseIterator() = default;
     BaseIterator(ResourceListT *owner, ResourceListId id)
       : _owner(owner)
       , _id(id)
@@ -250,39 +260,36 @@ public:
     BaseIterator(const BaseIterator &other)
       : BaseIterator(other._owner, other._id)
     {}
-    BaseIterator(BaseIterator &&other)
+    BaseIterator(BaseIterator &&other) noexcept
       : _owner(std::exchange(other._owner, nullptr))
       , _id(std::exchange(other._id, kNullResource))
     {}
 
-    BaseIterator &operator=(const BaseIterator &other)
+    BaseIterator &operator=(  // NOLINT(bugprone-unhandled-self-assignment)
+      const BaseIterator &other)
     {
-      if (this != &other)
-      {
-        if (_owner)
-        {
-          _owner->unlock();
-        }
-        _owner = other._owner;
-        _id = other._id;
-        if (_owner)
-        {
-          _owner->lock();
-        }
-      }
+      // Why does clang-tidy think self assignment isn't properly handled?
+      BaseIterator(other).swap(*this);
       return *this;
     }
-    BaseIterator &operator=(BaseIterator &&other)
+    BaseIterator &operator=(BaseIterator &&other) noexcept
     {
       _owner = std::exchange(other._owner, nullptr);
       _id = std::exchange(other._id, kNullResource);
       return *this;
     }
 
-    ResourceListT *owner() const { return _owner; }
-    inline Id id() const { return _id; }
+    [[nodiscard]] ResourceListT *owner() const { return _owner; }
+    [[nodiscard]] Id id() const { return _id; }
 
   protected:
+    void swap(BaseIterator &other)
+    {
+      using std::swap;
+      swap(_owner, other._owner);
+      swap(_id, other._id);
+    }
+
     void next()
     {
       // Not happy with how clunky the next/prev implementations are. The compiler will probably
@@ -321,11 +328,13 @@ public:
       }
     }
 
+    // NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-classes)
     ResourceListT *_owner = nullptr;
     Id _id = kNullResource;
+    // NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes)
   };
 
-  class iterator : public BaseIterator<ResourceList<T>>
+  class iterator : public BaseIterator<ResourceList<T>>  // NOLINT(readability-identifier-naming)
   {
   public:
     using Super = BaseIterator<ResourceList<T>>;
@@ -335,30 +344,35 @@ public:
       : BaseIterator<ResourceList<T>>(owner, id)
     {}
     iterator(const iterator &other) = default;
-    iterator(iterator &&other) = default;
+    iterator(iterator &&other) noexcept = default;
+
+    ~iterator() = default;
 
     /// Dereference the resource.
     /// @return The references resource entry.
-    inline T &operator*() { return Super::_owner->_items[Super::_id].resource; }
+    [[nodiscard]] T &operator*() { return Super::_owner->_items[Super::_id].resource; }
     /// @overload
-    inline const T &operator*() const { return Super::_owner->_items[Super::_id].resource; }
+    [[nodiscard]] const T &operator*() const { return Super::_owner->_items[Super::_id].resource; }
     /// Dereference the resource.
     /// @return The references resource entry.
-    inline T *operator->() { return &Super::_owner->_items[Super::_id].resource; }
+    [[nodiscard]] T *operator->() { return &Super::_owner->_items[Super::_id].resource; }
     /// @overload
-    inline const T *operator->() const { return &Super::_owner->_items[Super::_id].resource; }
+    [[nodiscard]] const T *operator->() const
+    {
+      return &Super::_owner->_items[Super::_id].resource;
+    }
 
     iterator &operator=(const iterator &other) = default;
-    iterator &operator=(iterator &&other) = default;
+    iterator &operator=(iterator &&other) noexcept = default;
 
     template <typename R>
-    bool operator==(const BaseIterator<R> &other) const
+    [[nodiscard]] bool operator==(const BaseIterator<R> &other) const
     {
       return Super::_owner == other.owner() && Super::_id == other.id();
     }
 
     template <typename R>
-    bool operator!=(const BaseIterator<R> &other) const
+    [[nodiscard]] bool operator!=(const BaseIterator<R> &other) const
     {
       return !operator==(other);
     }
@@ -392,12 +406,13 @@ public:
     friend class const_iterator;
   };
 
-  class const_iterator : public BaseIterator<const ResourceList<T>>
+  class const_iterator  // NOLINT(readability-identifier-naming)
+    : public BaseIterator<const ResourceList<T>>
   {
   public:
     using Super = BaseIterator<const ResourceList<T>>;
 
-    const_iterator() {}
+    const_iterator() = default;
     const_iterator(const ResourceList<T> *owner, Id id)
       : BaseIterator<const ResourceList<T>>(owner, id)
     {}
@@ -405,14 +420,19 @@ public:
       : BaseIterator<const ResourceList<T>>(other._owner, other._id)
     {}
     const_iterator(const const_iterator &other) = default;
-    const_iterator(const_iterator &&other) = default;
+    const_iterator(const_iterator &&other) noexcept = default;
+
+    ~const_iterator() = default;
 
     /// Dereference the resource.
     /// @return The references resource entry.
-    inline const T &operator*() const { return Super::_owner->_items[Super::_id].resource; }
+    [[nodiscard]] const T &operator*() const { return Super::_owner->_items[Super::_id].resource; }
     /// Dereference the resource.
     /// @return The references resource entry.
-    inline const T *operator->() const { return &Super::_owner->_items[Super::_id].resource; }
+    [[nodiscard]] const T *operator->() const
+    {
+      return &Super::_owner->_items[Super::_id].resource;
+    }
 
     const_iterator &operator=(const iterator &other)
     {
@@ -421,7 +441,7 @@ public:
       return *this;
     }
     const_iterator &operator=(const const_iterator &other) = default;
-    const_iterator &operator=(const_iterator &&other) = default;
+    const_iterator &operator=(const_iterator &&other) noexcept = default;
 
     template <typename R>
     bool operator==(const BaseIterator<R> &other) const
@@ -467,9 +487,9 @@ private:
   friend iterator;
   friend const_iterator;
 
-  inline Id firstValid() const
+  [[nodiscard]] Id firstValid() const
   {
-    std::scoped_lock<decltype(_lock)> guard(_lock);
+    const std::scoped_lock<decltype(_lock)> guard(_lock);
     for (Id id = 0; id < _items.size(); ++id)
     {
       const auto &item = _items[id];
@@ -482,12 +502,12 @@ private:
     return kNullResource;
   }
 
-  inline void lock() const
+  void lock() const
   {
     _lock.lock();
     ++_lock_count;
   }
-  inline void unlock() const
+  void unlock() const
   {
     --_lock_count;
     _lock.unlock();
@@ -519,12 +539,11 @@ ResourceList<T>::ResourceList(size_t capacity)
 
 
 template <typename T>
-ResourceList<T>::~ResourceList() noexcept(false)
+ResourceList<T>::~ResourceList() noexcept
 {
-  std::unique_lock<decltype(_lock)> guard(_lock);
   if (_lock_count > 0)
   {
-    throw std::runtime_error("Deleting resource list with outstanding resource references");
+    log::fatal("Deleting resource list with outstanding resource references");
   }
 }
 
@@ -532,7 +551,7 @@ ResourceList<T>::~ResourceList() noexcept(false)
 template <typename T>
 typename ResourceList<T>::ResourceRef ResourceList<T>::allocate()
 {
-  std::unique_lock<decltype(_lock)> guard(_lock);
+  const std::unique_lock<decltype(_lock)> guard(_lock);
   // Try free list first.
   if (_free_head != kNullResource)
   {
@@ -587,7 +606,7 @@ typename ResourceList<T>::ResourceConstRef ResourceList<T>::at(Id id) const
 template <typename T>
 void ResourceList<T>::release(Id id)
 {
-  std::unique_lock<decltype(_lock)> guard(_lock);
+  const std::unique_lock<decltype(_lock)> guard(_lock);
   if (_free_head != kNullResource)
   {
     // Append to the free list tail.

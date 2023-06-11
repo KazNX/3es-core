@@ -9,6 +9,11 @@
 #include <cstring>
 #include <utility>
 
+// Casting and pointer arithmetic are fundamental the the PacketStream.
+// clang-format off
+// NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+// clang-format on
+
 namespace tes
 {
 PacketWriter::PacketWriter(PacketHeader *packet, uint16_t max_payload_size, uint16_t routing_id,
@@ -30,8 +35,8 @@ PacketWriter::PacketWriter(PacketHeader *packet, uint16_t max_payload_size, uint
 PacketWriter::PacketWriter(uint8_t *buffer, size_t buffer_size, uint16_t routing_id,
                            uint16_t message_id)
   : PacketStream<PacketHeader>(reinterpret_cast<PacketHeader *>(buffer))
+  , _buffer_size(buffer_size)
 {
-  _buffer_size = buffer_size;
   if (buffer_size >= sizeof(PacketHeader))
   {
     _packet->marker = networkEndianSwapValue(kPacketMarker);
@@ -71,14 +76,24 @@ PacketWriter::PacketWriter(PacketWriter &&other) noexcept
 }
 
 
-PacketWriter &PacketWriter::operator=(PacketWriter other)
+PacketWriter &PacketWriter::operator=(const PacketWriter &other)
+{
+  _packet = other._packet;
+  _status = other._status;
+  _payload_position = other._payload_position;
+  _buffer_size = other._buffer_size;
+  return *this;
+}
+
+
+PacketWriter &PacketWriter::operator=(PacketWriter &&other) noexcept
 {
   other.swap(*this);
   return *this;
 }
 
 
-void PacketWriter::swap(PacketWriter &other)
+void PacketWriter::swap(PacketWriter &other) noexcept
 {
   std::swap(_packet, other._packet);
   std::swap(_status, other._status);
@@ -228,3 +243,7 @@ void PacketWriter::incrementPayloadSize(size_t inc)
   invalidateCrc();
 }
 }  // namespace tes
+
+// clang-format off
+// NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+// clang-format on

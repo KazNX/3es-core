@@ -79,7 +79,7 @@ Quaternion<T> matrixToQuaternion(const M &m)
 {
   // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
   // article "CSLQuaternion Calculus and Fast Animation".
-  Quaternion<T> q;
+  Quaternion<T> q = {};
   T trace = m(0, 0) + m(1, 1) + m(2, 2);
   T root;
   const std::array<int, 3> next = { 1, 2, 0 };
@@ -108,8 +108,8 @@ Quaternion<T> matrixToQuaternion(const M &m)
     {
       i = 2;
     }
-    j = next[i];
-    k = next[j];
+    j = next.at(i);
+    k = next.at(j);
 
     root = std::sqrt(m(i, i) - m(j, j) - m(k, k) + static_cast<T>(1.0));
     q[i] = static_cast<T>(0.5) * root;
@@ -138,7 +138,7 @@ inline Quaternion<T> transformToQuaternion(const Matrix4<T> &m)
 template <class M, typename T>
 M quaternionToMatrix(const Quaternion<T> &q)
 {
-  M m;
+  M m = {};
   T tx = q.x() + q.x();
   T ty = q.y() + q.y();
   T tz = q.z() + q.z();

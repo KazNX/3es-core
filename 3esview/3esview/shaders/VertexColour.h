@@ -29,7 +29,7 @@ public:
   std::shared_ptr<Magnum::GL::AbstractShaderProgram> shader() const override { return _shader; }
   std::shared_ptr<Magnum::Shaders::VertexColor3D> typedShader() const { return _shader; }
 
-  Shader &setProjectionMatrix(const Magnum::Matrix4 &projection) override;
+  Shader &setProjectionMatrix(const Magnum::Matrix4 &matrix) override;
   Shader &setViewMatrix(const Magnum::Matrix4 &matrix) override;
   Shader &setModelMatrix(const Magnum::Matrix4 &matrix) override;
 

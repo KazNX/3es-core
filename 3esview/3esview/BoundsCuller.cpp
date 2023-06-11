@@ -35,8 +35,6 @@ Bounds Bounds::calculateLooseBounds(const Magnum::Matrix4 &transform) const
 }
 
 
-constexpr BoundsId BoundsCuller::kInvalidId;
-
 BoundsCuller::BoundsCuller() = default;
 BoundsCuller::~BoundsCuller() = default;
 

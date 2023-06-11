@@ -72,6 +72,10 @@ void main()
 {
   vec3 colour = texture(colourTexture, inPs.uv0).xyz;
   float depth = texture(depthTexture, inPs.uv0).x;
+  
+  // Write original depth before we make it linear.
+  gl_FragDepth = depth;
+
   depth = linearEyeDepth(depth, projectionParams.z, projectionParams.w);
 
   float edlFactor = obscurance(depth);

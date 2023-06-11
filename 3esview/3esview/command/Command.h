@@ -12,7 +12,7 @@
 namespace tes::view
 {
 class Viewer;
-}
+}  // namespace tes::view
 
 namespace tes::view::command
 {
@@ -29,26 +29,28 @@ class TES_VIEWER_API Command
 public:
   /// Constructor.
   /// @param name The command name. Must be unique.
-  /// @param signature A set of arguments which defines the command signature. This also determines the default
-  /// argument values for the command when arguments are omitted.
+  /// @param signature A set of arguments which defines the command signature. This also determines
+  /// the default argument values for the command when arguments are omitted.
   /// @param enabled The initial enabled status for the command.
-  Command(const std::string &name, Args &&signature, bool enabled = true);
+  Command(std::string name, Args &&signature, bool enabled = true);
   /// @overload
-  Command(const std::string &name, const Args &signature, bool enabled = true);
+  Command(std::string name, const Args &signature, bool enabled = true);
+  Command(const Command &other) = delete;
   /// Destructor.
   virtual ~Command();
+  Command &operator=(const Command &other) = delete;
 
   /// Get the name of the command. Command names must be unique.
   /// @return The command name.
-  const std::string &name() const { return _name; }
+  [[nodiscard]] const std::string &name() const { return _name; }
 
   /// Get the command argument signature and default values.
   /// @return The argument signature.
-  const Args &signature() const { return _signature; }
+  [[nodiscard]] const Args &signature() const { return _signature; }
 
   /// Check if the command is explicitly enabled or not.
   /// @return True when enabled.
-  bool enabled() const { return _enabled; }
+  [[nodiscard]] bool enabled() const { return _enabled; }
 
   /// Set the @c enabled() status of the command.
   /// @return True when enabled
@@ -60,11 +62,12 @@ public:
   ///
   /// @param viewer The viewer to execute on.
   /// @return True when admissible.
-  bool admissible(Viewer &viewer) const;
+  [[nodiscard]] bool admissible(Viewer &viewer) const;
 
   /// Synchronously execute the command.
   ///
-  /// This checks the command is both @c enabled() and @c admissible() returning appropriate result codes on failure.
+  /// This checks the command is both @c enabled() and @c admissible() returning appropriate result
+  /// codes on failure.
   ///
   /// @param args The command arguments to pass.
   /// @return A @c CommandResult indicating the execution results.
@@ -75,12 +78,12 @@ public:
 
   /// Check the call signature for @p args matches @c signature().
   ///
-  /// This checks that the types of each item in @p args matches that of @c signature() up to @c signature().count().
-  /// Extraneous arguments are ignored.
+  /// This checks that the types of each item in @p args matches that of @c signature() up to @c
+  /// signature().count(). Extraneous arguments are ignored.
   ///
   /// @param args Arguments to check against @c signature().
   /// @return True if the corresponding types match.
-  bool checkSignature(const Args &args) const;
+  [[nodiscard]] bool checkSignature(const Args &args) const;
 
 protected:
   struct ExecInfo
@@ -94,9 +97,10 @@ protected:
 
   /// Do the work to execute the command.
   ///
-  /// The @p args parameter provides the arguments passed to the invocation. This may be fewer than those provided by
-  /// @c signature(). The typical way to unpack arguments with provision for using defaults from @c signature() is
-  /// to unpack arguments as follows:
+  /// The @p args parameter provides the arguments passed to the invocation. This may be fewer than
+  /// those provided by
+  /// @c signature(). The typical way to unpack arguments with provision for using defaults from @c
+  /// signature() is to unpack arguments as follows:
   ///
   /// @code
   /// CommandResult MyCommand1::doWork(const ExecInfo &info, const Args &args)
@@ -118,20 +122,24 @@ protected:
   /// @endcode
   ///
   /// @param viewer The viewer to execute on.
-  /// @param info Reserved for future use to provide information about the execution context (e.g., async or not).
+  /// @param info Reserved for future use to provide information about the execution context (e.g.,
+  /// async or not).
   /// @param args The arguments passed for execution. See remarks on retrieving arguments.
-  /// @return A result indicating the success or failure result. On failure the @c CommandResult::reason() must be
-  /// set.
+  /// @return A result indicating the success or failure result. On failure the @c
+  /// CommandResult::reason() must be set.
   virtual CommandResult invoke(Viewer &viewer, const ExecInfo &info, const Args &args) = 0;
 
-  /// Get the value of the argument at @p index falling back to defaults from @c signature() if required.
-  /// @tparam T The type to retrieve as. Must match the given @p args type or @c std::bad_any_cast is thrown.
-  /// @param index Index of the argument to retrieve. Must be in range for either @p args or @c signature() or
+  /// Get the value of the argument at @p index falling back to defaults from @c signature() if
+  /// required.
+  /// @tparam T The type to retrieve as. Must match the given @p args type or @c std::bad_any_cast
+  /// is thrown.
+  /// @param index Index of the argument to retrieve. Must be in range for either @p args or @c
+  /// signature() or
   ///   @c std::out_of_range is thrown.
   /// @param args The arguments passed for this invocation.
   /// @return The argument value.
   template <typename T>
-  T arg(size_t index, const Args &args) const
+  [[nodiscard]] T arg(size_t index, const Args &args) const
   {
     if (index < args.count())
     {

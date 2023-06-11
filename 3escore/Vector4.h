@@ -40,15 +40,15 @@ public:
   static const Vector4<T> AxisW;
 
   /// Default constructor: undefined initialisation behaviour.
-  Vector4() = default;
+  constexpr Vector4() = default;
   /// Initialises all members to @p scalar.
   /// @param scalar The value for all members.
-  Vector4(const T &scalar) noexcept
+  explicit constexpr Vector4(const T &scalar) noexcept
     : _storage({ scalar, scalar, scalar, scalar })
   {}
   /// Copy constructor.
   /// @param other Vector to copy the value of.
-  Vector4(const Vector4<T> &other) noexcept
+  constexpr Vector4(const Vector4<T> &other) noexcept
     : _storage({ other.x(), other.y(), other.z(), other.w() })
   {}
 
@@ -56,7 +56,7 @@ public:
   /// Copy constructor from a Vector3.
   /// @param other Vector to copy the value of.
   /// @param w The w component value.
-  Vector4(const Vector3<T> &other, const T &w) noexcept
+  constexpr Vector4(const Vector3<T> &other, const T &w) noexcept
     : _storage({ other.x(), other.y(), other.z(), w })
   {}
 
@@ -64,20 +64,22 @@ public:
   /// @param x The x coordinate.
   /// @param y The y coordinate.
   /// @param z The z coordinate.
-  Vector4(const T &x, const T &y, const T &z, const T &w) noexcept
+  constexpr Vector4(const T &x, const T &y, const T &z, const T &w) noexcept
     : _storage({ x, y, z, w })
   {}
   // NOLINTEND(readability-identifier-length)
 
   /// Initialisation from a array of at least length 4.
-  Vector4(const std::array<T, 4> &array) noexcept  // NOLINT(modernize-avoid-c-arrays)
+  constexpr Vector4(
+    const std::array<T, 4> &array) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
     : _storage({ array[0], array[1], array[2], array[3] })
   {}
 
   /// Initialisation from a array of at least length 4.
   /// @param array Array to initialise from.
   template <typename U>
-  Vector4(const std::array<U, 4> array) noexcept  // NOLINT(modernize-avoid-c-arrays)
+  constexpr Vector4(
+    const std::array<U, 4> array) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
     : _storage({ static_cast<T>(array[0]), static_cast<T>(array[1]), static_cast<T>(array[2]),
                  static_cast<T>(array[3]) })
   {}
@@ -85,7 +87,9 @@ public:
   /// Initialisation from a array of at least length 4.
   /// No bounds checking is performed.
   /// @param array4 An array of at least length 4. Copies elements (0, 1, 2, 3).
-  Vector4(const T array4[4]) noexcept  // NOLINT(modernize-avoid-c-arrays)
+  constexpr Vector4(
+    const T array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
+                                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ array4[0], array4[1], array4[2], array4[3] })
   {}
 
@@ -93,7 +97,9 @@ public:
   /// No bounds checking is performed.
   /// @param array4 An array of at least length 4. Copies elements (0, 1, 2, 3).
   template <typename U>
-  Vector4(const U array4[4]) noexcept  // NOLINT(modernize-avoid-c-arrays)
+  constexpr Vector4(
+    const U array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
+                                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ static_cast<T>(array4[0]), static_cast<T>(array4[1]), static_cast<T>(array4[2]),
                  static_cast<T>(array4[3]) })
   {}
@@ -101,7 +107,7 @@ public:
   /// Copy constructor from a different numeric type.
   /// @param other Vector to copy the value of.
   template <typename U>
-  explicit Vector4(const Vector4<U> &other) noexcept
+  explicit constexpr Vector4(const Vector4<U> &other) noexcept
     : _storage({ static_cast<T>(other.x()), static_cast<T>(other.y()), static_cast<T>(other.z()),
                  static_cast<T>(other.w()) })
   {}
@@ -111,11 +117,13 @@ public:
   /// @param other Vector to copy the value of.
   /// @param w The w component value.
   template <typename U>
-  explicit Vector4(const Vector3<U> &other, const T &w) noexcept
+  explicit constexpr Vector4(const Vector3<U> &other, const T &w) noexcept
     : _storage(
         { static_cast<T>(other.x()), static_cast<T>(other.y()), static_cast<T>(other.z()), w })
   {}
   // NOLINTEND(readability-identifier-length)
+
+  ~Vector4() = default;
 
   /// Simple assignment operator.
   /// @param other Vector to copy the value of.
@@ -174,9 +182,9 @@ public:
   /// Index operator. Not bounds checked.
   /// @param index Access coordinates by index; 0 = x, 1 = y, 2 = z, 3 = w.
   /// @return The coordinate value.
-  T &operator[](int index) { return _storage[index]; }
+  T &operator[](int index) { return _storage.at(index); }
   /// @overload
-  [[nodiscard]] const T &operator[](int index) const { return _storage[index]; }
+  [[nodiscard]] const T &operator[](int index) const { return _storage.at(index); }
 
   /// Exact equality operator. Compares each component with the same operator.
   /// @param other The vector to compare to.
@@ -520,7 +528,7 @@ inline T Vector4<T>::dot3(const Vector4<T> &other) const
 template <typename T>
 inline Vector4<T> Vector4<T>::cross3(const Vector4<T> &other) const
 {
-  Vector4<T> v;
+  Vector4<T> v = {};
   v.x() = y() * other.z() - z() * other.y();
   v.y() = z() * other.x() - x() * other.z();
   v.z() = x() * other.y() - y() * other.x();

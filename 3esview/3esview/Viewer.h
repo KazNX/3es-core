@@ -5,7 +5,6 @@
 
 #include "camera/Fly.h"
 #include "handler/Camera.h"
-#include "settings/Settings.h"
 #include "ThirdEyeScene.h"
 
 #include <filesystem>
@@ -32,6 +31,8 @@ namespace data
 class DataThread;
 }  // namespace data
 
+class ViewerLog;
+
 class TES_VIEWER_API Viewer : public Magnum::Platform::Application
 {
 public:
@@ -42,6 +43,7 @@ public:
   [[nodiscard]] static uint16_t defaultPort();
 
   explicit Viewer(const Arguments &arguments);
+  Viewer(const Arguments &arguments, const std::vector<settings::Extension> &extended_settings);
   ~Viewer();
 
   [[nodiscard]] std::shared_ptr<ThirdEyeScene> tes() const { return _tes; }
@@ -65,6 +67,9 @@ public:
     return (isCameraActive()) ? *_active_recorded_camera : 0;
   }
   [[nodiscard]] bool isCameraActive() const { return _active_recorded_camera.has_value(); }
+
+  [[nodiscard]] ViewerLog &logger() { return *_logger; }
+  [[nodiscard]] const ViewerLog &logger() const { return *_logger; }
 
 protected:
   /// Return value for @c onDrawStart()
@@ -101,6 +106,7 @@ protected:
 
   virtual void onReset();
   virtual void onCameraSettingsChange(const settings::Settings::Config &config);
+  virtual void onLogSettingsChange(const settings::Settings::Config &config);
   virtual void onRenderSettingsChange(const settings::Settings::Config &config);
   virtual void onPlaybackSettingsChange(const settings::Settings::Config &config);
 
@@ -163,6 +169,7 @@ private:
   std::shared_ptr<ThirdEyeScene> _tes;
   std::shared_ptr<data::DataThread> _data_thread;
   std::shared_ptr<command::Set> _commands;
+  std::unique_ptr<ViewerLog> _logger;
 
   Clock::time_point _last_sim_time = Clock::now();
 

@@ -15,7 +15,8 @@
 
 namespace tes::view::shaders
 {
-/// Flat colour shader. Can be used for solid, transparent and line based shapes and supports instance rendering.
+/// Flat colour shader. Can be used for solid, transparent and line based shapes and supports
+/// instance rendering.
 class TES_VIEWER_API Flat : public Shader
 {
 public:
@@ -24,12 +25,15 @@ public:
   /// Destructor.
   ~Flat();
 
-  Feature features() const override { return Feature::Instance | Feature::Transparent | Feature::Tint; }
+  Feature features() const override
+  {
+    return Feature::Instance | Feature::Transparent | Feature::Tint;
+  }
 
   std::shared_ptr<Magnum::GL::AbstractShaderProgram> shader() const override { return _shader; }
   std::shared_ptr<Magnum::Shaders::Flat3D> typedShader() const { return _shader; }
 
-  Shader &setProjectionMatrix(const Magnum::Matrix4 &projection) override;
+  Shader &setProjectionMatrix(const Magnum::Matrix4 &matrix) override;
   Shader &setViewMatrix(const Magnum::Matrix4 &matrix) override;
   Shader &setModelMatrix(const Magnum::Matrix4 &matrix) override;
 

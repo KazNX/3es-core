@@ -24,7 +24,7 @@ bool Shape::writeCreate(PacketWriter &stream) const
 
 bool Shape::writeUpdate(PacketWriter &stream) const
 {
-  UpdateMessage update;
+  UpdateMessage update = {};
   update.id = _data.id;
   update.flags = _data.flags;
   stream.reset(routingId(), UpdateMessage::MessageId);
@@ -34,7 +34,7 @@ bool Shape::writeUpdate(PacketWriter &stream) const
 
 bool Shape::writeDestroy(PacketWriter &stream) const
 {
-  DestroyMessage destroy;
+  DestroyMessage destroy = {};
   destroy.id = _data.id;
   stream.reset(routingId(), DestroyMessage::MessageId);
   return destroy.write(stream);
@@ -50,7 +50,7 @@ bool Shape::readCreate(PacketReader &stream)
 
 bool Shape::readUpdate(PacketReader &stream)
 {
-  UpdateMessage update;
+  UpdateMessage update = {};
   ObjectAttributesd attrs;
   if (update.read(stream, attrs))
   {
@@ -64,14 +64,17 @@ bool Shape::readUpdate(PacketReader &stream)
       // Partial update.
       if (update.flags & UFPosition)
       {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
         std::memcpy(_attributes.position, attrs.position, sizeof(attrs.position));
       }
       if (update.flags & UFRotation)
       {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
         std::memcpy(_attributes.rotation, attrs.rotation, sizeof(attrs.rotation));
       }
       if (update.flags & UFScale)
       {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
         std::memcpy(_attributes.scale, attrs.scale, sizeof(attrs.scale));
       }
       if (update.flags & UFColour)

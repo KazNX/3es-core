@@ -95,7 +95,7 @@ inline MultiShape::MultiShape(Iter shapes_begin, Iter shapes_end, const Transfor
     if (first)
     {
       first = false;
-      _routing_id = (*iter)->routingId();
+      setRoutingId((*iter)->routingId());
       setId((*iter)->id());
       setCategory((*iter)->category());
     }

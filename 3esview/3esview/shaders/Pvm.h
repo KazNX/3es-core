@@ -15,9 +15,9 @@ namespace tes::view::shaders
 {
 /// A helper for tracking projection, view and model matrices for shaders.
 ///
-/// Typical usage is to call the set functions as matrices change, which marks particular matrices as dirty. Then
-/// before drawing, check the flags to see if a particular matrix is dirty and only update the shader value when dirty.
-/// After drawing, call @c clearDirty() to reset the flags.
+/// Typical usage is to call the set functions as matrices change, which marks particular matrices
+/// as dirty. Then before drawing, check the flags to see if a particular matrix is dirty and only
+/// update the shader value when dirty. After drawing, call @c clearDirty() to reset the flags.
 ///
 /// Some examples:
 ///
@@ -66,8 +66,9 @@ namespace tes::view::shaders
 /// }
 /// ```
 ///
-/// From this usage, we can see how the dirty flags are for the user to observe and this class does nothing other than
-/// provide the information about what has changed since the last call to @c clearDirty().
+/// From this usage, we can see how the dirty flags are for the user to observe and this class does
+/// nothing other than provide the information about what has changed since the last call to @c
+/// clearDirty().
 class TES_VIEWER_API Pvm
 {
 public:
@@ -83,36 +84,36 @@ public:
     VM = unsigned(View) | unsigned(Model),
   };
 
-  const Magnum::Matrix4 &projection() const;
+  [[nodiscard]] const Magnum::Matrix4 &projection() const;
   void setProjection(const Magnum::Matrix4 &matrix);
 
-  const Magnum::Matrix4 &view() const;
+  [[nodiscard]] const Magnum::Matrix4 &view() const;
   void setView(const Magnum::Matrix4 &matrix);
 
-  const Magnum::Matrix4 &model() const;
+  [[nodiscard]] const Magnum::Matrix4 &model() const;
   void setModel(const Magnum::Matrix4 &matrix);
 
-  bool dirtyProjection() const;
-  bool dirtyView() const;
-  bool dirtyModel() const;
-  bool dirtyPvm() const;
-  bool dirtyPv() const;
-  bool dirtyVm() const;
+  [[nodiscard]] bool dirtyProjection() const;
+  [[nodiscard]] bool dirtyView() const;
+  [[nodiscard]] bool dirtyModel() const;
+  [[nodiscard]] bool dirtyPvm() const;
+  [[nodiscard]] bool dirtyPv() const;
+  [[nodiscard]] bool dirtyVm() const;
 
   /// Request the full `projection * view * model` transform.
   /// @return The full PVM transformation.
-  Magnum::Matrix4 pvm() const;
+  [[nodiscard]] Magnum::Matrix4 pvm() const;
   /// Request the `projection * view` transform.
   /// @return The PV transformation.
-  Magnum::Matrix4 pv() const;
+  [[nodiscard]] Magnum::Matrix4 pv() const;
   /// Request the `view * model` transform.
   /// @return The VM transformation.
-  Magnum::Matrix4 vm() const;
+  [[nodiscard]] Magnum::Matrix4 vm() const;
 
   void clearDirty(DirtyFlag flag);
   void clearDirty();
 
-protected:
+private:
   Magnum::Matrix4 _projection_matrix;
   Magnum::Matrix4 _view_matrix;
   Magnum::Matrix4 _model_matrix;

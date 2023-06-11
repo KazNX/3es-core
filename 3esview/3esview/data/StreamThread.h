@@ -45,7 +45,10 @@ public:
   using Clock = std::chrono::steady_clock;
 
   StreamThread(std::shared_ptr<ThirdEyeScene> tes, std::shared_ptr<std::istream> stream);
+  StreamThread(const StreamThread &other) = delete;
   ~StreamThread() override;
+
+  StreamThread &operator=(const StreamThread &other) = delete;
 
   /// Reports whether the current stream is a live connection or a replay.
   ///
@@ -284,11 +287,11 @@ private:
     /// Keyframe storage
     std::unique_ptr<KeyframeStore> store;
     /// Data at which to make a new keyframe (MiB).
-    size_t size_interval_mib = 20;  // NOLINT(readability-magic-numbers)
+    size_t size_interval_mib = 20;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     /// Frame number interval at which to make keyframes.
-    FrameNumber frame_interval = 100;  // NOLINT(readability-magic-numbers)
+    FrameNumber frame_interval = 100;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     /// Minimum number of frames between key frames..
-    FrameNumber frame_minimum_interval = 5;  // NOLINT(readability-magic-numbers)
+    FrameNumber frame_minimum_interval = 5;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     /// True if new keyfames are allowed.
     bool enabled = true;
   };
@@ -321,7 +324,7 @@ private:
   /// The scene manager.
   std::shared_ptr<ThirdEyeScene> _tes;
   std::thread _thread;
-  ServerInfoMessage _server_info;
+  ServerInfoMessage _server_info = {};
   bool _have_server_info = false;
   Keyframes _keyframes;
 };

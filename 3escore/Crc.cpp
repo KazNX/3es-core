@@ -45,16 +45,15 @@ CrcCalc<CRC>::CrcCalc(CRC initial_remainder, CRC final_xor_value, CRC polynomial
 template <typename CRC>
 CRC CrcCalc<CRC>::crc(const uint8_t *message, size_t byte_count) const
 {
-  uint8_t data;
+  uint8_t data = 0;
   CRC remainder = _initial_remainder;
 
   // Divide the message by the polynomial, a byte at a time.
   for (size_t byte = 0u; byte < byte_count; ++byte)
   {
-    // NOLINTBEGIN(hicpp-signed-bitwise)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-*)
     data = static_cast<uint8_t>(message[byte] ^ (remainder >> (kWidth - 8u)));
-    remainder = static_cast<CRC>(_crc_table[data] ^ (remainder << 8u));
-    // NOLINTEND(hicpp-signed-bitwise)
+    remainder = static_cast<CRC>(_crc_table.at(data) ^ (remainder << 8u));
   }
 
   // The final remainder is the CRC.
@@ -79,7 +78,6 @@ void CrcCalc<CRC>::initTable(CRC polynomial) noexcept
       // Try to divide the current data bit.
       if (remainder & kTopBit)
       {
-        // NOLINTNEXTLINE(hicpp-signed-bitwise)
         remainder = static_cast<CRC>((remainder << 1u) ^ polynomial);
       }
       else
@@ -89,7 +87,7 @@ void CrcCalc<CRC>::initTable(CRC polynomial) noexcept
     }
 
     // Store the result into the table.
-    _crc_table[dividend] = remainder;
+    _crc_table.at(dividend) = remainder;
   }
 }
 

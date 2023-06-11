@@ -8,7 +8,7 @@ namespace tes
 template <typename T>
 inline Quaternion<T> operator*(const Quaternion<T> &a, const Quaternion<T> &b)
 {
-  Quaternion<T> q;
+  Quaternion<T> q = {};
   q.x() = a.w() * b.x() + a.x() * b.w() + a.y() * b.z() - a.z() * b.y();
   q.y() = a.w() * b.y() - a.x() * b.z() + a.y() * b.w() + a.z() * b.x();
   q.z() = a.w() * b.z() + a.x() * b.y() - a.y() * b.x() + a.z() * b.w();
@@ -192,7 +192,7 @@ Vector3<T> Quaternion<T>::transform(const Vector3<T> &vec) const
   const T zz = z() * z(), zw = z() * w();
   // NOLINTEND(readability-identifier-length, readability-isolate-declaration)
 
-  Vector3<T> res;
+  Vector3<T> res = {};
 
   res.x() = (1 - 2 * (yy + zz)) * vec.x() + (2 * (xy - zw)) * vec.y() + (2 * (xz + yw)) * vec.z();
   res.y() = (2 * (xy + zw)) * vec.x() + (1 - 2 * (xx + zz)) * vec.y() + (2 * (yz - xw)) * vec.z();
@@ -233,7 +233,7 @@ Quaternion<T> Quaternion<T>::slerp(const Quaternion<T> &from, const Quaternion<T
 
   cos_val = from.dot(to);
 
-  Quaternion<T> temp;
+  Quaternion<T> temp = {};
 
   // numerical round-off error could create problems in call to acos
   if (cos_val < static_cast<T>(0))

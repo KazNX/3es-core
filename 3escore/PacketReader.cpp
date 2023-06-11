@@ -9,6 +9,11 @@
 #include <cstring>
 #include <utility>
 
+// Casting and pointer arithmetic are fundamental the the PacketStream.
+// clang-format off
+// NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+// clang-format on
+
 namespace tes
 {
 
@@ -20,26 +25,16 @@ PacketReader::PacketReader(const PacketHeader *packet)
 
 
 PacketReader::PacketReader(PacketReader &&other) noexcept
-  : PacketStream<const PacketHeader>(nullptr)
-{
-  _packet = std::exchange(other._packet, nullptr);
-  _status = std::exchange(other._status, Ok);
-  _payload_position = std::exchange(other._payload_position, 0);
-}
-
-
-PacketReader &PacketReader::operator=(PacketReader &&other) noexcept
-{
-  other.swap(*this);
-  return *this;
-}
+  : PacketStream<const PacketHeader>(std::move(other))
+{}
 
 
 void PacketReader::swap(PacketReader &other) noexcept
 {
-  std::swap(_packet, other._packet);
-  std::swap(_status, other._status);
-  std::swap(_payload_position, other._payload_position);
+  using std::swap;
+  swap(_packet, other._packet);
+  swap(_status, other._status);
+  swap(_payload_position, other._payload_position);
 }
 
 
@@ -134,3 +129,7 @@ size_t PacketReader::peek(uint8_t *dst, size_t byte_count, bool allow_byte_swap)
   return copy_count;
 }
 }  // namespace tes
+
+// clang-format off
+// NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+// clang-format on

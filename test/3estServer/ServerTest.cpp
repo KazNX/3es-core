@@ -25,7 +25,7 @@
 #include <thread>
 #include <vector>
 
-// NOLINTBEGIN(readability-magic-numbers, readability-function-cognitive-complexity)
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-function-cognitive-complexity)
 
 namespace
 {
@@ -781,4 +781,4 @@ int main(int argc, char **argv_non_const)
   return 0;
 }
 
-// NOLINTEND(readability-magic-numbers, readability-function-cognitive-complexity)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-function-cognitive-complexity)

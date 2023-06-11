@@ -10,6 +10,7 @@
 
 namespace tes::view::settings
 {
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 struct Render
 {
   Bool use_edl_shader = { "EDL shader", true, "Enable Eye-Dome-Lighting shader?" };
@@ -21,7 +22,18 @@ struct Render
   Float point_size = { "Point size", 4.0f, 1.0f, 64.0f,
                        "Point render size for point clouds (pixels)." };
   Colour background_colour = { "Background colour", tes::Colour::Grey, "Background colour." };
+
+  [[nodiscard]] inline bool operator==(const Render &other) const
+  {
+    return use_edl_shader == other.use_edl_shader && edl_radius == other.edl_radius &&
+           edl_exponential_scale == other.edl_exponential_scale &&
+           edl_linear_scale == other.edl_linear_scale && point_size == other.point_size &&
+           background_colour == other.background_colour;
+  }
+
+  [[nodiscard]] inline bool operator!=(const Render &other) const { return !operator==(other); }
 };
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }  // namespace tes::view::settings
 
 #endif  // TES_VIEW_SETTINGS_RENDER_H

@@ -59,7 +59,7 @@ public:
   // IPEndPoint ServerEndPoint { get; private set; }
   [[nodiscard]] const std::string &outputPrefix() const { return _output_prefix; }
   [[nodiscard]] constexpr static const char *defaultPrefix() { return "tes"; }
-  // NOLINTNEXTLINE(readability-magic-numbers)
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
   [[nodiscard]] constexpr static uint16_t defaultPort() { return 33500u; }
   [[nodiscard]] constexpr static const char *defaultIP() { return "127.0.0.1"; }
 

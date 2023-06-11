@@ -36,7 +36,7 @@ class ThirdEyeScene;
 namespace camera
 {
 struct Camera;
-}
+}  // namespace camera
 }  // namespace tes::view
 
 namespace tes::view::data
@@ -49,9 +49,12 @@ class TES_VIEWER_API NetworkThread : public DataThread
 public:
   using Clock = std::chrono::steady_clock;
 
-  NetworkThread(std::shared_ptr<ThirdEyeScene> tes, const std::string &host, uint16_t port,
+  NetworkThread(std::shared_ptr<ThirdEyeScene> tes, std::string host, uint16_t port,
                 bool allow_reconnect = true);
+  NetworkThread(const NetworkThread &other) = delete;
   ~NetworkThread() override;
+
+  NetworkThread &operator=(const NetworkThread &other) = delete;
 
   /// The host to which we'll be connecting.
   /// @return The target host.
@@ -153,7 +156,7 @@ protected:
   void run();
 
 private:
-  void configureSocket(TcpSocket &socket);
+  static void configureSocket(TcpSocket &socket);
   void runWith(TcpSocket &socket);
 
   /// Process a control packet.

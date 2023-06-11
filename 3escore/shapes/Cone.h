@@ -45,6 +45,18 @@ public:
   /// @param other Object to move.
   Cone(Cone &&other) noexcept = default;
 
+  ~Cone() override = default;
+
+  /// Copy assignment.
+  /// @param other The object to copy.
+  /// @return @c *this
+  Cone &operator=(const Cone &other) noexcept = default;
+
+  /// Move assignment.
+  /// @param other The object to move.
+  /// @return @c *this
+  Cone &operator=(Cone &&other) noexcept = default;
+
   [[nodiscard]] const char *type() const override { return "cone"; }
 
   /// Sets the cone radius at the base.

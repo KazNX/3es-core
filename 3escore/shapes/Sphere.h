@@ -42,6 +42,18 @@ public:
   /// @param other Object to move.
   Sphere(Sphere &&other) noexcept = default;
 
+  ~Sphere() override = default;
+
+  /// Copy assignment.
+  /// @param other The object to copy.
+  /// @return @c *this
+  Sphere &operator=(const Sphere &other) noexcept = default;
+
+  /// Move assignment.
+  /// @param other The object to move.
+  /// @return @c *this
+  Sphere &operator=(Sphere &&other) noexcept = default;
+
   [[nodiscard]] const char *type() const override { return "sphere"; }
 
   /// Set the sphere radius. This sets the same scale for all dimensions.

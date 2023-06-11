@@ -28,7 +28,10 @@ public:
   using Lock = std::mutex;
 
   TcpServer(const ServerSettings &settings, const ServerInfoMessage *server_info);
+  TcpServer(const TcpServer &other) = delete;
   ~TcpServer() final;
+
+  TcpServer &operator=(const TcpServer &other) = delete;
 
   const ServerSettings &settings() const { return _settings; }
 

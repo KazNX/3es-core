@@ -43,6 +43,17 @@ MeshSet::MeshSet(MeshSet &&other) noexcept = default;
 MeshSet::~MeshSet() = default;
 
 
+MeshSet &MeshSet::operator=(const MeshSet &other)
+{
+  Shape::operator=(other);
+  other.onClone(*this);
+  return *this;
+}
+
+
+MeshSet &MeshSet::operator=(MeshSet &&other) noexcept = default;
+
+
 bool MeshSet::writeCreate(PacketWriter &stream) const
 {
   if (!Shape::writeCreate(stream))
@@ -87,7 +98,7 @@ bool MeshSet::writeCreate(PacketWriter &stream) const
     ok = stream.writeElement(part_id) == sizeof(part_id) && ok;
     // The precision of the transforms is determined by the CreateMessage::flag OFDoublePrecision
     // only.
-    if (_data.flags & OFDoublePrecision)
+    if (flags() & OFDoublePrecision)
     {
       ok = attr.write(stream) && ok;
     }
@@ -119,7 +130,7 @@ bool MeshSet::readCreate(PacketReader &stream)
   ok = ok && stream.readElement(number_of_parts) == sizeof(number_of_parts);
   _parts.resize(number_of_parts);
 
-  const bool expect_double_precision = (_data.flags & OFDoublePrecision) != 0;
+  const bool expect_double_precision = (flags() & OFDoublePrecision) != 0;
   for (unsigned i = 0; i < number_of_parts; ++i)
   {
     ok = ok && stream.readElement(part_id) == sizeof(part_id);
@@ -128,6 +139,7 @@ bool MeshSet::readCreate(PacketReader &stream)
     if (ok)
     {
       _parts[i].transform =
+        // NOLINTNEXTLINE(cppcoreguidlines-pro-bounds-array-to-pointer-decay)
         Transform(Vector3d(attr.position), Quaterniond(attr.rotation), Vector3d(attr.scale));
       _parts[i].transform.setPreferDoublePrecision(expect_double_precision);
       // We can only reference dummy resources here.

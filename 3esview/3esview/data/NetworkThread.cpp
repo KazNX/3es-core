@@ -21,10 +21,10 @@
 
 namespace tes::view::data
 {
-NetworkThread::NetworkThread(std::shared_ptr<ThirdEyeScene> tes, const std::string &host,
-                             uint16_t port, bool allow_reconnect)
+NetworkThread::NetworkThread(std::shared_ptr<ThirdEyeScene> tes, std::string host, uint16_t port,
+                             bool allow_reconnect)
   : _allow_reconnect(allow_reconnect)
-  , _host(host)
+  , _host(std::move(host))
   , _port(port)
 {
   _tes = std::exchange(tes, nullptr);
@@ -113,7 +113,9 @@ bool NetworkThread::endRecording()
 
 void NetworkThread::run()
 {
+  using namespace std::chrono_literals;
   auto socket = std::make_unique<TcpSocket>();
+  constexpr auto kReconnectDelay = 200ms;
 
   do
   {
@@ -124,7 +126,7 @@ void NetworkThread::run()
     {
       if (_allow_reconnect)
       {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(kReconnectDelay);
       }
       continue;
     }
@@ -154,7 +156,7 @@ void NetworkThread::runWith(TcpSocket &socket)
   // We have two buffers here -> redundant.
   // TODO(KS): change the PacketBuffer interface so we can read directly into it's buffer.
   PacketBuffer packet_buffer;
-  std::vector<uint8_t> read_buffer(2 * 1024u);
+  std::vector<uint8_t> read_buffer(2048u);
 
   _current_frame = 0;
   _total_frames = 0;
@@ -176,7 +178,7 @@ void NetworkThread::runWith(TcpSocket &socket)
     {
       packet_decoder.setPacket(packet_header);
 
-      while (packet_header = packet_decoder.next())
+      while ((packet_header = packet_decoder.next()))
       {
         PacketReader packet(packet_header);
         // Lock for frame control messages as these tell us to advance the frame and how long to
@@ -209,7 +211,7 @@ void NetworkThread::runWith(TcpSocket &socket)
 
 void NetworkThread::processControlMessage(PacketReader &packet)
 {
-  ControlMessage msg;
+  ControlMessage msg = {};
   if (!msg.read(packet))
   {
     log::error("Failed to decode control packet: ", packet.messageId());
@@ -263,7 +265,7 @@ void NetworkThread::processControlMessage(PacketReader &packet)
     _tes->reset();
     break;
   case CIdKeyframe:
-    break;
+    [[fallthrough]];
   case CIdEnd:
     break;
   default:
@@ -295,7 +297,9 @@ void NetworkThread::recordFlush(float dt, const camera::Camera &camera)
     }
     else if (_record->status() == StreamRecorder::State::PendingSnapshot)
     {
-      const auto [success, _] = _tes->saveSnapshot(_record->connection());
+      // Make sure we fail the snapshot if a quit is requested to prevent a deadlock.
+      const auto [success, _] = _tes->saveSnapshot(
+        _record->connection(), [this]() { return static_cast<bool>(_quit_flag); });
       if (success)
       {
         _record->markSnapshot();

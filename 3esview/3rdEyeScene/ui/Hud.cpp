@@ -23,6 +23,9 @@
 #include <Corrade/PluginManager/PluginManager.h>
 #include <Corrade/Utility/Resource.h>
 
+#include <iomanip>
+#include <sstream>
+
 namespace tes::view::ui
 {
 
@@ -36,7 +39,7 @@ Hud::Hud(Viewer &viewer, const PreferredCoordinates &coords)
   : Panel("Hud", viewer)
 {
   _preferred_coordinates = coords;
-  _window_flags |= ImGuiWindowFlags_NoBackground;
+  _window_flags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMouseInputs;
   _set_camera_command = viewer.commands()->lookupName("setCamera").command;
 }
 
@@ -51,6 +54,8 @@ void Hud::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
   {
     drawCameraCombo();
   }
+
+  drawFps();
 }
 
 
@@ -111,5 +116,23 @@ void Hud::drawCameraCombo()
       }
     }
   }
+}
+
+
+void Hud::drawFps()
+{
+  const int fps_offset_y = 10;
+  const int fps_width = 70;
+  const int fps_height = 24;
+  const ChildWindow child("FPSDisplay", { { { -fps_width, fps_offset_y }, Anchor::TopRight, true },
+                                          { { fps_width, fps_height }, Stretch::None, true } });
+
+  std::ostringstream out;
+  out.precision(2);
+  const auto fps = viewer().tes()->fps();
+  out << std::fixed << std::setprecision(3) << fps << std::flush;
+
+  const auto fps_str = out.str();
+  ImGui::Text(fps_str.c_str());
 }
 }  // namespace tes::view::ui

@@ -23,9 +23,12 @@ public:
   /// @param filename Path to the file to write to.
   /// @param settings Various server settings to initialise with.
   FileConnection(const std::string &filename, const ServerSettings &settings);
+  FileConnection(const FileConnection &other) = delete;
 
   // See cpp file for details on disabling bugprone-exception-escape
   ~FileConnection() final;  // NOLINT(bugprone-exception-escape)
+
+  FileConnection &operator=(const FileConnection &other) = delete;
 
   /// Close the socket connection.
   void close() final;

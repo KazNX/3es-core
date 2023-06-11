@@ -27,9 +27,8 @@ Exception::Exception(const char *msg, const char *filename, int line_number)
 }
 
 
-Exception::Exception(Exception &&other) noexcept
-  : _message(std::move(other._message))
-{}
+Exception::Exception(const Exception &other) = default;
+Exception::Exception(Exception &&other) noexcept = default;
 
 
 Exception::~Exception() = default;
@@ -39,6 +38,9 @@ const char *Exception::what() const noexcept
 {
   return _message.c_str();
 }
+
+
+Exception &Exception::operator=(Exception &&other) noexcept = default;
 
 
 void Exception::swap(Exception &other) noexcept

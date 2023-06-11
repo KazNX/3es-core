@@ -8,6 +8,11 @@
 
 #include "PacketStream.h"
 
+// Casting and pointer arithmetic are fundamental the the PacketStream.
+// clang-format off
+// NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+// clang-format on
+
 namespace tes
 {
 /// A utility class for writing payload data to a @c PacketHeader.
@@ -80,9 +85,11 @@ public:
   /// Assignment operator. Simple as neither writer owns the underlying memory.
   /// Both point to the same underlying memory, but only one should be used.
   /// @param other The packet to copy.
-  PacketWriter &operator=(PacketWriter other);
+  PacketWriter &operator=(const PacketWriter &other);
+  /// @overload
+  PacketWriter &operator=(PacketWriter &&other) noexcept;
 
-  void swap(PacketWriter &other);
+  void swap(PacketWriter &other) noexcept;
 
   friend inline void swap(PacketWriter &first, PacketWriter &second) { first.swap(second); }
 
@@ -185,7 +192,7 @@ public:
   template <typename T>
   PacketWriter &operator>>(T &val);
 
-protected:
+private:
   uint8_t *payloadWritePtr();
   void incrementPayloadSize(size_t inc);
 
@@ -239,5 +246,9 @@ inline uint8_t *PacketWriter::payloadWritePtr()
   return payload() + _payload_position;
 }
 }  // namespace tes
+
+// clang-format off
+// NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+// clang-format on
 
 #endif  // TES_CORE_PACKET_WRITER_H

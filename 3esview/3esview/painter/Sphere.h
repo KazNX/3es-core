@@ -13,7 +13,8 @@ class TES_VIEWER_API Sphere : public ShapePainter
 public:
   /// Constructor.
   /// @param culler Bounds culler
-  Sphere(std::shared_ptr<BoundsCuller> culler, std::shared_ptr<shaders::ShaderLibrary> shaders);
+  Sphere(const std::shared_ptr<BoundsCuller> &culler,
+         const std::shared_ptr<shaders::ShaderLibrary> &shaders);
 
   /// Solid mesh creation function.
   /// @return A solid (or transparent) mesh representation.

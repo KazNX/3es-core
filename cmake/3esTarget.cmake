@@ -26,7 +26,7 @@ function(tes_configure_target_flags TARGET)
     #-------------------------------------
     # MSC settings.
     #-------------------------------------
-    # Correctly report the C++ version number.
+    # Correctly report the C++ version number in the __cplusplus preprocessor definition.
     $<$<CXX_COMPILER_ID:MSVC>:/Zc:__cplusplus>
     # Set warning level 3
     $<$<CXX_COMPILER_ID:MSVC>:/W3>

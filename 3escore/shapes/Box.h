@@ -40,6 +40,18 @@ public:
   /// @param other Object to move.
   Box(Box &&other) noexcept = default;
 
+  ~Box() override = default;
+
+  /// Copy assignment.
+  /// @param other The object to copy.
+  /// @return @c *this
+  Box &operator=(const Box &other) noexcept = default;
+
+  /// Move assignment.
+  /// @param other The object to move.
+  /// @return @c *this
+  Box &operator=(Box &&other) noexcept = default;
+
   [[nodiscard]] const char *type() const override { return "box"; }
 };
 

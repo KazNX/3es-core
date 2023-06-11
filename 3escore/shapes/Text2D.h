@@ -77,17 +77,15 @@ inline Text2D::Text2D(std::string text, const Id &id, const Spherical &pos)
 
 inline bool Text2D::inWorldSpace() const
 {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  return (_data.flags & Text2DFWorldSpace) != 0;
+  return (flags() & Text2DFWorldSpace) != 0;
 }
 
 
 inline Text2D &Text2D::setInWorldSpace(bool world_space)
 {
-  // NOLINTBEGIN(hicpp-signed-bitwise)
-  _data.flags = static_cast<uint16_t>(_data.flags & ~Text2DFWorldSpace);
-  _data.flags = static_cast<uint16_t>(_data.flags | Text2DFWorldSpace * !!world_space);
-  // NOLINTEND(hicpp-signed-bitwise)
+  auto new_flags = static_cast<uint16_t>(flags() & ~Text2DFWorldSpace);
+  new_flags = static_cast<uint16_t>(new_flags | Text2DFWorldSpace * !!world_space);
+  setFlags(new_flags);
   return *this;
 }
 }  // namespace tes

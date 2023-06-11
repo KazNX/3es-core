@@ -99,7 +99,7 @@ SimpleMesh::SimpleMesh(uint32_t id, size_t vertex_count, size_t index_count, Dra
 SimpleMesh::SimpleMesh(const SimpleMesh &other)
 {
   const std::scoped_lock guard(other._imp->lock);
-  _imp = other._imp;
+  _imp = other._imp;  // NOLINT(cppcoreguidelines-prefer-member-initializer)
 }
 
 
@@ -304,7 +304,7 @@ unsigned SimpleMesh::addVertices(const Vector3f *v, size_t count)
   setVertexCount(int_cast<unsigned>(_imp->vertices.size() + count));
   for (unsigned i = 0; i < count; ++i)
   {
-    _imp->vertices[offset + i] = v[i];
+    _imp->vertices.at(offset + i) = v[i];
   }
   return int_cast<unsigned>(offset);
 }
@@ -316,7 +316,7 @@ unsigned SimpleMesh::setVertices(size_t at, const Vector3f *v, size_t count)
   unsigned set = 0;
   for (size_t i = at; i < at + count && i < _imp->vertices.size(); ++i)
   {
-    _imp->vertices[i] = v[i - at];
+    _imp->vertices.at(i) = v[i - at];
     ++set;
   }
   return set;
@@ -374,7 +374,7 @@ void SimpleMesh::addIndices(const uint32_t *idx, size_t count)
   setIndexCount(int_cast<unsigned>(count + offset));
   for (unsigned i = 0; i < count; ++i)
   {
-    _imp->indices[i + offset] = idx[i];
+    _imp->indices.at(i + offset) = idx[i];
   }
 }
 
@@ -385,7 +385,7 @@ unsigned SimpleMesh::setIndices(size_t at, const uint32_t *idx, size_t count)
   unsigned set = 0;
   for (size_t i = at; i < at + count && i < _imp->indices.size(); ++i)
   {
-    _imp->indices[i] = idx[set++];
+    _imp->indices.at(i) = idx[set++];
   }
   return set;
 }
@@ -418,7 +418,7 @@ unsigned SimpleMesh::setNormals(size_t at, const Vector3f *n, size_t count)
   }
   for (size_t i = at; i < at + count && i < _imp->normals.size(); ++i)
   {
-    _imp->normals[i] = n[set++];
+    _imp->normals.at(i) = n[set++];
   }
   return set;
 }
@@ -452,7 +452,7 @@ unsigned SimpleMesh::setColours(size_t at, const uint32_t *c, size_t count)
 
   for (size_t i = at; i < at + count && i < _imp->colours.size(); ++i)
   {
-    _imp->colours[i] = c[i - at];
+    _imp->colours.at(i) = c[i - at];
     ++set;
   }
   return set;
@@ -487,7 +487,7 @@ unsigned SimpleMesh::setUvs(size_t at, const float *uvs, size_t count)
   for (size_t i = at; i < at + count && i < _imp->uvs.size(); ++i)
   {
     const UV uv = { uvs[(i - at) * 2 + 0], uvs[(i - at) * 2 + 1] };
-    _imp->uvs[i] = uv;
+    _imp->uvs.at(i) = uv;
     ++set;
   }
   return set;
@@ -589,12 +589,12 @@ bool SimpleMesh::processColours(const MeshComponentMessage &msg, unsigned offset
       _imp->components |= Colour;
     }
 
-    std::array<uint8_t, 4> rgba;
+    std::array<uint8_t, 4> rgba = {};
     for (unsigned i = 0; i < stream.count() && i + offset < vertexCount(); ++i)
     {
       for (unsigned j = 0; j < rgba.size(); ++j)
       {
-        rgba[j] = stream.get<uint8_t>(i, j);
+        rgba.at(j) = stream.get<uint8_t>(i, j);
       }
 
       _imp->colours[i] = tes::Colour(rgba).colour32();

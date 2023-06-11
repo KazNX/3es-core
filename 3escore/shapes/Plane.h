@@ -44,6 +44,18 @@ public:
   /// @param other Object to move.
   Plane(Plane &&other) noexcept = default;
 
+  ~Plane() override = default;
+
+  /// Copy assignment.
+  /// @param other The object to copy.
+  /// @return @c *this
+  Plane &operator=(const Plane &other) noexcept = default;
+
+  /// Move assignment.
+  /// @param other The object to move.
+  /// @return @c *this
+  Plane &operator=(Plane &&other) noexcept = default;
+
   [[nodiscard]] const char *type() const override { return "plane"; }
 
   /// Set the plane normal. Affects @p rotation().
