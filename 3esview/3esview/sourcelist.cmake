@@ -2,6 +2,7 @@
 list(APPEND PUBLIC_HEADERS
   # General headers
   BoundsCuller.h
+  Constants.h
   DrawParams.h
   EdlEffect.h
   FboEffect.h
@@ -22,10 +23,12 @@ list(APPEND PUBLIC_HEADERS
   command/DefaultCommands.h
   command/Set.h
   command/Shortcut.h
+  command/camera/SetCamera.h
   command/connection/Close.h
   command/connection/OpenFile.h
   command/connection/OpenTcp.h
   command/playback/Loop.h
+  command/playback/Record.h
   command/playback/Pause.h
   command/playback/SkipBackward.h
   command/playback/SkipForward.h
@@ -37,6 +40,7 @@ list(APPEND PUBLIC_HEADERS
   data/DataThread.h
   data/KeyframeStore.h
   data/NetworkThread.h
+  data/StreamRecorder.h
   data/StreamThread.h
   handler/Camera.h
   handler/Category.h
@@ -102,11 +106,13 @@ list(APPEND SOURCES
   command/DefaultCommands.cpp
   command/Set.cpp
   command/Shortcut.cpp
+  command/camera/SetCamera.cpp
   command/connection/Close.cpp
   command/connection/OpenFile.cpp
   command/connection/OpenTcp.cpp
   command/playback/Loop.cpp
   command/playback/Pause.cpp
+  command/playback/Record.cpp
   command/playback/SkipBackward.cpp
   command/playback/SkipForward.cpp
   command/playback/SkipToFrame.cpp
@@ -117,6 +123,7 @@ list(APPEND SOURCES
   data/DataThread.cpp
   data/KeyframeStore.cpp
   data/NetworkThread.cpp
+  data/StreamRecorder.cpp
   data/StreamThread.cpp
   handler/Camera.cpp
   handler/Category.cpp

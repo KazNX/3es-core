@@ -1,3 +1,6 @@
+//
+// Author: Kazys Stepanas
+//
 #ifndef TES_VIEW_COMMAND_CONNECTION_CLOSE_H
 #define TES_VIEW_COMMAND_CONNECTION_CLOSE_H
 

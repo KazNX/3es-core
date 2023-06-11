@@ -9,7 +9,7 @@
 #include <Magnum/Math/Matrix4.h>
 #include <Magnum/Math/Vector3.h>
 
-namespace tes::camera
+namespace tes::view::camera
 {
 struct TES_VIEWER_API Camera
 {
@@ -72,6 +72,6 @@ inline Magnum::Matrix4 viewProjection(const Camera &camera, const Magnum::Vector
 }
 
 
-}  // namespace tes::camera
+}  // namespace tes::view::camera
 
 #endif  // TES_VIEW_CAMERA_CAMERA_H

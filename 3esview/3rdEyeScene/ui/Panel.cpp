@@ -13,7 +13,20 @@ namespace tes::view::ui
 Magnum::Vector2i Panel::PreferredCoordinates::Position::forView(
   const Magnum::Vector2i &viewport_size) const
 {
-  auto pos = coord;
+  const auto im_pos =
+    forView(ImVec2{ static_cast<float>(viewport_size.x()), static_cast<float>(viewport_size.y()) });
+  return { static_cast<int>(im_pos.x), static_cast<int>(im_pos.y) };
+}
+
+
+ImVec2 Panel::PreferredCoordinates::Position::forView(const ImVec2 &viewport_size) const
+{
+  if (!in_use)
+  {
+    return { 0, 0 };
+  }
+
+  auto pos = ImVec2{ static_cast<float>(coord.x()), static_cast<float>(coord.y()) };
   // Fix left/right adjustment
   switch (anchor)
   {
@@ -27,13 +40,13 @@ Magnum::Vector2i Panel::PreferredCoordinates::Position::forView(
   case Anchor::BottomRight:
   case Anchor::CentreRight:
     // Right relative.
-    pos.x() += viewport_size.x();
+    pos.x += viewport_size.x;
     break;
   case Anchor::TopCentre:
   case Anchor::BottomCentre:
   case Anchor::Centre:
     // Centre relative.
-    pos.x() += viewport_size.x() / 2;
+    pos.x += viewport_size.x / 2;
     break;
   }
 
@@ -50,13 +63,13 @@ Magnum::Vector2i Panel::PreferredCoordinates::Position::forView(
   case Anchor::BottomRight:
   case Anchor::BottomCentre:
     // Bottom relative.
-    pos.y() += viewport_size.y();
+    pos.y += viewport_size.y;
     break;
   case Anchor::CentreLeft:
   case Anchor::CentreRight:
   case Anchor::Centre:
     // Centre relative.
-    pos.y() += viewport_size.y() / 2;
+    pos.y += viewport_size.y / 2;
     break;
   }
 
@@ -67,14 +80,27 @@ Magnum::Vector2i Panel::PreferredCoordinates::Position::forView(
 Magnum::Vector2i Panel::PreferredCoordinates::Size::forView(
   const Magnum::Vector2i &viewport_size) const
 {
-  auto size = extents;
+  const auto im_pos =
+    forView(ImVec2{ static_cast<float>(viewport_size.x()), static_cast<float>(viewport_size.y()) });
+  return { static_cast<int>(im_pos.x), static_cast<int>(im_pos.y) };
+}
+
+
+ImVec2 Panel::PreferredCoordinates::Size::forView(const ImVec2 &viewport_size) const
+{
+  if (!in_use)
+  {
+    return { 0, 0 };
+  }
+
+  auto size = ImVec2{ static_cast<float>(extents.x()), static_cast<float>(extents.y()) };
   if ((stretch & Stretch::Horizontal) != Stretch::None)
   {
-    size.x() += viewport_size.x();
+    size.x += viewport_size.x;
   }
   if ((stretch & Stretch::Vertical) != Stretch::None)
   {
-    size.y() += viewport_size.y();
+    size.y += viewport_size.y;
   }
 
   return size;
@@ -83,7 +109,7 @@ Magnum::Vector2i Panel::PreferredCoordinates::Size::forView(
 
 void Panel::draw(Magnum::ImGuiIntegration::Context &ui)
 {
-  auto window = defineWindow(preferredCoordinates());
+  auto window = defineWindow(preferredCoordinates(), _window_flags);
   drawContent(ui, window);
 }
 
@@ -94,9 +120,9 @@ Magnum::Vector2i Panel::uiViewportSize() const
 }
 
 
-Panel::Window Panel::defineWindow(const PreferredCoordinates &preferred_coordinates)
+Panel::Window Panel::defineWindow(const PreferredCoordinates &preferred_coordinates, int flags)
 {
-  return { name(), uiViewportSize(), preferred_coordinates };
+  return { name(), uiViewportSize(), preferred_coordinates, flags };
 }
 
 

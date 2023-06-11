@@ -9,7 +9,7 @@
 #include <3escore/Log.h>
 
 #include <3esview/command/Set.h>
-#include <3esview/data/DataThread.h>
+#include <3esview/data/NetworkThread.h>
 #include <3esview/Viewer.h>
 
 #include <Magnum/GL/TextureFormat.h>
@@ -105,14 +105,30 @@ void IconBar::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
   TES_UNUSED(ui);
 
   const ImVec2 icon_size = { kButtonSize, kButtonSize };
-  button({ &_icons[static_cast<unsigned>(View::Settings)], "Settings",
-           _commands[static_cast<unsigned>(View::Settings)].get(), icon_size });
-  button({ &_icons[static_cast<unsigned>(View::Connect)], "Connect",
-           _commands[static_cast<unsigned>(View::Connect)].get(), icon_size });
+  auto *connect_icon = &_icons[static_cast<unsigned>(View::Connect)];
+  if (std::dynamic_pointer_cast<data::NetworkThread>(viewer().dataThread()))
+  {
+    connect_icon = &_icons[static_cast<unsigned>(View::Connected)];
+  };
+  button(
+    { connect_icon, "Connect", _commands[static_cast<unsigned>(View::Connect)].get(), icon_size });
   button({ &_icons[static_cast<unsigned>(View::Categories)], "Categories",
            _commands[static_cast<unsigned>(View::Categories)].get(), icon_size });
   button({ &_icons[static_cast<unsigned>(View::Log)], "Log",
            _commands[static_cast<unsigned>(View::Log)].get(), icon_size });
+
+  // Place the settings button at the bottom of the icon bar.
+  const auto viewport_size = uiViewportSize();
+  const auto available_size = ImGui::GetContentRegionAvail();
+  // Work out an approximate spacing between buttons.
+  const auto spacing =
+    3 * static_cast<int>(ImGui::GetFrameHeightWithSpacing() - ImGui::GetFrameHeight());
+  // Add a dummy to fill space to the bottom of the window, allowing for the settings button at the
+  // bottom of the icon bar.
+  ImGui::Dummy({ 0.0f, available_size.y - (spacing + kButtonSize) });
+
+  button({ &_icons[static_cast<unsigned>(View::Settings)], "Settings",
+           _commands[static_cast<unsigned>(View::Settings)].get(), icon_size });
   window.end();
 
   if (_active_view != View::Invalid)
@@ -163,10 +179,7 @@ void IconBar::initialiseIcons()
 const IconBar::ViewIconNames &IconBar::viewIconNames()
 {
   static IconBar::ViewIconNames names = {
-    "Settings.png",
-    "Connect.png",
-    "Categories.png",
-    "Log.png",
+    "Settings.png", "Connect.png", "Categories.png", "Log.png", "Connected.png",
   };
   return names;
 }

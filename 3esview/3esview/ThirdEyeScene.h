@@ -35,6 +35,11 @@
 #include <unordered_set>
 #include <vector>
 
+namespace tes
+{
+class Connection;
+}  // namespace tes
+
 // TODO(KS): abstract away Magnum so it's not in any public headers.
 namespace tes::view
 {
@@ -139,6 +144,9 @@ public:
   /// effected until the next @c render() call.
   ///
   /// @param frame The new frame number.
+  /// @param[out] camera_out Retrieves the current camera position.
+  void updateToFrame(FrameNumber frame, camera::Camera &camera_out);
+  /// @overload
   void updateToFrame(FrameNumber frame);
 
   /// Updates the server information details.
@@ -172,6 +180,11 @@ public:
   /// @return A pair containing a boolean success indicator and the frame number which has been
   /// saved.
   std::pair<bool, FrameNumber> saveSnapshot(const std::filesystem::path &path);
+  /// This overload of @c saveSnapshot() writes the snapshot to the given @p connection.
+  /// @param connection The connection to write to.
+  /// @return A pair containing a boolean success indicator and the frame number which has been
+  /// saved.
+  std::pair<bool, FrameNumber> saveSnapshot(tes::Connection &connection);
 
   void createSampleShapes();
 
@@ -205,9 +218,9 @@ private:
   void handlePendingSnapshot();
 
   /// Implements the detail of @c saveSnapshot() .
-  /// @param path The file path to save to.
+  /// @param connection Connection object to write the snapshot to. May be a @c FileConnection .
   /// @return True on success.
-  bool saveCurrentFrameSnapshot(const std::filesystem::path &path);
+  bool saveCurrentFrameSnapshot(tes::Connection &connection);
 
   void restoreSettings();
   void storeSettings();
@@ -253,9 +266,17 @@ private:
   {
     std::mutex mutex;
     std::condition_variable signal;
-    std::filesystem::path path;
+    /// Connection object to save the next snapshot to.
+    Connection *connection = nullptr;
     SnapshotState waiting = SnapshotState::None;
     FrameNumber frame_number = 0;
+
+    void clear()
+    {
+      connection = nullptr;
+      waiting = SnapshotState::None;
+      frame_number = 0;
+    }
   };
 
   std::mutex _render_mutex;

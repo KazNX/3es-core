@@ -1,8 +1,15 @@
 #include "NetworkThread.h"
 
-#include <3esview/ThirdEyeScene.h>
+#include "StreamRecorder.h"
 
+#include <3esview/ThirdEyeScene.h>
+#include <3esview/camera/Camera.h>
+#include <3esview/handler/Camera.h>
+
+#include <3escore/CollatedPacket.h>
 #include <3escore/CollatedPacketDecoder.h>
+#include <3escore/CoreUtil.h>
+#include <3escore/FileConnection.h>
 #include <3escore/Log.h>
 #include <3escore/PacketBuffer.h>
 #include <3escore/PacketReader.h>
@@ -64,6 +71,43 @@ void NetworkThread::join()
   _quit_flag = true;
   _allow_reconnect = false;
   _thread.join();
+}
+
+
+bool NetworkThread::isRecording() const
+{
+  return _record != nullptr;
+}
+
+
+std::filesystem::path NetworkThread::recodingPath() const
+{
+  const std::lock_guard guard(_data_mutex);
+  return (isRecording()) ? _record->path() : std::filesystem::path();
+}
+
+
+bool NetworkThread::startRecording(const std::filesystem::path &path)
+{
+  const std::lock_guard guard(_data_mutex);
+  // TODO(KS): this will start mid frame. It may be better to wait to the next frame flush.
+  // Conversely, this could be the right behaviour for an unresponsive, or large data connection.
+  recordStopUnguarded();
+  _record = std::make_unique<StreamRecorder>(path, _server_info);
+  if (_record->isOpen())
+  {
+    return true;
+  }
+  _record = nullptr;
+  return false;
+}
+
+
+bool NetworkThread::endRecording()
+{
+  const std::lock_guard guard(_data_mutex);
+  // TODO(KS): see TODO in startRecording() regarding stopping mid frame.
+  return recordStopUnguarded();
 }
 
 
@@ -143,6 +187,7 @@ void NetworkThread::runWith(TcpSocket &socket)
           processControlMessage(packet);
           break;
         case MtServerInfo:
+          recordPacket(packet);
           if (processServerInfo(packet, _server_info))
           {
             _tes->updateServerInfo(_server_info);
@@ -153,6 +198,7 @@ void NetworkThread::runWith(TcpSocket &socket)
           }
           break;
         default:
+          recordPacket(packet);
           _tes->processMessage(packet);
           break;
         }
@@ -170,15 +216,27 @@ void NetworkThread::processControlMessage(PacketReader &packet)
     return;
   }
 
+  // End frame messsages need special handling as that represents a frame flush.
+  // We also need to get the recorded camera position from that action.
+  if (packet.messageId() != CIdFrame)
+  {
+    recordPacket(packet);
+  }
+
   switch (packet.messageId())
   {
   case CIdNull:
     break;
   case CIdFrame: {
     const auto current_frame = ++_current_frame;
+    camera::Camera camera = {};
     // Frame ending.
-    _tes->updateToFrame(current_frame);
+    _tes->updateToFrame(current_frame, camera);
     _total_frames = std::max(current_frame, _total_frames);
+    const auto elapsed_sever_time = (msg.value32) ? msg.value32 : _server_info.default_frame_time;
+    const auto elapsed_micro_seconds = _server_info.time_unit * elapsed_sever_time;
+    const auto dt = static_cast<float>(static_cast<double>(elapsed_micro_seconds) * 1e-6);
+    recordFlush(dt, camera);
     break;
   }
   case CIdCoordinateFrame:
@@ -212,5 +270,56 @@ void NetworkThread::processControlMessage(PacketReader &packet)
     log::error("Unknown control message id: ", packet.messageId());
     break;
   }
+}
+
+
+void NetworkThread::recordPacket(const PacketReader &packet)
+{
+  const std::lock_guard guard(_data_mutex);
+  if (_record && _record->status() == StreamRecorder::State::Recording)
+  {
+    _record->recordPacket(packet);
+  }
+}
+
+
+void NetworkThread::recordFlush(float dt, const camera::Camera &camera)
+{
+  const std::lock_guard guard(_data_mutex);
+  if (_record)
+  {
+    if (_record->status() == StreamRecorder::State::Recording)
+    {
+      _record->recordCamera(camera);
+      _record->flush(dt);
+    }
+    else if (_record->status() == StreamRecorder::State::PendingSnapshot)
+    {
+      const auto [success, _] = _tes->saveSnapshot(_record->connection());
+      if (success)
+      {
+        _record->markSnapshot();
+        log::trace("Recording snapshot taken.");
+      }
+      else
+      {
+        recordStopUnguarded();
+        log::error("Failed to start recording snapshot.");
+      }
+    }
+  }
+}
+
+
+bool NetworkThread::recordStopUnguarded()
+{
+  if (!_record)
+  {
+    return false;
+  }
+
+  _record->close();
+  _record = nullptr;
+  return true;
 }
 }  // namespace tes::view::data

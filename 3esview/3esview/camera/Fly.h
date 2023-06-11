@@ -5,7 +5,7 @@
 
 #include "Controller.h"
 
-namespace tes::camera
+namespace tes::view::camera
 {
 class TES_VIEWER_API Fly : public Controller
 {
@@ -23,7 +23,10 @@ public:
   /// Get the mouse sensitivity: radians/pixel.
   inline float mouseSensitivity() const { return _mouse_sensitivity; }
   /// Set the mouse sensitivity: radians/pixel.
-  inline void setMouseSensitivity(float mouse_sensitivity) { _mouse_sensitivity = mouse_sensitivity; }
+  inline void setMouseSensitivity(float mouse_sensitivity)
+  {
+    _mouse_sensitivity = mouse_sensitivity;
+  }
   /// Get the movement key speed multiplier.
   inline float moveMultiplier() const { return _move_multiplier; }
   /// Set the movement key speed multiplier.
@@ -31,7 +34,10 @@ public:
   /// Get the rotation key speed multiplier.
   inline float rotationMultiplier() const { return _rotation_multiplier; }
   /// Set the rotation key speed multiplier.
-  inline void setRotationMultiplier(float rotation_multiplier) { _rotation_multiplier = rotation_multiplier; }
+  inline void setRotationMultiplier(float rotation_multiplier)
+  {
+    _rotation_multiplier = rotation_multiplier;
+  }
   /// Get the mouse sensitivity multiplier.
   inline float mouseMultiplier() const { return _mouse_multiplier; }
   /// Set the mouse sensitivity multiplier.
@@ -39,7 +45,8 @@ public:
 
   void updateMouse(float dx, float dy, Camera &camera) override;
 
-  void updateKeys(float dt, Magnum::Vector3i translate, Magnum::Vector3i rotate, Camera &camera) override;
+  void updateKeys(float dt, Magnum::Vector3i translate, Magnum::Vector3i rotate,
+                  Camera &camera) override;
 
 private:
   /// Movement speed for key translation updates: m/s.
@@ -55,6 +62,6 @@ private:
   /// Current mouse sensitivity multiplier.
   float _mouse_multiplier = 1.0f;
 };
-}  // namespace tes::camera
+}  // namespace tes::view::camera
 
 #endif  // TES_VIEW_CAMERA_FLY

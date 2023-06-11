@@ -27,7 +27,7 @@ class Command;
 
 namespace tes::view::ui
 {
-class ConnectView : public Panel
+class TES_VIEWER_API ConnectView : public Panel
 {
 public:
   /// An enumeration of the actions which can be triggered by the playback bar.

@@ -25,7 +25,7 @@ class Command;
 
 namespace tes::view::ui
 {
-class IconBar : public Panel
+class TES_VIEWER_API IconBar : public Panel
 {
 public:
   constexpr static int kButtonSize = 24;
@@ -47,6 +47,13 @@ public:
 
     /// Number of @c Views - used for array sizes.
     Count,
+
+    // Additional items for dynamic icons (not actually views)
+    Connected = Count,
+
+    /// Number of icons
+    IconCount,
+
     /// Invalid value
     Invalid = Count
   };
@@ -67,10 +74,10 @@ private:
   void drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window) override;
   void initialiseIcons();
 
-  using ViewIcons = std::array<Magnum::GL::Texture2D, static_cast<unsigned>(View::Count)>;
+  using ViewIcons = std::array<Magnum::GL::Texture2D, static_cast<unsigned>(View::IconCount)>;
   using ViewCommands =
     std::array<std::shared_ptr<tes::view::command::Command>, static_cast<unsigned>(View::Count)>;
-  using ViewIconNames = std::array<std::string, static_cast<unsigned>(View::Count)>;
+  using ViewIconNames = std::array<std::string, static_cast<unsigned>(View::IconCount)>;
   using ViewPanels = std::array<std::shared_ptr<Panel>, static_cast<unsigned>(View::Count)>;
 
   static const IconBar::ViewIconNames &viewIconNames();

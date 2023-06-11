@@ -16,7 +16,7 @@
 namespace tes
 {
 /// A file stream implementation of a 3es @c Connection.
-class FileConnection final : public BaseConnection
+class TES_CORE_API FileConnection final : public BaseConnection
 {
 public:
   /// Create a new connection using the given @p clientSocket.

@@ -224,6 +224,8 @@ public:
   /// @return True on success
   bool sendServerInfo(const ServerInfoMessage &info) override;
 
+  using Connection::send;
+
   /// Add data from @c packet.
   /// @param packet Data to add. Must be finalised.
   /// @param allow_collation Ignored.
@@ -257,8 +259,6 @@ private:
   /// Buffer used to finalise collation. Deflating may not be successful, so we can try and fail
   /// with this buffer.
   std::vector<uint8_t> _final_buffer;
-  // unsigned _buffer_size = 0;                ///< current size of @c _buffer.
-  // unsigned _final_buffer_size = 0;          ///< current size of @c _final_buffer.
   unsigned _final_packet_cursor = 0;        ///< End of data in @c _final_buffer
   unsigned _cursor = 0;                     ///< Current write position in @c _buffer.
   unsigned _max_packet_size = 0;            ///< Maximum @p _buffer_size.

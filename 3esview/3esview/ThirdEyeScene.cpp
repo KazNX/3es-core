@@ -33,6 +33,7 @@
 #include "shaders/VoxelGeom.h"
 
 #include <3escore/FileConnection.h>
+#include <3escore/Finally.h>
 #include <3escore/Log.h>
 
 #include <Magnum/GL/Context.h>
@@ -235,7 +236,7 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
 }
 
 
-void ThirdEyeScene::updateToFrame(FrameNumber frame)
+void ThirdEyeScene::updateToFrame(FrameNumber frame, camera::Camera &camera)
 {
   // Called from the data thread, not the main thread.
   // Must invoke endFrame() between prepareFrame() and draw() calls.
@@ -247,8 +248,16 @@ void ThirdEyeScene::updateToFrame(FrameNumber frame)
       handler->endFrame(_render_stamp);
     }
   }
+  camera = _camera;
   _new_frame = frame;
   _have_new_frame = true;
+}
+
+
+void ThirdEyeScene::updateToFrame(FrameNumber frame)
+{
+  camera::Camera camera = {};
+  updateToFrame(frame, camera);
 }
 
 
@@ -290,7 +299,7 @@ void ThirdEyeScene::handlePendingSnapshot()
   if (_snapshot_wait.waiting == SnapshotState::Waiting)
   {
     _snapshot_wait.frame_number = _render_stamp.frame_number;
-    if (saveCurrentFrameSnapshot(_snapshot_wait.path))
+    if (_snapshot_wait.connection && saveCurrentFrameSnapshot(*_snapshot_wait.connection))
     {
       _snapshot_wait.waiting = SnapshotState::Success;
     }
@@ -307,16 +316,36 @@ void ThirdEyeScene::handlePendingSnapshot()
 
 std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(const std::filesystem::path &path)
 {
+  // Note(KS): The server settings are irrelevant for a file connection. We can use teh default.
+  // Arguably this implies the Connection constructor should be refactored.
+  FileConnection out(path.string(), ServerSettings());
+  const auto result = saveSnapshot(out);
+  out.close();
+  return result;
+}
+
+
+std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(tes::Connection &connection)
+{
   std::unique_lock guard(_snapshot_wait.mutex);
+
   if (std::this_thread::get_id() == _main_thread_id)
   {
     // Main thread. Save now.
-    const bool ok = saveCurrentFrameSnapshot(path);
+    const bool ok = saveCurrentFrameSnapshot(connection);
     return { ok, _render_stamp.frame_number };
   }
 
+  if (_snapshot_wait.connection)
+  {
+    // Already waiting on a snapshot
+    return { false, 0 };
+  }
+
+  Finally finally([this]() { _snapshot_wait.clear(); });
+  _snapshot_wait.connection = &connection;
+
   // Block until signalled on the wait condition.
-  _snapshot_wait.path = path;
   _snapshot_wait.waiting = SnapshotState::Waiting;
   while (_snapshot_wait.waiting == SnapshotState::Waiting)
   {
@@ -627,20 +656,16 @@ void ThirdEyeScene::onCameraConfigChange(const settings::Settings::Config &confi
 }
 
 
-bool ThirdEyeScene::saveCurrentFrameSnapshot(const std::filesystem::path &path)
+bool ThirdEyeScene::saveCurrentFrameSnapshot(tes::Connection &connection)
 {
-  // Note(KS): The server settings are irrelevant for a file connection. We can use teh default.
-  // Arguably this implies the Connection constructor should be refactored.
-  FileConnection out(path.string(), ServerSettings());
   // Write the server info message. We don't need a frame count.
-  out.sendServerInfo(_server_info);
+  connection.sendServerInfo(_server_info);
   for (const auto &handler : _ordered_message_handlers)
   {
-    handler->serialise(out);
+    handler->serialise(connection);
   }
-  out.updateTransfers(0);
-  out.updateFrame(0.0f, true);
-  out.close();
+  connection.updateTransfers(0);
+  connection.updateFrame(0.0f, true);
   return true;
 }
 

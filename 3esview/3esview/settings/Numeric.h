@@ -75,7 +75,7 @@ using UInt = Numeric<unsigned>;
 using Float = Numeric<float>;
 using Double = Numeric<double>;
 
-class Bool
+class TES_VIEWER_API Bool
 {
 public:
   Bool(const std::string &label, bool value, const std::string &tip)

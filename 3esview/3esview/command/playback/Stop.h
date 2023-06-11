@@ -7,6 +7,7 @@
 
 namespace tes::view::command::playback
 {
+/// Stop file playback or recording.
 class TES_VIEWER_API Stop : public Command
 {
 public:

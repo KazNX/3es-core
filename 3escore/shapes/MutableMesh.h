@@ -24,7 +24,7 @@ struct MutableMeshImp;
 /// - id
 ///
 /// Note the mutable mesh is not a resource. The manages a @c SimpleMesh which is a resource.
-class MutableMesh
+class TES_CORE_API MutableMesh
 {
 public:
   MutableMesh(uint32_t id, DrawType draw_type = DtTriangles,

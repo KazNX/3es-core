@@ -329,7 +329,8 @@ Datum             | Byte Size | Description
 ----------------- | --------: | -------------------------------------------------------------------
 Camera ID         | 1         | Identifies the camera. ID 255 is reserved for serialising details of the client's own camera when recording.
 Flags             | 1         | One byte flag values. Flag value 1 indicates all float values are 64 bit.
-Reserved          | 2         | Two bytes of padding. Must be zero.
+Coordinate frame  | 2         | Specifies an explicit coordinate frame for the camera. Ignored unless the Coordinate Frame flag is set.
+Reserved          | 4         | Two bytes of padding. Must be zero.
 Position          | 12 or 24  | XYZ coordinate for the camera position. Each element is a 32 or 64-bit float (see Flags).
 Facing            | 12 or 24  | XYZ forward vector (normalised) identifying the camera facing relative to Position.
 Up                | 12 or 24  | XYZ up vector (normalised) for the camera.
@@ -341,7 +342,8 @@ Supported flag values are:
 
 Flag                    | Value   | Description
 ----------------------- | ------: | --------------------------------------------
-Double Precision        | 1       | Indicates Position, Facing, Up, Near, Far and FOV values are all 64-bit quantities.
+Double Precision        | 1       | Indicates the camera coordinates are double precision. Only single precision is implemented.
+Coordinate Frame        | 2       | Indicates the Coordinate frame member is valid and should be respected. Otherwise it is ignored.
 
 ## Category messages
 

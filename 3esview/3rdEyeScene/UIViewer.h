@@ -21,7 +21,7 @@ class Panel;
 
 namespace tes::view
 {
-class UIViewer : public Viewer
+class TES_VIEWER_API UIViewer : public Viewer
 {
 public:
   class GuiContext
@@ -63,6 +63,7 @@ protected:
 private:
   void initialiseUi();
   void initialiseImGui();
+  void initialiseHud();
   void initialiseIconBarUi();
   void initialisePlaybackUi();
 

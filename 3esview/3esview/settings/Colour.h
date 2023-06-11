@@ -12,7 +12,7 @@
 namespace tes::view::settings
 {
 /// An enum value for use in settings.
-class Colour
+class TES_VIEWER_API Colour
 {
 public:
   using ValueType = tes::Colour;

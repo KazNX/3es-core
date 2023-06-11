@@ -17,6 +17,8 @@ list(APPEND SOURCES
   ui/CategoriesView.h
   ui/ConnectView.cpp
   ui/ConnectView.h
+  ui/Hud.cpp
+  ui/Hud.h
   ui/IconBar.cpp
   ui/IconBar.h
   ui/ImGui.h

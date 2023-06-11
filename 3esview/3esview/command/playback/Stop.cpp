@@ -1,7 +1,7 @@
 #include "Stop.h"
 
 #include <3esview/Viewer.h>
-#include <3esview/data/DataThread.h>
+#include <3esview/data/NetworkThread.h>
 
 namespace tes::view::command::playback
 {
@@ -12,7 +12,9 @@ Stop::Stop()
 
 bool Stop::checkAdmissible(Viewer &viewer) const
 {
-  return viewer.dataThread() != nullptr;
+  const auto data_thread = viewer.dataThread();
+  const auto network_thread = std::dynamic_pointer_cast<data::NetworkThread>(data_thread);
+  return network_thread && network_thread->isRecording() || !network_thread && data_thread;
 }
 
 
@@ -20,7 +22,15 @@ CommandResult Stop::invoke(Viewer &viewer, const ExecInfo &info, const Args &arg
 {
   (void)info;
   (void)args;
-  viewer.closeOrDisconnect();
+  const auto network_thread = std::dynamic_pointer_cast<data::NetworkThread>(viewer.dataThread());
+  if (network_thread)
+  {
+    network_thread->endRecording();
+  }
+  else
+  {
+    viewer.closeOrDisconnect();
+  }
   return { CommandResult::Code::Ok };
 }
 }  // namespace tes::view::command::playback

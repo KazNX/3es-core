@@ -27,7 +27,7 @@ class Command;
 
 namespace tes::view::ui
 {
-class Playback : public Panel
+class TES_VIEWER_API Playback : public Panel
 {
 public:
   constexpr static int kButtonSize = 24;

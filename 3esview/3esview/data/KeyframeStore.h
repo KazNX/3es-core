@@ -26,7 +26,7 @@ namespace tes::view::data
 /// - A frame number
 /// - A @c StreamThread file position
 /// - A (temporary) keyframe snapshot file.
-class KeyframeStore
+class TES_VIEWER_API KeyframeStore
 {
 public:
   struct Keyframe
