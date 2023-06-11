@@ -6,6 +6,7 @@
 #include "MeshResource.h"
 
 #include <3esview/MagnumColour.h>
+#include <3esview/painter/CategoryState.h>
 
 #include <3escore/Connection.h>
 #include <3escore/Log.h>
@@ -124,7 +125,8 @@ void MeshSet::endFrame(const FrameStamp &stamp)
 }
 
 
-void MeshSet::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params)
+void MeshSet::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+                   const painter::CategoryState &categories)
 {
   (void)stamp;
   const std::lock_guard guard(_mutex);
@@ -142,7 +144,7 @@ void MeshSet::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &par
       continue;
     }
 
-    if (_culler->isVisible(drawable.bounds_id))
+    if (_culler->isVisible(drawable.bounds_id) && categories.isActive(drawable.category_id))
     {
       const unsigned set_idx = (!drawable.owner->twoSided()) ? 0 : 1;
       _draw_sets[set_idx].push_back({ drawable.resource_id, drawable.transform, drawable.colour });
@@ -318,6 +320,7 @@ bool MeshSet::createDrawables(const std::shared_ptr<tes::MeshSet> &shape)
   {
     Drawable &drawable = _drawables.emplace_back();
     drawable.part_id = i;
+    drawable.category_id = shape->category();
     drawable.resource_id = shape->partResource(i)->id();
     drawable.transform =
       composeTransform(shape->attributes()) * composeTransform(shape->partTransform(i));

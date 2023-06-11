@@ -422,12 +422,14 @@ inline void defineCategory(Connection *connection, const std::string &name, uint
 {
   if (connection)
   {
+    constexpr unsigned kMaxNameLength = 0xffffu;
     tes::CategoryNameMessage msg;
     msg.category_id = static_cast<uint16_t>(category_id);
     msg.parent_id = static_cast<uint16_t>(parent_id);
     msg.default_active = (active) ? 1 : 0;
     const size_t name_len = name.length();
-    msg.name_length = static_cast<uint16_t>((name_len <= 0xffffu) ? name_len : 0xffffu);
+    msg.name_length =
+      static_cast<uint16_t>((name_len <= kMaxNameLength) ? name_len : kMaxNameLength);
     msg.name = name.c_str();
     tes::sendMessage(*connection, tes::MtCategory, tes::CategoryNameMessage::MessageId, msg);
   }

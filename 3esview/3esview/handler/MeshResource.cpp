@@ -90,12 +90,14 @@ void MeshResource::endFrame(const FrameStamp &stamp)
 }
 
 
-void MeshResource::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params)
+void MeshResource::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+                        const painter::CategoryState &categories)
 {
   // This handler does not drawing, it just holds resources.
   (void)pass;
   (void)stamp;
   (void)params;
+  (void)categories;
 }
 
 

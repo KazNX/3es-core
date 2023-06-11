@@ -10,6 +10,7 @@
 
 #include <3esview/MagnumColour.h>
 #include <3esview/MagnumV3.h>
+#include <3esview/painter/CategoryState.h>
 #include <3esview/painter/Text.h>
 #include <3esview/util/PendingAction.h>
 
@@ -70,7 +71,8 @@ public:
   void reset() override;
   void prepareFrame(const FrameStamp &stamp) override;
   void endFrame(const FrameStamp &stamp) override;
-  void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params) override;
+  void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+            const painter::CategoryState &categories) override;
   void readMessage(PacketReader &reader) override;
   void serialise(Connection &out, ServerInfoMessage &info) override;
 
@@ -157,7 +159,8 @@ void Text<TextShape, Affordances>::endFrame(const FrameStamp &stamp)
 
 template <typename TextShape, typename Affordances>
 void Text<TextShape, Affordances>::draw(DrawPass pass, const FrameStamp &stamp,
-                                        const DrawParams &params)
+                                        const DrawParams &params,
+                                        const painter::CategoryState &categories)
 {
   TES_UNUSED(stamp);
   TES_UNUSED(params);
@@ -170,20 +173,30 @@ void Text<TextShape, Affordances>::draw(DrawPass pass, const FrameStamp &stamp,
   {
     _painter->draw2D(
       _transient.begin(), _transient.end(),
-      [](const std::vector<TextEntry>::iterator &iter) { return *iter; }, params);
+      [&categories](const std::vector<TextEntry>::iterator &iter) {
+        return std::pair{ *iter, categories.isActive(iter->category_id) };
+      },
+      params);
     _painter->draw2D(
       _text.begin(), _text.end(),
-      [](const std::unordered_map<uint32_t, TextEntry>::iterator &iter) { return iter->second; },
+      [&categories](const std::unordered_map<uint32_t, TextEntry>::iterator &iter) {
+        return std::pair{ iter->second, categories.isActive(iter->second.category_id) };
+      },
       params);
   }
   else
   {
     _painter->draw3D(
       _transient.begin(), _transient.end(),
-      [](const std::vector<TextEntry>::iterator &iter) { return *iter; }, params);
+      [&categories](const std::vector<TextEntry>::iterator &iter) {
+        return std::pair{ *iter, categories.isActive(iter->category_id) };
+      },
+      params);
     _painter->draw3D(
       _text.begin(), _text.end(),
-      [](const std::unordered_map<uint32_t, TextEntry>::iterator &iter) { return iter->second; },
+      [&categories](const std::unordered_map<uint32_t, TextEntry>::iterator &iter) {
+        return std::pair{ iter->second, categories.isActive(iter->second.category_id) };
+      },
       params);
   }
 }

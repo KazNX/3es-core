@@ -24,7 +24,8 @@ public:
 
   void reset() override;
 
-  bool update(const Id &id, const Magnum::Matrix4 &transform, const Magnum::Color4 &colour) override;
+  bool update(const Id &id, const Magnum::Matrix4 &transform,
+              const Magnum::Color4 &colour) override;
   bool remove(const Id &id) override;
 
   /// Calculate bounds for a capsule shape.
@@ -33,9 +34,10 @@ public:
   static void calculateBounds(const Magnum::Matrix4 &transform, Bounds &bounds);
 
   void drawOpaque(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                  const Magnum::Matrix4 &view_matrix) override;
+                  const Magnum::Matrix4 &view_matrix, const CategoryState &categories) override;
   void drawTransparent(const FrameStamp &stamp, const Magnum::Matrix4 &projection_matrix,
-                       const Magnum::Matrix4 &view_matrix) override;
+                       const Magnum::Matrix4 &view_matrix,
+                       const CategoryState &categories) override;
 
   void commit() override;
 
@@ -61,8 +63,8 @@ public:
 
 protected:
   util::ResourceListId addShape(const Id &shape_id, Type type, const Magnum::Matrix4 &transform,
-                                const Magnum::Color4 &colour, bool hidden, const ParentId &parent_id,
-                                unsigned *child_index) override;
+                                const Magnum::Color4 &colour, bool hidden,
+                                const ParentId &parent_id, unsigned *child_index) override;
 
 private:
   static void buildEndCapSolid(SimpleMesh &mesh, bool bottomCap);
@@ -71,12 +73,12 @@ private:
 
   /// Transform modifier function for end cap transforms.
   ///
-  /// This normalises the Z scale to match the X/Y scale, so we have a uniform spherical end cap, but converts the
-  /// Z scale to an axial translation.
+  /// This normalises the Z scale to match the X/Y scale, so we have a uniform spherical end cap,
+  /// but converts the Z scale to an axial translation.
   ///
   /// @param[in,out] transform The transform to modify.
-  /// @param positive True to apply a positive axial translation, false for negative. This yields the two different end
-  /// caps.
+  /// @param positive True to apply a positive axial translation, false for negative. This yields
+  /// the two different end caps.
   static void endCapTransformModifier(Magnum::Matrix4 &transform, bool positive);
 
   // We have additional shape caches which draw the separate parts of the capsule.

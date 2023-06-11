@@ -20,6 +20,8 @@
 #define TEXT_ID 1u
 #define SPHERE_ID 2u
 
+#define ADD_SPHERE_BUG 0
+
 // Example to view a sphere tessellation. This code duplicates tessellate/3essphere code and adds
 // 3ES commands.
 using Vector3f = tes::Vector3f;
@@ -263,7 +265,7 @@ void subdivideUnitSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> 
     // Calculate the new vertex at the centre of the existing triangle.
     new_vertices[0] = (0.5f * (verts[0] + verts[1])).normalised();
     new_vertices[1] = (0.5f * (verts[1] + verts[2])).normalised();
-#if 1
+#if !ADD_SPHERE_BUG
     new_vertices[2] = (0.5f * (verts[2] + verts[0])).normalised();
 #else   // #
         // Introduce a bug in the tessellation

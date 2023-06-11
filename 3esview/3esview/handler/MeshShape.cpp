@@ -1,6 +1,7 @@
 #include "MeshShape.h"
 
 #include <3esview/mesh/Converter.h>
+#include <3esview/painter/CategoryState.h>
 #include <3esview/shaders/Shader.h>
 #include <3esview/shaders/ShaderLibrary.h>
 
@@ -103,7 +104,8 @@ void MeshShape::endFrame(const FrameStamp &stamp)
   _pending_queue.clear();
 }
 
-void MeshShape::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params)
+void MeshShape::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+                     const painter::CategoryState &categories)
 {
   (void)pass;
   (void)stamp;
@@ -123,8 +125,9 @@ void MeshShape::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &p
   update_shader_matrices(_shader_library->lookupForDrawType(DtTriangles));
   update_shader_matrices(_shader_library->lookupForDrawType(DtVoxels));
 
-  const auto draw_mesh = [this, &params](RenderMesh &render_mesh) {
-    if (_culler->isVisible(render_mesh.bounds_id) && render_mesh.mesh && render_mesh.shader)
+  const auto draw_mesh = [this, &params, &categories](RenderMesh &render_mesh) {
+    if (_culler->isVisible(render_mesh.bounds_id) && render_mesh.mesh && render_mesh.shader &&
+        categories.isActive(render_mesh.category_id))
     {
       render_mesh.shader->setDrawScale(render_mesh.shape->drawScale())
         .setModelMatrix(render_mesh.transform)
@@ -333,6 +336,7 @@ MeshShape::RenderMeshPtr MeshShape::create(std::shared_ptr<tes::MeshShape> shape
   // directly.
   auto new_entry = std::make_shared<RenderMesh>();
   new_entry->shape = shape;
+  new_entry->category_id = shape->category();
   return new_entry;
 }
 

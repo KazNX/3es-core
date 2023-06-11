@@ -9,8 +9,20 @@
 #include "Endian.h"
 #include "PacketHeader.h"
 
+#include <limits>
+
 namespace tes
 {
+/// Defies the packet CRC type.
+using CrcType = uint16_t;
+
+/// Defines the upper limit for the size of any one 3es packet.
+///
+/// This is calculated as the size of the packet plus the payload (determined by
+/// @c PacketHeader::payload_size ) plus the @c CrcType size.
+constexpr size_t kMaxPacketSize = std::numeric_limits<decltype(PacketHeader::payload_size)>::max() +
+                                  sizeof(PacketHeader) + sizeof(CrcType);
+
 /// A utility class used for managing read/write operations to a @c PacketHeader payload.
 ///
 /// The template type is intended to be either a @c PacketReader or a @c const @c PacketHeader
@@ -20,7 +32,7 @@ class PacketStream
 {
 public:
   /// Defies the packet CRC type.
-  using CrcType = uint16_t;
+  using CrcType = tes::CrcType;
 
   /// Control values for seeking.
   enum SeekPos

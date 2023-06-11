@@ -30,7 +30,8 @@ public:
   void prepareFrame(const FrameStamp &stamp) override;
   void endFrame(const FrameStamp &stamp) override;
 
-  void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params) override;
+  void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+            const painter::CategoryState &categories) override;
 
   void readMessage(PacketReader &reader) override;
   void serialise(Connection &out, ServerInfoMessage &info) override;
@@ -74,6 +75,8 @@ private:
     std::shared_ptr<tes::MeshSet> owner;
     /// Index of this part id in the @c owner parts.
     unsigned part_id = 0;
+    /// The category as determined by @c tes::Id .
+    unsigned category_id = 0;
     /// State flags.
     DrawableFlag flags = DrawableFlag::Zero;
   };

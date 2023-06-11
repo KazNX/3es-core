@@ -47,11 +47,13 @@ class PacketWriter;
 /// This allows a single packet with a single @c PacketHeader and collated packet
 /// message with optional compression. However, when a collated packet is used for
 /// transaction collation (as described in the multi-threaded case), it may require
-/// collation of larger data sizes. In this case, the @c CollatedPacket(unsigned, unsigned)
+/// collation of larger data sizes. In this case, the `CollatedPacket(unsigned, unsigned)`
 /// constructor can be used to specify a larger collation buffer limit (the buffer resizes as
-/// required). Such large, collated packets are sent using
-/// @c Server::send(const CollatedPacket &). Internally, the method may either send
-/// the packet as is (if small enough), or extract and reprocess each collated packet.
+/// required). Such large, collated packets are sent using `Server::send(const CollatedPacket &)`.
+/// Internally, the method may either send the packet as is (if small enough), or extract and
+/// reprocess each collated packet.
+///
+/// @see See @c PacketHeader notes on @c payload_size limits.
 class TES_CORE_API CollatedPacket : public Connection
 {
 public:

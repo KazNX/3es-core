@@ -244,7 +244,7 @@ void OccupancyMesh::update(const UnorderedKeySet &newly_occupied, const Unordere
 
   // Send messages for individually changed voxels.
   // Start a mesh redefinition message.
-  std::vector<uint8_t> buffer(0xffffu);
+  std::vector<uint8_t> buffer(tes::kMaxPacketSize);
   tes::PacketWriter packet(buffer.data(), (uint16_t)buffer.size());
   tes::MeshRedefineMessage msg = {};
   tes::MeshComponentMessage cmp_msg = {};

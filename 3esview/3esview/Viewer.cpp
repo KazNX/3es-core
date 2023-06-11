@@ -40,13 +40,30 @@
 
 namespace tes::view
 {
+namespace
+{
+void focusCallback(GLFWwindow *window, int focused)
+{
+  auto *app = static_cast<Magnum::Platform::GlfwApplication *>(glfwGetWindowUserPointer(window));
+  auto *viewer = dynamic_cast<Viewer *>(app);
+  viewer = viewer;
+  if (viewer)
+  {
+    viewer->setContinuousSim(focused != 0);
+  }
+}
+}  // namespace
+
 uint16_t Viewer::defaultPort()
 {
   return ServerSettings().listen_port;
 }
 
 Viewer::Viewer(const Arguments &arguments)
-  : Magnum::Platform::Application{ arguments, Configuration{}.setTitle("3rd Eye Scene Viewer") }
+  : Magnum::Platform::Application{ arguments,
+                                   Configuration{}
+                                     .setTitle("3rd Eye Scene Viewer")
+                                     .setWindowFlags(Configuration::WindowFlag::Resizable) }
   , _tes(std::make_shared<ThirdEyeScene>())
   , _commands(std::make_shared<command::Set>())
   , _move_keys({
@@ -71,13 +88,33 @@ Viewer::Viewer(const Arguments &arguments)
     })
 {
   _edl_effect = std::make_shared<EdlEffect>(Magnum::GL::defaultFramebuffer.viewport());
-  _tes->setActiveFboEffect(_edl_effect);
   command::registerDefaultCommands(*_commands);
 
   if (!handleStartupArgs(arguments))
   {
     exit();
   }
+
+  // GLFW specific.
+  // Bind a callback to force continuous sim while focused.
+  // glfwSetWindowUserPointer(window(), this);
+  glfwSetWindowFocusCallback(window(), focusCallback);
+
+  const auto config = _tes->settings().config();
+  _camera.position = { 0, -5, 0 };
+  onCameraSettingsChange(config);
+  onRenderSettingsChange(config);
+  onPlaybackSettingsChange(config);
+
+  _tes->settings().addObserver(
+    settings::Settings::Category::Camera,
+    [this](const settings::Settings::Config &config) { onCameraSettingsChange(config); });
+  _tes->settings().addObserver(
+    settings::Settings::Category::Render,
+    [this](const settings::Settings::Config &config) { onRenderSettingsChange(config); });
+  _tes->settings().addObserver(
+    settings::Settings::Category::Playback,
+    [this](const settings::Settings::Config &config) { onPlaybackSettingsChange(config); });
 }
 
 
@@ -90,15 +127,17 @@ Viewer::~Viewer()
 bool Viewer::open(const std::filesystem::path &path)
 {
   closeOrDisconnect();
+  _tes->reset();
   std::ifstream file(path.string(), std::ios::binary);
   if (!file.is_open())
   {
     return false;
   }
 
+  const auto config = _tes->settings().config();
   _data_thread =
     std::make_shared<StreamThread>(_tes, std::make_shared<std::ifstream>(std::move(file)));
-  _data_thread->setLooping(true);
+  _data_thread->setLooping(config.playback.looping.value());
   return true;
 }
 
@@ -106,6 +145,7 @@ bool Viewer::open(const std::filesystem::path &path)
 bool Viewer::connect(const std::string &host, uint16_t port, bool allow_reconnect)
 {
   closeOrDisconnect();
+  _tes->reset();
   auto net_thread = std::make_shared<NetworkThread>(_tes, host, port, allow_reconnect);
   _data_thread = net_thread;
   if (!allow_reconnect)
@@ -135,6 +175,11 @@ bool Viewer::closeOrDisconnect()
     _data_thread = nullptr;
     return true;
   }
+  else
+  {
+    // Reset existing data on second close/reset request.
+    _tes->reset();
+  }
   return false;
 }
 
@@ -153,6 +198,7 @@ void Viewer::setContinuousSim(bool continuous)
 
 bool Viewer::continuousSim()
 {
+  // Check forcing continuous mode.
   if (_continuous_sim || _mouse_rotation_active || _data_thread)
   {
     return true;
@@ -181,12 +227,16 @@ void Viewer::drawEvent()
   _last_sim_time = now;
   const float dt = std::chrono::duration_cast<std::chrono::duration<float>>(delta_time).count();
 
-  updateCamera(dt, _tes->camera());
+  const auto draw_mode = onDrawStart(dt);
+
+  updateCamera(dt, draw_mode == DrawMode::Normal);
 
   _tes->render(dt, windowSize());
 
+  onDrawComplete(dt);
+
   swapBuffers();
-  if (continuousSim())
+  if (continuousSim() || isTextInputActive())
   {
     redraw();
   }
@@ -195,43 +245,8 @@ void Viewer::drawEvent()
 
 void Viewer::viewportEvent(ViewportEvent &event)
 {
-  (void)event;
+  Magnum::GL::defaultFramebuffer.setViewport({ {}, event.framebufferSize() });
   _edl_effect->viewportChange(Magnum::GL::defaultFramebuffer.viewport());
-}
-
-
-void Viewer::mousePressEvent(MouseEvent &event)
-{
-  if (event.button() != MouseEvent::Button::Left)
-    return;
-
-  _mouse_rotation_active = true;
-  event.setAccepted();
-}
-
-
-void Viewer::mouseReleaseEvent(MouseEvent &event)
-{
-  _mouse_rotation_active = false;
-
-  event.setAccepted();
-  redraw();
-}
-
-
-void Viewer::mouseMoveEvent(MouseMoveEvent &event)
-{
-  using namespace Magnum::Math::Literals;
-  if (!(event.buttons() & MouseMoveEvent::Button::Left))
-  {
-    return;
-  }
-
-  _fly.updateMouse(float(event.relativePosition().x()), float(event.relativePosition().y()),
-                   _tes->camera());
-
-  event.setAccepted();
-  redraw();
 }
 
 
@@ -326,24 +341,92 @@ void Viewer::keyReleaseEvent(KeyEvent &event)
 }
 
 
+void Viewer::mousePressEvent(MouseEvent &event)
+{
+  if (event.button() != MouseEvent::Button::Left)
+    return;
+
+  _mouse_rotation_active = true;
+  event.setAccepted();
+}
+
+
+void Viewer::mouseReleaseEvent(MouseEvent &event)
+{
+  _mouse_rotation_active = false;
+
+  event.setAccepted();
+  redraw();
+}
+
+
+void Viewer::mouseMoveEvent(MouseMoveEvent &event)
+{
+  using namespace Magnum::Math::Literals;
+  if (!(event.buttons() & MouseMoveEvent::Button::Left))
+  {
+    return;
+  }
+
+  _fly.updateMouse(float(event.relativePosition().x()), float(event.relativePosition().y()),
+                   _tes->camera());
+
+  event.setAccepted();
+  redraw();
+}
+
+
+void Viewer::onReset()
+{
+  _active_remote_camera = handler::Camera::kInvalidCameraId;
+}
+
+
+void Viewer::onCameraSettingsChange(const settings::Settings::Config &config)
+{
+  _camera.clip_far = config.camera.far_clip.value();
+  _camera.clip_near = config.camera.near_clip.value();
+  _camera.fov_horizontal_deg = config.camera.fov.value();
+}
+
+
+void Viewer::onRenderSettingsChange(const settings::Settings::Config &config)
+{
+  const auto &render = config.render;
+  _edl_effect->setLinearScale(render.edl_linear_scale.value());
+  _edl_effect->setExponentialScale(render.edl_exponential_scale.value());
+  _edl_effect->setRadius(static_cast<float>(render.edl_radius.value()));
+  if (render.use_edl_shader.value())
+  {
+    _tes->setActiveFboEffect(_edl_effect);
+  }
+  else
+  {
+    _tes->clearActiveFboEffect();
+  }
+}
+
+
+void Viewer::onPlaybackSettingsChange(const settings::Settings::Config &config)
+{
+  if (_data_thread)
+  {
+    _data_thread->setLooping(config.playback.looping.value());
+  }
+}
+
+
 bool Viewer::checkEdlKeys(KeyEvent &event)
 {
   bool dirty = false;
+  auto render_config = _tes->settings().config().render;
   if (event.key() == KeyEvent::Key::Tab)
   {
-    bool edl_on = false;
-    if (!_tes->activeFboEffect())
-    {
-      _tes->setActiveFboEffect(_edl_effect);
-      edl_on = true;
-    }
-    else
-    {
-      _tes->clearActiveFboEffect();
-    }
+    render_config.use_edl_shader.setValue(!render_config.use_edl_shader.value());
     event.setAccepted(true);
     dirty = true;
-    Magnum::Debug() << "EDL: " << (edl_on ? "on" : "off");
+    Magnum::Debug() << "EDL: " << (render_config.use_edl_shader.value() ? "on" : "off");
+    _tes->settings().update(render_config);
   }
   else if (event.key() == KeyEvent::Key::Space)
   {
@@ -371,19 +454,21 @@ bool Viewer::checkEdlKeys(KeyEvent &event)
     switch (_edl_tweak)
     {
     case EdlParam::LinearScale:
-      _edl_effect->setLinearScale(_edl_effect->linearScale() + delta);
+      render_config.edl_linear_scale.setValue(render_config.edl_linear_scale.value() + delta);
       Magnum::Debug() << "EDL linear scale: " << _edl_effect->linearScale();
       event.setAccepted(true);
       dirty = true;
       break;
     case EdlParam::ExponentialScale:
-      _edl_effect->setExponentialScale(_edl_effect->exponentialScale() + delta);
+      render_config.edl_exponential_scale.setValue(render_config.edl_exponential_scale.value() +
+                                                   delta);
       Magnum::Debug() << "EDL exponential scale: " << _edl_effect->exponentialScale();
       event.setAccepted(true);
       dirty = true;
       break;
     case EdlParam::Radius:
-      _edl_effect->setRadius(_edl_effect->radius() + delta);
+      render_config.edl_radius.setValue(render_config.edl_radius.value() +
+                                        static_cast<unsigned>(2.0f * delta));
       Magnum::Debug() << "EDL radius scale: " << _edl_effect->radius();
       event.setAccepted(true);
       dirty = true;
@@ -391,13 +476,52 @@ bool Viewer::checkEdlKeys(KeyEvent &event)
     default:
       break;
     }
+
+    if (dirty)
+    {
+      _tes->settings().update(render_config);
+    }
   }
 
   return dirty;
 }
 
 
-void Viewer::updateCamera(float dt, camera::Camera &camera)
+void Viewer::updateCamera(float dt, bool allow_user_input)
+{
+  auto camera_handler = std::dynamic_pointer_cast<handler::Camera>(_tes->messageHandler(MtCamera));
+  if (camera_handler)
+  {
+    if (_active_remote_camera != handler::Camera::kInvalidCameraId)
+    {
+      const auto config = _tes->settings().config().camera;
+      // Check camera handler for an active camera.
+      camera::Camera remote_camera = {};
+      camera_handler->lookup(_active_remote_camera, remote_camera);
+      if (!config.allow_remote_settings.value())
+      {
+        // Don't allow remote camera settings. Keep the user settings.
+        remote_camera.clip_far = _camera.clip_far;
+        remote_camera.clip_near = _camera.clip_near;
+        remote_camera.fov_horizontal_deg = _camera.fov_horizontal_deg;
+      }
+      _tes->setCamera(remote_camera);
+      allow_user_input = false;
+    }
+  }
+
+  if (allow_user_input)
+  {
+    updateCameraInput(dt, _camera);
+    _tes->setCamera(_camera);
+  }
+  else
+  {
+    _mouse_rotation_active = false;
+  }
+}
+
+void Viewer::updateCameraInput(float dt, camera::Camera &camera)
 {
   Magnum::Vector3i key_translation(0);
   Magnum::Vector3i key_rotation(0);

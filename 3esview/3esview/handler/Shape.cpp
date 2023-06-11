@@ -62,15 +62,16 @@ void Shape::endFrame(const FrameStamp &stamp)
 }
 
 
-void Shape::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params)
+void Shape::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+                 const painter::CategoryState &categories)
 {
   switch (pass)
   {
   case DrawPass::Opaque:
-    _painter->drawOpaque(stamp, params.projection_matrix, params.view_matrix);
+    _painter->drawOpaque(stamp, params.projection_matrix, params.view_matrix, categories);
     break;
   case DrawPass::Transparent:
-    _painter->drawTransparent(stamp, params.projection_matrix, params.view_matrix);
+    _painter->drawTransparent(stamp, params.projection_matrix, params.view_matrix, categories);
     break;
   default:
     break;
@@ -222,7 +223,7 @@ bool Shape::handleCreate(const CreateMessage &msg, const ObjectAttributes &attrs
     draw_type = painter::ShapePainter::Type::Wireframe;
   }
 
-  const Id id(msg.id);
+  const Id id(msg.id, msg.category);
 
   if (msg.flags & OFReplace)
   {

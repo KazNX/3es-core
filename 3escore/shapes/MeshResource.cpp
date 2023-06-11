@@ -17,9 +17,7 @@ namespace tes
 uint16_t MeshResource::estimateTransferCount(size_t element_size, unsigned byte_limit,
                                              unsigned overhead)
 {
-  //                                    packet header           message                         crc
-  const size_t max_transfer =
-    (0xffffu - (sizeof(PacketHeader) + overhead + sizeof(uint16_t))) / element_size;
+  const size_t max_transfer = (kMaxPacketSize - overhead) / element_size;
   size_t count = byte_limit ? byte_limit / element_size : max_transfer;
   if (count < 1)
   {

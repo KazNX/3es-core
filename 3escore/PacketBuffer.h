@@ -67,11 +67,12 @@ private:
   void appendData(const Iter &begin, const Iter &end);
 
   /// Remove the first @p byte_count bytes from the packet buffer.
-  /// @param byte_count The number of bytes to remove from the buffer.
-  void removeData(size_t byte_count);
+  /// @param remove_byte_count The number of bytes to remove from the buffer.
+  void removeData(size_t remove_byte_count);
 
   std::vector<uint8_t> _packet_buffer;  ///< Buffers incoming packet data.
-  bool _marker_found = false;           ///< Has the @c PacketHeader marker been found?
+  /// Indicates that @c _packet_buffer has valid packet marker byte sequence at position zero.
+  bool _marker_found = false;
 };
 }  // namespace tes
 

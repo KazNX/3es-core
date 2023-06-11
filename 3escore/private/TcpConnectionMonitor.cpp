@@ -238,7 +238,7 @@ void TcpConnectionMonitor::monitorConnections()
 #ifdef __apple__
       // On OSX, set send buffer size. Not sure automatic sizing is working.
       // Remove this code if it is.
-      new_socket->setSendBufferSize(0xffff);
+      new_socket->setSendBufferSize(1024 * 1024);
 #endif  // __apple__
 
       auto new_connection = std::make_shared<TcpConnection>(new_socket, _server.settings());

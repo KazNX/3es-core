@@ -6,6 +6,7 @@
 #include <3esview/camera/Camera.h>
 #include <3esview/DrawParams.h>
 #include <3esview/FrameStamp.h>
+#include <3esview/painter/CategoryState.h>
 #include <3esview/util/Enum.h>
 
 #include <3escore/Messages.h>
@@ -167,7 +168,9 @@ public:
   /// @param stamp The frame stamp. The @c FrameStamp::frame_number always matches value given to
   /// the last @c prepareFrame() call, while the @c FrameStamp::render_mark is monotonic increasing.
   /// @param params Camera, view and projection parameters.
-  virtual void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params) = 0;
+  /// @param categories Reflects the current active categories.
+  virtual void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+                    const painter::CategoryState &categories) = 0;
 
   /// Read a message which has been predetermined to be belong to this handler.
   ///

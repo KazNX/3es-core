@@ -39,11 +39,24 @@ enum PacketFlag : unsigned
   // PF_PlatformBigEndian = (1u << 1u),
 };
 
-/// The header for an incoming 3ES data packet. All packet data, including payload
-/// bytes, must be in network endian which is big endian.
+/// The header for an incoming 3ES data packet. All packet data, including payload bytes, must be in
+/// network endian which is big endian.
 ///
-/// A two byte CRC value is to appear immediately after the @p PacketHeader header and
-/// payload.
+/// All 3ES packets must being with this header, but may be followed by additional, the size of
+/// which is indicated by @c payload_size . Note this is a 16-bit quantity, so limited to `0xffffu`.
+///
+/// A two byte CRC value is to appear immediately after the @p PacketHeader header and payload.
+///
+/// @note The @c payload_size bit width limit was chosen to keep the header size small. Initially
+/// there were also some issues with the initial socket implementation causing some data loss due
+/// to undersized buffers. The payload size can't be changed without invalidating the header format,
+/// invalidating any previously captured data. However, a @c PacketFlag could be used to incidate
+/// that a 4-byte payload size followes the @c PacketHeader . This change is reserved for future
+/// implementation if need be. In particular larger packets may support better compression for
+/// @c CollatedPacket .
+///
+/// @see The upper limit for the combined size of a packet is defined by
+/// @c tes::kMaxPacketSize defined in @c PacketStream.h
 struct TES_CORE_API PacketHeader
 {
   uint32_t marker;         ///< Marker bytes. Identifies the packet start.

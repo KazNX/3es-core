@@ -34,13 +34,6 @@ void StreamThread::setTargetFrame(FrameNumber frame)
   {
     std::scoped_lock guard(_data_mutex);
     _target_frame = frame;
-    if (_target_frame < _currentFrame)
-    {
-      // Reset and seek back.
-      _tes->reset();
-      _stream_reader->seek(0);
-      _currentFrame = 0;
-    }
   }
   // Ensure the thread wakes up to step the frame.
   // Note we have unlocked the mutex before the notify call.
@@ -69,6 +62,20 @@ bool StreamThread::looping() const
 }
 
 
+void StreamThread::setPlaybackSpeed(float speed)
+{
+  std::scoped_lock guard(_data_mutex);
+  _playback_speed = std::max(0.01f, speed);
+}
+
+
+float StreamThread::playbackSpeed() const
+{
+  std::scoped_lock guard(_data_mutex);
+  return _playback_speed;
+}
+
+
 void StreamThread::pause()
 {
   _paused = true;
@@ -87,6 +94,46 @@ void StreamThread::join()
   _quitFlag = true;
   unpause();
   _thread.join();
+}
+
+
+bool StreamThread::checkCompatibility(const PacketHeader *header)
+{
+  return checkCompatibility(PacketReader(header));
+}
+
+
+bool StreamThread::checkCompatibility(const PacketReader &reader)
+{
+  const auto version_major = reader.versionMajor();
+  const auto version_minor = reader.versionMinor();
+
+  // Exact version match.
+  if (version_major == kPacketVersionMajor && version_minor == kPacketCompatibilityVersionMinor)
+  {
+    return true;
+  }
+  // Check major version is in the allowed range (open interval).
+  if (kPacketCompatibilityVersionMajor < version_major && version_major < kPacketVersionMajor)
+  {
+    // Major version is between the allowed range.
+    return true;
+  }
+
+  // Major version match, ensure minor version is in range.
+  if (version_major == kPacketVersionMajor && version_minor <= kPacketVersionMinor)
+  {
+    return true;
+  }
+
+  // Major version compatibility match, ensure minor version is in range.
+  if (version_major == kPacketCompatibilityVersionMajor &&
+      version_minor >= kPacketCompatibilityVersionMinor)
+  {
+    return true;
+  }
+
+  return false;
 }
 
 
@@ -113,7 +160,12 @@ void StreamThread::run()
       std::this_thread::sleep_until(next_frame_start);
       break;
     case TargetFrameState::Behind:  // Go back.
-      skipBack(target_frame);
+      // Reset and seek back.
+      _tes->reset();
+      _stream_reader->seek(0);
+      _currentFrame = 0;
+      // Check again.
+      continue;
       break;
     case TargetFrameState::Ahead:  // Catch up.
       _catchingUp = true;
@@ -141,9 +193,18 @@ void StreamThread::run()
     at_frame_boundary = false;  // Tracks when we reach a frame boundary.
     while (!_quitFlag && !at_frame_boundary && _stream_reader->isOk() && !_stream_reader->isEof())
     {
-      auto packet_header = _stream_reader->extractPacket();
+      auto [packet_header, status] = _stream_reader->extractPacket();
       if (packet_header)
       {
+        // Check the initial packet compability.
+        if (!checkCompatibility(packet_header))
+        {
+          const PacketReader packet(packet_header);
+          log::warn("Unsupported packet version: ", packet.versionMajor(), ".",
+                    packet.versionMinor());
+          continue;
+        }
+
         // Handle collated packets by wrapping the header.
         // This is fine for normal packets too.
         packer_decoder.setPacket(packet_header);
@@ -152,6 +213,16 @@ void StreamThread::run()
         while (auto *header = packer_decoder.next())
         {
           PacketReader packet(header);
+
+          // Check extracted packet compability. This may be the same as the one checked above, or
+          // it may be a new packet from a CollatedPacket
+          if (!checkCompatibility(packet))
+          {
+            log::warn("Unsupported packet version (extracted): ", packet.versionMajor(), ".",
+                      packet.versionMinor());
+            continue;
+          }
+
           // Lock for frame control messages as these tell us to advance the frame and how long to
           // wait.
           switch (packet.routingId())
@@ -196,7 +267,9 @@ bool StreamThread::blockOnPause()
     std::unique_lock lock(_data_mutex);
     // Wait for unpause.
     _notify.wait(lock, [this] {
-      if (!_paused || targetFrame() != 0)
+      // Note: we can check _target_frame directly since the _data_mutex is locked while checking
+      // the condition variable.
+      if (!_paused || _target_frame.has_value())
       {
         return true;
       }
@@ -225,7 +298,8 @@ StreamThread::Clock::duration StreamThread::processControlMessage(PacketReader &
     _tes->updateToFrame(++_currentFrame);
     // Work out how long to the next frame.
     const auto dt = (msg.value32) ? msg.value32 : _server_info.default_frame_time;
-    return std::chrono::microseconds(_server_info.time_unit * dt);
+    return std::chrono::microseconds(
+      static_cast<uint64_t>(_server_info.time_unit * dt / _playback_speed));
   }
   case CIdCoordinateFrame:
     if (msg.value32 < CFCount)
@@ -243,7 +317,8 @@ StreamThread::Clock::duration StreamThread::processControlMessage(PacketReader &
     break;
   case CIdForceFrameFlush:
     _tes->updateToFrame(_currentFrame);
-    return std::chrono::microseconds(_server_info.time_unit * _server_info.default_frame_time);
+    return std::chrono::microseconds(static_cast<uint64_t>(
+      _server_info.time_unit * _server_info.default_frame_time / _playback_speed));
   case CIdReset:
     // This doesn't seem right any more. Need to check what the Unity viewer did with this. It may
     // be an artifact of the main thread needing to do so much work in Unity.
@@ -286,7 +361,7 @@ StreamThread::TargetFrameState StreamThread::checkTargetFrameState(FrameNumber &
 
   if (target_frame > current_frame)
   {
-    return TargetFrameState::Behind;
+    return TargetFrameState::Ahead;
   }
 
   _target_frame.reset();

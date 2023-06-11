@@ -19,14 +19,14 @@ public:
   ~FrameDisplay();
 
   /// Increment the current frame value by 1.
-  void incrementFrame() { ++_frameNumber; }
+  void incrementFrame() { ++_frame_number; }
 
   /// Increment the current frame by a given value.
   /// @param increment The increment to add.
-  void incrementFrame(int64_t increment) { _frameNumber += increment; }
+  void incrementFrame(int64_t increment) { _frame_number += increment; }
 
   /// Reset frame number to zero.
-  void reset() { _frameNumber.store(0); }
+  void reset() { _frame_number.store(0); }
 
   /// Start the display thread. Ignored if already running.
   void start();
@@ -38,7 +38,7 @@ private:
   /// Thread loop.
   void run();
 
-  std::atomic_int64_t _frameNumber;
+  std::atomic_int64_t _frame_number;
   std::atomic_bool _quit;
   std::unique_ptr<std::thread> _thread;
 };

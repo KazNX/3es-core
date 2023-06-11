@@ -33,7 +33,7 @@ struct CollatedPacketDecoderDetail;
 /// @code
 /// void readPackets(TcpSocket &socket)
 /// {
-///   std::vector<uint8_t> readBuffer(0xffffu);
+///   std::vector<uint8_t> readBuffer(tes::kMaxPacketSize);
 ///   PacketBuffer packetBuffer;
 ///   CollatedPacketDecoder decoder;
 ///   std::vector<uint8_t> rawBuffer;

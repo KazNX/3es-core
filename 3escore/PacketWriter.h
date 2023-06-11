@@ -44,8 +44,8 @@ public:
   /// or set with @c setRoutingId().
   ///
   /// @param packet The packet to write to.
-  /// @param max_payload_size Specifies the space available for the payload (bytes).
-  ///   This is in excess of the packet size, not the total buffer size.
+  /// @param max_payload_size Specifies the excess space available immediately following the
+  ///   @c PacketHeader memory which can be used for payload (bytes) and @c CrcType .
   PacketWriter(PacketHeader *packet, uint16_t max_payload_size, uint16_t routing_id = 0,
                uint16_t message_id = 0);
 
@@ -58,11 +58,11 @@ public:
   /// The @c routing_id maybe given now or set with @c setRoutingId().
   ///
   /// @param buffer The packet data buffer.
-  /// @param buffer_size The total number of bytes available for the @c PacketHeader
-  ///   and its paylaod. Must be at least @c sizeof(PacketHeader), or all writing
-  ///   will fail.
-  /// @param routing_id Optionlly sets the @c routing_id member of the packet.
-  PacketWriter(uint8_t *buffer, uint16_t buffer_size, uint16_t routing_id = 0,
+  /// @param buffer_size The total number of bytes available for the @c PacketHeader ,
+  ///   its payload and @c CrcType . Must be at least `sizeof(PacketHeader) + sizeof(CrcType)` , or
+  ///   all writing will fail.
+  /// @param routing_id Optionally sets the @c routing_id member of the packet.
+  PacketWriter(uint8_t *buffer, size_t buffer_size, uint16_t routing_id = 0,
                uint16_t message_id = 0);
 
   /// Copy constructor. Simple as neither writer owns the underlying memory.
@@ -115,15 +115,23 @@ public:
   [[nodiscard]] uint16_t maxPayloadSize() const;
 
   /// Finalises the packet for sending, calculating the CRC.
+  ///
+  /// Adds @c PFNoCrc if there is no room remaining for a CRC.
+  ///
   /// @return True if the packet is valid and ready for sending.
   bool finalise();
 
   /// Calculates the CRC and writes it to the @c PacketHeader crc member.
   ///
   /// The current CRC value is returned when @c isCrcValid() is true.
-  /// The CRC will not be calculate when @c isFail() is true and the
+  ///
+  /// This may add @c PFNoCrc if there is no room remaining to write the Crc,
+  /// then return zero.
+  ///
+  /// The CRC will also not be calculate when @c isFail() is true but the
   /// result is undefined.
-  /// @return The Calculated CRC, or undifined when @c isFail().
+  ///
+  /// @return The Calculated CRC, or undefined when @c isFail().
   CrcType calculateCrc();
 
   /// Writes a single data element from the current position. This assumes that
@@ -181,7 +189,7 @@ protected:
   uint8_t *payloadWritePtr();
   void incrementPayloadSize(size_t inc);
 
-  uint16_t _buffer_size = 0;
+  size_t _buffer_size = 0;
 };
 
 inline void PacketWriter::setRoutingId(uint16_t routing_id)

@@ -14,7 +14,7 @@ namespace tes
 PacketWriter::PacketWriter(PacketHeader *packet, uint16_t max_payload_size, uint16_t routing_id,
                            uint16_t message_id)
   : PacketStream<PacketHeader>(packet)
-  , _buffer_size(static_cast<uint16_t>(max_payload_size + sizeof(PacketHeader)))
+  , _buffer_size(max_payload_size + sizeof(PacketHeader))
 {
   _packet->marker = kPacketMarker;
   _packet->version_major = kPacketVersionMajor;
@@ -27,12 +27,12 @@ PacketWriter::PacketWriter(PacketHeader *packet, uint16_t max_payload_size, uint
 }
 
 
-PacketWriter::PacketWriter(uint8_t *buffer, uint16_t buffer_size, uint16_t routing_id,
+PacketWriter::PacketWriter(uint8_t *buffer, size_t buffer_size, uint16_t routing_id,
                            uint16_t message_id)
   : PacketStream<PacketHeader>(reinterpret_cast<PacketHeader *>(buffer))
 {
   _buffer_size = buffer_size;
-  if (buffer_size >= sizeof(PacketHeader) + sizeof(CrcType))
+  if (buffer_size >= sizeof(PacketHeader))
   {
     _packet->marker = networkEndianSwapValue(kPacketMarker);
     _packet->version_major = networkEndianSwapValue(kPacketVersionMajor);
@@ -42,7 +42,8 @@ PacketWriter::PacketWriter(uint8_t *buffer, uint16_t buffer_size, uint16_t routi
     ;
     _packet->payload_size = 0u;
     _packet->payload_offset = 0u;
-    _packet->flags = 0u;
+    // Flag no CRC if there's no room.
+    _packet->flags = (_buffer_size >= sizeof(PacketHeader) + sizeof(CrcType)) ? 0u : PFNoCrc;
   }
   else
   {
@@ -95,7 +96,8 @@ void PacketWriter::reset(uint16_t routing_id, uint16_t message_id)
     _packet->message_id = networkEndianSwapValue(message_id);
     _packet->payload_size = 0u;
     _packet->payload_offset = 0u;
-    _packet->flags = 0u;
+    // Flag no CRC if there's no room.
+    _packet->flags = (_buffer_size >= sizeof(PacketHeader) + sizeof(CrcType)) ? 0u : PFNoCrc;
     _payload_position = 0;
   }
   else
@@ -137,6 +139,12 @@ PacketWriter::CrcType PacketWriter::calculateCrc()
   if (isFail())
   {
     return 0u;
+  }
+
+  if (bytesRemaining() < sizeof(CrcType))
+  {
+    // No space for CRC. Flag no CRC.
+    packet().flags |= PFNoCrc;
   }
 
   if (packet().flags & PFNoCrc)

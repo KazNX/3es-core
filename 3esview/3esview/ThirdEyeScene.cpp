@@ -24,6 +24,8 @@
 #include "painter/Star.h"
 #include "painter/Text.h"
 
+#include "settings/Loader.h"
+
 #include "shaders/Flat.h"
 #include "shaders/ShaderLibrary.h"
 #include "shaders/PointGeom.h"
@@ -39,6 +41,8 @@
 #include <Magnum/GL/TextureFormat.h>
 #include <Magnum/GL/Version.h>
 #include <Magnum/Text/DistanceFieldGlyphCache.h>
+
+#include <iterator>
 
 // Things to learn about:
 // - UI
@@ -60,21 +64,31 @@ ThirdEyeScene::ThirdEyeScene()
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::ProgramPointSize);
   Magnum::GL::Renderer::setPointSize(8);
 
-  _camera.position = { 0, -5, 0 };
+  restoreSettings();
 
   _culler = std::make_shared<BoundsCuller>();
   // Initialise the font.
   initialiseFont();
   initialiseShaders();
   initialiseHandlers();
+
+  const auto config = _settings.config();
+  onCameraConfigChange(config);
+
+  _settings.addObserver(
+    settings::Settings::Category::Camera,
+    [this](const settings::Settings::Config &config) { onCameraConfigChange(config); });
 }
 
 
 ThirdEyeScene::~ThirdEyeScene()
 {
+  storeSettings();
   // Need an ordered cleanup.
-  _messageHandlers.clear();
-  _orderedMessageHandlers.clear();
+  _message_handlers.clear();
+  _ordered_message_handlers.clear();
+  _main_draw_handlers.clear();
+  _secondary_draw_handlers.clear();
   _painters.clear();
   _text_painter = nullptr;
 }
@@ -135,78 +149,81 @@ void ThirdEyeScene::reset()
     _reset_notify.wait(lock, [target_reset = _reset_marker + 1, this]()  //
                        { return _reset_marker >= target_reset; });
   }
+  if (_reset_callback)
+  {
+    _reset_callback();
+  }
 }
 
 
 void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
 {
-  using namespace Magnum::Math::Literals;
   //---------------------------------------------------------------------------
   // This section is protected by the _render_mutex
   // It must ensure that there can be no additional handler::Message::endFrame() calls in between
   // calling handler::Message::prepareFrame() and handler::Message::draw()
   // After the draw calls we release the mutex while finalising the rendering.
+  std::unique_lock guard(_render_mutex);
+  if (_reset)
   {
-    std::unique_lock guard(_render_mutex);
-
-    if (_reset)
-    {
-      effectReset();
-    }
-
-    // Update frame if needed.
-    if (_have_new_frame || _new_server_info)
-    {
-      // Update server info.
-      if (_new_server_info)
-      {
-        for (auto &handler : _orderedMessageHandlers)
-        {
-          handler->updateServerInfo(_server_info);
-        }
-        _new_server_info = false;
-      }
-
-      _render_stamp.frame_number = _new_frame;
-      _have_new_frame = false;
-
-      for (auto &handler : _orderedMessageHandlers)
-      {
-        handler->prepareFrame(_render_stamp);
-      }
-    }
-
-    const DrawParams params(_camera, window_size);
-    ++_render_stamp.render_mark;
-
-    _culler->cull(_render_stamp.render_mark, Magnum::Frustum::fromMatrix(params.pv_transform));
-
-    if (_active_fbo_effect)
-    {
-      _active_fbo_effect->prepareFrame(params.pv_transform, FboEffect::ProjectionType::Perspective,
-                                       _camera.clip_near, _camera.clip_far);
-    }
-    else
-    {
-      Magnum::GL::defaultFramebuffer
-        .clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth)
-        .bind();
-    }
-
-    drawShapes(dt, params);
-    updateFpsDisplay(dt, params);
+    effectReset();
   }
+
+  // Update frame if needed.
+  if (_have_new_frame || _new_server_info)
+  {
+    // Update server info.
+    if (_new_server_info)
+    {
+      for (auto &handler : _ordered_message_handlers)
+      {
+        handler->updateServerInfo(_server_info);
+      }
+      _new_server_info = false;
+    }
+
+    _render_stamp.frame_number = _new_frame;
+    _have_new_frame = false;
+
+    for (auto &handler : _ordered_message_handlers)
+    {
+      handler->prepareFrame(_render_stamp);
+    }
+  }
+
+  const auto categories = *_category_handler->categories();
+  const DrawParams params(_camera, window_size);
+  ++_render_stamp.render_mark;
+
+  _culler->cull(_render_stamp.render_mark, Magnum::Frustum::fromMatrix(params.pv_transform));
+
+  if (_active_fbo_effect)
+  {
+    _active_fbo_effect->prepareFrame(params.pv_transform, FboEffect::ProjectionType::Perspective,
+                                     _camera.clip_near, _camera.clip_far);
+  }
+  else
+  {
+    Magnum::GL::defaultFramebuffer
+      .clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth)
+      .bind();
+  }
+
+  drawPrimary(dt, params, categories);
   //---------------------------------------------------------------------------
 
   //---------------------------------------------------------------------------
   // This section is not protected by the _render_mutex
   if (_active_fbo_effect)
   {
-    Magnum::GL::defaultFramebuffer.bind();
-    Magnum::GL::defaultFramebuffer.clear(Magnum::GL::FramebufferClear::Color |
-                                         Magnum::GL::FramebufferClear::Depth);
+    Magnum::GL::defaultFramebuffer
+      .clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth)
+      .bind();
     _active_fbo_effect->completeFrame();
   }
+
+  updateFpsDisplay(dt, params);
+  drawSecondary(dt, params, categories);
   //---------------------------------------------------------------------------
 }
 
@@ -218,7 +235,7 @@ void ThirdEyeScene::updateToFrame(FrameNumber frame)
   std::lock_guard guard(_render_mutex);
   if (frame != _render_stamp.frame_number)
   {
-    for (auto &handler : _orderedMessageHandlers)
+    for (auto &handler : _ordered_message_handlers)
     {
       handler->endFrame(_render_stamp);
     }
@@ -238,8 +255,8 @@ void ThirdEyeScene::updateServerInfo(const ServerInfoMessage &server_info)
 
 void ThirdEyeScene::processMessage(PacketReader &packet)
 {
-  auto handler = _messageHandlers.find(packet.routingId());
-  if (handler != _messageHandlers.end())
+  auto handler = _message_handlers.find(packet.routingId());
+  if (handler != _message_handlers.end())
   {
     handler->second->readMessage(packet);
   }
@@ -396,7 +413,7 @@ void ThirdEyeScene::createSampleShapes()
 void ThirdEyeScene::effectReset()
 {
   // _render_mutex must be locked before calling.
-  for (auto &handler : _orderedMessageHandlers)
+  for (auto &handler : _ordered_message_handlers)
   {
     handler->reset();
   }
@@ -427,46 +444,59 @@ void ThirdEyeScene::initialiseHandlers()
   _painters.emplace(SIdArrow, std::make_shared<painter::Arrow>(_culler, _shader_library));
   _painters.emplace(SIdPose, std::make_shared<painter::Pose>(_culler, _shader_library));
 
-  _orderedMessageHandlers.emplace_back(std::make_shared<handler::Category>());
-  _orderedMessageHandlers.emplace_back(std::make_shared<handler::Camera>());
+  const auto category_handler = std::make_shared<handler::Category>();
+  _ordered_message_handlers.emplace_back(category_handler);
+  _category_handler = category_handler.get();
 
-  _orderedMessageHandlers.emplace_back(
+  const auto camera_handler = std::make_shared<handler::Camera>();
+  _ordered_message_handlers.emplace_back(camera_handler);
+  _camera_handler = camera_handler.get();
+
+  _ordered_message_handlers.emplace_back(
     std::make_shared<handler::Shape>(SIdSphere, "sphere", _painters[SIdSphere]));
-  _orderedMessageHandlers.emplace_back(
+  _ordered_message_handlers.emplace_back(
     std::make_shared<handler::Shape>(SIdBox, "box", _painters[SIdBox]));
-  _orderedMessageHandlers.emplace_back(
+  _ordered_message_handlers.emplace_back(
     std::make_shared<handler::Shape>(SIdCone, "cone", _painters[SIdCone]));
-  _orderedMessageHandlers.emplace_back(
+  _ordered_message_handlers.emplace_back(
     std::make_shared<handler::Shape>(SIdCylinder, "cylinder", _painters[SIdCylinder]));
-  _orderedMessageHandlers.emplace_back(
+  _ordered_message_handlers.emplace_back(
     std::make_shared<handler::Shape>(SIdCapsule, "capsule", _painters[SIdCapsule]));
-  _orderedMessageHandlers.emplace_back(
+  _ordered_message_handlers.emplace_back(
     std::make_shared<handler::Shape>(SIdPlane, "plane", _painters[SIdPlane]));
-  _orderedMessageHandlers.emplace_back(
+  _ordered_message_handlers.emplace_back(
     std::make_shared<handler::Shape>(SIdStar, "star", _painters[SIdStar]));
-  _orderedMessageHandlers.emplace_back(
+  _ordered_message_handlers.emplace_back(
     std::make_shared<handler::Shape>(SIdArrow, "arrow", _painters[SIdArrow]));
-  _orderedMessageHandlers.emplace_back(
+  _ordered_message_handlers.emplace_back(
     std::make_shared<handler::Shape>(SIdPose, "pose", _painters[SIdPose]));
 
   auto mesh_resources = std::make_shared<handler::MeshResource>(_shader_library);
-  _orderedMessageHandlers.emplace_back(mesh_resources);
-  _orderedMessageHandlers.emplace_back(
+  _ordered_message_handlers.emplace_back(mesh_resources);
+  _ordered_message_handlers.emplace_back(
     std::make_shared<handler::MeshShape>(_culler, _shader_library));
-  _orderedMessageHandlers.emplace_back(std::make_shared<handler::MeshSet>(_culler, mesh_resources));
+  _ordered_message_handlers.emplace_back(
+    std::make_shared<handler::MeshSet>(_culler, mesh_resources));
 
-  _orderedMessageHandlers.emplace_back(std::make_shared<handler::Text2D>(_text_painter));
-  _orderedMessageHandlers.emplace_back(std::make_shared<handler::Text3D>(_text_painter));
+  // Copy main draw handlers
+  _main_draw_handlers = _ordered_message_handlers;
+
+  // Add secondary draw handlers
+  _secondary_draw_handlers.emplace_back(std::make_shared<handler::Text2D>(_text_painter));
+  _secondary_draw_handlers.emplace_back(std::make_shared<handler::Text3D>(_text_painter));
+
+  std::copy(_secondary_draw_handlers.begin(), _secondary_draw_handlers.end(),
+            std::back_inserter(_ordered_message_handlers));
 
   // TODO:
   // - point cloud
   // - multi-shape
 
   // Copy message handlers to the routing set and initialise.
-  for (auto &handler : _orderedMessageHandlers)
+  for (auto &handler : _ordered_message_handlers)
   {
     handler->initialise();
-    _messageHandlers.emplace(handler->routingId(), handler);
+    _message_handlers.emplace(handler->routingId(), handler);
   }
 }
 
@@ -486,21 +516,37 @@ void ThirdEyeScene::initialiseShaders()
 }
 
 
-void ThirdEyeScene::drawShapes(float dt, const DrawParams &params)
+void ThirdEyeScene::drawPrimary(float dt, const DrawParams &params,
+                                const painter::CategoryState &categories)
+{
+  draw(dt, params, categories, _main_draw_handlers);
+}
+
+
+void ThirdEyeScene::drawSecondary(float dt, const DrawParams &params,
+                                  const painter::CategoryState &categories)
+{
+  draw(dt, params, categories, _secondary_draw_handlers);
+}
+
+
+void ThirdEyeScene::draw(float dt, const DrawParams &params,
+                         const painter::CategoryState &categories,
+                         const std::vector<std::shared_ptr<handler::Message>> &drawers)
 {
   (void)dt;
   // Draw opaque then transparent for proper blending.
-  for (const auto &handler : _orderedMessageHandlers)
+  for (const auto &handler : drawers)
   {
-    handler->draw(handler::Message::DrawPass::Opaque, _render_stamp, params);
+    handler->draw(handler::Message::DrawPass::Opaque, _render_stamp, params, categories);
   }
-  for (const auto &handler : _orderedMessageHandlers)
+  for (const auto &handler : drawers)
   {
-    handler->draw(handler::Message::DrawPass::Transparent, _render_stamp, params);
+    handler->draw(handler::Message::DrawPass::Transparent, _render_stamp, params, categories);
   }
-  for (const auto &handler : _orderedMessageHandlers)
+  for (const auto &handler : drawers)
   {
-    handler->draw(handler::Message::DrawPass::Overlay, _render_stamp, params);
+    handler->draw(handler::Message::DrawPass::Overlay, _render_stamp, params, categories);
   }
 }
 
@@ -517,5 +563,30 @@ void ThirdEyeScene::updateFpsDisplay(float dt, const DrawParams &params)
   fps_text.transform = Magnum::Matrix4::translation(Magnum::Vector3(0.01f, 0.015f, 0.0f));
   fps_text.text = std::to_string(fps);
   _text_painter->draw2D(fps_text, params);
+}
+
+
+void ThirdEyeScene::onCameraConfigChange(const settings::Settings::Config &config)
+{
+  _camera.clip_far = config.camera.far_clip.value();
+  _camera.clip_near = config.camera.near_clip.value();
+  _camera.fov_horizontal_deg = config.camera.fov.value();
+}
+
+
+void ThirdEyeScene::restoreSettings()
+{
+  settings::Settings::Config config = {};
+  if (settings::load(config))
+  {
+    _settings.update(config);
+  }
+}
+
+
+void ThirdEyeScene::storeSettings()
+{
+  const auto config = _settings.config();
+  settings::save(config);
 }
 }  // namespace tes::view

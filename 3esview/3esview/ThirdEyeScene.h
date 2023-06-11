@@ -9,6 +9,7 @@
 #include "FramesPerSecondWindow.h"
 #include "FrameStamp.h"
 #include "painter/ShapeCache.h"
+#include "settings/Settings.h"
 
 #include <3escore/Messages.h>
 
@@ -42,11 +43,14 @@ class FboEffect;
 
 namespace handler
 {
+class Camera;
+class Category;
 class Message;
 }  // namespace handler
 
 namespace painter
 {
+class CategoryState;
 class ShapePainter;
 class Text;
 }  // namespace painter
@@ -59,6 +63,8 @@ class ShaderLibrary;
 class TES_VIEWER_API ThirdEyeScene
 {
 public:
+  using ResetCallback = std::function<void()>;
+
   /// Constructor. Must be created on the main thread only - the thread which manages the render
   /// resource - i.e., the OpenGL context.
   ThirdEyeScene();
@@ -67,32 +73,59 @@ public:
 
   /// Get the list of names of known message handlers, keyed by routing ID.
   /// @return The known routing ID names.
-  static const std::unordered_map<uint32_t, std::string> defaultHandlerNames();
+  [[nodiscard]] static const std::unordered_map<uint32_t, std::string> defaultHandlerNames();
 
   /// Return the last rendered frame stamp.
   /// @return The last frame stamp.
-  FrameStamp frameStamp() const { return _render_stamp; }
+  [[nodiscard]] FrameStamp frameStamp() const { return _render_stamp; }
 
-  std::shared_ptr<BoundsCuller> culler() const { return _culler; }
+  [[nodiscard]] std::shared_ptr<BoundsCuller> culler() const { return _culler; }
 
   void setCamera(const camera::Camera &camera) { _camera = camera; }
-  camera::Camera &camera() { return _camera; }
-  const camera::Camera &camera() const { return _camera; }
+  [[nodiscard]] camera::Camera &camera() { return _camera; }
+  [[nodiscard]] const camera::Camera &camera() const { return _camera; }
 
   void setActiveFboEffect(std::shared_ptr<FboEffect> effect);
   void clearActiveFboEffect();
-  std::shared_ptr<FboEffect> activeFboEffect() { return _active_fbo_effect; }
-  const std::shared_ptr<FboEffect> &activeFboEffect() const { return _active_fbo_effect; }
+  [[nodiscard]] std::shared_ptr<FboEffect> activeFboEffect() { return _active_fbo_effect; }
+  [[nodiscard]] const std::shared_ptr<FboEffect> &activeFboEffect() const
+  {
+    return _active_fbo_effect;
+  }
 
   /// Access the shader library. This is for mesh rendering shaders.
   /// @return The shader library.
-  std::shared_ptr<shaders::ShaderLibrary> shaderLibrary() const { return _shader_library; }
+  [[nodiscard]] std::shared_ptr<shaders::ShaderLibrary> shaderLibrary() const
+  {
+    return _shader_library;
+  }
+
+  [[nodiscard]] const settings::Settings &settings() const { return _settings; }
+  [[nodiscard]] settings::Settings &settings() { return _settings; }
+
+  [[nodiscard]] handler::Camera &cameraHandler() { return *_camera_handler; }
+  [[nodiscard]] const handler::Camera &cameraHandler() const { return *_camera_handler; }
+  [[nodiscard]] handler::Category &categoryHandler() { return *_category_handler; }
+  [[nodiscard]] const handler::Category &categoryHandler() const { return *_category_handler; }
+
+  [[nodiscard]] std::shared_ptr<handler::Message> messageHandler(uint32_t routing_id)
+  {
+    const auto find = _message_handlers.find(routing_id);
+    if (find != _message_handlers.end())
+    {
+      return find->second;
+    }
+    return {};
+  }
 
   /// Reset the current state, clearing all the currently visible data.
   ///
   /// When called on the main thread, this immediately resets the message handlers. From other
   /// threads, this will mark the main thread for reset and block until the reset is effected.
   void reset();
+
+  const ResetCallback &resetCallback() const { return _reset_callback; }
+  void setResetCallback(ResetCallback callback) { _reset_callback = std::move(callback); }
 
   void render(float dt, const Magnum::Vector2i &window_size);
 
@@ -135,8 +168,27 @@ private:
   void initialiseHandlers();
   void initialiseShaders();
 
-  void drawShapes(float dt, const DrawParams &params);
+  /// Primary drawing pass. Draws _main_draw_handlers with the FBO effect active.
+  /// @param dt Time since last render (seconds).
+  /// @param params Draw parameters.
+  void drawPrimary(float dt, const DrawParams &params, const painter::CategoryState &categories);
+  /// Secondary drawing pass. Draws _secondary_draw_handlers using the main frame buffer.
+  /// @param dt Time since last render (seconds).
+  /// @param params Draw parameters.
+  void drawSecondary(float dt, const DrawParams &params, const painter::CategoryState &categories);
+  /// Draw all items from @p drawers calling @c handler::Message::draw() for each
+  /// @c handler::Message::DrawPass .
+  /// @param dt Time since last render (seconds).
+  /// @param params Draw parameters.
+  /// @param drawers What to draw.
+  void draw(float dt, const DrawParams &params, const painter::CategoryState &categories,
+            const std::vector<std::shared_ptr<handler::Message>> &drawers);
   void updateFpsDisplay(float dt, const DrawParams &params);
+
+  void onCameraConfigChange(const settings::Settings::Config &config);
+
+  void restoreSettings();
+  void storeSettings();
 
   std::shared_ptr<FboEffect> _active_fbo_effect;
 
@@ -146,17 +198,26 @@ private:
   std::shared_ptr<shaders::ShaderLibrary> _shader_library;
 
   std::unordered_map<ShapeHandlerIDs, std::shared_ptr<painter::ShapePainter>> _painters;
-  std::unordered_map<uint32_t, std::shared_ptr<handler::Message>> _messageHandlers;
+  std::unordered_map<uint32_t, std::shared_ptr<handler::Message>> _message_handlers;
   /// Message handers arranged by update order..
-  std::vector<std::shared_ptr<handler::Message>> _orderedMessageHandlers;
+  std::vector<std::shared_ptr<handler::Message>> _ordered_message_handlers;
+  /// Message handlers arranged by draw order, effected during the @c drawPrimary() call.
+  std::vector<std::shared_ptr<handler::Message>> _main_draw_handlers;
+  /// Message handlers arranged by draw order, effected during the @c drawSecondary() call.
+  std::vector<std::shared_ptr<handler::Message>> _secondary_draw_handlers;
   /// List of unknown message handlers for which we've raised warnings. Cleared on @c reset().
   std::unordered_set<uint32_t> _unknown_handlers;
+
+  handler::Camera *_camera_handler = nullptr;
+  handler::Category *_category_handler = nullptr;
 
   std::shared_ptr<painter::Text> _text_painter;
 
   FrameStamp _render_stamp = {};
 
   Corrade::PluginManager::Manager<Magnum::Text::AbstractFont> _font_manager;
+
+  ResetCallback _reset_callback;
 
   std::mutex _render_mutex;
   FrameNumber _new_frame = 0;
@@ -171,6 +232,8 @@ private:
   std::thread::id _main_thread_id;
 
   FramesPerSecondWindow _fps;
+
+  settings::Settings _settings;
 };
 }  // namespace tes::view
 

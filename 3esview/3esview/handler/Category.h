@@ -9,50 +9,84 @@
 #include "Message.h"
 
 #include <mutex>
-#include <unordered_map>
 
 namespace tes::view::handler
 {
 class TES_VIEWER_API Category : public Message
 {
 public:
-  /// Represents a display category.
-  struct TES_VIEWER_API CategoryInfo
+  class TES_VIEWER_API CategoriesRef
   {
-    /// Display name for the category.
-    std::string name;
-    /// Category ID. Zero is always the root category to which all other categories belong. It can
-    /// be given an explicit name.
-    uint16_t id = 0;
-    /// Parent category, defaulting to the root ID.
-    uint16_t parent_id = 0;
-    /// Does this category default to the active state?
-    bool default_active = false;
-    /// Currently active?
-    bool active = false;
+  public:
+    CategoriesRef() = default;
+    CategoriesRef(std::mutex &mutex, painter::CategoryState &state)
+      : _mutex(&mutex)
+      , _state(&state)
+    {
+      mutex.lock();
+    }
+    CategoriesRef(const CategoriesRef &other) = delete;
+    CategoriesRef(CategoriesRef &&other)
+      : _mutex(std::exchange(other._mutex, nullptr))
+      , _state(std::exchange(other._state, nullptr))
+    {}
+
+    CategoriesRef &operator=(const CategoriesRef &other) = delete;
+    CategoriesRef &operator=(CategoriesRef &&other)
+    {
+      _mutex = std::exchange(other._mutex, _mutex);
+      _state = std::exchange(other._state, _state);
+      return *this;
+    }
+
+    ~CategoriesRef() { release(); }
+
+    void release()
+    {
+      if (_mutex)
+      {
+        _mutex->unlock();
+      }
+      _mutex = nullptr;
+      _state = nullptr;
+    }
+
+    const painter::CategoryState &operator*() const { return *_state; }
+    painter::CategoryState &operator*() { return *_state; }
+    const painter::CategoryState *operator->() const { return _state; }
+    painter::CategoryState *operator->() { return _state; }
+
+  private:
+    std::mutex *_mutex = nullptr;
+    painter::CategoryState *_state = nullptr;
   };
 
   Category();
 
-  bool isActive(unsigned category) const;
-  bool setActive(unsigned category, bool active = true);
-
-  bool lookup(unsigned category, CategoryInfo &info);
+  /// Attain a @c CategoriesRef to the internal categories state.
+  ///
+  /// Note the returned object should be shortlived and must be released quickly. Copy the
+  /// @c painter::CategoryState for longer running operations.
+  ///
+  /// @return A reference to the internal category state.
+  CategoriesRef categories() { return CategoriesRef(_mutex, _categories); }
 
   void initialise() override;
   void reset() override;
   void prepareFrame(const FrameStamp &stamp) override;
   void endFrame(const FrameStamp &stamp) override;
-  void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params) override;
+  void draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
+            const painter::CategoryState &categories) override;
   void readMessage(PacketReader &reader) override;
   void serialise(Connection &out, ServerInfoMessage &info) override;
 
 private:
-  bool updateCategory(const CategoryInfo &info);
+  /// Ensure the root category is present and has a name.
+  void ensureRoot();
 
-  using CategoryMap = std::unordered_map<unsigned, CategoryInfo>;
   mutable std::mutex _mutex;
-  CategoryMap _category_map;
+  painter::CategoryState _categories;
+  std::vector<painter::CategoryInfo> _pending;
 };
 }  // namespace tes::view::handler
 

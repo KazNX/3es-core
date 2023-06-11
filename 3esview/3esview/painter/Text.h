@@ -37,10 +37,11 @@ namespace tes::view::painter
 {
 /// This class renders 2D and 3D text using an immediate mode style rendering.
 ///
-/// The two public draw methods - @c draw2D() and @c draw3D() - are designed to draw a collection of @c TextEntry items.
-/// The expected usage is to have @c TextEntry items in either a vector or unordered map. As such we don't explicitly
-/// know how to interface with the containers. Instead these methods accept forward iterators - begin and end pairs -
-/// and a @c resolver object function which resolves the iterator to a @c TextEntry.
+/// The two public draw methods - @c draw2D() and @c draw3D() - are designed to draw a collection of
+/// @c TextEntry items. The expected usage is to have @c TextEntry items in either a vector or
+/// unordered map. As such we don't explicitly know how to interface with the containers. Instead
+/// these methods accept forward iterators - begin and end pairs - and a @c resolver object function
+/// which resolves the iterator to a @c TextEntry.
 ///
 /// We can render a vector or unordered map of @c TextEntry items using:
 ///
@@ -52,15 +53,18 @@ namespace tes::view::painter
 ///                   params);
 /// }
 ///
-/// void draw(Text &renderer, std::unordered_map<int, Text::TextEntry> &text, const DrawParams &params)
+/// void draw(Text &renderer, std::unordered_map<int, Text::TextEntry> &text, const DrawParams
+/// &params)
 /// {
 ///   renderer.draw2D(text.begin(), text.end(),
-///   /* resolver */  [] (std::unordered_map<int, Text::TextEntry>::iterator &iter) { return iter->second; },
+///   /* resolver */  [] (std::unordered_map<int, Text::TextEntry>::iterator &iter) { return
+///   iter->second; },
 ///                   params);
 /// }
 /// ```
 ///
-/// This interface also supports rendering from a container which indirectly contains @c TextEntry items.
+/// This interface also supports rendering from a container which indirectly contains @c TextEntry
+/// items.
 class TES_VIEWER_API Text
 {
 public:
@@ -74,8 +78,8 @@ public:
     Zero = 0,
     /// A flag for 2D text, which projects a 3D world position on the 2D overlay.
     ///
-    /// This is considered 2D text because it is rendered in the 2D overlay. It may dissapear from view as the camera
-    /// pans around.
+    /// This is considered 2D text because it is rendered in the 2D overlay. It may dissapear from
+    /// view as the camera pans around.
     ScreenProjected = (1 << 0),
     /// A flag for 3D text which keeps the text facing the camera.
     ScreenFacing = (1 << 1),
@@ -94,6 +98,8 @@ public:
     Magnum::Float font_size = 1;
     /// Rendering flags.
     TextFlag flags = TextFlag::Zero;
+    /// Category ID - see @c painter::CategoryState .
+    unsigned category_id = 0u;
   };
 
   /// Construct a text renderer.
@@ -103,7 +109,8 @@ public:
   /// @param font_plugin The font plugin name.
   Text(Corrade::PluginManager::Manager<Magnum::Text::AbstractFont> &font_manager,
        const std::string &font_resource_name = "SourceSansPro-Regular.ttf",
-       const std::string &fonts_resource_section = "fonts", const std::string &font_plugin = "TrueTypeFont");
+       const std::string &fonts_resource_section = "resources",
+       const std::string &font_plugin = "TrueTypeFont");
 
   /// Check if we are able to render text.
   /// @return True if text rendering is availabe.
@@ -115,13 +122,16 @@ public:
   ///
   /// @tparam Iter The forward iterator type for a collection of @c TextEntry items.
   /// @tparam Resolver The @c TextEntry resolver. A callable object of the form:
-  ///   `std::function<const TextEntry &(const Iter &)>`
+  ///   `std::function<std::pair<const TextEntry &, bool>(const Iter &)>`. The bool return value
+  ///   indicates whether the text is visible or not.
   /// @param begin The first item to render.
   /// @param end The end iterator.
-  /// @param resolver A functional object which resolves an @c Iter object to a @c TextEntry reference.
+  /// @param resolver A functional object which resolves an @c Iter object to a @c TextEntry
+  /// reference.
   /// @param params Draw parameters.
   template <typename Iter, typename Resolver>
-  void draw2D(const Iter &begin, const Iter &end, const Resolver &resolver, const DrawParams &params);
+  void draw2D(const Iter &begin, const Iter &end, const Resolver &resolver,
+              const DrawParams &params);
 
   /// A convenience function for drawing a single text item.
   ///
@@ -131,7 +141,7 @@ public:
   /// @param params Draw parameters.
   void draw2D(const TextEntry &text, const DrawParams &params)
   {
-    const auto draw_item = [&text](const int) { return text; };
+    const auto draw_item = [&text](const int) { return std::pair{ text, true }; };
     draw2D(0, 1, draw_item, params);
   }
 
@@ -144,10 +154,12 @@ public:
   ///   `std::function<const TextEntry &(const Iter &)>`
   /// @param begin The first item to render.
   /// @param end The end iterator.
-  /// @param resolver A functional object which resolves an @c Iter object to a @c TextEntry reference.
+  /// @param resolver A functional object which resolves an @c Iter object to a @c TextEntry
+  /// reference.
   /// @param params Draw parameters.
   template <typename Iter, typename Resolver>
-  void draw3D(const Iter &begin, const Iter &end, const Resolver &resolver, const DrawParams &params);
+  void draw3D(const Iter &begin, const Iter &end, const Resolver &resolver,
+              const DrawParams &params);
 
   /// A convenience function for drawing a single text item.
   ///
@@ -157,7 +169,7 @@ public:
   /// @param params Draw parameters.
   void draw3D(const TextEntry &text, const DrawParams &params)
   {
-    const auto draw_item = [&text](const int) { return text; };
+    const auto draw_item = [&text](const int) { return std::pair{ text, true }; };
     draw3D(0, 1, draw_item, params);
   }
 
@@ -179,32 +191,36 @@ private:
 
   /// Draw 2D text.
   ///
-  /// 2D text is rendered in an overlay and always the same size. This should only be called during the overlay draw
-  /// pass.
+  /// 2D text is rendered in an overlay and always the same size. This should only be called during
+  /// the overlay draw pass.
   void draw2DText(const TextEntry &text, const DrawParams &params);
 
   /// Draw 3D text.
   ///
-  /// 3D text is rendered in the scene and is perspective scaled. 3D text should be rendered during the opaque draw
-  /// pass. This should only be called during the opaque or transparent rendering passes.
+  /// 3D text is rendered in the scene and is perspective scaled. 3D text should be rendered during
+  /// the opaque draw pass. This should only be called during the opaque or transparent rendering
+  /// passes.
   void draw3DText(const TextEntry &text, const DrawParams &params);
 
   /// Draw a single text item.
-  /// @tparam Renderer The text renderer type: `[Magnum::Text::Renderer2D, Magnum::Text::Renderer3D]`
+  /// @tparam Renderer The text renderer type: `[Magnum::Text::Renderer2D,
+  /// Magnum::Text::Renderer3D]`
   /// @tparam Matrix The text transformation matrix type of rank 3 or 4.
   /// @tparam Shader The text shader type:
   ///   `[Magnum::Shader::DistanceFieldVector2D, Magnum::Shader::DistanceFieldVector3D]`
   /// @param text The text item to draw.
-  /// @param full_projection_matrix The full transformation matrix including projection, camera and model transforms.
+  /// @param full_projection_matrix The full transformation matrix including projection, camera and
+  /// model transforms.
   /// @param renderer The text renderer.
   /// @param shader The text shader.
   template <typename Matrix, typename Renderer, typename Shader>
-  void draw(const TextEntry &text, const Matrix &full_projection_matrix, Renderer &renderer, Shader &shader);
+  void draw(const TextEntry &text, const Matrix &full_projection_matrix, Renderer &renderer,
+            Shader &shader);
 
   std::unique_ptr<Magnum::Text::Renderer2D> _renderer_2d;
   std::unique_ptr<Magnum::Text::Renderer3D> _renderer_3d;
-  /// Default transformation matrix required to get the text from facing along Z to align with the world up vector,
-  /// facing back along the forward vector.
+  /// Default transformation matrix required to get the text from facing along Z to align with the
+  /// world up vector, facing back along the forward vector.
   Magnum::Matrix4 _default_transform;
 
   std::unique_ptr<Magnum::Text::AbstractFont> _font = nullptr;
@@ -214,7 +230,8 @@ private:
 };
 
 template <typename Iter, typename Resolver>
-void Text::draw2D(const Iter &begin, const Iter &end, const Resolver &resolver, const DrawParams &params)
+void Text::draw2D(const Iter &begin, const Iter &end, const Resolver &resolver,
+                  const DrawParams &params)
 {
   if (!isAvailable())
   {
@@ -225,7 +242,11 @@ void Text::draw2D(const Iter &begin, const Iter &end, const Resolver &resolver, 
   _shader_2d.bindVectorTexture(_cache->texture());
   for (auto iter = begin; iter != end; ++iter)
   {
-    draw2DText(resolver(iter), params);
+    const auto &&[text, visible] = resolver(iter);
+    if (visible)
+    {
+      draw2DText(text, params);
+    }
   }
   endDraw2D();
 }
@@ -233,7 +254,8 @@ void Text::draw2D(const Iter &begin, const Iter &end, const Resolver &resolver, 
 TES_ENUM_FLAGS(Text::TextFlag, unsigned);
 
 template <typename Iter, typename Resolver>
-void Text::draw3D(const Iter &begin, const Iter &end, const Resolver &resolver, const DrawParams &params)
+void Text::draw3D(const Iter &begin, const Iter &end, const Resolver &resolver,
+                  const DrawParams &params)
 {
   if (!isAvailable())
   {
@@ -244,7 +266,11 @@ void Text::draw3D(const Iter &begin, const Iter &end, const Resolver &resolver, 
   _shader_3d.bindVectorTexture(_cache->texture());
   for (auto iter = begin; iter != end; ++iter)
   {
-    draw3DText(resolver(iter), params);
+    const auto &&[text, visible] = resolver(iter);
+    if (visible)
+    {
+      draw3DText(text, params);
+    }
   }
   endDraw3D();
 }

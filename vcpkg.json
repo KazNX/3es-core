@@ -34,18 +34,27 @@
           ]
         },
         {
-          "name": "magnum-extras",
+          "name": "imgui",
           "features": [
-            "ui"
+            "freetype",
+            "glfw-binding"
+          ]
+        },
+        {
+          "name": "magnum-integration",
+          "features": [
+            "imgui"
           ]
         },
         {
           "name": "magnum-plugins",
           "features": [
-            "freetypefont"
+            "freetypefont",
+            "pngimporter"
           ]
         },
-        "nativefiledialog"
+        "nativefiledialog",
+        "ryml"
       ]
     },
     "occupancy": {

@@ -84,14 +84,14 @@ public:
   void setIndefiniteWriteTimeout();
 
   /// Sets the read buffer size (bytes).
-  /// @param buffer_size The new buffer size. Max is 2^16 - 1.
+  /// @param buffer_size The new buffer size.
   void setReadBufferSize(int buffer_size);
 
   /// Gets the current read buffer size (bytes).
   [[nodiscard]] int readBufferSize() const;
 
   /// Sets the send buffer size (bytes).
-  /// @param buffer_size The new buffer size. Max is 2^16 - 1.
+  /// @param buffer_size The new buffer size.
   void setSendBufferSize(int buffer_size);
 
   /// Gets the current send buffer size (bytes).

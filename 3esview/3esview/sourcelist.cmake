@@ -30,6 +30,7 @@ list(APPEND PUBLIC_HEADERS
   command/playback/SkipBackward.h
   command/playback/SkipForward.h
   command/playback/SkipToFrame.h
+  command/playback/Speed.h
   command/playback/StepBackward.h
   command/playback/StepForward.h
   command/playback/Stop.h
@@ -49,6 +50,7 @@ list(APPEND PUBLIC_HEADERS
   mesh/Converter.h
   painter/Arrow.h
   painter/Box.h
+  painter/CategoryState.h
   painter/Capsule.h
   painter/Cone.h
   painter/Cylinder.h
@@ -59,6 +61,16 @@ list(APPEND PUBLIC_HEADERS
   painter/Sphere.h
   painter/Star.h
   painter/Text.h
+  settings/Camera.h
+  settings/Colour.h
+  settings/Enum.h
+  settings/Loader.h
+  settings/Log.h
+  settings/Numeric.h
+  settings/Playback.h
+  settings/Render.h
+  settings/Settings.h
+  settings/Values.h
   shaders/Edl.h
   shaders/Flat.h
   shaders/PointGeom.h
@@ -97,6 +109,7 @@ list(APPEND SOURCES
   command/playback/SkipBackward.cpp
   command/playback/SkipForward.cpp
   command/playback/SkipToFrame.cpp
+  command/playback/Speed.cpp
   command/playback/StepBackward.cpp
   command/playback/StepForward.cpp
   command/playback/Stop.cpp
@@ -116,6 +129,7 @@ list(APPEND SOURCES
   painter/Arrow.cpp
   painter/Box.cpp
   painter/Capsule.cpp
+  painter/CategoryState.cpp
   painter/Cone.cpp
   painter/Cylinder.cpp
   painter/Plane.cpp
@@ -125,6 +139,8 @@ list(APPEND SOURCES
   painter/Sphere.cpp
   painter/Star.cpp
   painter/Text.cpp
+  settings/Loader.cpp
+  settings/Settings.cpp
   shaders/Edl.cpp
   shaders/Edl.frag
   shaders/Edl.vert
@@ -144,4 +160,5 @@ list(APPEND SOURCES
 )
 
 list(APPEND PRIVATE_SOURCES
+  3p/cfgpath.h
 )
