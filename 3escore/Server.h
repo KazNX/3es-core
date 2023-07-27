@@ -65,12 +65,12 @@ struct TES_CORE_API ServerSettings
   /// Size of the client packet buffers.
   uint16_t client_buffer_size = kDefaultBufferSize;
   /// Compression level to use if enabled. See @c CompressionLevel.
-  uint16_t compression_level = ClDefault;
+  CompressionLevel compression_level = CompressionLevel::Default;
 
   ServerSettings() = default;
   ServerSettings(uint32_t flags, uint16_t port = kDefaultPort,
                  uint16_t client_buffer_size = kDefaultBufferSize,
-                 CompressionLevel compression_level = ClDefault)
+                 CompressionLevel compression_level = CompressionLevel::Default)
     : listen_port(port)
     , flags(flags)
     , client_buffer_size(client_buffer_size)

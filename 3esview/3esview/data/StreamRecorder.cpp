@@ -97,7 +97,7 @@ ServerSettings StreamRecorder::serverSettings()
 {
   // Most settings are irrelevant.
   ServerSettings settings = {};
-  settings.compression_level = ClHigh;
+  settings.compression_level = CompressionLevel::High;
   return settings;
 }
 }  // namespace tes::view::data

@@ -9,11 +9,6 @@ struct timeval;
 
 namespace tes::tcpbase
 {
-enum SocketError
-{
-
-};
-
 int TES_CORE_API create();
 void TES_CORE_API close(int socket);
 

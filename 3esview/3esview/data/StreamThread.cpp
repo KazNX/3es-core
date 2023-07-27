@@ -348,9 +348,11 @@ StreamThread::ProcessPacketResult StreamThread::processPacket(const PacketHeader
 
     // Lock for frame control messages as these tell us to advance the frame and how long to
     // wait.
+    const bool no_frame_end = (flags & ProcessPacketFlag::NoFrameEnd) != ProcessPacketFlag::None;
     switch (packet.routingId())
     {
     case MtControl:
+
       result.frame_interval += processControlMessage(
         packet, (flags & ProcessPacketFlag::NoFrameEnd) != ProcessPacketFlag::None);
       if (packet.messageId() == CIdFrame)
@@ -404,7 +406,7 @@ StreamThread::Clock::duration StreamThread::processControlMessage(PacketReader &
       static_cast<double>(_server_info.time_unit * dt) / static_cast<double>(_playback_speed)));
   }
   case CIdCoordinateFrame:
-    if (msg.value32 < CFCount)
+    if (msg.value32 < static_cast<int32_t>(CoordinateFrame::Count))
     {
       _server_info.coordinate_frame = static_cast<CoordinateFrame>(msg.value32);
       _tes->updateServerInfo(_server_info);

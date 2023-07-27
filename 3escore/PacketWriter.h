@@ -109,7 +109,7 @@ public:
 
   [[nodiscard]] uint8_t *payload();
 
-  inline void invalidateCrc() { _status = static_cast<uint16_t>(_status & ~CrcValid); }
+  inline void invalidateCrc() { _status &= ~PacketStatus::CrcValid; }
 
   /// Returns the number of bytes remaining available in the payload.
   /// This is calculated as the @c maxPayloadSize() - @c payloadSize().

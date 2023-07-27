@@ -136,7 +136,7 @@ void renderVoxels(const UnorderedKeySet &keys, const octomap::OcTree &map,
     }
 
     // Render slightly smaller than the actual voxel size.
-    create(g_tes_server, MeshShape(tes::DtVoxels, tes::Id(0u, category), centres)
+    create(g_tes_server, MeshShape(tes::DrawType::Voxels, tes::Id(0u, category), centres)
                            .setUniformNormal(0.95f * float(map.getResolution()))
                            .setColour(colour));
   }
@@ -312,7 +312,7 @@ int populateMap(const Options &opt)
       if (opt.rays & Rays_Lines)
       {
         create(g_tes_server,
-               MeshShape(DtLines, Id(0u, CAT_Rays), rays).setColour(Colour::DarkOrange));
+               MeshShape(DrawType::Lines, Id(0u, CAT_Rays), rays).setColour(Colour::DarkOrange));
       }
       rays.clear();
       // Render touched voxels in bulk.
@@ -327,7 +327,7 @@ int populateMap(const Options &opt)
       if (opt.samples)
       {
         create(g_tes_server,
-               MeshShape(DtPoints, Id(0u, CAT_OccupiedCells), samples).setColour(Colour::Orange));
+               MeshShape(DrawType::Points, Id(0u, CAT_OccupiedCells), samples).setColour(Colour::Orange));
       }
       samples.clear();
       // updateServer(g_tes_server);

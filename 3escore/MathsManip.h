@@ -17,7 +17,7 @@ namespace tes
 {
 /// @ingroup tesiostream
 /// Accepted values for @c ::tesMatrixMode.
-enum class MatrixMode : int
+enum class MatrixMode
 {
   /// Display all matrix elements inline.
   Inline,
@@ -27,7 +27,7 @@ enum class MatrixMode : int
 
 /// @ingroup tesiostream
 /// Display mode W component in @c Vector4 and @c Quaternion types.
-enum class WMode : int
+enum class WMode
 {
   /// W is displayed last to match memory layout (default).
   Last,

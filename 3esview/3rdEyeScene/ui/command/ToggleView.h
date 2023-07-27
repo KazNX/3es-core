@@ -9,7 +9,7 @@
 
 namespace tes::view::ui::command
 {
-class TES_VIEWER_API ToggleView : public tes::view::command::Command
+class ToggleView : public tes::view::command::Command
 {
 public:
   using Args = tes::view::command::Args;

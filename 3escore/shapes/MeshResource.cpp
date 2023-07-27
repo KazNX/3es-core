@@ -49,7 +49,7 @@ int MeshResource::create(PacketWriter &packet) const
   msg.vertex_count = vertexCount();
   msg.index_count = indexCount();
   msg.flags = 0;
-  msg.draw_type = drawType();
+  msg.draw_type = static_cast<uint8_t>(drawType());
 
   if (transform.preferDoublePrecision())
   {

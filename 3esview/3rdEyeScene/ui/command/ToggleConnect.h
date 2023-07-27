@@ -7,7 +7,7 @@
 
 namespace tes::view::ui::command
 {
-class TES_VIEWER_API ToggleConnect : public ToggleView
+class ToggleConnect : public ToggleView
 {
 public:
   ToggleConnect(ui::IconBar &icon_bar);

@@ -7,6 +7,7 @@
 #include <3escore/CoreConfig.h>
 
 #include <3escore/DataBuffer.h>
+#include <3escore/MeshMessages.h>
 #include <3escore/Resource.h>
 #include <3escore/Transform.h>
 
@@ -42,18 +43,18 @@ public:
 
   /// Returns the @c DrawType of the mesh.
   /// @param stream Reserved for future use.
-  [[nodiscard]] virtual uint8_t drawType(int stream) const = 0;
+  [[nodiscard]] virtual DrawType drawType(int stream) const = 0;
   /// @overload
-  [[nodiscard]] uint8_t drawType() const { return drawType(0); }
+  [[nodiscard]] DrawType drawType() const { return drawType(0); }
 
   /// Returns the draw scale for the mesh resource.
   ///
   /// The semantics depend on the draw type:
   ///
-  /// - @c DtPoints point size.
-  /// - @c DtLines line width.
-  /// - @c DtTriangles no effect.
-  /// - @c DtVoxels voxel line width (cube size set by normals).
+  /// - @c DrawType::Points point size.
+  /// - @c DrawType::Lines line width.
+  /// - @c DrawType::Triangles no effect.
+  /// - @c DrawType::Voxels voxel line width (cube size set by normals).
   [[nodiscard]] virtual float drawScale(int stream) const = 0;
   /// @overload
   [[nodiscard]] virtual float drawScale() const { return drawScale(0); }

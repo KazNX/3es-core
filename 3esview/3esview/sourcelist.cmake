@@ -88,7 +88,6 @@ list(APPEND PUBLIC_HEADERS
   shaders/ShaderLibrary.h
   shaders/VertexColour.h
   shaders/VoxelGeom.h
-  util/Enum.h
   util/PendingAction.h
   util/ResourceList.h
 )

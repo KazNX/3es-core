@@ -34,9 +34,9 @@ uint32_t MeshPlaceholder::tint() const
 }
 
 
-uint8_t MeshPlaceholder::drawType(int /* stream */) const
+DrawType MeshPlaceholder::drawType(int /* stream */) const
 {
-  return 0;
+  return DrawType::Points;
 }
 
 

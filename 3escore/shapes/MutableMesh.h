@@ -27,8 +27,8 @@ struct MutableMeshImp;
 class TES_CORE_API MutableMesh
 {
 public:
-  MutableMesh(uint32_t id, DrawType draw_type = DtTriangles,
-              unsigned components = SimpleMesh::Vertex | SimpleMesh::Index);
+  MutableMesh(uint32_t id, DrawType draw_type = DrawType::Triangles,
+              MeshComponentFlag components = MeshComponentFlag::Vertex | MeshComponentFlag::Index);
   MutableMesh(const MutableMesh &other) = delete;
 
   ~MutableMesh();

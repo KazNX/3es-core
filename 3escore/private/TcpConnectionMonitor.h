@@ -19,22 +19,22 @@ class BaseConnection;
 class TcpServer;
 class TcpListenSocket;
 
+/// Error codes.
+enum class TcpConnectionError
+{
+  None,
+  /// Failed to listen on the requested port.
+  ListenFailure,
+  /// Timeout has expired.
+  Timeout
+};
+
 /// Implements a @c ConnectionMonitor using the TCP protocol. Intended only for use with a @c
 /// TcpServer.
 class TcpConnectionMonitor final : public ConnectionMonitor
 {
 public:
   using Lock = std::mutex;
-
-  /// Error codes.
-  enum ConnectionError
-  {
-    CENone,
-    /// Failed to listen on the requested port.
-    CEListenFailure,
-    /// Timeout has expired.
-    CETimeout
-  };
 
   /// Construct a TCP based connection monitor for @p server.
   /// @param server The server owning this connection monitor.
@@ -60,12 +60,12 @@ public:
   [[nodiscard]] const TcpListenSocket *socket() const { return _listen.get(); }
 
   /// Get the last error code.
-  /// @return The @c ConnectionError for the last error.
-  [[nodiscard]] int lastErrorCode() const;
+  /// @return The @c TcpConnectionError for the last error.
+  [[nodiscard]] TcpConnectionError lastErrorCode() const;
 
   /// Clear the last error code.
-  /// @return The @c ConnectionError for the last error.
-  [[nodiscard]] int clearErrorCode();
+  /// @return The @c TcpConnectionError for the last error.
+  [[nodiscard]] TcpConnectionError clearErrorCode();
 
   /// Report the port on which the connection monitor is listening.
   /// @return The listen port or zero if not listening.
@@ -165,7 +165,7 @@ private:
   ConnectionMode _mode = ConnectionMode::None;  ///< Current execution mode.
   std::vector<std::shared_ptr<Connection>> _connections;
   std::vector<std::shared_ptr<Connection>> _expired;
-  std::atomic_int _error_code = { 0 };
+  std::atomic_int _error_code = { static_cast<int>(TcpConnectionError::None) };
   std::atomic_uint16_t _listen_port = { 0 };
   std::atomic_bool _running = { false };
   std::atomic_bool _quit_flag = { false };

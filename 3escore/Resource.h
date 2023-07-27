@@ -47,7 +47,7 @@ public:
   /// @return The resource's ID.
   [[nodiscard]] virtual uint32_t id() const = 0;
 
-  /// The resource type ID. This corresponds to the routing ID (see @c MessageTypeIDs).
+  /// The resource type ID. This corresponds to the routing ID (see @c RoutingId).
   /// May be loosely used for casting.
   /// @return The type ID.
   [[nodiscard]] virtual uint16_t typeId() const = 0;

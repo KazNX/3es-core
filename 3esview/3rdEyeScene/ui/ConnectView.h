@@ -18,16 +18,16 @@
 namespace tes::view::data
 {
 class DataThread;
-}
+}  // namespace tes::view::data
 
 namespace tes::view::command
 {
 class Command;
-}
+}  // namespace tes::view::command
 
 namespace tes::view::ui
 {
-class TES_VIEWER_API ConnectView : public Panel
+class ConnectView : public Panel
 {
 public:
   /// An enumeration of the actions which can be triggered by the playback bar.

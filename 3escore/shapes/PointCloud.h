@@ -55,9 +55,9 @@ public:
   /// @return White.
   [[nodiscard]] uint32_t tint() const override;
 
-  /// Always returns @c DtPoints.
-  /// @return @c DtPoints
-  [[nodiscard]] uint8_t drawType(int stream) const override;
+  /// Always returns @c DrawType::Points.
+  /// @return @c DrawType::Points
+  [[nodiscard]] DrawType drawType(int stream) const override;
   using MeshResource::drawType;
 
   /// @copydoc::MeshResource::drawScale()

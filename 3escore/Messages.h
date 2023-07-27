@@ -6,9 +6,11 @@
 
 #include "CoreConfig.h"
 
+#include "CoordinateFrame.h"
 #include "PacketReader.h"
 #include "PacketWriter.h"
 
+#include <array>
 #include <cinttypes>
 #include <cstring>
 
@@ -23,16 +25,14 @@ namespace tes
 /// These map to the @c MessageHandler::routingId() member.
 ///
 /// Limited to 2^16 - 1.
-///
-/// @todo Rename to RoutingIDs that is used first then a message ID is assigned.
-enum MessageTypeIDs : unsigned
+enum RoutingId : uint16_t
 {
   MtNull,
   MtServerInfo,
   MtControl,
   MtCollatedPacket,
 
-  // TODO(KS): Move MtMesh and MtMaterial into a resources set.
+  // TODO(KS): Move MtMessageMesh and MtMaterial into a resources set.
   MtMesh,
   MtCamera,
   MtCategory,
@@ -46,9 +46,9 @@ enum MessageTypeIDs : unsigned
 };
 
 /// Default/built in renderers (routing IDs).
-enum ShapeHandlerIDs : unsigned
+enum ShapeHandlerId : uint16_t
 {
-  SIdSphere = ShapeHandlersIDStart,
+  SIdSphere = RoutingId::ShapeHandlersIDStart,
   SIdBox,
   SIdCone,
   SIdCylinder,
@@ -67,7 +67,7 @@ enum ShapeHandlerIDs : unsigned
 };
 
 /// Message IDs for a @c ControlMessage.
-enum ControlId : unsigned
+enum ControlId : uint16_t
 {
   CIdNull,
   /// Marks a change of frame. Pending objects changes are applied Defines a new
@@ -99,13 +99,13 @@ enum ControlId : unsigned
 };
 
 /// Message IDs for @c MtCategory routing.
-enum CategoryMessageId : unsigned
+enum CategoryMessageId : uint16_t
 {
   CMIdName,  ///< Category name definition.
 };
 
-/// Object/shape management message ID. Used with @c ShapeHandlerIDs routing IDs.
-enum ObjectMessageId : unsigned
+/// Object/shape management message ID. Used with @c ShapeHandlerId routing IDs.
+enum ObjectMessageId : uint16_t
 {
   OIdNull,
   OIdCreate,
@@ -115,7 +115,7 @@ enum ObjectMessageId : unsigned
 };
 
 /// Flags controlling the creation and appearance of an object.
-enum ObjectFlag : unsigned
+enum ObjectFlag : uint16_t
 {
   OFNone = 0,  ///< No flags. Default appearance.
   /// Indicates @c ObjectAttributes is in double precision.
@@ -147,7 +147,7 @@ enum ObjectFlag : unsigned
 };
 
 /// Flags for @c CameraMessage
-enum CameraFlags : unsigned
+enum CameraFlags : uint16_t
 {
   CFNone = 0,  ///< No flags. Default appearance.
   /// Reserved: not supported for camera messages.
@@ -156,8 +156,9 @@ enum CameraFlags : unsigned
   /// Otherwise that member is ignored.
   CFExplicitFrame = (OFDoublePrecision << 1u),
 };
+
 /// Additional attributes for point data sources.
-enum PointsAttributeFlag : unsigned
+enum PointsAttributeFlag : uint16_t
 {
   PAFNone = 0,              ///< No additional data (points only)
   PAFNormals = (1u << 0u),  ///< Per point normals.
@@ -165,7 +166,7 @@ enum PointsAttributeFlag : unsigned
 };
 
 /// @c ObjectFlag extensions for Text2D rendering.
-enum Text2DFlag : unsigned
+enum Text2DFlag : uint16_t
 {
   Text2DFWorldSpace = OFExtended  ///< Position is given in world space and mapped to screen space.
                                   ///< Otherwise in screen space with (0, 0, z) at the top left
@@ -173,19 +174,19 @@ enum Text2DFlag : unsigned
 };
 
 /// @c ObjectFlag extensions for Text2D rendering.
-enum Text3DFlag : unsigned
+enum Text3DFlag : uint16_t
 {
   Text3DFScreenFacing = OFExtended  ///< Text is oriented to face the screen.
 };
 
 /// @c ObjectFlag extensions for @c MeshShape.
-enum MeshShapeFlag : unsigned
+enum MeshShapeFlag : uint16_t
 {
   MeshShapeCalculateNormals = OFExtended  ///< Calculate normals and rendering with lighting.
 };
 
 /// Flags controlling the creation and appearance of an object.
-enum UpdateFlag : unsigned
+enum UpdateFlag : uint16_t
 {
   /// This flag indicates that the @c UpdateMessage only contains data for specific items.
   /// Combined with `{UFPosition, UFRotation, UFScale, UFColour}` to indicate what data are present.
@@ -201,13 +202,13 @@ enum UpdateFlag : unsigned
 };
 
 /// Flags for @c CollatedPacketMessage.
-enum CollatedPacketFlag : unsigned
+enum CollatedPacketFlag : uint16_t
 {
   CPFCompress = (1u << 0u),
 };
 
 /// Flags for various @c ControlId messages.
-enum ControlFlag : unsigned
+enum ControlFlag : uint16_t
 {
   /// Flag for @c CIdFrame indicating transient objects should be maintained and not flushed for
   /// this frame.
@@ -217,7 +218,7 @@ enum ControlFlag : unsigned
 /// Data type identifies for any data stream type. Also used in @c DataBuffer to identify the
 /// contained data type. Note the packed types are not valid to be held in a @c DataBuffer and are
 /// only used in transmission.
-enum DataStreamType : unsigned
+enum DataStreamType : uint8_t
 {
   DctNone,     ///< No type: invalid.
   DctInt8,     ///< Elements using 8-bit signed integers.
@@ -261,7 +262,7 @@ struct TES_CORE_API ServerInfoMessage
   /// Specifies the @c CoordinateFrame used by this server.
   ///
   /// The default is @c XYZ.
-  uint8_t coordinate_frame;
+  CoordinateFrame coordinate_frame;
   /// Reserved for future use. Must be zero.
   /// Aiming to pad out to a total of 64-bytes in the packet.
   uint8_t reserved[35];  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
@@ -340,7 +341,7 @@ struct TES_CORE_API ControlMessage
 struct TES_CORE_API CategoryNameMessage
 {
   /// ID for this message.
-  enum : unsigned
+  enum : uint16_t
   {
     MessageId = CMIdName
   };
@@ -446,10 +447,10 @@ struct TES_CORE_API CollatedPacketMessage
 template <typename Real>
 struct TES_CORE_API ObjectAttributes
 {
-  uint32_t colour;   ///< Initial object colour.
-  Real position[3];  ///< Object position.
-  Real rotation[4];  ///< Object rotation (quaternion) xyzw order.
-  Real scale[3];     ///< Object scale.
+  uint32_t colour;               ///< Initial object colour.
+  std::array<Real, 3> position;  ///< Object position.
+  std::array<Real, 4> rotation;  ///< Object rotation (quaternion) xyzw order.
+  std::array<Real, 3> scale;     ///< Object scale.
 
   /// Set to an identity transform coloured white.
   inline void identity()
@@ -587,7 +588,7 @@ using ObjectAttributesd = ObjectAttributes<double>;
 struct TES_CORE_API CreateMessage
 {
   /// ID for this message.
-  enum : unsigned
+  enum : uint16_t
   {
     MessageId = OIdCreate
   };
@@ -636,7 +637,7 @@ struct TES_CORE_API CreateMessage
 struct TES_CORE_API DataMessage
 {
   /// ID for this message.
-  enum : unsigned
+  enum : uint16_t
   {
     MessageId = OIdData
   };
@@ -671,7 +672,7 @@ struct TES_CORE_API DataMessage
 struct TES_CORE_API UpdateMessage
 {
   /// ID for this message.
-  enum : unsigned
+  enum : uint16_t
   {
     MessageId = OIdUpdate
   };
@@ -714,7 +715,7 @@ struct TES_CORE_API UpdateMessage
 struct TES_CORE_API DestroyMessage
 {
   /// ID for this message.
-  enum : unsigned
+  enum : uint16_t
   {
     MessageId = OIdDestroy
   };

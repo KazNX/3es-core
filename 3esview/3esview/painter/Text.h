@@ -6,7 +6,7 @@
 
 #include <3esview/ViewConfig.h>
 
-#include <3esview/util/Enum.h>
+#include <3escore/Enum.h>
 
 #include <Corrade/PluginManager/Manager.h>
 

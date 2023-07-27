@@ -150,9 +150,10 @@ private:
 
 std::shared_ptr<tes::MeshResource> createTestMesh()
 {
-  auto mesh = std::make_shared<tes::SimpleMesh>(
-    1, 4, 6, tes::DtTriangles,
-    tes::SimpleMesh::Vertex | tes::SimpleMesh::Index | tes::SimpleMesh::Colour);
+  auto mesh = std::make_shared<tes::SimpleMesh>(1, 4, 6, tes::DrawType::Triangles,
+                                                tes::MeshComponentFlag::Vertex |
+                                                  tes::MeshComponentFlag::Index |
+                                                  tes::MeshComponentFlag::Colour);
   mesh->setVertex(0, tes::Vector3f(-0.5f, 0, -0.5f));
   mesh->setVertex(1, tes::Vector3f(0.5f, 0, -0.5f));
   mesh->setVertex(2, tes::Vector3f(0.5f, 0, 0.5f));
@@ -373,8 +374,8 @@ void createShapes(unsigned &next_id, std::vector<std::shared_ptr<tes::Shape>> &s
       tes::Vector3f(0, 0, 0),        tes::Vector3f(0, 0, 1), tes::Vector3f(0, 0, 1),
       tes::Vector3f(0.25f, 0, 0.8f), tes::Vector3f(0, 0, 1), tes::Vector3f(-0.25f, 0, 0.8f)
     };
-    auto lines = std::make_shared<tes::MeshShape>(tes::DtLines, tes::Id(next_id++, CatLines),
-                                                  tes::DataBuffer(line_set));
+    auto lines = std::make_shared<tes::MeshShape>(
+      tes::DrawType::Lines, tes::Id(next_id++, CatLines), tes::DataBuffer(line_set));
     shapes.emplace_back(lines);
     // if (!no_move)
     // {
@@ -399,7 +400,7 @@ void createShapes(unsigned &next_id, std::vector<std::shared_ptr<tes::Shape>> &s
       tes::Colour(tes::Colour::White), tes::Colour(tes::Colour::White)
     };
     auto triangles = std::make_shared<tes::MeshShape>(
-      tes::DtTriangles, tes::Id(next_id++, CatTriangles), tes::DataBuffer(triangle_set));
+      tes::DrawType::Triangles, tes::Id(next_id++, CatTriangles), tes::DataBuffer(triangle_set));
     triangles->setColours(colours);
     triangles->duplicateArrays();
     shapes.emplace_back(triangles);
@@ -437,8 +438,8 @@ void createShapes(unsigned &next_id, std::vector<std::shared_ptr<tes::Shape>> &s
                                                           tes::Colour(tes::Colour::Green),
                                                           tes::Colour(tes::Colour::Blue),
                                                           tes::Colour(tes::Colour::White) };
-    auto points = std::make_shared<tes::MeshShape>(tes::DtPoints, tes::Id(next_id++, CatPoints),
-                                                   tes::DataBuffer(pts));
+    auto points = std::make_shared<tes::MeshShape>(
+      tes::DrawType::Points, tes::Id(next_id++, CatPoints), tes::DataBuffer(pts));
     points->setColours(colours);
     points->setDrawScale(3.0f);
     shapes.emplace_back(points);
@@ -459,8 +460,8 @@ void createShapes(unsigned &next_id, std::vector<std::shared_ptr<tes::Shape>> &s
                                                           tes::Colour(tes::Colour::Green),
                                                           tes::Colour(tes::Colour::Blue),
                                                           tes::Colour(tes::Colour::White) };
-    auto points = std::make_shared<tes::MeshShape>(tes::DtVoxels, tes::Id(next_id++, CatPoints),
-                                                   tes::DataBuffer(pts));
+    auto points = std::make_shared<tes::MeshShape>(
+      tes::DrawType::Voxels, tes::Id(next_id++, CatPoints), tes::DataBuffer(pts));
     points->setColours(colours);
     points->setDrawScale(0.2f);
     shapes.emplace_back(points);
@@ -614,7 +615,7 @@ void showUsage(int argc, char **argv)
   std::cout << argv[0] << " [options] [shapes]\n";
   std::cout << "\nValid options:\n";
   std::cout << "  help: show this message\n";
-  if (tes::checkFeature(tes::TFeatureCompression))
+  if (tes::checkFeature(tes::Feature::Compression))
   {
     std::cout << "  compress: write collated and compressed packets\n";
   }
@@ -659,7 +660,7 @@ int main(int argc, char **argv_non_const)
 
   tes::ServerInfoMessage info;
   tes::initDefaultServerInfo(&info);
-  info.coordinate_frame = tes::XYZ;
+  info.coordinate_frame = tes::CoordinateFrame::XYZ;
   unsigned server_flags = tes::SFDefaultNoCompression;
   if (haveOption("compress", argc, argv))
   {

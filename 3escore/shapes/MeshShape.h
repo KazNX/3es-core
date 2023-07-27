@@ -55,7 +55,7 @@ public:
 
     [[nodiscard]] Transform transform() const final;
     [[nodiscard]] uint32_t tint() const final;
-    [[nodiscard]] uint8_t drawType(int stream) const final;
+    [[nodiscard]] DrawType drawType(int stream) const final;
     using MeshResource::drawType;
     [[nodiscard]] float drawScale(int stream) const final;
     using MeshResource::drawScale;
@@ -99,8 +99,8 @@ public:
   /// and indices have been read. Other data such as normals may be written before vertices
   /// and indices, but this is an optional send implementation.
   ///
-  /// For @c DtPoints , the points are coloured by type when the colour value is zero (black, with
-  /// zero alpha). This is the default colour for @c DtPoints.
+  /// For @c DrawType::Points , the points are coloured by type when the colour value is zero
+  /// (black, with zero alpha). This is the default colour for @c DrawType::Points.
   ///
   /// Note: normals must be sent before completing vertices and indices. Best done first.
   enum SendDataType : uint16_t
@@ -171,7 +171,7 @@ public:
   /// @param calculate True to calculate vertex normals in the viewer.
   MeshShape &setCalculateNormals(bool calculate);
 
-  /// Colour @c DtPoints by height. Requires @c drawType() @c DtPoints .
+  /// Colour @c DrawType::Points by height. Requires @c drawType() @c DrawType::Points .
   ///
   /// This sets the shape colour to zero (black, with zero alpha).
   ///
@@ -180,13 +180,13 @@ public:
   /// @return @c *this
   MeshShape &setColourByHeight(bool colour_by_height);
 
-  /// Check if colouring points by height. Requires @c drawType() @c DtPoints .
-  /// @return True if the @c drawType() is @c DtPoints and set to colour by height.
+  /// Check if colouring points by height. Requires @c drawType() @c DrawType::Points .
+  /// @return True if the @c drawType() is @c DrawType::Points and set to colour by height.
   [[nodiscard]] bool colourByHeight() const;
 
   /// Set the draw scale used to (de)emphasise the rendering.
   ///
-  /// This equates to point size for @c DtPoints or line width for @c DtLines.
+  /// This equates to point size for @c DrawType::Points or line width for @c DrawType::Lines.
   /// A zero value indicates use of the viewer default drawing scale.
   ///
   /// The viewer is free to ignore this value.
@@ -220,7 +220,7 @@ public:
   /// this shape doesn't own its own pointers, otherwise it is copied. Should be called before
   /// calling @c expandVertices().
   ///
-  /// For @c DtPoints , this also clears @c setColourByHeight().
+  /// For @c DrawType::Points , this also clears @c setColourByHeight().
   ///
   /// @param colours The colours array.
   MeshShape &setColours(DataBuffer colour_buffer)
@@ -289,17 +289,17 @@ private:
   DataBuffer _vertices;  ///< Mesh vertices.
   /// Normal stream. Expect zero, one per vertex or one to apply to all vertices.
   DataBuffer _normals;
-  DataBuffer _colours;              ///< Per vertex colours. Null for none.
-  DataBuffer _indices;              ///< Per vertex colours. Null for none.
-  double _quantisation_unit = 0.0;  ///< Quantisation for data packing. Zero => no packing.
-  float _draw_scale = 0.0f;         ///< Draw scale: point scaling, line width, etc.
-  DrawType _draw_type = DtPoints;   ///< The primitive to render.
+  DataBuffer _colours;                     ///< Per vertex colours. Null for none.
+  DataBuffer _indices;                     ///< Per vertex colours. Null for none.
+  double _quantisation_unit = 0.0;         ///< Quantisation for data packing. Zero => no packing.
+  float _draw_scale = 0.0f;                ///< Draw scale: point scaling, line width, etc.
+  DrawType _draw_type = DrawType::Points;  ///< The primitive to render.
 };
 
 
 inline MeshShape::MeshShape()
   : Shape(SIdMeshShape)
-  , _draw_type(DtTriangles)
+  , _draw_type(DrawType::Triangles)
 {}
 
 
@@ -309,7 +309,7 @@ inline MeshShape::MeshShape(DrawType draw_type, const Id &id, DataBuffer vertice
   , _vertices(std::move(vertices))
   , _draw_type(draw_type)
 {
-  if (draw_type == DtPoints)
+  if (draw_type == DrawType::Points)
   {
     setColourByHeight(true);
   }
@@ -328,7 +328,7 @@ inline MeshShape::MeshShape(DrawType draw_type, const Id &id, DataBuffer vertice
                 _indices.type() == DctInt32 || _indices.type() == DctUInt8 ||
                 _indices.type() == DctUInt16 || _indices.type() == DctUInt32,
               "Indices not of integery type (4-byte width limit)")
-  if (draw_type == DtPoints)
+  if (draw_type == DrawType::Points)
   {
     setColourByHeight(true);
   }
@@ -352,7 +352,7 @@ inline MeshShape &MeshShape::setCalculateNormals(bool calculate)
 
 inline MeshShape &MeshShape::setColourByHeight(bool colour_by_height)
 {
-  if (drawType() == DtPoints)
+  if (drawType() == DrawType::Points)
   {
     if (colour_by_height)
     {
@@ -369,7 +369,7 @@ inline MeshShape &MeshShape::setColourByHeight(bool colour_by_height)
 
 inline bool MeshShape::colourByHeight() const
 {
-  return drawType() == DtPoints && colour().colour32() == 0;
+  return drawType() == DrawType::Points && colour().colour32() == 0;
 }
 
 

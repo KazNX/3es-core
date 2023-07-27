@@ -6,6 +6,7 @@
 
 #include <3escore/CoreConfig.h>
 
+#include "MeshComponentFlag.h"
 #include "MeshResource.h"
 
 #include <3escore/Colour.h>
@@ -23,26 +24,15 @@ struct SimpleMeshImp;
 class TES_CORE_API SimpleMesh : public MeshResource
 {
 public:
-  /// Flags indicating which components are present. @c Vertex flag is
-  /// always set. Other flags are optional, though @c Index is preferred.
-  enum ComponentFlag : unsigned
-  {
-    Vertex = (1u << 0u),  ///< Contains vertices. This flag is enforced.
-    Index = (1u << 1u),
-    Colour = (1u << 2u),
-    Color = Colour,
-    Normal = (1u << 3u),
-    Uv = (1u << 4u)
-  };
-
   /// Construct a @c SimpleMesh resource.
   /// @param id An ID unique among all @c tes::Resource objects.
   /// @param vertex_count Number of vertices to preallocate.
   /// @param index_count Number of indices to preallocate.
   /// @param drawType Defines the primitive type being indexed.
-  /// @param components The components defined by this mesh. See @c ComponentFlag.
+  /// @param components The components defined by this mesh. See @c MeshComponentFlag.
   SimpleMesh(uint32_t id, size_t vertex_count = 0u, size_t index_count = 0u,
-             DrawType draw_type = DtTriangles, unsigned components = Vertex | Index);
+             DrawType draw_type = DrawType::Triangles,
+             MeshComponentFlag components = MeshComponentFlag::Vertex | MeshComponentFlag::Index);
 
   /// Copy constructor supporting initial, shallow copy with copy on write semantics.
   /// @param other The mesh to copy.
@@ -89,10 +79,8 @@ public:
 
   using MeshResource::drawType;
   /// @copydoc::MeshResource::drawType()
-  [[nodiscard]] uint8_t drawType(int stream) const override;
+  [[nodiscard]] DrawType drawType(int stream) const override;
 
-  /// Get the @c drawType() as a @c DrawType value.
-  [[nodiscard]] DrawType getDrawType() const;
   /// Set the draw type as a @c DrawType value.
   /// @param type The draw type to set.
   void setDrawType(DrawType type);
@@ -105,18 +93,19 @@ public:
   /// @param scale The draw scale: must be zero or positive.
   void setDrawScale(float scale);
 
-  /// Query the @c ComponentFlag components used by this mesh.
-  /// @return The @c ComponentFlag values.
-  [[nodiscard]] unsigned components() const;
+  /// Query the @c MeshComponentFlag components used by this mesh.
+  /// @return The @c MeshComponentFlag flags.
+  [[nodiscard]] MeshComponentFlag components() const;
 
-  /// Set the @c ComponentFlag components for this mesh.
-  /// @param components @c ComponentFlag values to set.
-  void setComponents(unsigned components);
+  /// Set the @c MeshComponentFlag components for this mesh.
+  ///
+  /// @c MeshComponentFlag::Vertex is always implied.
+  /// @param components @c MeshComponentFlag flags to set.
+  void setComponents(MeshComponentFlag components);
 
-  /// Add @c ComponentFlag values to the existing set.
-  /// @param components Additional @c ComponentFlag values to set. Already set values are
-  /// effectively ignored.
-  void addComponents(unsigned components);
+  /// Add @c MeshComponentFlag flags to the existing set.
+  /// @param components Additional @c MeshComponentFlag flags to set.
+  void addComponents(MeshComponentFlag components);
 
   using MeshResource::vertexCount;
   [[nodiscard]] unsigned vertexCount(int stream) const override;
@@ -186,7 +175,7 @@ private:
 };
 
 
-inline void SimpleMesh::addComponents(unsigned components)
+inline void SimpleMesh::addComponents(MeshComponentFlag components)
 {
   setComponents(this->components() | components);
 }

@@ -242,7 +242,7 @@ void NetworkThread::processControlMessage(PacketReader &packet)
     break;
   }
   case CIdCoordinateFrame:
-    if (msg.value32 < CFCount)
+    if (msg.value32 < static_cast<int32_t>(CoordinateFrame::Count))
     {
       _server_info.coordinate_frame = CoordinateFrame(msg.value32);
       _tes->updateServerInfo(_server_info);

@@ -8,7 +8,7 @@
 
 #include "Panel.h"
 
-#include <3esview/util/Enum.h>
+#include <3escore/Enum.h>
 
 namespace tes::view::ui
 {
@@ -16,7 +16,7 @@ namespace tes::view::ui
 ///
 /// To start a new tree branch call @c beginBranch() and @c endSection() .
 /// Use @c beginLeaf() and @c endLeaf() for each leaf.
-class TES_VIEWER_API TreeView : public Panel
+class TreeView : public Panel
 {
 public:
   /// Flags for @c beginBranch()
@@ -39,8 +39,8 @@ protected:
   static void beginLeaf(unsigned idx, const std::string &label, const std::string &info = {});
   static void endLeaf();
 };
-}  // namespace tes::view::ui
 
-TES_ENUM_FLAGS(tes::view::ui::TreeView::BranchFlag, unsigned);
+TES_ENUM_FLAGS(TreeView::BranchFlag, unsigned);
+}  // namespace tes::view::ui
 
 #endif  // TRD_EYE_SCENE_UI_TABLE_VIEW_H

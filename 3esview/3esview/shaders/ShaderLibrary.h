@@ -82,10 +82,10 @@ public:
   /// Lookup a shader by a primitive @c DrawType.
   ///
   /// This maps:
-  /// - @c DtPoints `->` @c ID::PointCloud
-  /// - @c DtLines `->` @c ID::Line
-  /// - @c DtTriangles `->` @c ID::VertexColour
-  /// - @c DtVoxels `->` @c ID::Voxel
+  /// - @c DrawType::Points `->` @c ID::PointCloud
+  /// - @c DrawType::Lines `->` @c ID::Line
+  /// - @c DrawType::Triangles `->` @c ID::VertexColour
+  /// - @c DrawType::Voxels `->` @c ID::Voxel
   ///
   /// @param draw_type The 3escore mesh messages draw type.
   /// @return A shader for drawing the specified type or null if no shader is available for that

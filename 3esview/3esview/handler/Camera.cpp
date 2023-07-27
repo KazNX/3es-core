@@ -187,62 +187,62 @@ void Camera::getWorldAxes(tes::CoordinateFrame frame, Magnum::Vector3 *side, Mag
   Magnum::Vector3 ref_up;
   switch (frame)
   {
-  case XYZ:
+  case CoordinateFrame::XYZ:
     ref_side = { 1, 0, 0 };
     ref_dir = { 0, 1, 0 };
     ref_up = { 0, 0, 1 };
     break;
-  case XZYNeg:
+  case CoordinateFrame::XZYNeg:
     ref_side = { 1, 0, 0 };
     ref_dir = { 0, 0, 1 };
     ref_up = { 0, -1, 0 };
     break;
-  case YXZNeg:
+  case CoordinateFrame::YXZNeg:
     ref_side = { 0, 1, 0 };
     ref_dir = { 1, 0, 0 };
     ref_up = { 0, 0, -1 };
     break;
-  case YZX:
+  case CoordinateFrame::YZX:
     ref_side = { 0, 1, 0 };
     ref_dir = { 0, 0, 1 };
     ref_up = { 1, 0, 0 };
     break;
-  case ZXY:
+  case CoordinateFrame::ZXY:
     ref_side = { 0, 0, 1 };
     ref_dir = { 1, 0, 0 };
     ref_up = { 0, 1, 0 };
     break;
-  case ZYXNeg:
+  case CoordinateFrame::ZYXNeg:
     ref_side = { 0, 0, 1 };
     ref_dir = { 0, 1, 0 };
     ref_up = { -1, 0, 0 };
     break;
-  case XYZNeg:
+  case CoordinateFrame::XYZNeg:
     ref_side = { 1, 0, 0 };
     ref_dir = { 0, 1, 0 };
     ref_up = { 0, 0, -1 };
     break;
-  case XZY:
+  case CoordinateFrame::XZY:
     ref_side = { 1, 0, 0 };
     ref_dir = { 0, 0, 1 };
     ref_up = { 0, 1, 0 };
     break;
-  case YXZ:
+  case CoordinateFrame::YXZ:
     ref_side = { 0, 1, 0 };
     ref_dir = { 1, 0, 0 };
     ref_up = { 0, 0, 1 };
     break;
-  case YZXNeg:
+  case CoordinateFrame::YZXNeg:
     ref_side = { 0, 1, 0 };
     ref_dir = { 0, 0, 1 };
     ref_up = { -1, 0, 0 };
     break;
-  case ZXYNeg:
+  case CoordinateFrame::ZXYNeg:
     ref_side = { 0, 0, 1 };
     ref_dir = { 1, 0, 0 };
     ref_up = { 0, -1, 0 };
     break;
-  case ZYX:
+  case CoordinateFrame::ZYX:
     ref_side = { 0, 0, 1 };
     ref_dir = { 0, 1, 0 };
     ref_up = { -1, 0, 0 };

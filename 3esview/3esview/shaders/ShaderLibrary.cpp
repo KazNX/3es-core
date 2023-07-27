@@ -60,13 +60,13 @@ std::shared_ptr<Shader> ShaderLibrary::lookupForDrawType(DrawType draw_type) con
 {
   switch (draw_type)
   {
-  case DtPoints:
+  case DrawType::Points:
     return lookup(shaders::ShaderLibrary::ID::PointCloud);
-  case DtLines:
+  case DrawType::Lines:
     return lookup(shaders::ShaderLibrary::ID::Line);
-  case DtTriangles:
+  case DrawType::Triangles:
     return lookup(shaders::ShaderLibrary::ID::VertexColour);
-  case DtVoxels:
+  case DrawType::Voxels:
     return lookup(shaders::ShaderLibrary::ID::Voxel);
   default:
     log::error("Unsupported mesh draw type: ", int(draw_type));

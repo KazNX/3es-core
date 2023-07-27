@@ -8,8 +8,8 @@
 #include <3esview/painter/CategoryState.h>
 
 #include <3esview/camera/Camera.h>
-#include <3esview/util/Enum.h>
 
+#include <3escore/Enum.h>
 #include <3escore/Messages.h>
 
 #include <Magnum/Magnum.h>
@@ -103,7 +103,7 @@ public:
 
   /// Returns the unique ID for the message handler. This identifies the type of
   /// handled and in some cases, such as Renderers, the type of object handled.
-  /// ID ranges are described in the @c MessageTypeIDs enumeration.
+  /// ID ranges are described in the @c RoutingId enumeration.
   [[nodiscard]] uint16_t routingId() const { return _routing_id; }
 
   /// Read the current @c ModeFlag values.

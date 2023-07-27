@@ -13,17 +13,17 @@ namespace tes
 {
 /// Defines the set of feature flags.
 /// See @c checkFeature().
-enum Feature : unsigned
+enum class Feature
 {
   /// Is compression is available.
-  TFeatureCompression,
+  Compression,
 
   /// Notes the number of valid feature values.
-  /// While @c TFeatureLimit shows the maximum possible features we can track,
+  /// While @c Limit shows the maximum possible features we can track,
   /// This is the maximum we can actually express and ever need iterate for.
-  TFeatureEnd,
-  TFeatureLimit = 64,
-  TFeatureInvalid = TFeatureLimit
+  End,
+  Limit = 64,
+  Invalid = Limit
 };
 
 /// Convert a @c Feature to a feature flag.
@@ -37,7 +37,7 @@ uint64_t TES_CORE_API featureFlag(Feature feature);
 ///
 /// Only the first feature flag is noted when multiple bits are set.
 /// @param flag The feature flag of interest.
-/// @return The @c Feature associated with @p flag or @c TFeatureInvalid if no
+/// @return The @c Feature associated with @p flag or @c Feature::Invalid if no
 ///   valid feature bits are set.
 /// @see @c featureFlag()
 Feature TES_CORE_API featureForFlag(uint64_t flag);

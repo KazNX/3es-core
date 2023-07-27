@@ -209,8 +209,9 @@ void Capsule::endCapTransformModifier(Magnum::Matrix4 &transform, bool positive)
 
 Magnum::GL::Mesh Capsule::solidMeshCylinder()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtTriangles,
-                               SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
+  static SimpleMesh build_mesh(
+    0, 0, 0, DrawType::Triangles,
+    MeshComponentFlag::Vertex | MeshComponentFlag::Normal | MeshComponentFlag::Index);
   static std::mutex guard;
 
   std::unique_lock<std::mutex> lock(guard);
@@ -245,8 +246,9 @@ Magnum::GL::Mesh Capsule::wireframeMeshCylinder()
 
 Magnum::GL::Mesh Capsule::solidMeshCapTop()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtTriangles,
-                               SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
+  static SimpleMesh build_mesh(
+    0, 0, 0, DrawType::Triangles,
+    MeshComponentFlag::Vertex | MeshComponentFlag::Normal | MeshComponentFlag::Index);
   static std::mutex guard;
 
   std::unique_lock<std::mutex> lock(guard);
@@ -263,8 +265,9 @@ Magnum::GL::Mesh Capsule::solidMeshCapTop()
 
 Magnum::GL::Mesh Capsule::solidMeshCapBottom()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtTriangles,
-                               SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
+  static SimpleMesh build_mesh(
+    0, 0, 0, DrawType::Triangles,
+    MeshComponentFlag::Vertex | MeshComponentFlag::Normal | MeshComponentFlag::Index);
   static std::mutex guard;
 
   std::unique_lock<std::mutex> lock(guard);

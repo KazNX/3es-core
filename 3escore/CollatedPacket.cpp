@@ -76,16 +76,16 @@ CollatedPacket::CollatedPacket(unsigned buffer_size, unsigned max_packet_size)
 CollatedPacket::~CollatedPacket() = default;
 
 
-void CollatedPacket::setCompressionLevel(int level)
+void CollatedPacket::setCompressionLevel(CompressionLevel level)
 {
-  if (ClNone <= level && level < ClLevels)
+  if (CompressionLevel::None <= level && level < CompressionLevel::Levels)
   {
-    _compression_level = static_cast<uint16_t>(level);
+    _compression_level = level;
   }
 }
 
 
-int CollatedPacket::compressionLevel() const
+CompressionLevel CollatedPacket::compressionLevel() const
 {
   return _compression_level;
 }
@@ -174,7 +174,8 @@ bool CollatedPacket::finalise()
 
     // Z_BEST_COMPRESSION
     // params: stream,level, method, window bits, memLevel, strategy
-    const int gzip_compression_level = tes::kTesToGZipCompressionLevel.at(_compression_level);
+    const int gzip_compression_level =
+      tes::kTesToGZipCompressionLevel.at(static_cast<uint16_t>(_compression_level));
     deflateInit2(&_zip->stream, gzip_compression_level, Z_DEFLATED,
                  CollatedPacketZip::WindowBits | CollatedPacketZip::GZipEncoding, 8,
                  Z_DEFAULT_STRATEGY);
@@ -204,8 +205,10 @@ bool CollatedPacket::finalise()
       }
       else
       {
-        log::error("Compression failure. Collated ", collatedBytes(), " compressed to ",
-                   compressed_bytes);
+        // Failed to compress something to be smaller than the original size. That's not a hard
+        // failure; we'll send the uncompressed data.
+        log::warn("Compression failure. Collated ", collatedBytes(), " compressed to ",
+                  compressed_bytes);
       }
     }
   }

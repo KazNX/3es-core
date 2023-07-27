@@ -31,7 +31,7 @@ public:
 
   [[nodiscard]] Transform transform() const override;
   [[nodiscard]] uint32_t tint() const override;
-  [[nodiscard]] uint8_t drawType(int stream) const override;
+  [[nodiscard]] DrawType drawType(int stream) const override;
   using MeshResource::drawType;
   [[nodiscard]] float drawScale(int stream) const override;
   using MeshResource::drawScale;

@@ -25,7 +25,7 @@ struct VertexChange
     std::array<float, 2> uv;
     uint32_t colour;
   };
-  unsigned component_flag;
+  MeshComponentFlag component_flag;
   unsigned write_index;
 };
 
@@ -51,12 +51,12 @@ struct MutableMeshImp
   /// Is an update required?
   bool dirty = false;
 
-  MutableMeshImp(uint32_t id, DrawType draw_type, unsigned components)
+  MutableMeshImp(uint32_t id, DrawType draw_type, MeshComponentFlag components)
     : mesh(id, 0u, 0u, draw_type, components)
   {}
 };
 
-MutableMesh::MutableMesh(uint32_t id, DrawType draw_type, unsigned components)
+MutableMesh::MutableMesh(uint32_t id, DrawType draw_type, MeshComponentFlag components)
   : _imp(std::make_unique<MutableMeshImp>(id, draw_type, components))
 {}
 
@@ -113,7 +113,7 @@ unsigned MutableMesh::pendingIndexCount() const
 
 unsigned MutableMesh::setVertices(const UIntArg &at, const Vector3f *v, const UIntArg &count)
 {
-  if ((_imp->mesh.components() & SimpleMesh::Vertex) == 0)
+  if ((_imp->mesh.components() & MeshComponentFlag::Vertex) == MeshComponentFlag::Zero)
   {
     // Unsupported component.
     return 0;
@@ -125,7 +125,7 @@ unsigned MutableMesh::setVertices(const UIntArg &at, const Vector3f *v, const UI
   const unsigned vertex_count = pendingVertexCount();
 
   VertexChange delta = {};
-  delta.component_flag = SimpleMesh::Vertex;
+  delta.component_flag = MeshComponentFlag::Vertex;
   for (unsigned i = 0; i < count && target_index < vertex_count; ++i)
   {
     delta.write_index = target_index;
@@ -143,7 +143,7 @@ unsigned MutableMesh::setVertices(const UIntArg &at, const Vector3f *v, const UI
 
 unsigned MutableMesh::setIndices(const UIntArg &at, const uint32_t *idx, const UIntArg &count)
 {
-  if ((_imp->mesh.components() & SimpleMesh::Index) == 0)
+  if ((_imp->mesh.components() & MeshComponentFlag::Index) == MeshComponentFlag::Zero)
   {
     // Unsupported component.
     return 0;
@@ -170,7 +170,7 @@ unsigned MutableMesh::setIndices(const UIntArg &at, const uint32_t *idx, const U
 
 unsigned MutableMesh::setNormals(const UIntArg &at, const Vector3f *n, const UIntArg &count)
 {
-  if ((_imp->mesh.components() & SimpleMesh::Normal) == 0)
+  if ((_imp->mesh.components() & MeshComponentFlag::Normal) == MeshComponentFlag::Zero)
   {
     // Unsupported component.
     return 0;
@@ -182,7 +182,7 @@ unsigned MutableMesh::setNormals(const UIntArg &at, const Vector3f *n, const UIn
   const unsigned vertex_count = pendingVertexCount();
 
   VertexChange delta = {};
-  delta.component_flag = SimpleMesh::Normal;
+  delta.component_flag = MeshComponentFlag::Normal;
   for (unsigned i = 0; i < count && target_index < vertex_count; ++i)
   {
     delta.write_index = target_index;
@@ -200,7 +200,7 @@ unsigned MutableMesh::setNormals(const UIntArg &at, const Vector3f *n, const UIn
 
 unsigned MutableMesh::setColours(const UIntArg &at, const uint32_t *c, const UIntArg &count)
 {
-  if ((_imp->mesh.components() & SimpleMesh::Colour) == 0)
+  if ((_imp->mesh.components() & MeshComponentFlag::Colour) == MeshComponentFlag::Zero)
   {
     // Unsupported component.
     return 0;
@@ -212,7 +212,7 @@ unsigned MutableMesh::setColours(const UIntArg &at, const uint32_t *c, const UIn
   const unsigned vertex_count = pendingVertexCount();
 
   VertexChange delta = {};
-  delta.component_flag = SimpleMesh::Colour;
+  delta.component_flag = MeshComponentFlag::Colour;
   for (unsigned i = 0; i < count && target_index < vertex_count; ++i)
   {
     delta.write_index = target_index;
@@ -228,7 +228,7 @@ unsigned MutableMesh::setColours(const UIntArg &at, const uint32_t *c, const UIn
 
 unsigned MutableMesh::setUvs(const UIntArg &at, const float *uvs, const UIntArg &count)
 {
-  if ((_imp->mesh.components() & SimpleMesh::Uv) == 0)
+  if ((_imp->mesh.components() & MeshComponentFlag::Uv) == MeshComponentFlag::Zero)
   {
     // Unsupported component.
     return 0;
@@ -240,7 +240,7 @@ unsigned MutableMesh::setUvs(const UIntArg &at, const float *uvs, const UIntArg 
   const unsigned vertex_count = pendingVertexCount();
 
   VertexChange delta = {};
-  delta.component_flag = SimpleMesh::Uv;
+  delta.component_flag = MeshComponentFlag::Uv;
   for (unsigned i = 0; i < count && target_index < vertex_count; ++i)
   {
     delta.write_index = target_index;
@@ -288,7 +288,7 @@ void MutableMesh::update(Connection *con)
   msg.mesh_id = _imp->mesh.id();
   msg.vertex_count = new_vertex_count;
   msg.index_count = new_index_count;
-  msg.draw_type = _imp->mesh.drawType(0);
+  msg.draw_type = static_cast<uint8_t>(_imp->mesh.drawType(0));
 
   packet.reset(tes::MtMesh, tes::MeshRedefineMessage::MessageId);
   if (transform.preferDoublePrecision())
@@ -340,7 +340,7 @@ void MutableMesh::update(Connection *con)
     // Process new vertices.
     for (const auto &vertex_def : _imp->vertex_changes)
     {
-      if (vertex_def.component_flag & SimpleMesh::Vertex)
+      if ((vertex_def.component_flag & MeshComponentFlag::Vertex) != MeshComponentFlag::Zero)
       {
         packet.reset(tes::MtMesh, tes::MmtVertex);
         component_msg.write(packet);
@@ -350,7 +350,7 @@ void MutableMesh::update(Connection *con)
         con->send(packet);
       }
 
-      if (vertex_def.component_flag & SimpleMesh::Colour)
+      if ((vertex_def.component_flag & MeshComponentFlag::Colour) != MeshComponentFlag::Zero)
       {
         packet.reset(tes::MtMesh, tes::MmtVertexColour);
         component_msg.write(packet);
@@ -360,7 +360,7 @@ void MutableMesh::update(Connection *con)
         con->send(packet);
       }
 
-      if (vertex_def.component_flag & SimpleMesh::Normal)
+      if ((vertex_def.component_flag & MeshComponentFlag::Normal) != MeshComponentFlag::Zero)
       {
         packet.reset(tes::MtMesh, tes::MmtNormal);
         component_msg.write(packet);
@@ -370,7 +370,7 @@ void MutableMesh::update(Connection *con)
         con->send(packet);
       }
 
-      if (vertex_def.component_flag & SimpleMesh::Uv)
+      if ((vertex_def.component_flag & MeshComponentFlag::Uv) != MeshComponentFlag::Zero)
       {
         packet.reset(tes::MtMesh, tes::MmtUv);
         component_msg.write(packet);
@@ -429,22 +429,22 @@ void MutableMesh::migratePending()
 
   for (const auto &vertex_def : _imp->vertex_changes)
   {
-    if (vertex_def.component_flag & SimpleMesh::Vertex)
+    if ((vertex_def.component_flag & MeshComponentFlag::Vertex) != MeshComponentFlag::Zero)
     {
       _imp->mesh.setVertex(vertex_def.write_index, vertex_def.position);
     }
 
-    if (vertex_def.component_flag & SimpleMesh::Colour)
+    if ((vertex_def.component_flag & MeshComponentFlag::Colour) != MeshComponentFlag::Zero)
     {
       _imp->mesh.setColour(vertex_def.write_index, vertex_def.colour);
     }
 
-    if (vertex_def.component_flag & SimpleMesh::Normal)
+    if ((vertex_def.component_flag & MeshComponentFlag::Normal) != MeshComponentFlag::Zero)
     {
       _imp->mesh.setNormal(vertex_def.write_index, vertex_def.normal);
     }
 
-    if (vertex_def.component_flag & SimpleMesh::Uv)
+    if ((vertex_def.component_flag & MeshComponentFlag::Uv) != MeshComponentFlag::Zero)
     {
       _imp->mesh.setUv(vertex_def.write_index, vertex_def.uv[0], vertex_def.uv[1]);
     }

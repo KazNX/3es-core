@@ -261,7 +261,7 @@ private:
   std::shared_ptr<BoundsCuller> _culler;
   std::shared_ptr<shaders::ShaderLibrary> _shader_library;
 
-  std::unordered_map<ShapeHandlerIDs, std::shared_ptr<painter::ShapePainter>> _painters;
+  std::unordered_map<ShapeHandlerId, std::shared_ptr<painter::ShapePainter>> _painters;
   std::unordered_map<uint32_t, std::shared_ptr<handler::Message>> _message_handlers;
   /// Message handers arranged by update order..
   std::vector<std::shared_ptr<handler::Message>> _ordered_message_handlers;

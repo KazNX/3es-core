@@ -1,10 +1,10 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_UTIL_ENUM_H
-#define TES_VIEW_UTIL_ENUM_H
+#ifndef TES_CORE_UTIL_ENUM_H
+#define TES_CORE_UTIL_ENUM_H
 
-#include <3esview/ViewConfig.h>
+#include <3escore/CoreConfig.h>
 
 // NOLINTBEGIN(bugprone-macro-parentheses)
 
@@ -39,4 +39,4 @@
 // NOLINTEND(bugprone-macro-parentheses)
 
 
-#endif  // TES_VIEW_UTIL_ENUM_H
+#endif  // TES_CORE_UTIL_ENUM_H

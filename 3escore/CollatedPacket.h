@@ -102,11 +102,11 @@ public:
   /// Set the target compression level. Rejected if @p level is out of range of @c CompressionLevel.
   /// May be set even if compression is not enabled, but will have no effect.
   /// @param level The target level to set. See @c CompressionLevel.
-  void setCompressionLevel(int level);
+  void setCompressionLevel(CompressionLevel level);
 
   /// Get the target compression level.
   /// @return The current compression level @c CompressionLevel.
-  [[nodiscard]] int compressionLevel() const;
+  [[nodiscard]] CompressionLevel compressionLevel() const;
 
   /// Return the capacity of the collated packet.
   ///
@@ -263,12 +263,13 @@ private:
   /// Buffer used to finalise collation. Deflating may not be successful, so we can try and fail
   /// with this buffer.
   std::vector<uint8_t> _final_buffer;
-  unsigned _final_packet_cursor = 0;        ///< End of data in @c _final_buffer
-  unsigned _cursor = 0;                     ///< Current write position in @c _buffer.
-  unsigned _max_packet_size = 0;            ///< Maximum @p _buffer_size.
-  uint16_t _compression_level = ClDefault;  ///< @c CompressionLevel
-  bool _finalised = false;                  ///< Finalisation flag.
-  bool _active = true;                      ///< For @c Connection::active().
+  unsigned _final_packet_cursor = 0;  ///< End of data in @c _final_buffer
+  unsigned _cursor = 0;               ///< Current write position in @c _buffer.
+  unsigned _max_packet_size = 0;      ///< Maximum @p _buffer_size.
+  /// @c CompressionLevel
+  CompressionLevel _compression_level = CompressionLevel::Default;
+  bool _finalised = false;  ///< Finalisation flag.
+  bool _active = true;      ///< For @c Connection::active().
 };
 
 
