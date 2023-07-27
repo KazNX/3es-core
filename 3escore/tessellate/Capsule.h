@@ -16,7 +16,7 @@ namespace tes::capsule
 {
 /// Indices for the capsule parts in @c part_isolated_index_offsets argument of @c
 /// tes::capsule::solid() .
-enum class PartIndex : int
+enum class PartIndex
 {
   TopStart,     ///< Top hemisphere start indices.
   BottomStart,  ///< Bottom hemisphere start indices.

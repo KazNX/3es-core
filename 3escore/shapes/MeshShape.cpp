@@ -56,7 +56,7 @@ uint32_t MeshShape::Resource::tint() const
 }
 
 
-uint8_t MeshShape::Resource::drawType(int stream) const
+DrawType MeshShape::Resource::drawType(int stream) const
 {
   (void)stream;
   return _shape.drawType();
@@ -149,7 +149,7 @@ MeshShape::MeshShape(MeshShape &&other) noexcept
   , _indices(std::move(other._indices))
   , _quantisation_unit(std::exchange(other._quantisation_unit, 0.0))
   , _draw_scale(std::exchange(other._draw_scale, 0.0f))
-  , _draw_type(std::exchange(other._draw_type, DtPoints))
+  , _draw_type(std::exchange(other._draw_type, DrawType::Points))
 {}
 
 
@@ -176,7 +176,7 @@ MeshShape &MeshShape::operator=(MeshShape &&other) noexcept
   _indices = std::move(other._indices);
   _quantisation_unit = std::exchange(other._quantisation_unit, 0.0);
   _draw_scale = std::exchange(other._draw_scale, 0.0f);
-  _draw_type = std::exchange(other._draw_type, DtPoints);
+  _draw_type = std::exchange(other._draw_type, DrawType::Points);
   Shape::operator=(std::move(other));
   return *this;
 }
@@ -266,7 +266,7 @@ bool MeshShape::writeCreate(PacketWriter &packet) const
   count = _indices.count();
   ok = packet.writeElement(count) == sizeof(count) && ok;
   ok = packet.writeElement(_draw_scale) == sizeof(_draw_scale) && ok;
-  const uint8_t draw_type = _draw_type;
+  const uint8_t draw_type = static_cast<uint8_t>(_draw_type);
   ok = packet.writeElement(draw_type) == sizeof(draw_type) && ok;
   return ok;
 }

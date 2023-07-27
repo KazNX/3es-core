@@ -8,7 +8,7 @@ namespace tes
 {
 uint64_t featureFlag(Feature feature)
 {
-  return (1ull << feature);
+  return uint64_t(1ull) << static_cast<uint64_t>(feature);
 }
 
 
@@ -16,7 +16,7 @@ Feature featureForFlag(uint64_t flag)
 {
   // Simple solution for now.
   uint64_t bit = 1u;
-  for (unsigned i = 0; i < TFeatureEnd; ++i, bit = bit << 1u)
+  for (unsigned i = 0; i < static_cast<unsigned>(Feature::End); ++i, bit = bit << 1u)
   {
     if (flag & bit)
     {
@@ -24,7 +24,7 @@ Feature featureForFlag(uint64_t flag)
     }
   }
 
-  return TFeatureInvalid;
+  return Feature::Invalid;
 }
 
 bool checkFeature(Feature feature)
@@ -37,7 +37,7 @@ bool checkFeatureFlag(uint64_t feature_flag)
 {
   switch (feature_flag)
   {
-  case (1ull << TFeatureCompression):
+  case (1ull << static_cast<unsigned>(Feature::Compression)):
 #ifdef TES_ZLIB
     return true;
 #endif  // TES_ZLIB
@@ -54,7 +54,8 @@ bool checkFeatureFlag(uint64_t feature_flag)
 bool checkFeatures(uint64_t feature_flags)
 {
   uint64_t bit = 1u;
-  for (unsigned i = 0; i < TFeatureEnd && feature_flags != 0ull; ++i, bit = bit << 1u)
+  for (unsigned i = 0; i < static_cast<unsigned>(Feature::End) && feature_flags != 0ull;
+       ++i, bit = bit << 1u)
   {
     if (feature_flags & bit)
     {

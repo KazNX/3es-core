@@ -31,16 +31,16 @@ TcpConnectionMonitor::~TcpConnectionMonitor()
 }
 
 
-int TcpConnectionMonitor::lastErrorCode() const
+TcpConnectionError TcpConnectionMonitor::lastErrorCode() const
 {
-  return _error_code;
+  return static_cast<TcpConnectionError>(_error_code.load());
 }
 
 
-int TcpConnectionMonitor::clearErrorCode()
+TcpConnectionError TcpConnectionMonitor::clearErrorCode()
 {
-  const int last_error = _error_code;
-  _error_code = 0;
+  const TcpConnectionError last_error = static_cast<TcpConnectionError>(_error_code.load());
+  _error_code = static_cast<int>(TcpConnectionError::None);
   return last_error;
 }
 
@@ -73,7 +73,7 @@ bool TcpConnectionMonitor::start(ConnectionMode mode)
     }
     else
     {
-      _error_code = CEListenFailure;
+      _error_code = static_cast<int>(TcpConnectionError::ListenFailure);
       stopListening();
     }
     break;
@@ -100,7 +100,7 @@ bool TcpConnectionMonitor::start(ConnectionMode mode)
 
     if (!_running && !_error_code && elapsed_ms >= _server.settings().async_timeout_ms)
     {
-      _error_code = CETimeout;
+      _error_code = static_cast<int>(TcpConnectionError::Timeout);
     }
     break;
   }
@@ -340,7 +340,7 @@ void TcpConnectionMonitor::monitorThread()
 {
   if (!listen())
   {
-    _error_code = CEListenFailure;
+    _error_code = static_cast<int>(TcpConnectionError::ListenFailure);
     stopListening();
     return;
   }

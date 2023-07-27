@@ -50,7 +50,8 @@ void onSignal(int arg)
 
 std::shared_ptr<MeshShape> createPointsMesh(unsigned id, const std::vector<Vector3f> &vertices)
 {
-  auto shape = std::make_shared<MeshShape>(DtPoints, tes::Id(id), tes::DataBuffer(vertices));
+  auto shape =
+    std::make_shared<MeshShape>(DrawType::Points, tes::Id(id), tes::DataBuffer(vertices));
   return shape;
 }
 
@@ -71,8 +72,8 @@ std::shared_ptr<MeshShape> createLinesMesh(unsigned id, const std::vector<Vector
     lineIndices.push_back(indices[i + 0]);
   }
 
-  auto shape =
-    std::make_shared<MeshShape>(DtLines, Id(id), DataBuffer(vertices), DataBuffer(lineIndices));
+  auto shape = std::make_shared<MeshShape>(DrawType::Lines, Id(id), DataBuffer(vertices),
+                                           DataBuffer(lineIndices));
   return shape;
 }
 
@@ -80,8 +81,8 @@ std::shared_ptr<MeshShape> createLinesMesh(unsigned id, const std::vector<Vector
 std::shared_ptr<MeshShape> createTrianglesMesh(unsigned id, const std::vector<Vector3f> &vertices,
                                                const std::vector<unsigned> &indices)
 {
-  auto shape =
-    std::make_shared<MeshShape>(DtTriangles, Id(id), DataBuffer(vertices), DataBuffer(indices));
+  auto shape = std::make_shared<MeshShape>(DrawType::Triangles, Id(id), DataBuffer(vertices),
+                                           DataBuffer(indices));
   return shape;
 }
 
@@ -106,7 +107,7 @@ std::shared_ptr<MeshShape> createVoxelsMesh(unsigned id)
     }
   }
 
-  auto shape = std::make_shared<MeshShape>(DtVoxels, Id(id), DataBuffer(vertices));
+  auto shape = std::make_shared<MeshShape>(DrawType::Voxels, Id(id), DataBuffer(vertices));
   shape->setUniformNormal(Vector3f(voxelScale));
   return shape;
 }
@@ -137,7 +138,7 @@ std::shared_ptr<MeshSet> createMeshSet(unsigned id, const std::vector<Vector3f> 
   {
     std::shared_ptr<SimpleMesh> mesh = std::make_shared<SimpleMesh>(
       id * 100 + i, unsigned(vertices.size()), unsigned(indices.size()));
-    mesh->addComponents(SimpleMesh::Normal);
+    mesh->addComponents(MeshComponentFlag::Normal);
 
     mesh->setTransform(Matrix4f::translation(Vector3f(float(i) * 2.0f, float(i) * 2.0f, 0)));
 
@@ -163,13 +164,13 @@ std::string drawTypeString(DrawType type)
 {
   switch (type)
   {
-  case DtPoints:
+  case DrawType::Points:
     return "points";
-  case DtLines:
+  case DrawType::Lines:
     return "lines";
-  case DtTriangles:
+  case DrawType::Triangles:
     return "triangles";
-  case DtVoxels:
+  case DrawType::Voxels:
     return "voxels";
   default:
     break;
@@ -521,14 +522,14 @@ std::ostream &logShape(std::ostream &o, const T &shape, const char *suffix)
 }
 
 
-const char *coordinateFrameString(uint8_t frame)
+const char *coordinateFrameString(CoordinateFrame frame)
 {
-  const char *frames[] = { "xyz",  "xz-y", "yx-z", "yzx",  "zxy",  "zy-x",
-                           "xy-z", "xzy",  "yxz",  "yz-x", "zx-y", "zyx" };
+  const std::array<const char *, 12> frames = { "xyz",  "xz-y", "yx-z", "yzx",  "zxy",  "zy-x",
+                                                "xy-z", "xzy",  "yxz",  "yz-x", "zx-y", "zyx" };
 
-  if (frame < sizeof(frames) / sizeof(frames[0]))
+  if (static_cast<unsigned>(frame) < sizeof(frames) / sizeof(frames[0]))
   {
-    return frames[frame];
+    return frames[static_cast<unsigned>(frame)];
   }
 
   return "unknown";
@@ -564,7 +565,7 @@ void showUsage(int argc, char **argv)
   std::cout << argv[0] << " [options] [shapes]\n";
   std::cout << "\nValid options:\n";
   std::cout << "  help: show this message\n";
-  if (checkFeature(TFeatureCompression))
+  if (checkFeature(Feature::Compression))
   {
     std::cout << "  compress: write collated and compressed packets\n";
   }
@@ -586,7 +587,7 @@ int main(int argc, char **argvNonConst)
 
   ServerInfoMessage info;
   initDefaultServerInfo(&info);
-  info.coordinate_frame = XYZ;
+  info.coordinate_frame = CoordinateFrame::XYZ;
   unsigned serverFlags = SFDefaultNoCompression;
   if (haveOption("compress", argc, argv))
   {

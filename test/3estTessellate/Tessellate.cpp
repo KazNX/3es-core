@@ -92,13 +92,13 @@ std::shared_ptr<MeshSet> createMeshShape(unsigned shapeId, unsigned mesh_id,
                                          const std::vector<unsigned> &indices,
                                          const std::vector<Vector3f> *normals)
 {
-  unsigned components = SimpleMesh::Vertex | SimpleMesh::Index;
+  MeshComponentFlag components = MeshComponentFlag::Vertex | MeshComponentFlag::Index;
   if (normals)
   {
-    components |= SimpleMesh::Normal;
+    components |= MeshComponentFlag::Normal;
   }
-  auto resource =
-    std::make_shared<SimpleMesh>(mesh_id, vertices.size(), indices.size(), DtTriangles, components);
+  auto resource = std::make_shared<SimpleMesh>(mesh_id, vertices.size(), indices.size(),
+                                               DrawType::Triangles, components);
   resource->setVertices(0, vertices.data(), vertices.size());
   resource->setIndices(0, indices.data(), indices.size());
   if (normals)
@@ -212,7 +212,7 @@ void showUsage(int argc, char **argv)
   std::cout << argv[0] << " [options] [shapes]\n";
   std::cout << "\nValid options:\n";
   std::cout << "  help: show this message\n";
-  if (tes::checkFeature(tes::TFeatureCompression))
+  if (tes::checkFeature(tes::Feature::Compression))
   {
     std::cout << "  compress: write collated and compressed packets\n";
   }
@@ -244,7 +244,7 @@ int main(int argc, char **argvNonConst)
 
   ServerInfoMessage info;
   initDefaultServerInfo(&info);
-  info.coordinate_frame = XYZ;
+  info.coordinate_frame = CoordinateFrame::XYZ;
   unsigned serverFlags = SFDefaultNoCompression;
   if (haveOption("compress", argc, argv))
   {

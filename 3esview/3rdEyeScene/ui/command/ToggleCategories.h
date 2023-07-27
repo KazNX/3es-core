@@ -12,7 +12,7 @@ class IconBar;
 
 namespace tes::view::ui::command
 {
-class TES_VIEWER_API ToggleCategories : public ToggleView
+class ToggleCategories : public ToggleView
 {
 public:
   ToggleCategories(ui::IconBar &icon_bar);

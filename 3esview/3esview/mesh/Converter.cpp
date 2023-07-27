@@ -318,16 +318,16 @@ Magnum::GL::Mesh convert(const tes::MeshResource &mesh_resource, tes::Bounds<Mag
 
   switch (mesh_resource.drawType())
   {
-  case DtPoints:
+  case DrawType::Points:
     primitive = Magnum::MeshPrimitive::Points;
     break;
-  case DtLines:
+  case DrawType::Lines:
     primitive = Magnum::MeshPrimitive::Lines;
     break;
-  case DtTriangles:
+  case DrawType::Triangles:
     primitive = Magnum::MeshPrimitive::Triangles;
     break;
-  case DtVoxels:
+  case DrawType::Voxels:
     // Requires the right geometry shader to work with this primitive type.
     primitive = Magnum::MeshPrimitive::Points;
     break;

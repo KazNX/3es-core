@@ -25,7 +25,7 @@ class Command;
 
 namespace tes::view::ui
 {
-class TES_VIEWER_API IconBar : public Panel
+class IconBar : public Panel
 {
 public:
   constexpr static int kButtonSize = 24;

@@ -24,8 +24,9 @@ void Cylinder::calculateBounds(const Magnum::Matrix4 &transform, Bounds &bounds)
 
 Magnum::GL::Mesh Cylinder::solidMesh()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtTriangles,
-                               SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
+  static SimpleMesh build_mesh(
+    0, 0, 0, DrawType::Triangles,
+    MeshComponentFlag::Vertex | MeshComponentFlag::Normal | MeshComponentFlag::Index);
   static std::mutex guard;
 
   const std::scoped_lock lock(guard);
@@ -57,7 +58,8 @@ Magnum::GL::Mesh Cylinder::solidMesh()
 
 Magnum::GL::Mesh Cylinder::wireframeMesh()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtLines, SimpleMesh::Vertex | SimpleMesh::Index);
+  static SimpleMesh build_mesh(0, 0, 0, DrawType::Lines,
+                               MeshComponentFlag::Vertex | MeshComponentFlag::Index);
   static std::mutex guard;
 
   const std::scoped_lock lock(guard);

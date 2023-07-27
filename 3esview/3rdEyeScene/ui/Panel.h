@@ -8,7 +8,7 @@
 
 #include "ImGui.h"
 
-#include <3esview/util/Enum.h>
+#include <3escore/Enum.h>
 
 #include <Magnum/GL/Texture.h>
 
@@ -18,7 +18,7 @@
 namespace tes::view::command
 {
 class Command;
-}
+}  // namespace tes::view::command
 
 namespace Magnum::ImGuiIntegration
 {
@@ -33,7 +33,7 @@ class Viewer;
 namespace tes::view::ui
 {
 /// Base class for a UI panel - anything which draws using the immediate mode UI.
-class TES_VIEWER_API Panel
+class Panel
 {
 public:
   enum class Anchor : unsigned
@@ -306,8 +306,8 @@ protected:
   Viewer &_viewer;
   PreferredCoordinates _preferred_coordinates = {};
 };
-}  // namespace tes::view::ui
 
-TES_ENUM_FLAGS(tes::view::ui::Panel::Stretch, unsigned);
+TES_ENUM_FLAGS(Panel::Stretch, unsigned);
+}  // namespace tes::view::ui
 
 #endif  // TRD_EYE_SCENE_UI_PANEL_H

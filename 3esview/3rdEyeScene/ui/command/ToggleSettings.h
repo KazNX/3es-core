@@ -7,7 +7,7 @@
 
 namespace tes::view::ui::command
 {
-class TES_VIEWER_API ToggleSettings : public ToggleView
+class ToggleSettings : public ToggleView
 {
 public:
   ToggleSettings(ui::IconBar &icon_bar);

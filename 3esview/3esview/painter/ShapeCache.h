@@ -4,9 +4,9 @@
 #include <3esview/ViewConfig.h>
 
 #include <3esview/BoundsCuller.h>
-#include <3esview/util/Enum.h>
 #include <3esview/util/ResourceList.h>
 
+#include <3escore/Enum.h>
 #include <3escore/shapes/Id.h>
 
 #include <Magnum/GL/Mesh.h>

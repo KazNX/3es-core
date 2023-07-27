@@ -107,7 +107,7 @@ void showUsage(int argc, char **argv)
   std::cout << argv[0] << " [options]\n";
   std::cout << "\nValid options:\n";
   std::cout << "  help: show this message\n";
-  if (tes::checkFeature(tes::TFeatureCompression))
+  if (tes::checkFeature(tes::Feature::Compression))
   {
     std::cout << "  compress: write collated and compressed packets\n";
   }
@@ -201,7 +201,7 @@ int main(int argc, char **argvNonConst)
 
   ServerInfoMessage info;
   initDefaultServerInfo(&info);
-  info.coordinate_frame = XYZ;
+  info.coordinate_frame = CoordinateFrame::XYZ;
   unsigned serverFlags = SFDefaultNoCompression;
   if (haveOption("compress", argc, argv))
   {
@@ -226,7 +226,8 @@ int main(int argc, char **argvNonConst)
     const auto sendStart = TimingClock::now();
 
     // Send triangle data in chunks.
-    MeshShape shape(DtTriangles, tes::Id(), tes::DataBuffer(triangles));  // Transient triangles.
+    MeshShape shape(DrawType::Triangles, tes::Id(),
+                    tes::DataBuffer(triangles));  // Transient triangles.
     server->create(shape);
 
     server->updateFrame(0.0f);

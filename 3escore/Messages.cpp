@@ -13,6 +13,6 @@ void initDefaultServerInfo(ServerInfoMessage *info)
   memset(info, 0, sizeof(*info));
   info->time_unit = 1000ull;
   info->default_frame_time = default_frame_step_ms;
-  info->coordinate_frame = 0;
+  info->coordinate_frame = CoordinateFrame::XYZ;
 }
 }  // namespace tes

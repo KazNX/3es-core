@@ -41,7 +41,7 @@ public:
   uint32_t id() const final;
   tes::Transform transform() const final;
   uint32_t tint() const final;
-  uint8_t drawType(int stream) const final;
+  uint8_t DrawType(int stream) const final;
   using tes::MeshResource::drawType;
   float drawScale(int stream) const final;
   using tes::MeshResource::drawScale;

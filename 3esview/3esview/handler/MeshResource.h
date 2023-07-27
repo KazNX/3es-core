@@ -136,7 +136,7 @@ private:
   ///
   /// Does nothing if @p mesh already has normals, unless @c force is given.
   ///
-  /// Can only be calculated for @c DtTriangles draw type.
+  /// Can only be calculated for @c DrawType::Triangles draw type.
   ///
   /// @param mesh The mesh to calculate normals for.
   static void calculateNormals(SimpleMesh &mesh, bool force);
@@ -178,8 +178,8 @@ private:
   std::shared_ptr<shaders::ShaderLibrary> _shader_library;
 };
 
-
 TES_ENUM_FLAGS(MeshResource::DrawFlag, unsigned);
+TES_ENUM_FLAGS(MeshResource::ResourceFlag, unsigned);
 
 inline MeshResource::ResourceReference MeshResource::get(uint32_t id) const
 {

@@ -242,7 +242,7 @@ void testShape(const T &shape, ServerInfoMessage *infoOut = nullptr,
   // Initialise server.
   ServerInfoMessage info;
   initDefaultServerInfo(&info);
-  info.coordinate_frame = XYZ;
+  info.coordinate_frame = CoordinateFrame::XYZ;
 
   unsigned serverFlags = SFDefault | SFCollateAndCompress;
   ServerSettings serverSettings(serverFlags);
@@ -406,15 +406,15 @@ TEST(Shapes, MeshSet)
 
   // Vertices and indices only.
   mesh = std::make_shared<SimpleMesh>(nextMeshId++, unsigned(vertices.size()),
-                                      unsigned(indices.size()), DtTriangles);
+                                      unsigned(indices.size()), DrawType::Triangles);
   mesh->setVertices(0, vertices.data(), unsigned(vertices.size()));
   mesh->setIndices(0, indices.data(), unsigned(indices.size()));
   meshes.push_back(mesh);
 
   // Vertices, indices and colours
-  mesh = std::make_shared<SimpleMesh>(nextMeshId++, unsigned(vertices.size()),
-                                      unsigned(indices.size()), DtTriangles,
-                                      SimpleMesh::Vertex | SimpleMesh::Index | SimpleMesh::Colour);
+  mesh = std::make_shared<SimpleMesh>(
+    nextMeshId++, unsigned(vertices.size()), unsigned(indices.size()), DrawType::Triangles,
+    MeshComponentFlag::Vertex | MeshComponentFlag::Index | MeshComponentFlag::Colour);
   mesh->setVertices(0, vertices.data(), unsigned(vertices.size()));
   mesh->setNormals(0, normals.data(), unsigned(normals.size()));
   mesh->setColours(0, colours.data(), unsigned(colours.size()));
@@ -422,24 +422,25 @@ TEST(Shapes, MeshSet)
   meshes.push_back(mesh);
 
   // Points and colours only (essentially a point cloud)
-  mesh =
-    std::make_shared<SimpleMesh>(nextMeshId++, unsigned(vertices.size()), unsigned(indices.size()),
-                                 DtPoints, SimpleMesh::Vertex | SimpleMesh::Colour);
+  mesh = std::make_shared<SimpleMesh>(nextMeshId++, unsigned(vertices.size()),
+                                      unsigned(indices.size()), DrawType::Points,
+                                      MeshComponentFlag::Vertex | MeshComponentFlag::Colour);
   mesh->setVertices(0, vertices.data(), unsigned(vertices.size()));
   mesh->setColours(0, colours.data(), unsigned(colours.size()));
   meshes.push_back(mesh);
 
   // Lines.
   mesh = std::make_shared<SimpleMesh>(nextMeshId++, unsigned(vertices.size()),
-                                      unsigned(wireIndices.size()), DtLines);
+                                      unsigned(wireIndices.size()), DrawType::Lines);
   mesh->setVertices(0, vertices.data(), unsigned(vertices.size()));
   mesh->setIndices(0, wireIndices.data(), unsigned(wireIndices.size()));
   meshes.push_back(mesh);
 
   // One with the lot.
-  mesh = std::make_shared<SimpleMesh>(
-    nextMeshId++, unsigned(vertices.size()), unsigned(indices.size()), DtTriangles,
-    SimpleMesh::Vertex | SimpleMesh::Index | SimpleMesh::Normal | SimpleMesh::Colour);
+  mesh = std::make_shared<SimpleMesh>(nextMeshId++, unsigned(vertices.size()),
+                                      unsigned(indices.size()), DrawType::Triangles,
+                                      MeshComponentFlag::Vertex | MeshComponentFlag::Index |
+                                        MeshComponentFlag::Normal | MeshComponentFlag::Colour);
   mesh->setVertices(0, vertices.data(), unsigned(vertices.size()));
   mesh->setNormals(0, normals.data(), unsigned(normals.size()));
   mesh->setColours(0, colours.data(), unsigned(colours.size()));
@@ -486,49 +487,49 @@ TEST(Shapes, Mesh)
 
   // I> Test each constructor.
   // 1. drawType, verts, vcount, vstrideBytes, pos, rot, scale
-  testShape(MeshShape(DtPoints, Id(), DataBuffer(vertices),
+  testShape(MeshShape(DrawType::Points, Id(), DataBuffer(vertices),
                       Transform(Vector3f(1.2f, 2.3f, 3.4f),
                                 Quaternionf().setAxisAngle(Vector3f(1, 1, 1), degToRad(18.0f)),
                                 Vector3f(1.0f, 1.2f, 0.8f))));
   // 2. drawType, verts, vcount, vstrideBytes, indices, icount, pos, rot, scale
-  testShape(MeshShape(DtTriangles, Id(), DataBuffer(vertices), DataBuffer(indices),
+  testShape(MeshShape(DrawType::Triangles, Id(), DataBuffer(vertices), DataBuffer(indices),
                       Transform(Vector3f(1.2f, 2.3f, 3.4f),
                                 Quaternionf().setAxisAngle(Vector3f(1, 1, 1), degToRad(18.0f)),
                                 Vector3f(1.0f, 1.2f, 0.8f))));
   // 3. drawType, verts, vcount, vstrideBytes, id, pos, rot, scale
-  testShape(MeshShape(DtPoints, Id(42u), DataBuffer(vertices),
+  testShape(MeshShape(DrawType::Points, Id(42u), DataBuffer(vertices),
                       Transform(Vector3f(1.2f, 2.3f, 3.4f),
                                 Quaternionf().setAxisAngle(Vector3f(1, 1, 1), degToRad(18.0f)),
                                 Vector3f(1.0f, 1.2f, 0.8f))));
   // 4. drawType, verts, vcount, vstrideBytes, indices, icount, id, pos, rot,
   // scale
-  testShape(MeshShape(DtTriangles, Id(42u), DataBuffer(vertices), DataBuffer(indices),
+  testShape(MeshShape(DrawType::Triangles, Id(42u), DataBuffer(vertices), DataBuffer(indices),
                       Transform(Vector3f(1.2f, 2.3f, 3.4f),
                                 Quaternionf().setAxisAngle(Vector3f(1, 1, 1), degToRad(18.0f)),
                                 Vector3f(1.0f, 1.2f, 0.8f))));
   // 5. drawType, verts, vcount, vstrideBytes, indices, icount, id, cat, pos,
   // rot, scale
-  testShape(MeshShape(DtTriangles, Id(42u), DataBuffer(vertices), DataBuffer(indices),
+  testShape(MeshShape(DrawType::Triangles, Id(42u), DataBuffer(vertices), DataBuffer(indices),
                       Transform(Vector3f(1.2f, 2.3f, 3.4f),
                                 Quaternionf().setAxisAngle(Vector3f(1, 1, 1), degToRad(18.0f)),
                                 Vector3f(1.0f, 1.2f, 0.8f))));
 
   // II> Test with uniform normal.
-  testShape(MeshShape(DtVoxels, Id(42u), DataBuffer(vertices), DataBuffer(indices),
+  testShape(MeshShape(DrawType::Voxels, Id(42u), DataBuffer(vertices), DataBuffer(indices),
                       Transform(Vector3f(1.2f, 2.3f, 3.4f),
                                 Quaternionf().setAxisAngle(Vector3f(1, 1, 1), degToRad(18.0f)),
                                 Vector3f(1.0f, 1.2f, 0.8f)))
               .setUniformNormal(Vector3f(0.1f, 0.1f, 0.1f)));
 
   // III> Test will many normals.
-  testShape(MeshShape(DtTriangles, Id(42u, 1), DataBuffer(vertices), DataBuffer(indices),
+  testShape(MeshShape(DrawType::Triangles, Id(42u, 1), DataBuffer(vertices), DataBuffer(indices),
                       Transform(Vector3f(1.2f, 2.3f, 3.4f),
                                 Quaternionf().setAxisAngle(Vector3f(1, 1, 1), degToRad(18.0f)),
                                 Vector3f(1.0f, 1.2f, 0.8f)))
               .setNormals(DataBuffer(normals)));
 
   // IV> Test with colours.
-  testShape(MeshShape(DtTriangles, Id(), DataBuffer(vertices), DataBuffer(indices),
+  testShape(MeshShape(DrawType::Triangles, Id(), DataBuffer(vertices), DataBuffer(indices),
                       Transform(Vector3f(1.2f, 2.3f, 3.4f),
                                 Quaternionf().setAxisAngle(Vector3f(1, 1, 1), degToRad(18.0f)),
                                 Vector3f(1.0f, 1.2f, 0.8f)))

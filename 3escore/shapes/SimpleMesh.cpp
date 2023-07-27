@@ -26,11 +26,11 @@ struct SimpleMeshImp
   Transform transform = Transform::identity(false);
   uint32_t id = 0;
   uint32_t tint = 0xffffffffu;
-  unsigned components = 0;
-  DrawType draw_type = DtTriangles;
+  MeshComponentFlag components = MeshComponentFlag::Zero;
+  DrawType draw_type = DrawType::Triangles;
   float draw_scale = 0;
 
-  inline SimpleMeshImp(unsigned components)
+  inline SimpleMeshImp(MeshComponentFlag components)
     : components(components)
   {}
 
@@ -52,14 +52,14 @@ struct SimpleMeshImp
     return copy;
   }
 
-  inline void clear(unsigned component_flags)
+  inline void clear(MeshComponentFlag component_flags)
   {
     clearArrays();
     transform = Transform::identity(false);
     id = 0;
     tint = 0xffffffffu;
     components = component_flags;
-    draw_type = DtTriangles;
+    draw_type = DrawType::Triangles;
     draw_scale = 0;
   }
 
@@ -76,7 +76,7 @@ struct SimpleMeshImp
 
 
 SimpleMesh::SimpleMesh(uint32_t id, size_t vertex_count, size_t index_count, DrawType draw_type,
-                       unsigned components)
+                       MeshComponentFlag components)
   : _imp(std::make_shared<SimpleMeshImp>(components))
 {
   _imp->id = id;
@@ -89,7 +89,7 @@ SimpleMesh::SimpleMesh(uint32_t id, size_t vertex_count, size_t index_count, Dra
     setVertexCount(vertex_count);
   }
 
-  if (index_count && (components & Index))
+  if (index_count && (components & MeshComponentFlag::Index) != MeshComponentFlag::Zero)
   {
     setIndexCount(index_count);
   }
@@ -113,11 +113,11 @@ void SimpleMesh::clear()
   const std::scoped_lock guard(_imp->lock);
   if (_imp.use_count() == 1)
   {
-    _imp->clear(Vertex | Index);
+    _imp->clear(MeshComponentFlag::Vertex | MeshComponentFlag::Index);
   }
   else
   {
-    _imp = std::make_shared<SimpleMeshImp>(Vertex | Index);
+    _imp = std::make_shared<SimpleMeshImp>(MeshComponentFlag::Vertex | MeshComponentFlag::Index);
   }
 }
 
@@ -134,7 +134,7 @@ void SimpleMesh::clearData()
   else
   {
     auto old = _imp;
-    _imp = std::make_shared<SimpleMeshImp>(Vertex | Index);
+    _imp = std::make_shared<SimpleMeshImp>(MeshComponentFlag::Vertex | MeshComponentFlag::Index);
     _imp->transform = old->transform;
     _imp->id = old->id;
     _imp->tint = old->tint;
@@ -182,13 +182,7 @@ std::shared_ptr<Resource> SimpleMesh::clone() const
 }
 
 
-uint8_t SimpleMesh::drawType(int /*stream*/) const
-{
-  return _imp->draw_type;
-}
-
-
-DrawType SimpleMesh::getDrawType() const
+DrawType SimpleMesh::drawType(int /*stream*/) const
 {
   return _imp->draw_type;
 }
@@ -214,45 +208,48 @@ void SimpleMesh::setDrawScale(float scale)
 }
 
 
-unsigned SimpleMesh::components() const
+MeshComponentFlag SimpleMesh::components() const
 {
   return _imp->components;
 }
 
 
-void SimpleMesh::setComponents(unsigned components)
+void SimpleMesh::setComponents(MeshComponentFlag components)
 {
   copyOnWrite();
-  _imp->components = components | Vertex;
+  _imp->components = components | MeshComponentFlag::Vertex;
   // Fix up discrepencies.
-  if (!(_imp->components & Index) && !_imp->indices.empty())
+  if ((_imp->components & MeshComponentFlag::Index) == MeshComponentFlag::Zero &&
+      !_imp->indices.empty())
   {
     _imp->indices.clear();
   }
 
-  if ((_imp->components & Colour) && _imp->colours.empty())
+  if ((_imp->components & MeshComponentFlag::Colour) != MeshComponentFlag::Zero &&
+      _imp->colours.empty())
   {
     _imp->colours.resize(_imp->vertices.size());
   }
-  else if (!(_imp->components & Colour) && !_imp->colours.empty())
+  else
   {
     _imp->colours.clear();
   }
 
-  if ((_imp->components & Normal) && _imp->normals.empty())
+  if ((_imp->components & MeshComponentFlag::Normal) != MeshComponentFlag::Zero &&
+      _imp->normals.empty())
   {
     _imp->normals.resize(_imp->vertices.size());
   }
-  else if (!(_imp->components & Normal) && !_imp->normals.empty())
+  else
   {
     _imp->normals.clear();
   }
 
-  if ((_imp->components & Uv) && _imp->uvs.empty())
+  if ((_imp->components & MeshComponentFlag::Uv) != MeshComponentFlag::Zero && _imp->uvs.empty())
   {
     _imp->uvs.resize(_imp->vertices.size());
   }
-  else if (!(_imp->components & Uv) && !_imp->uvs.empty())
+  else
   {
     _imp->uvs.clear();
   }
@@ -273,17 +270,17 @@ void SimpleMesh::setVertexCount(size_t count)
 {
   copyOnWrite();
   _imp->vertices.resize(count);
-  if ((_imp->components & Colour))
+  if ((_imp->components & MeshComponentFlag::Colour) != MeshComponentFlag::Zero)
   {
     _imp->colours.resize(_imp->vertices.size());
   }
 
-  if ((_imp->components & Normal))
+  if ((_imp->components & MeshComponentFlag::Normal) != MeshComponentFlag::Zero)
   {
     _imp->normals.resize(_imp->vertices.size());
   }
 
-  if ((_imp->components & Uv))
+  if ((_imp->components & MeshComponentFlag::Uv) != MeshComponentFlag::Zero)
   {
     _imp->uvs.resize(_imp->vertices.size());
   }
@@ -341,7 +338,8 @@ DataBuffer SimpleMesh::vertices(int stream) const
 
 unsigned SimpleMesh::indexCount(int stream) const
 {
-  if (!stream && (_imp->components & Index) && !_imp->indices.empty())
+  if (!stream && (_imp->components & MeshComponentFlag::Index) != MeshComponentFlag::Zero &&
+      !_imp->indices.empty())
   {
     return int_cast<unsigned>(_imp->indices.size());
   }
@@ -355,7 +353,7 @@ void SimpleMesh::setIndexCount(size_t count)
   _imp->indices.resize(count);
   if (count)
   {
-    _imp->components |= Index;
+    _imp->components |= MeshComponentFlag::Index;
   }
 }
 
@@ -399,7 +397,8 @@ const uint32_t *SimpleMesh::rawIndices() const
 
 DataBuffer SimpleMesh::indices(int stream) const
 {
-  if (stream == 0 && (_imp->components & Index) && !_imp->indices.empty())
+  if (stream == 0 && (_imp->components & MeshComponentFlag::Index) != MeshComponentFlag::Zero &&
+      !_imp->indices.empty())
   {
     return { _imp->indices };
   }
@@ -411,10 +410,11 @@ unsigned SimpleMesh::setNormals(size_t at, const Vector3f *n, size_t count)
 {
   copyOnWrite();
   unsigned set = 0;
-  if (!(_imp->components & Normal) && !_imp->vertices.empty())
+  if ((_imp->components & MeshComponentFlag::Normal) == MeshComponentFlag::Zero &&
+      !_imp->vertices.empty())
   {
     _imp->normals.resize(_imp->vertices.size());
-    _imp->components |= Normal;
+    _imp->components |= MeshComponentFlag::Normal;
   }
   for (size_t i = at; i < at + count && i < _imp->normals.size(); ++i)
   {
@@ -432,7 +432,8 @@ const Vector3f *SimpleMesh::rawNormals() const
 
 DataBuffer SimpleMesh::normals(int stream) const
 {
-  if (stream == 0 && (_imp->components & Normal) && !_imp->normals.empty())
+  if (stream == 0 && (_imp->components & MeshComponentFlag::Normal) != MeshComponentFlag::Zero &&
+      !_imp->normals.empty())
   {
     return { _imp->normals };
   }
@@ -444,10 +445,11 @@ unsigned SimpleMesh::setColours(size_t at, const uint32_t *c, size_t count)
 {
   copyOnWrite();
   unsigned set = 0;
-  if (!(_imp->components & Colour) && !_imp->vertices.empty())
+  if ((_imp->components & MeshComponentFlag::Colour) == MeshComponentFlag::Zero &&
+      !_imp->vertices.empty())
   {
     _imp->colours.resize(_imp->vertices.size());
-    _imp->components |= Colour;
+    _imp->components |= MeshComponentFlag::Colour;
   }
 
   for (size_t i = at; i < at + count && i < _imp->colours.size(); ++i)
@@ -467,7 +469,8 @@ const uint32_t *SimpleMesh::rawColours() const
 
 DataBuffer SimpleMesh::colours(int stream) const
 {
-  if (stream == 0 && (_imp->components & Colour) && !_imp->colours.empty())
+  if (stream == 0 && (_imp->components & MeshComponentFlag::Colour) != MeshComponentFlag::Zero &&
+      !_imp->colours.empty())
   {
     return { _imp->colours };
   }
@@ -479,10 +482,11 @@ unsigned SimpleMesh::setUvs(size_t at, const float *uvs, size_t count)
 {
   copyOnWrite();
   unsigned set = 0;
-  if (!(_imp->components & Uv) && !_imp->vertices.empty())
+  if ((_imp->components & MeshComponentFlag::Uv) == MeshComponentFlag::Zero &&
+      !_imp->vertices.empty())
   {
     _imp->uvs.resize(_imp->vertices.size());
-    _imp->components |= Uv;
+    _imp->components |= MeshComponentFlag::Uv;
   }
   for (size_t i = at; i < at + count && i < _imp->uvs.size(); ++i)
   {
@@ -506,7 +510,8 @@ const float *SimpleMesh::rawUvs() const
 
 DataBuffer SimpleMesh::uvs(int stream) const
 {
-  if (stream == 0 && (_imp->components & Uv) && !_imp->uvs.empty())
+  if (stream == 0 && (_imp->components & MeshComponentFlag::Uv) != MeshComponentFlag::Zero &&
+      !_imp->uvs.empty())
   {
     return { &_imp->uvs.data()->u, _imp->uvs.size(), 2 };
   }
@@ -583,10 +588,10 @@ bool SimpleMesh::processColours(const MeshComponentMessage &msg, unsigned offset
   if (stream.type() == DctUInt8 && stream.componentCount() == 4)
   {
     copyOnWrite();
-    if (!(_imp->components & Colour) && vertexCount())
+    if ((_imp->components & MeshComponentFlag::Colour) == MeshComponentFlag::Zero && vertexCount())
     {
       _imp->colours.resize(vertexCount());
-      _imp->components |= Colour;
+      _imp->components |= MeshComponentFlag::Colour;
     }
 
     std::array<uint8_t, 4> rgba = {};
@@ -612,10 +617,10 @@ bool SimpleMesh::processNormals(const MeshComponentMessage &msg, unsigned offset
 {
   TES_UNUSED(msg);
   copyOnWrite();
-  if (!(_imp->components & Normal) && vertexCount())
+  if ((_imp->components & MeshComponentFlag::Normal) == MeshComponentFlag::Zero && vertexCount())
   {
     _imp->normals.resize(vertexCount());
-    _imp->components |= Normal;
+    _imp->components |= MeshComponentFlag::Normal;
   }
   for (unsigned i = 0; i < stream.count() && i + offset < vertexCount(); ++i)
   {
@@ -633,10 +638,10 @@ bool SimpleMesh::processUVs(const MeshComponentMessage &msg, unsigned offset,
 {
   TES_UNUSED(msg);
   copyOnWrite();
-  if (!(_imp->components & Normal) && vertexCount())
+  if ((_imp->components & MeshComponentFlag::Normal) == MeshComponentFlag::Zero && vertexCount())
   {
     _imp->uvs.resize(vertexCount());
-    _imp->components |= Normal;
+    _imp->components |= MeshComponentFlag::Normal;
   }
   for (unsigned i = 0; i < stream.count() && i + offset < vertexCount(); ++i)
   {

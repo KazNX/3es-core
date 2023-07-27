@@ -9,17 +9,17 @@
 namespace tes
 {
 /// Target compression levels.
-enum CompressionLevel
+enum class CompressionLevel : uint16_t
 {
-  ClNone,
-  ClLow,
-  ClMedium,
-  ClHigh,
-  ClVeryHigh,
+  None,
+  Low,
+  Medium,
+  High,
+  VeryHigh,
 
-  ClLevels,
+  Levels,
 
-  ClDefault = ClMedium
+  Default = Medium
 };
 }  // namespace tes
 

@@ -52,7 +52,7 @@ PacketWriter::PacketWriter(uint8_t *buffer, size_t buffer_size, uint16_t routing
   }
   else
   {
-    _status |= Fail;
+    _status |= PacketStatus::Fail;
   }
 }
 
@@ -70,7 +70,7 @@ PacketWriter::PacketWriter(PacketWriter &&other) noexcept
   : PacketStream<PacketHeader>(nullptr)
 {
   _packet = std::exchange(other._packet, nullptr);
-  _status = std::exchange(other._status, Ok);
+  _status = std::exchange(other._status, PacketStatus::Zero);
   _payload_position = std::exchange(other._payload_position, 0);
   _buffer_size = std::exchange(other._buffer_size, 0);
 }
@@ -104,7 +104,7 @@ void PacketWriter::swap(PacketWriter &other) noexcept
 
 void PacketWriter::reset(uint16_t routing_id, uint16_t message_id)
 {
-  _status = Ok;
+  _status = PacketStatus::Zero;
   if (_buffer_size >= sizeof(PacketHeader))
   {
     _packet->routing_id = networkEndianSwapValue(routing_id);
@@ -117,7 +117,7 @@ void PacketWriter::reset(uint16_t routing_id, uint16_t message_id)
   }
   else
   {
-    _status |= Fail;
+    _status |= PacketStatus::Fail;
   }
 }
 
@@ -165,7 +165,7 @@ PacketWriter::CrcType PacketWriter::calculateCrc()
   if (packet().flags & PFNoCrc)
   {
     // No CRC requested.
-    _status |= CrcValid;
+    _status |= PacketStatus::CrcValid;
     return 0;
   }
 
@@ -176,14 +176,14 @@ PacketWriter::CrcType PacketWriter::calculateCrc()
   if (crc_offset > _buffer_size - sizeof(CrcType))
   {
     // CRC overruns the buffer. Cannot calculate.
-    _status |= Fail;
+    _status |= PacketStatus::Fail;
     return 0;
   }
 
   const CrcType crc_val =
     crc16(reinterpret_cast<const uint8_t *>(_packet), sizeof(PacketHeader) + payloadSize());
   *crc_pos = networkEndianSwapValue(crc_val);
-  _status |= CrcValid;
+  _status |= PacketStatus::CrcValid;
   return *crc_pos;
 }
 

@@ -27,7 +27,7 @@ class Command;
 
 namespace tes::view::ui
 {
-class TES_VIEWER_API SettingsView : public TreeView
+class SettingsView : public TreeView
 {
 public:
   SettingsView(Viewer &viewer);

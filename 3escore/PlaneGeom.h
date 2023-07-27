@@ -13,11 +13,11 @@
 namespace tes::planegeom
 {
 /// Point classification results.
-enum PlaneClassification
+enum class PlaneClassification
 {
-  PCBehind = -1,  ///< Behind the plane.
-  PCOn = 0,       ///< On or part of the plane.
-  PCInFront = 1   ///< In front of the plane.
+  Behind = -1,  ///< Behind the plane.
+  On = 0,       ///< On or part of the plane.
+  InFront = 1   ///< In front of the plane.
 };
 
 /// Create a plane from a normal and distance (D) value.
@@ -72,21 +72,21 @@ template <typename T>
 /// @param epsilon Epsilon value used as a tolerance for @c PCOn results.
 /// @return The point's @c PlaneClassification.
 template <typename T>
-[[nodiscard]] inline int classifyPoint(const Vector4<T> &plane, const Vector3<T> &point,
-                                       T epsilon = 0)
+[[nodiscard]] inline PlaneClassification classifyPoint(const Vector4<T> &plane,
+                                                       const Vector3<T> &point, T epsilon = 0)
 {
   const T signedDistance = signedDistanceToPoint(plane, point);
   if (signedDistance < -epsilon)
   {
-    return PCBehind;
+    return PlaneClassification::Behind;
   }
 
   if (signedDistance > epsilon)
   {
-    return PCInFront;
+    return PlaneClassification::InFront;
   }
 
-  return PCOn;
+  return PlaneClassification::On;
 }
 }  // namespace tes::planegeom
 

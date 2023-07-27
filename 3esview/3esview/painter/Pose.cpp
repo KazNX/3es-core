@@ -17,9 +17,9 @@ Pose::Pose(const std::shared_ptr<BoundsCuller> &culler,
 
 Magnum::GL::Mesh Pose::solidMesh()
 {
-  static SimpleMesh build_mesh(
-    0, 0, 0, DtTriangles,
-    SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Colour | SimpleMesh::Index);
+  static SimpleMesh build_mesh(0, 0, 0, DrawType::Triangles,
+                               MeshComponentFlag::Vertex | MeshComponentFlag::Normal |
+                                 MeshComponentFlag::Colour | MeshComponentFlag::Index);
   static std::mutex guard;
 
   const std::scoped_lock lock(guard);
@@ -113,9 +113,10 @@ Magnum::GL::Mesh Pose::solidMesh()
 
 Magnum::GL::Mesh Pose::wireframeMesh()
 {
-  // static SimpleMesh build_mesh(0, 0, 0, DtLines, SimpleMesh::Vertex | SimpleMesh::Colour |
-  // SimpleMesh::Index);
-  static SimpleMesh build_mesh(0, 0, 0, DtLines, SimpleMesh::Vertex | SimpleMesh::Index);
+  // static SimpleMesh build_mesh(0, 0, 0, DrawType::Lines, MeshComponentFlag::Vertex |
+  // MeshComponentFlag::Colour | MeshComponentFlag::Index);
+  static SimpleMesh build_mesh(0, 0, 0, DrawType::Lines,
+                               MeshComponentFlag::Vertex | MeshComponentFlag::Index);
   static std::mutex guard;
 
   const std::scoped_lock lock(guard);

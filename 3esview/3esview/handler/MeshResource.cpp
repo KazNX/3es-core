@@ -7,9 +7,9 @@
 #include <3esview/shaders/PointGeom.h>
 #include <3esview/shaders/Shader.h>
 #include <3esview/shaders/ShaderLibrary.h>
-#include <3esview/util/Enum.h>
 
 #include <3escore/Connection.h>
+#include <3escore/Enum.h>
 #include <3escore/Log.h>
 #include <3escore/MeshMessages.h>
 #include <3escore/TriGeom.h>
@@ -18,8 +18,6 @@
 
 namespace tes::view::handler
 {
-TES_ENUM_FLAGS(MeshResource::ResourceFlag, unsigned);
-
 MeshResource::MeshResource(std::shared_ptr<shaders::ShaderLibrary> shader_library)
   : Message(MtMesh, "mesh resource")
   , _shader_library(std::move(shader_library))
@@ -274,10 +272,10 @@ unsigned MeshResource::draw(const DrawParams &params, const std::vector<DrawItem
         .setViewportSize(params.view_size);
     }
   };
-  update_shader_matrices(_shader_library->lookupForDrawType(DtPoints));
-  update_shader_matrices(_shader_library->lookupForDrawType(DtLines));
-  update_shader_matrices(_shader_library->lookupForDrawType(DtTriangles));
-  update_shader_matrices(_shader_library->lookupForDrawType(DtVoxels));
+  update_shader_matrices(_shader_library->lookupForDrawType(DrawType::Points));
+  update_shader_matrices(_shader_library->lookupForDrawType(DrawType::Lines));
+  update_shader_matrices(_shader_library->lookupForDrawType(DrawType::Triangles));
+  update_shader_matrices(_shader_library->lookupForDrawType(DrawType::Voxels));
 
   unsigned drawn = 0;
   for (const auto &item : drawables)
@@ -342,7 +340,7 @@ void MeshResource::calculateNormals(SimpleMesh &mesh, bool force)
     return;
   }
 
-  if (mesh.drawType() != DtTriangles)
+  if (mesh.drawType() != DrawType::Triangles)
   {
     return;
   }

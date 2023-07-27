@@ -20,7 +20,7 @@ namespace tes
 PacketReader::PacketReader(const PacketHeader *packet)
   : PacketStream<const PacketHeader>(packet)
 {
-  seek(0, Begin);
+  seek(0, SeekPos::Begin);
 }
 
 
@@ -47,7 +47,7 @@ bool PacketReader::checkCrc()
 
   if ((flags() & PFNoCrc))
   {
-    _status |= CrcValid;
+    _status |= PacketStatus::CrcValid;
     return true;
   }
 
@@ -55,7 +55,7 @@ bool PacketReader::checkCrc()
   const CrcType crc_val = calculateCrc();
   if (crc_val == packet_crc)
   {
-    _status |= CrcValid;
+    _status |= PacketStatus::CrcValid;
     return true;
   }
   return false;

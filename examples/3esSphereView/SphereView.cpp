@@ -64,7 +64,7 @@ void showUsage(int argc, char **argv)
   std::cout << "\nValid options:\n";
   std::cout << "  help: show this message\n";
   std::cout << "  collate: use packet collation.\n";
-  TES_IF(tes::featureFlag(tes::TFeatureCompression))
+  TES_IF(tes::featureFlag(tes::Feature::Compression))
   {
     std::cout << "  compress: collated and compress packets (implies collation).\n";
   }
@@ -105,7 +105,7 @@ unsigned tesUnrollDisplay(const std::vector<Vector3f> &vertices,
 
     cursor += count;
 
-    TES_STMT(tes::create(tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(SPHERE_ID),
+    TES_STMT(tes::create(tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(SPHERE_ID),
                                                     tes::DataBuffer(local_vertices))
                                        .setColour(tes::Colour(200, 200, 200))));
     ++shape_count;
@@ -227,9 +227,9 @@ void sphereInitialise(std::vector<Vector3f> &vertices, std::vector<unsigned> &in
   // Send the initial sphere. We know it has less than 65k vertices.
   if (!vertices.empty() && !indices.empty())
   {
-    TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(SPHERE_ID), tes::DataBuffer(vertices))
-                    .setColour(tes::Colour(200, 200, 200))));
+    TES_STMT(tes::create(tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(SPHERE_ID),
+                                                    tes::DataBuffer(vertices))
+                                       .setColour(tes::Colour(200, 200, 200))));
   }
 }
 
@@ -257,7 +257,7 @@ void subdivideUnitSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> 
 
     // Highlight the working triangle: extrude it a bit to make it pop.
     TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(),
+      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
                                  std::array<tes::Vector3f, 3>{ verts[0] * 1.01f, verts[1] * 1.01f,
                                                                verts[2] * 1.01f })
                     .setColour(tes::Colour::FireBrick)));
@@ -284,12 +284,12 @@ void subdivideUnitSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> 
     def[2] = insertVertex(new_vertices[2], vertices, vertex_map);
 
     TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(),
+      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
                                  std::array<tes::Vector3f, 3>{ vertices[def[0]], vertices[def[1]],
                                                                vertices[def[2]] })
                     .setColour(tes::Colour::Cyan)));
     TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(),
+      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
                                  std::array<tes::Vector3f, 3>{ vertices[def[0]], vertices[def[1]],
                                                                vertices[def[2]] })
                     .setColour(tes::Colour::Navy)
@@ -306,12 +306,12 @@ void subdivideUnitSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> 
     indices.push_back(def[2]);
 
     TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(),
+      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
                                  std::array<tes::Vector3f, 3>{ vertices[abc[0]], vertices[abc[1]],
                                                                vertices[abc[2]] })
                     .setColour(tes::Colour::Cyan)));
     TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(),
+      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
                                  std::array<tes::Vector3f, 3>{ vertices[abc[0]], vertices[abc[1]],
                                                                vertices[abc[2]] })
                     .setColour(tes::Colour::Navy)
@@ -322,12 +322,12 @@ void subdivideUnitSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> 
     indices.push_back(def[0]);
 
     TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(),
+      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
                                  std::array<tes::Vector3f, 3>{ vertices[abc[1]], vertices[def[1]],
                                                                vertices[def[2]] })
                     .setColour(tes::Colour::Cyan)));
     TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(),
+      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
                                  std::array<tes::Vector3f, 3>{ vertices[abc[1]], vertices[def[1]],
                                                                vertices[def[2]] })
                     .setColour(tes::Colour::Navy)
@@ -338,12 +338,12 @@ void subdivideUnitSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> 
     indices.push_back(def[1]);
 
     TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(),
+      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
                                  std::array<tes::Vector3f, 3>{ vertices[abc[2]], vertices[def[2]],
                                                                vertices[def[1]] })
                     .setColour(tes::Colour::Cyan)));
     TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(),
+      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
                                  std::array<tes::Vector3f, 3>{ vertices[abc[2]], vertices[def[2]],
                                                                vertices[def[1]] })
                     .setColour(tes::Colour::Navy)
@@ -386,12 +386,12 @@ int main(int argc, char **argv_non_const)
   {
     server_flags = tes::SFCollate;
   }
-  if (tes::checkFeature(tes::TFeatureCompression) && haveOption("compress", argc, argv))
+  if (tes::checkFeature(tes::Feature::Compression) && haveOption("compress", argc, argv))
   {
     server_flags = tes::SFCompress | tes::SFCollate;
   }
 
-  tes_server = tes::createServer(tes::ServerSettings{ server_flags }, tes::XYZ);
+  tes_server = tes::createServer(tes::ServerSettings{ server_flags }, tes::CoordinateFrame::XYZ);
   tes::startServer(tes_server);
   tes::waitForConnection(tes_server, 1000u);
   std::cout << "Starting with " << tes_server->connectionCount() << " connection(s)." << std::endl;
@@ -417,7 +417,7 @@ int main(int argc, char **argv_non_const)
 #ifdef TES_ENABLE
     for (unsigned i = 0; i < shape_count; ++i)
     {
-      tes::destroy(tes_server, tes::MeshShape(tes::DtTriangles, tes::Id(SPHERE_ID) + i));
+      tes::destroy(tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(SPHERE_ID) + i));
     }
     // Send the updated sphere. We must unroll into sets of triangles of less than 65K
     // vertices.

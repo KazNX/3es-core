@@ -13,7 +13,7 @@ namespace tes
 /// value is down, in which case the 'Neg' suffix is added.
 ///
 /// Right handed coordinate frames come first with left handed frames being those
-/// greater than or equal to @c CFLeft.
+/// greater than or equal to @c Left.
 ///
 /// Examples:
 /// Label | Right | Forward | Up  | Notes
@@ -21,7 +21,7 @@ namespace tes
 /// XYZ   | X     | Y       | Z   | A common extension of 2D Catesian coordinates.
 /// XZY   | X     | Z       | Y   | The default in Unity 3D.
 /// XZYNeg| X     | Z       | -Y  | A common camera space system.
-enum CoordinateFrame
+enum class CoordinateFrame : uint8_t
 {
   // Right handled frames.
   XYZ,
@@ -38,8 +38,8 @@ enum CoordinateFrame
   ZXYNeg,
   ZYX,
 
-  CFCount,
-  CFLeft = XYZNeg
+  Count,
+  Left = XYZNeg
 };
 }  // namespace tes
 

@@ -64,18 +64,15 @@ bool Shape::readUpdate(PacketReader &stream)
       // Partial update.
       if (update.flags & UFPosition)
       {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-        std::memcpy(_attributes.position, attrs.position, sizeof(attrs.position));
+        std::copy(attrs.position.begin(), attrs.position.end(), _attributes.position.begin());
       }
       if (update.flags & UFRotation)
       {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-        std::memcpy(_attributes.rotation, attrs.rotation, sizeof(attrs.rotation));
+        std::copy(attrs.rotation.begin(), attrs.rotation.end(), _attributes.rotation.begin());
       }
       if (update.flags & UFScale)
       {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-        std::memcpy(_attributes.scale, attrs.scale, sizeof(attrs.scale));
+        std::copy(attrs.scale.begin(), attrs.scale.end(), _attributes.scale.begin());
       }
       if (update.flags & UFColour)
       {

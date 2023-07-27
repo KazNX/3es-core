@@ -79,10 +79,10 @@ uint32_t PointCloud::tint() const
 }
 
 
-uint8_t PointCloud::drawType(int stream) const
+DrawType PointCloud::drawType(int stream) const
 {
   TES_UNUSED(stream);
-  return DtPoints;
+  return DrawType::Points;
 }
 
 
@@ -387,7 +387,7 @@ void PointCloud::copyOnWrite()
 bool PointCloud::processCreate(const MeshCreateMessage &msg,
                                const ObjectAttributes<double> &attributes, float draw_scale)
 {
-  if (msg.draw_type != DtPoints)
+  if (static_cast<DrawType>(msg.draw_type) != DrawType::Points)
   {
     return false;
   }

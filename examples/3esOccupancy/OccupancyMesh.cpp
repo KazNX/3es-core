@@ -86,7 +86,7 @@ uint32_t OccupancyMesh::tint() const
 uint8_t OccupancyMesh::drawType(int stream) const
 {
   TES_UNUSED(stream);
-  return tes::DtVoxels;
+  return tes::DrawType::Voxels;
 }
 
 

@@ -16,7 +16,8 @@
 
 namespace tes
 {
-extern const std::array<int, ClLevels> kTesToGZipCompressionLevel;
+extern const std::array<int, static_cast<unsigned>(CompressionLevel::Levels)>
+  kTesToGZipCompressionLevel;
 
 struct CollatedPacketZip
 {

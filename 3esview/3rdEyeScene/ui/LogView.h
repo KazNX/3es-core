@@ -29,7 +29,7 @@ class Command;
 
 namespace tes::view::ui
 {
-class TES_VIEWER_API LogView : public Panel
+class LogView : public Panel
 {
 public:
   static constexpr size_t kBufferStep = 100 * 1024;

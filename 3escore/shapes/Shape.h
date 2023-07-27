@@ -31,7 +31,7 @@ class Resource;
 ///
 /// A shape instance is unique represented by its @c routingId() and @c id()
 /// combined. The @c routingId() can be considered a unique shape type
-/// identifier (see @c ShapeHandlerIDs), while the @c id() represents the
+/// identifier (see @c ShapeHandlerId), while the @c id() represents the
 /// shape instance.
 ///
 /// Shape instances may be considered transient or persistent. Transient
@@ -110,7 +110,7 @@ public:
 
   /// Identifies the shape routing id. This is used to route to the correct message handler in the
   /// viewer application and essentially uniquely identifies the shape type.
-  /// @return The shape routing id. See @c ShapeHandlerIDs .
+  /// @return The shape routing id. See @c ShapeHandlerId .
   [[nodiscard]] uint16_t routingId() const;
 
   /// Direct access to the internal data.

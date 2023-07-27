@@ -15,6 +15,7 @@ list(APPEND PUBLIC_HEADERS
   Crc.h
   Debug.h
   Endian.h
+  Enum.h
   Exception.h
   Feature.h
   FileConnection.h
@@ -75,6 +76,7 @@ list(APPEND PUBLIC_SHAPE_HEADERS
   shapes/Cone.h
   shapes/Cylinder.h
   shapes/Id.h
+  shapes/MeshComponentFlag.h
   shapes/MeshPlaceholder.h
   shapes/MeshResource.h
   shapes/MeshSet.h

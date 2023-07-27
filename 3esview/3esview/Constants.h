@@ -10,7 +10,7 @@
 namespace tes::view
 {
 /// Specifies the coordinate frame of the client viewer.
-constexpr CoordinateFrame kViewerCoordinateFrame = tes::XYZ;
+constexpr CoordinateFrame kViewerCoordinateFrame = tes::CoordinateFrame::XYZ;
 
 /// Get the world right vector for the client viewer.
 /// @tparam Real @c float or @c double

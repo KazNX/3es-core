@@ -17,16 +17,16 @@
 namespace tes::view::data
 {
 class DataThread;
-}
+}  // namespace tes::view::data
 
 namespace tes::view::command
 {
 class Command;
-}
+}  // namespace tes::view::command
 
 namespace tes::view::ui
 {
-class TES_VIEWER_API Hud : public Panel
+class Hud : public Panel
 {
 public:
   constexpr static int kButtonSize = 24;

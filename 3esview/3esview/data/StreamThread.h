@@ -6,8 +6,8 @@
 #include "DataThread.h"
 
 #include <3esview/FrameStamp.h>
-#include <3esview/util/Enum.h>
 
+#include <3escore/Enum.h>
 #include <3escore/Messages.h>
 
 #include <array>
@@ -43,6 +43,16 @@ class TES_VIEWER_API StreamThread : public DataThread
 {
 public:
   using Clock = std::chrono::steady_clock;
+
+  /// Option flags for @c processPacket()
+  /// @note Should be private, but is not to allow enum flag operators to be defined..
+  enum class ProcessPacketFlag : unsigned
+  {
+    /// No special options.
+    None = 0,
+    /// Suppress the frame end message handling.
+    NoFrameEnd = (1u << 0u)
+  };
 
   StreamThread(std::shared_ptr<ThirdEyeScene> tes, std::shared_ptr<std::istream> stream);
   StreamThread(const StreamThread &other) = delete;
@@ -148,17 +158,6 @@ protected:
   void run();
 
   void skipBack(FrameNumber target_frame);
-
-public:
-  /// Option flags for @c processPacket()
-  /// @note Should be private, but is not to allow enum flag operators to be defined..
-  enum class ProcessPacketFlag : unsigned
-  {
-    /// No special options.
-    None = 0,
-    /// Suppress the frame end message handling.
-    NoFrameEnd = (1u << 0u)
-  };
 
 private:
   /// Status for @c processPacket()
@@ -328,8 +327,8 @@ private:
   bool _have_server_info = false;
   Keyframes _keyframes;
 };
-}  // namespace tes::view::data
 
-TES_ENUM_FLAGS(tes::view::data::StreamThread::ProcessPacketFlag, unsigned);
+TES_ENUM_FLAGS(StreamThread::ProcessPacketFlag, unsigned);
+}  // namespace tes::view::data
 
 #endif  // TES_VIEW_STREAM_THREAD_H

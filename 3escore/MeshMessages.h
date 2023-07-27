@@ -39,13 +39,10 @@
 /// messages.
 ///
 /// Each mesh definition specifies one of the following draw modes or primitive types:
-/// - DtPoints
-/// - DtLines
-/// - DtLineLoop
-/// - DtLineStrip
-/// - DtTriangles
-/// - DtTriangleStrip
-/// - DtTriangleFan
+/// - DrawType::Points
+/// - DrawType::Lines
+/// - DrawType::Triangles
+/// - DrawType::Voxels
 ///
 /// A mesh object defined through the @c MeshHandler doe snot support any child or sub-objects.
 /// These sorts of relationships are defined in the mesh renderer. Note the precision of the float
@@ -121,7 +118,7 @@ namespace tes
 {
 /// @ingroup meshmsg
 /// Flag values for @c MeshCreateMessage .
-enum MeshCreateFlag : unsigned
+enum MeshCreateFlag : uint16_t
 {
   /// Indicates the use of double precision floating point values.
   McfDoublePrecision = (1u << 0u),
@@ -132,7 +129,7 @@ enum MeshCreateFlag : unsigned
 
 /// @ingroup meshmsg
 /// Flag values for @c MeshFinaliseMessage .
-enum MeshFinaliseFlag : unsigned
+enum MeshFinaliseFlag : uint16_t
 {
   /// Calculate normals on receive. Overwrites normals if present.
   MffCalculateNormals = (1u << 0u),
@@ -154,7 +151,7 @@ enum MeshFinaliseFlag : unsigned
 
 /// @ingroup meshmsg
 /// Defines the messageIDs for mesh message routing.
-enum MeshMessageType : unsigned
+enum MeshMessageType : uint16_t
 {
   MmtInvalid,
   MmtDestroy,
@@ -183,16 +180,19 @@ enum MeshMessageType : unsigned
 
 /// @ingroup meshmsg
 /// Defines the primitives for a mesh.
-enum DrawType : unsigned
+///
+/// @note This is the only `enum class` used in messaging. This aligned with better usage in mesh
+/// classes using the @c DrawType information. It is convert to @c uint8_t for serialisation.
+enum class DrawType : uint8_t
 {
-  DtPoints,
-  DtLines,
-  DtTriangles,
+  Points,
+  Lines,
+  Triangles,
   /// Geometry shader based voxels. Vertices define the voxel centres, the normals define half
   /// extents.
-  DtVoxels,
-  // DtQuads,
-  // DtLineLoop,
+  Voxels,
+  // Quads,
+  // LineLoop,
 };
 
 /// @ingroup meshmsg
@@ -205,7 +205,7 @@ enum DrawType : unsigned
 struct MeshCreateMessage
 {
   /// ID for this message.
-  enum : unsigned
+  enum : uint16_t
   {
     MessageId = MmtCreate
   };
@@ -258,7 +258,7 @@ struct MeshCreateMessage
 struct MeshRedefineMessage : MeshCreateMessage
 {
   /// ID for this message.
-  enum : unsigned
+  enum : uint16_t
   {
     MessageId = MmtRedefine
   };
@@ -269,7 +269,7 @@ struct MeshRedefineMessage : MeshCreateMessage
 struct MeshDestroyMessage
 {
   /// ID for this message.
-  enum : unsigned
+  enum : uint16_t
   {
     MessageId = MmtDestroy
   };
@@ -329,7 +329,7 @@ struct MeshComponentMessage
 struct Material
 {
   /// ID for this message.
-  enum : unsigned
+  enum : uint16_t
   {
     MessageId = MmtSetMaterial
   };
@@ -371,7 +371,7 @@ struct Material
 struct MeshFinaliseMessage
 {
   /// ID for this message.
-  enum : unsigned
+  enum : uint16_t
   {
     MessageId = MmtFinalise
   };

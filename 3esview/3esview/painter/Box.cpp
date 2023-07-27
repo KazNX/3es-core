@@ -17,8 +17,9 @@ Box::Box(const std::shared_ptr<BoundsCuller> &culler,
 
 Magnum::GL::Mesh Box::solidMesh()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtTriangles,
-                               SimpleMesh::Vertex | SimpleMesh::Normal | SimpleMesh::Index);
+  static SimpleMesh build_mesh(
+    0, 0, 0, DrawType::Triangles,
+    MeshComponentFlag::Vertex | MeshComponentFlag::Normal | MeshComponentFlag::Index);
   static std::mutex guard;
 
   const std::scoped_lock lock(guard);
@@ -45,7 +46,8 @@ Magnum::GL::Mesh Box::solidMesh()
 
 Magnum::GL::Mesh Box::wireframeMesh()
 {
-  static SimpleMesh build_mesh(0, 0, 0, DtLines, SimpleMesh::Vertex | SimpleMesh::Index);
+  static SimpleMesh build_mesh(0, 0, 0, DrawType::Lines,
+                               MeshComponentFlag::Vertex | MeshComponentFlag::Index);
   static std::mutex guard;
 
   const std::scoped_lock lock(guard);

@@ -26,7 +26,7 @@ public:
   ///
   /// Note the channel ordering depends on the machine endian. This supports implicit conversion to
   /// and from @c uint32_t colour such as when used in the @c DataBuffer .
-  enum class Channel : int
+  enum class Channel
   {
 #if TES_IS_BIG_ENDIAN
     R = 0,  ///< Red channel index.
@@ -41,11 +41,12 @@ public:
 #endif      // TES_IS_BIG_ENDIAN
   };
 
-  enum NamedColour : unsigned;
+  enum NamedColour;
 
   /// Construct a colour with the given numeric value.
   /// @param colour_value The integer colour representation: 0xRRGGBBAA.
-  Colour(uint32_t colour_value = 0xffffffffu) noexcept;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+  Colour(
+    uint32_t colour_value = 0xffffffffu) noexcept;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
   /// Construct a colour the named colours.
   /// @param name The colour name enumeration value.
@@ -302,7 +303,7 @@ public:
   };
 
   /// Enumerates a set of predefined colours ("web safe" colours).
-  enum NamedColour : unsigned
+  enum NamedColour
   {
     // Greys and blacks.
     Gainsboro,
@@ -489,7 +490,7 @@ public:
   /// improvements to these colours sets.
   ///
   /// @see @c colourCycle()
-  enum PredefinedSet : unsigned
+  enum PredefinedSet
   {
     /// Full web safe colour set.
     WebSafe,
