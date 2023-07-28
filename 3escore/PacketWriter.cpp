@@ -48,7 +48,7 @@ PacketWriter::PacketWriter(uint8_t *buffer, size_t buffer_size, uint16_t routing
     _packet->payload_size = 0u;
     _packet->payload_offset = 0u;
     // Flag no CRC if there's no room.
-    _packet->flags = (_buffer_size >= sizeof(PacketHeader) + sizeof(CrcType)) ? 0u : PFNoCrc;
+    _packet->flags = (_buffer_size >= sizeof(PacketHeader) + sizeof(CrcType)) ? PFZero : PFNoCrc;
   }
   else
   {
@@ -112,7 +112,7 @@ void PacketWriter::reset(uint16_t routing_id, uint16_t message_id)
     _packet->payload_size = 0u;
     _packet->payload_offset = 0u;
     // Flag no CRC if there's no room.
-    _packet->flags = (_buffer_size >= sizeof(PacketHeader) + sizeof(CrcType)) ? 0u : PFNoCrc;
+    _packet->flags = (_buffer_size >= sizeof(PacketHeader) + sizeof(CrcType)) ? PFZero : PFNoCrc;
     _payload_position = 0;
   }
   else

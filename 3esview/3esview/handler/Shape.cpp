@@ -4,6 +4,7 @@
 
 #include <3escore/Colour.h>
 #include <3escore/Connection.h>
+#include <3escore/CoreUtil.h>
 #include <3escore/Debug.h>
 #include <3escore/Log.h>
 #include <3escore/PacketReader.h>
@@ -198,7 +199,7 @@ void Shape::serialise(Connection &out)
              block_index += MultiShapeBlockCount)
         {
           const auto write_child_count =
-            std::min<uint16_t>(child_count - block_index, MultiShapeBlockCount);
+            std::min<uint16_t>(int_cast<uint16_t>(child_count - block_index), MultiShapeBlockCount);
           // Write block count
           ok = writer.writeElement(write_child_count) == sizeof(write_child_count) && ok;
 

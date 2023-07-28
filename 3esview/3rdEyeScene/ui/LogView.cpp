@@ -44,7 +44,7 @@ LogView::ToolState LogView::drawTools()
 
   const auto last_filter_index = _log_level_filter_index;
   if (ImGui::Combo("LogLevel", &_log_level_filter_index, _log_level_names.data(),
-                   static_cast<int>(_log_level_names.size())))
+                   int_cast<int>(_log_level_names.size())))
   {
     state.level_changed = last_filter_index != _log_level_filter_index;
   }
@@ -60,16 +60,13 @@ void LogView::drawText(const ToolState &tool_state)
   const auto line_height = ImGui::GetTextLineHeightWithSpacing();
   auto log_view = viewer().logger().view(filterLogLevel());
   // Work out how many lines we can display.
-  const auto lines_available = log_view.size();
+  const auto lines_available = static_cast<float>(log_view.size());
   const auto scroll_size_y = line_height * lines_available;
   ImGui::SetNextWindowContentSize({ _last_content_width, scroll_size_y });
   ChildWindow child("LogView", {});
   // Get the available space.
   const auto available_height = ImGui::GetWindowHeight();
   const auto displayable_lines = static_cast<size_t>(std::ceil(available_height / line_height));
-  // Work out the range we'll display.
-  const size_t first_line =
-    (lines_available >= displayable_lines) ? lines_available - displayable_lines : 0;
 
   switch (tool_state.action)
   {
@@ -87,7 +84,7 @@ void LogView::drawText(const ToolState &tool_state)
 
   if (_view_tail)
   {
-    ImGui::SetScrollY(std::max(scroll_size_y - displayable_lines, 0.0f));
+    ImGui::SetScrollY(std::max(scroll_size_y - static_cast<float>(displayable_lines), 0.0f));
   }
 
   // TODO(KS): filter the log by the selected log level. This completely changes how we render as
@@ -95,7 +92,7 @@ void LogView::drawText(const ToolState &tool_state)
   // Once idea is to request a filtered view of all the items, and amortise building
   // that and only render new text once that completes.
   ImGuiListClipper clipper;
-  clipper.Begin(int_cast<int>(lines_available), line_height);
+  clipper.Begin(static_cast<int>(lines_available), line_height);
 
   while (clipper.Step())
   {

@@ -74,30 +74,30 @@ std::istream &operator>>(std::istream &in, tes::log::Level &log_level)
   return in;
 }
 
-std::ostream &operator<<(std::ostream &out, tes::log::Level log_level)
-{
-  using Level = tes::log::Level;
-  switch (log_level)
-  {
-  case Level::Fatal:
-    out << "fatal";
-    break;
-  case Level::Error:
-    out << "error";
-    break;
-  case Level::Warn:
-    out << "warn";
-    break;
-  case Level::Info:
-    out << "info";
-    break;
-  case Level::Trace:
-    out << "trace";
-    break;
-  }
+// std::ostream &operator<<(std::ostream &out, tes::log::Level log_level)
+// {
+//   using Level = tes::log::Level;
+//   switch (log_level)
+//   {
+//   case Level::Fatal:
+//     out << "fatal";
+//     break;
+//   case Level::Error:
+//     out << "error";
+//     break;
+//   case Level::Warn:
+//     out << "warn";
+//     break;
+//   case Level::Info:
+//     out << "info";
+//     break;
+//   case Level::Trace:
+//     out << "trace";
+//     break;
+//   }
 
-  return out;
-}
+//   return out;
+// }
 }  // namespace
 
 namespace tes::view

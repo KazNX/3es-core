@@ -118,14 +118,13 @@ void IconBar::drawContent(Magnum::ImGuiIntegration::Context &ui, Window &window)
            _commands[static_cast<unsigned>(View::Log)].get(), icon_size });
 
   // Place the settings button at the bottom of the icon bar.
-  const auto viewport_size = uiViewportSize();
   const auto available_size = ImGui::GetContentRegionAvail();
   // Work out an approximate spacing between buttons.
   const auto spacing =
     3 * static_cast<int>(ImGui::GetFrameHeightWithSpacing() - ImGui::GetFrameHeight());
   // Add a dummy to fill space to the bottom of the window, allowing for the settings button at the
   // bottom of the icon bar.
-  ImGui::Dummy({ 0.0f, available_size.y - (spacing + kButtonSize) });
+  ImGui::Dummy({ 0.0f, available_size.y - static_cast<float>(spacing + kButtonSize) });
 
   button({ &_icons[static_cast<unsigned>(View::Settings)], "Settings",
            _commands[static_cast<unsigned>(View::Settings)].get(), icon_size });

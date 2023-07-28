@@ -29,6 +29,7 @@ extern const uint16_t TES_CORE_API kPacketCompatibilityVersionMinor;
 /// Flag values for @c PacketHeader objects.
 enum PacketFlag : uint8_t
 {
+  PFZero = 0u,
   /// Marks a @c PacketHeader as missing its 16-bit CRC.
   PFNoCrc = (1u << 0u),
   // /// Indicates that the platform which wrote this data was big endian. In most cases this is

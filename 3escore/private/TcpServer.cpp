@@ -23,8 +23,8 @@ std::shared_ptr<Server> Server::create(const ServerSettings &settings,
 TcpServer::TcpServer(const ServerSettings &settings, const ServerInfoMessage *server_info)
   : _monitor(nullptr)
   , _settings(settings)
-  , _active(true)
   , _server_info(server_info ? *server_info : ServerInfoMessage())
+  , _active(true)
 {
   _monitor = std::make_shared<TcpConnectionMonitor>(*this);
 

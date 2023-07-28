@@ -5,6 +5,6 @@
 
 namespace tes
 {
-// template class Vector3<float>;
-// template class Vector3<double>;
+template class Vector3<float>;
+template class Vector3<double>;
 }  // namespace tes

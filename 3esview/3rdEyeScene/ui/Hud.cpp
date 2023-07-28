@@ -133,6 +133,6 @@ void Hud::drawFps()
   out << std::fixed << std::setprecision(3) << fps << std::flush;
 
   const auto fps_str = out.str();
-  ImGui::Text(fps_str.c_str());
+  ImGui::Text("%s", fps_str.c_str());
 }
 }  // namespace tes::view::ui

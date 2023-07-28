@@ -168,7 +168,7 @@ Panel::ButtonResult Panel::button(const ButtonParams &params, bool allow_inactiv
     }
     else
     {
-      ImGui::Text(params.label.c_str());
+      ImGui::Text("%s", params.label.c_str());
     }
   }
   return ButtonResult::Inactive;
