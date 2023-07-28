@@ -110,8 +110,12 @@ private:
   Vector3<T> _maximum;  ///< Maximum extents.
 };
 
-// TES_EXTERN template class TES_CORE_API Bounds<float>;
-// TES_EXTERN template class TES_CORE_API Bounds<double>;
+// FIXME(KS): the extern template declarations broke with link errors when adding `constexpr`
+// functions. Why?
+#ifdef _MSC_VER
+TES_EXTERN template class TES_CORE_API Bounds<float>;
+TES_EXTERN template class TES_CORE_API Bounds<double>;
+#endif  // _MSC_VER
 
 /// Single precision bounds.
 using Boundsf = Bounds<float>;

@@ -307,8 +307,12 @@ private:
   std::array<T, 3> _storage;
 };
 
-// TES_EXTERN template class TES_CORE_API Vector3<float>;
-// TES_EXTERN template class TES_CORE_API Vector3<double>;
+// FIXME(KS): the extern template declarations broke with link errors when adding `constexpr`
+// functions. Why?
+#ifdef _MSC_VER
+TES_EXTERN template class TES_CORE_API Vector3<float>;
+TES_EXTERN template class TES_CORE_API Vector3<double>;
+#endif  // _MSC_VER
 
 
 //---------------------------------------------------------------------------
