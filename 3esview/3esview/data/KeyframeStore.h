@@ -11,6 +11,7 @@
 
 #include <filesystem>
 #include <istream>
+#include <vector>
 
 namespace tes::view::data
 {

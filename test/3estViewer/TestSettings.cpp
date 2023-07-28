@@ -48,7 +48,7 @@ protected:
   static T copyAndMove(const T &property)
   {
     T copy = property;
-    return std::move(copy);
+    return copy;
   }
 
   void testCommon()
@@ -112,9 +112,9 @@ struct ExtendedPropertyTester<Numeric<T>>
 };
 
 template <>
-struct ExtendedPropertyTester<Bool>
+struct ExtendedPropertyTester<Boolean>
 {
-  void testExtended(Bool &property) const
+  void testExtended(Boolean &property) const
   {
     auto copy = property;
     copy.setValue(true);
@@ -142,10 +142,10 @@ struct PropertyComparer<Enum>
   }
 };
 
-TEST(Settings, PropertiesBool)
+TEST(Settings, PropertiesBoolean)
 {
-  PropertyTester<Bool>({ "bool", false, "a boolean property" }).test();
-  PropertyTester<Bool>({ "bool", true, "a boolean property" }).test();
+  PropertyTester<Boolean>({ "bool", false, "a boolean property" }).test();
+  PropertyTester<Boolean>({ "bool", true, "a boolean property" }).test();
 }
 
 TEST(Settings, PropertiesNumeric)
@@ -198,24 +198,30 @@ TEST(Settings, PropertiesEnum)
 }
 
 
+namespace
+{
+template <typename Property>
+Property atMinValue(Property prop)
+{
+  prop.setValue(prop.minimum());
+  return prop;
+}
+}  // namespace
+
+
 TEST(Settings, Serialise)
 {
   const auto test_file = std::filesystem::temp_directory_path() / "3es-settings.yaml";
   const auto make_more_settings = [](bool tweak_values) {
     Extension ext("more");
 
-    const auto set_min_value = [](auto &prop) {
-      prop.setValue(prop.minimum());
-      return prop;
-    };
-
-    ext.add(ExtensionProperty(Bool{ "bool", tweak_values, "a boolean property" }));
-    ext.add(ExtensionProperty(set_min_value(Int{ "int", -6, -10, 10, "an int property" })));
-    ext.add(ExtensionProperty(set_min_value(UInt{ "uint", 42u, 0, 100, "a uint property" })));
+    ext.add(ExtensionProperty(Boolean{ "bool", tweak_values, "a boolean property" }));
+    ext.add(ExtensionProperty(atMinValue(Int{ "int", -6, -10, 10, "an int property" })));
+    ext.add(ExtensionProperty(atMinValue(UInt{ "uint", 42u, 0, 100, "a uint property" })));
     ext.add(
-      ExtensionProperty(set_min_value(Float{ "float", 3.141f, 0.0f, 6.0f, "a float property" })));
+      ExtensionProperty(atMinValue(Float{ "float", 3.141f, 0.0f, 6.0f, "a float property" })));
     ext.add(
-      ExtensionProperty(set_min_value(Double{ "double", -2.76, -5.0, 5.0, "a double property" })));
+      ExtensionProperty(atMinValue(Double{ "double", -2.76, -5.0, 5.0, "a double property" })));
     ext.add(ExtensionProperty(Enum{ "enum",
                                     (tweak_values) ? Value::Two : Value::One,
                                     "troll counting",

@@ -32,57 +32,68 @@ class Viewer;
 
 namespace tes::view::ui
 {
+namespace detail
+{
+// These detail types are a workaround for GCC/clang bug:
+// > default member initializer for '<type>' required before the end of its enclosing class
+enum class Anchor : unsigned
+{
+  TopLeft,
+  TopRight,
+  BottomLeft,
+  BottomRight,
+  Centre,
+  TopCentre,
+  BottomCentre,
+  CentreLeft,
+  CentreRight,
+};
+
+enum class Stretch : unsigned
+{
+  None = 0,
+  Horizontal = (1 << 0),
+  Vertical = (1 << 1)
+};
+
+TES_ENUM_FLAGS(Stretch, unsigned);
+
+struct PreferredCoordinates
+{
+  struct Position
+  {
+    Magnum::Vector2i coord = {};
+    Anchor anchor = Anchor::TopLeft;
+    bool in_use = false;
+
+    Magnum::Vector2i forView(const Magnum::Vector2i &viewport_size) const;
+    ImVec2 forView(const ImVec2 &viewport_size) const;
+  };
+  struct Size
+  {
+    Magnum::Vector2i extents = {};
+    Stretch stretch = Stretch::None;
+    bool in_use = false;
+
+    Magnum::Vector2i forView(const Magnum::Vector2i &viewport_size) const;
+    ImVec2 forView(const ImVec2 &viewport_size) const;
+  };
+
+  Position position = {};
+  Size size = {};
+};
+}  // namespace detail
+
 /// Base class for a UI panel - anything which draws using the immediate mode UI.
 class Panel
 {
 public:
-  enum class Anchor : unsigned
-  {
-    TopLeft,
-    TopRight,
-    BottomLeft,
-    BottomRight,
-    Centre,
-    TopCentre,
-    BottomCentre,
-    CentreLeft,
-    CentreRight,
-  };
-
-  enum class Stretch : unsigned
-  {
-    None = 0,
-    Horizontal = (1 << 0),
-    Vertical = (1 << 1)
-  };
-
-  struct PreferredCoordinates
-  {
-    struct Position
-    {
-      Magnum::Vector2i coord = {};
-      Anchor anchor = Anchor::TopLeft;
-      bool in_use = false;
-
-      Magnum::Vector2i forView(const Magnum::Vector2i &viewport_size) const;
-      ImVec2 forView(const ImVec2 &viewport_size) const;
-    };
-    struct Size
-    {
-      Magnum::Vector2i extents = {};
-      Stretch stretch = Stretch::None;
-      bool in_use = false;
-
-      Magnum::Vector2i forView(const Magnum::Vector2i &viewport_size) const;
-      ImVec2 forView(const ImVec2 &viewport_size) const;
-    };
-
-    Position position = {};
-    Size size = {};
-  };
+  using Anchor = detail::Anchor;
+  using Stretch = detail::Stretch;
+  using PreferredCoordinates = detail::PreferredCoordinates;
 
   Panel(const std::string &name, Viewer &viewer,
-        const PreferredCoordinates &preferred_coordinates = {})
+        const PreferredCoordinates &preferred_coordinates = PreferredCoordinates{})
     : _name(name)
     , _viewer(viewer)
     , _preferred_coordinates(preferred_coordinates)
@@ -306,8 +317,6 @@ protected:
   Viewer &_viewer;
   PreferredCoordinates _preferred_coordinates = {};
 };
-
-TES_ENUM_FLAGS(Panel::Stretch, unsigned);
 }  // namespace tes::view::ui
 
 #endif  // TRD_EYE_SCENE_UI_PANEL_H

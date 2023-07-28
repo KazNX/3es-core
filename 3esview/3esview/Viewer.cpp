@@ -200,6 +200,7 @@ Viewer::Viewer(const ViewArguments &arguments,
                                      .setWindowFlags(Configuration::WindowFlag::Resizable) }
   , _tes(std::make_shared<ThirdEyeScene>(extended_settings))
   , _commands(std::make_shared<command::Set>())
+  , _logger(std::make_unique<ViewerLog>())
   , _move_keys({
       { KeyEvent::Key::A, 0, true },         //
       { KeyEvent::Key::Left, 0, true },      //
@@ -220,7 +221,6 @@ Viewer::Viewer(const ViewArguments &arguments,
       { KeyEvent::Key::Q, 1, false },  //
       { KeyEvent::Key::E, 1, true },   //
     })
-  , _logger(std::make_unique<ViewerLog>())
 {
   _edl_effect = std::make_shared<EdlEffect>(Magnum::GL::defaultFramebuffer.viewport());
   command::registerDefaultCommands(*_commands);

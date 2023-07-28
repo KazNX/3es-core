@@ -54,7 +54,7 @@ private:
   ViewStatus show(unsigned idx, settings::Render &config);
   ViewStatus show(unsigned idx, settings::Extension &config);
 
-  ViewStatus showProperty(unsigned idx, settings::Bool &prop);
+  ViewStatus showProperty(unsigned idx, settings::Boolean &prop);
   ViewStatus showProperty(unsigned idx, settings::Int &prop);
   ViewStatus showProperty(unsigned idx, settings::UInt &prop);
   ViewStatus showProperty(unsigned idx, settings::Float &prop);

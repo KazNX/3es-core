@@ -13,7 +13,7 @@ namespace tes::view::settings
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 struct Playback
 {
-  Bool allow_key_frames = {
+  Boolean allow_key_frames = {
     "Allow key frames", false,
     "Enable scene keyframes to cache frames during playback and stepping?"
   };
@@ -27,11 +27,12 @@ struct Playback
     "Key frame minimum separation", 5, 1, 1000,
     "Do not allow keyframes unless this number of frames has elapsed."
   };
-  Bool keyframe_compression = { "Keyframe compression", true, "Compress key frames?" };
-  Bool looping = { "Looping", false,
-                   "Automatically restart playback at the end of a file stream?" };
-  Bool pause_on_error = { "Pause on error", true,
-                          "Pause if an error occurs during playback? Only affects file playback." };
+  Boolean keyframe_compression = { "Keyframe compression", true, "Compress key frames?" };
+  Boolean looping = { "Looping", false,
+                      "Automatically restart playback at the end of a file stream?" };
+  Boolean pause_on_error = {
+    "Pause on error", true, "Pause if an error occurs during playback? Only affects file playback."
+  };
 
   [[nodiscard]] inline bool operator==(const Playback &other) const
   {

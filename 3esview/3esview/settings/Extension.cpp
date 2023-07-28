@@ -16,18 +16,9 @@
       : _property(property)                                                   \
     {}                                                                        \
                                                                               \
-    PropertyType type() const override                                        \
-    {                                                                         \
-      return PropertyType::Type;                                              \
-    }                                                                         \
-    const std::string &label() const override                                 \
-    {                                                                         \
-      return _property.label();                                               \
-    }                                                                         \
-    const std::string &tip() const override                                   \
-    {                                                                         \
-      return _property.tip();                                                 \
-    }                                                                         \
+    PropertyType type() const override { return PropertyType::Type; }         \
+    const std::string &label() const override { return _property.label(); }   \
+    const std::string &tip() const override { return _property.tip(); }       \
     IOCode read(const ryml::ConstNodeRef &parent, std::ostream &log) override \
     {                                                                         \
       return priv::read(parent, _property, log);                              \
@@ -40,14 +31,8 @@
     {                                                                         \
       return new Type##Affordances(_property);                                \
     }                                                                         \
-    void *property() override                                                 \
-    {                                                                         \
-      return &_property;                                                      \
-    }                                                                         \
-    const void *property() const override                                     \
-    {                                                                         \
-      return &_property;                                                      \
-    }                                                                         \
+    void *property() override { return &_property; }                          \
+    const void *property() const override { return &_property; }              \
                                                                               \
   private:                                                                    \
     settings::Type _property;                                                 \
@@ -59,7 +44,7 @@ namespace detail
 {
 ExtensionPropertyAffordances::~ExtensionPropertyAffordances() = default;
 
-DEFINE_AFFORDANCES(Bool);
+DEFINE_AFFORDANCES(Boolean);
 DEFINE_AFFORDANCES(Enum);
 DEFINE_AFFORDANCES(Colour);
 DEFINE_AFFORDANCES(Int);
@@ -69,8 +54,8 @@ DEFINE_AFFORDANCES(Double);
 }  // namespace detail
 
 
-ExtensionProperty::ExtensionProperty(const Bool &property)
-  : _affordances(std::make_unique<detail::BoolAffordances>(property))
+ExtensionProperty::ExtensionProperty(const Boolean &property)
+  : _affordances(std::make_unique<detail::BooleanAffordances>(property))
 {}
 
 
@@ -122,9 +107,9 @@ bool ExtensionProperty::operator==(const ExtensionProperty &other) const
 {
   // TODO(KS): find a better way to do the type comparison such that we don't need to keep adding
   // code if we add property types.
-  if (const auto *this_bool = getProperty<Bool>())
+  if (const auto *this_bool = getProperty<Boolean>())
   {
-    const auto *other_bool = other.getProperty<Bool>();
+    const auto *other_bool = other.getProperty<Boolean>();
     if (other_bool)
     {
       return *this_bool == *other_bool;

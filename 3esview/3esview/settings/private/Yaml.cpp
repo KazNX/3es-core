@@ -101,7 +101,7 @@ IOCode read(const ryml::ConstNodeRef &parent, const std::string &key, std::strin
 }
 
 
-IOCode read(const ryml::ConstNodeRef &parent, Bool &prop, std::ostream &log)
+IOCode read(const ryml::ConstNodeRef &parent, Boolean &prop, std::ostream &log)
 {
   if (parent.empty())
   {
@@ -297,7 +297,7 @@ IOCode writeNumeric(ryml::NodeRef &parent, const T &prop, std::ostream &log)
 }
 
 
-IOCode write(ryml::NodeRef &parent, const Bool &prop, std::ostream &log)
+IOCode write(ryml::NodeRef &parent, const Boolean &prop, std::ostream &log)
 {
   TES_UNUSED(log);
   const auto key = ryml::csubstr(prop.label().c_str(), prop.label().size());

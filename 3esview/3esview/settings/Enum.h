@@ -53,7 +53,7 @@ public:
   template <typename E>
   [[nodiscard]] std::string enumValueName(E value) const
   {
-    return enumValue(static_cast<int>(value));
+    return enumName(static_cast<int>(value));
   }
 
   [[nodiscard]] std::string enumName(int value) const;
@@ -82,8 +82,8 @@ private:
 template <typename E>
 inline Enum::Enum(const std::string &label, E value, const std::string &tip,
                   std::initializer_list<std::pair<E, std::string>> named_values)
-  : _label(label)
-  , _value(static_cast<int>(value))
+  : _value(static_cast<int>(value))
+  , _label(label)
   , _tip(tip)
 {
   for (const auto &[value, name] : named_values)
@@ -109,11 +109,11 @@ inline bool Enum::setValueByName(const std::string &name)
 
 inline std::string Enum::enumName(int value) const
 {
-  for (const auto &[e, str] : _named_values)
+  for (const auto &named_value : _named_values)
   {
-    if (value == e)
+    if (value == named_value.first)
     {
-      return str;
+      return named_value.second;
     }
   }
   return {};

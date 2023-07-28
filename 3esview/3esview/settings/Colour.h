@@ -18,8 +18,8 @@ public:
   using ValueType = tes::Colour;
 
   Colour(std::string label, const ValueType &value, std::string tip)
-    : _label(std::move(label))
-    , _value(value)
+    : _value(value)
+    , _label(std::move(label))
     , _tip(std::move(tip))
   {}
 

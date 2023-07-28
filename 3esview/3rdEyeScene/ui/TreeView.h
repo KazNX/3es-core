@@ -30,7 +30,8 @@ public:
     ForceOpen = (1u << 1u)
   };
 
-  TreeView(const std::string &name, Viewer &viewer, const PreferredCoordinates &preferred = {});
+  TreeView(const std::string &name, Viewer &viewer,
+           const PreferredCoordinates &preferred = PreferredCoordinates{});
 
 protected:
   static bool beginBranch(unsigned idx, const std::string &label,

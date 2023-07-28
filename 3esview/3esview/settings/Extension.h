@@ -21,10 +21,10 @@ namespace tes::view::settings
 {
 namespace detail
 {
-enum PropertyType
+enum class PropertyType
 {
   Unknown,
-  Bool,
+  Boolean,
   Colour,
   Enum,
   Int,
@@ -40,9 +40,9 @@ struct TES_VIEWER_API PropertyTypeValueOf
 };
 
 template <>
-struct TES_VIEWER_API PropertyTypeValueOf<settings::Bool>
+struct TES_VIEWER_API PropertyTypeValueOf<settings::Boolean>
 {
-  static constexpr PropertyType value() { return PropertyType::Bool; }
+  static constexpr PropertyType value() { return PropertyType::Boolean; }
 };
 
 template <>
@@ -115,7 +115,7 @@ public:
 class TES_VIEWER_API ExtensionProperty
 {
 public:
-  explicit ExtensionProperty(const Bool &property);
+  explicit ExtensionProperty(const Boolean &property);
   explicit ExtensionProperty(const Enum &property);
   explicit ExtensionProperty(const Colour &property);
   explicit ExtensionProperty(const Int &property);
