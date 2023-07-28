@@ -310,8 +310,8 @@ using Matrix3f = Matrix3<float>;
 /// Defines a double precision 4x4 matrix.
 using Matrix3d = Matrix3<double>;
 
-TES_EXTERN template class TES_CORE_API Matrix3<float>;
-TES_EXTERN template class TES_CORE_API Matrix3<double>;
+// TES_EXTERN template class TES_CORE_API Matrix3<float>;
+// TES_EXTERN template class TES_CORE_API Matrix3<double>;
 
 /// Performs the matrix multiplication AB.
 /// @return The result of AB.

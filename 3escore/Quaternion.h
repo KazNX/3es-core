@@ -282,8 +282,8 @@ using Quaternionf = Quaternion<float>;
 /// Defines a double precision quaternion.
 using Quaterniond = Quaternion<double>;
 
-TES_EXTERN template class TES_CORE_API Quaternion<float>;
-TES_EXTERN template class TES_CORE_API Quaternion<double>;
+// TES_EXTERN template class TES_CORE_API Quaternion<float>;
+// TES_EXTERN template class TES_CORE_API Quaternion<double>;
 }  // namespace tes
 
 #include "Quaternion.inl"

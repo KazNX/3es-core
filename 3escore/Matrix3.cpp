@@ -5,6 +5,6 @@
 
 namespace tes
 {
-template class Matrix3<float>;
-template class Matrix3<double>;
+// template class Matrix3<float>;
+// template class Matrix3<double>;
 }  // namespace tes

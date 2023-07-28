@@ -39,15 +39,15 @@ public:
   static const Vector3<T> AxisZ;
 
   /// Default constructor: undefined initialisation behaviour.
-  constexpr Vector3() noexcept = default;
+  inline constexpr Vector3() noexcept = default;
   /// Initialises all members to @p scalar.
   /// @param scalar The value for all members.
-  explicit constexpr Vector3(const T &scalar) noexcept
+  inline explicit constexpr Vector3(const T &scalar) noexcept
     : _storage({ scalar, scalar, scalar })
   {}
   /// Copy constructor.
   /// @param other Vector to copy the value of.
-  constexpr Vector3(const Vector3<T> &other) noexcept
+  inline constexpr Vector3(const Vector3<T> &other) noexcept
     : _storage(other._storage)
   {}
 
@@ -56,28 +56,28 @@ public:
   /// @param x The x coordinate.
   /// @param y The y coordinate.
   /// @param z The z coordinate.
-  constexpr Vector3(const T &x, const T &y, const T &z) noexcept
+  inline constexpr Vector3(const T &x, const T &y, const T &z) noexcept
     : _storage({ x, y, z })
   {}
   // NOLINTEND(readability-identifier-length)
 
   /// Initialisation from a array of at least length 3.
   /// @param array Array to initialise from.
-  constexpr Vector3(const std::array<T, 3> &array) noexcept
+  inline constexpr Vector3(const std::array<T, 3> &array) noexcept
     : _storage(array)
   {}
 
   /// Initialisation from a array of at least length 3.
   /// @param array Array to initialise from.
   template <typename U>
-  constexpr Vector3(const std::array<U, 3> &array) noexcept
+  inline constexpr Vector3(const std::array<U, 3> &array) noexcept
     : _storage({ static_cast<T>(array[0]), static_cast<T>(array[1]), static_cast<T>(array[2]) })
   {}
 
   /// Initialisation from a array of at least length 3.
   /// No bounds checking is performed.
   /// @param array3 An array of at least length 3. Copies elements (0, 1, 2).
-  constexpr Vector3(
+  inline constexpr Vector3(
     const T array3[3]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                                  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ array3[0], array3[1], array3[2] })
@@ -87,7 +87,7 @@ public:
   /// No bounds checking is performed.
   /// @param array3 An array of at least length 3. Copies elements (0, 1, 2).
   template <typename U>
-  constexpr Vector3(
+  inline constexpr Vector3(
     const U array3[3]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                                  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ static_cast<T>(array3[0]), static_cast<T>(array3[1]), static_cast<T>(array3[2]) })
@@ -96,7 +96,7 @@ public:
   /// Copy constructor from a different numeric type.
   /// @param other Vector to copy the value of.
   template <typename U>
-  constexpr Vector3(const Vector3<U> &other) noexcept
+  inline constexpr Vector3(const Vector3<U> &other) noexcept
     : _storage({ static_cast<T>(other.x()), static_cast<T>(other.y()), static_cast<T>(other.z()) })
   {}
 
@@ -307,8 +307,8 @@ private:
   std::array<T, 3> _storage;
 };
 
-TES_EXTERN template class TES_CORE_API Vector3<float>;
-TES_EXTERN template class TES_CORE_API Vector3<double>;
+// TES_EXTERN template class TES_CORE_API Vector3<float>;
+// TES_EXTERN template class TES_CORE_API Vector3<double>;
 
 
 //---------------------------------------------------------------------------

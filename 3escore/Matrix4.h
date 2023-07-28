@@ -396,8 +396,8 @@ using Matrix4f = Matrix4<float>;
 /// Defines a double precision 4x4 matrix.
 using Matrix4d = Matrix4<double>;
 
-TES_EXTERN template class TES_CORE_API Matrix4<float>;
-TES_EXTERN template class TES_CORE_API Matrix4<double>;
+// TES_EXTERN template class TES_CORE_API Matrix4<float>;
+// TES_EXTERN template class TES_CORE_API Matrix4<double>;
 
 /// Performs the matrix multiplication AB.
 /// @return The result of AB.

@@ -5,6 +5,6 @@
 
 namespace tes
 {
-template class Bounds<float>;
-template class Bounds<double>;
+// template class Bounds<float>;
+// template class Bounds<double>;
 }  // namespace tes

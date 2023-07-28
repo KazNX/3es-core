@@ -110,8 +110,8 @@ private:
   Vector3<T> _maximum;  ///< Maximum extents.
 };
 
-TES_EXTERN template class TES_CORE_API Bounds<float>;
-TES_EXTERN template class TES_CORE_API Bounds<double>;
+// TES_EXTERN template class TES_CORE_API Bounds<float>;
+// TES_EXTERN template class TES_CORE_API Bounds<double>;
 
 /// Single precision bounds.
 using Boundsf = Bounds<float>;
