@@ -236,7 +236,8 @@ template <typename T>
 inline PacketWriter &PacketWriter::operator>>(T &val)
 {
   int written = writeElement(val);
-  _status |= !(written == sizeof(T)) * Fail;
+  _status |=
+    static_cast<PacketStatus>(!(written == sizeof(T)) * static_cast<unsigned>(PacketStatus::Fail));
   return *this;
 }
 
