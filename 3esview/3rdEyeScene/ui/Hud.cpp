@@ -79,15 +79,13 @@ void Hud::drawCameraCombo()
   labels_cstr[0] = labels[0].c_str();
 
   int current_index = 0;
+  // Add the enumerated cameras.
   for (int i = 0; i < int_cast<int>(cameras.size()); ++i)
   {
     const auto write_idx = i + 1;
     const auto &id = cameras[i];
     switch (id)
     {
-    case kFreeCameraId:
-      labels[write_idx] = "Fly";
-      break;
     case handler::Camera::kRecordedCameraID:
       labels[write_idx] = "Recorded";
       break;
