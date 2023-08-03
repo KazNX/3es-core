@@ -60,7 +60,8 @@ sudo apt install -y \
   libibus-1.0-dev \
   libtool \
   libwayland-dev \
-  libxkbcommon-dev
+  libxkbcommon-dev \
+  zenity
 ```
 
 ### Building with vcpkg
