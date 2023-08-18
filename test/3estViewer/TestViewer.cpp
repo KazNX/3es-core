@@ -35,6 +35,22 @@ TestViewer::~TestViewer()
 }
 
 
+std::shared_ptr<TestViewer> TestViewer::createViewer()
+{
+  static std::weak_ptr<TestViewer> instance;
+  auto shared_instance = instance.lock();
+  if (!shared_instance)
+  {
+    int argc = 1;
+    std::string arg = "test";
+    char *arg_ptr = arg.data();
+    char **argv = &arg_ptr;
+    instance = shared_instance = std::make_shared<TestViewer>(TestViewer::Arguments(argc, argv));
+  }
+  return shared_instance;
+}
+
+
 bool TestViewer::open(const std::filesystem::path &path)
 {
   closeOrDisconnect();
@@ -115,7 +131,9 @@ bool TestViewer::shouldQuit()
 int TestViewer::run(const FrameFunction &frame_function)
 {
   _frame_function = frame_function;
-  return exec();
+  const auto exit_code = exec();
+  reset();
+  return exit_code;
 }
 
 
@@ -137,8 +155,14 @@ int TestViewer::exec()
     }
     _tes->render(dt, Magnum::Vector2i(1024, 768));
     last_sim_time = now;
-  } while (!shouldQuit() || !can_continue);
+  } while (!shouldQuit() && can_continue);
 
   return 0;
+}
+
+
+void TestViewer::reset()
+{
+  _tes->reset();
 }
 }  // namespace tes::view

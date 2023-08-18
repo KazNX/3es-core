@@ -20,21 +20,22 @@ FrameDisplay::~FrameDisplay()
 
 void FrameDisplay::start()
 {
-  if (!_thread)
+  if (!_started)
   {
-    _quit.store(false);
-    _thread = std::make_unique<std::thread>(std::bind(&FrameDisplay::run, this));
+    _quit = false;
+    _thread = std::thread([this]() { run(); });
+    _started = true;
   }
 }
 
 
 void FrameDisplay::stop()
 {
-  if (_thread)
+  if (_started)
   {
     _quit = true;
-    _thread->join();
-    _thread.reset(nullptr);
+    _thread.join();
+    _started = false;
     _quit = false;
   }
 }
