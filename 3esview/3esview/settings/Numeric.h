@@ -18,27 +18,27 @@ class Numeric
 {
 public:
   Numeric(std::string label, T value, std::string tip)
-    : _label(std::move(label))
-    , _value(value)
+    : _value(value)
+    , _label(std::move(label))
     , _tip(std::move(tip))
   {}
   Numeric(std::string label, T value, T minimum, std::string tip)
-    : _label(std::move(label))
-    , _value(value)
+    : _value(value)
     , _minimum(minimum)
+    , _label(std::move(label))
     , _tip(std::move(tip))
   {}
   Numeric(std::string label, T value, std::string tip, T maximum)
-    : _label(std::move(label))
-    , _value(value)
+    : _value(value)
     , _maximum(maximum)
+    , _label(std::move(label))
     , _tip(std::move(tip))
   {}
   Numeric(std::string label, T value, T minimum, T maximum, std::string tip)
-    : _label(std::move(label))
-    , _value(value)
+    : _value(value)
     , _minimum(minimum)
     , _maximum(maximum)
+    , _label(std::move(label))
     , _tip(std::move(tip))
   {}
 
@@ -91,22 +91,22 @@ using UInt = Numeric<unsigned>;
 using Float = Numeric<float>;
 using Double = Numeric<double>;
 
-class TES_VIEWER_API Bool
+class TES_VIEWER_API Boolean
 {
 public:
-  Bool(std::string label, bool value, std::string tip)
-    : _label(std::move(label))
-    , _value(value)
+  Boolean(std::string label, bool value, std::string tip)
+    : _value(value)
+    , _label(std::move(label))
     , _tip(std::move(tip))
   {}
 
-  Bool(const Bool &other) = default;
-  Bool(Bool &&other) = default;
+  Boolean(const Boolean &other) = default;
+  Boolean(Boolean &&other) = default;
 
-  ~Bool() = default;
+  ~Boolean() = default;
 
-  Bool &operator=(const Bool &other) = default;
-  Bool &operator=(Bool &&other) = default;
+  Boolean &operator=(const Boolean &other) = default;
+  Boolean &operator=(Boolean &&other) = default;
 
   [[nodiscard]] const std::string &label() const { return _label; }
   [[nodiscard]] const std::string &tip() const { return _tip; }
@@ -114,12 +114,12 @@ public:
   [[nodiscard]] bool value() const { return _value; }
   void setValue(bool value) { _value = value; }
 
-  [[nodiscard]] bool operator==(const Bool &other) const
+  [[nodiscard]] bool operator==(const Boolean &other) const
   {
     return _value == other._value && _label == other._label && _tip == other._tip;
   }
 
-  [[nodiscard]] bool operator!=(const Bool &other) const { return !operator==(other); }
+  [[nodiscard]] bool operator!=(const Boolean &other) const { return !operator==(other); }
 
 private:
   bool _value = false;

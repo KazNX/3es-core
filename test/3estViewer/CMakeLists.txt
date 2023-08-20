@@ -37,6 +37,7 @@ configure_file(TestViewerConfig.in.h "${CMAKE_CURRENT_BINARY_DIR}/3estViewer/Tes
 
 set(SOURCES
   TestLog.cpp
+  TestMain.cpp
   TestSettings.cpp
   TestShapes.cpp
   TestUtil.cpp
@@ -66,7 +67,7 @@ target_link_libraries(3estViewer
     3esview
     Magnum::${WINDOWLESS_APP}
     ${TES_MAGNUM_PLUGIN_LIBRARIES}
-    GTest::Main
+    GTest::gtest
 )
 
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}" PREFIX source FILES ${SOURCES})

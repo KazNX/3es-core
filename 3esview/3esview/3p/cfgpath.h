@@ -111,8 +111,8 @@ static inline void get_user_config_file(char *out, unsigned int maxlen, const ch
     config_len = strlen(".config/");
   }
 
-  unsigned int home_len = strlen(home);
-  unsigned int appname_len = strlen(appname);
+  size_t home_len = strlen(home);
+  size_t appname_len = strlen(appname);
   const int ext_len = strlen(".conf");
 
   /* first +1 is "/", second is terminating null */
@@ -225,8 +225,8 @@ static inline void get_user_config_folder(char *out, unsigned int maxlen, const 
     config_len = strlen(".config/");
   }
 
-  unsigned int home_len = strlen(home);
-  unsigned int appname_len = strlen(appname);
+  size_t home_len = strlen(home);
+  size_t appname_len = strlen(appname);
 
   /* first +1 is "/", second is trailing "/", third is terminating null */
   if (home_len + 1 + config_len + appname_len + 1 + 1 > maxlen)
@@ -350,8 +350,8 @@ static inline void get_user_data_folder(char *out, unsigned int maxlen, const ch
     config_len = strlen(".local/share/");
   }
 
-  unsigned int home_len = strlen(home);
-  unsigned int appname_len = strlen(appname);
+  size_t home_len = strlen(home);
+  size_t appname_len = strlen(appname);
 
   /* first +1 is "/", second is trailing "/", third is terminating null */
   if (home_len + 1 + config_len + appname_len + 1 + 1 > maxlen)
@@ -439,8 +439,8 @@ static inline void get_user_cache_folder(char *out, unsigned int maxlen, const c
     config_len = strlen(".cache/");
   }
 
-  unsigned int home_len = strlen(home);
-  unsigned int appname_len = strlen(appname);
+  size_t home_len = strlen(home);
+  size_t appname_len = strlen(appname);
 
   /* first +1 is "/", second is trailing "/", third is terminating null */
   if (home_len + 1 + config_len + appname_len + 1 + 1 > maxlen)

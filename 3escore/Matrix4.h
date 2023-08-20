@@ -396,8 +396,12 @@ using Matrix4f = Matrix4<float>;
 /// Defines a double precision 4x4 matrix.
 using Matrix4d = Matrix4<double>;
 
+// FIXME(KS): the extern template declarations broke with link errors when adding `constexpr`
+// functions. Why?
+#ifdef _MSC_VER
 TES_EXTERN template class TES_CORE_API Matrix4<float>;
 TES_EXTERN template class TES_CORE_API Matrix4<double>;
+#endif  // _MSC_VER
 
 /// Performs the matrix multiplication AB.
 /// @return The result of AB.

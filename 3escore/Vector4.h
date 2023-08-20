@@ -40,15 +40,15 @@ public:
   static const Vector4<T> AxisW;
 
   /// Default constructor: undefined initialisation behaviour.
-  constexpr Vector4() = default;
+  inline constexpr Vector4() = default;
   /// Initialises all members to @p scalar.
   /// @param scalar The value for all members.
-  explicit constexpr Vector4(const T &scalar) noexcept
+  inline explicit constexpr Vector4(const T &scalar) noexcept
     : _storage({ scalar, scalar, scalar, scalar })
   {}
   /// Copy constructor.
   /// @param other Vector to copy the value of.
-  constexpr Vector4(const Vector4<T> &other) noexcept
+  inline constexpr Vector4(const Vector4<T> &other) noexcept
     : _storage({ other.x(), other.y(), other.z(), other.w() })
   {}
 
@@ -56,7 +56,7 @@ public:
   /// Copy constructor from a Vector3.
   /// @param other Vector to copy the value of.
   /// @param w The w component value.
-  constexpr Vector4(const Vector3<T> &other, const T &w) noexcept
+  inline constexpr Vector4(const Vector3<T> &other, const T &w) noexcept
     : _storage({ other.x(), other.y(), other.z(), w })
   {}
 
@@ -64,13 +64,14 @@ public:
   /// @param x The x coordinate.
   /// @param y The y coordinate.
   /// @param z The z coordinate.
-  constexpr Vector4(const T &x, const T &y, const T &z, const T &w) noexcept
+  /// @param w The w coordinate.
+  inline constexpr Vector4(const T &x, const T &y, const T &z, const T &w) noexcept
     : _storage({ x, y, z, w })
   {}
   // NOLINTEND(readability-identifier-length)
 
   /// Initialisation from a array of at least length 4.
-  constexpr Vector4(
+  inline constexpr Vector4(
     const std::array<T, 4> &array) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
     : _storage({ array[0], array[1], array[2], array[3] })
   {}
@@ -78,7 +79,7 @@ public:
   /// Initialisation from a array of at least length 4.
   /// @param array Array to initialise from.
   template <typename U>
-  constexpr Vector4(
+  inline constexpr Vector4(
     const std::array<U, 4> array) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
     : _storage({ static_cast<T>(array[0]), static_cast<T>(array[1]), static_cast<T>(array[2]),
                  static_cast<T>(array[3]) })
@@ -87,7 +88,7 @@ public:
   /// Initialisation from a array of at least length 4.
   /// No bounds checking is performed.
   /// @param array4 An array of at least length 4. Copies elements (0, 1, 2, 3).
-  constexpr Vector4(
+  inline constexpr Vector4(
     const T array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                                  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ array4[0], array4[1], array4[2], array4[3] })
@@ -97,7 +98,7 @@ public:
   /// No bounds checking is performed.
   /// @param array4 An array of at least length 4. Copies elements (0, 1, 2, 3).
   template <typename U>
-  constexpr Vector4(
+  inline constexpr Vector4(
     const U array4[4]) noexcept  // NOLINT(cppcoreguidelines-avoid-c-arrays)
                                  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     : _storage({ static_cast<T>(array4[0]), static_cast<T>(array4[1]), static_cast<T>(array4[2]),
@@ -107,7 +108,7 @@ public:
   /// Copy constructor from a different numeric type.
   /// @param other Vector to copy the value of.
   template <typename U>
-  explicit constexpr Vector4(const Vector4<U> &other) noexcept
+  inline explicit constexpr Vector4(const Vector4<U> &other) noexcept
     : _storage({ static_cast<T>(other.x()), static_cast<T>(other.y()), static_cast<T>(other.z()),
                  static_cast<T>(other.w()) })
   {}
@@ -117,7 +118,7 @@ public:
   /// @param other Vector to copy the value of.
   /// @param w The w component value.
   template <typename U>
-  explicit constexpr Vector4(const Vector3<U> &other, const T &w) noexcept
+  inline explicit constexpr Vector4(const Vector3<U> &other, const T &w) noexcept
     : _storage(
         { static_cast<T>(other.x()), static_cast<T>(other.y()), static_cast<T>(other.z()), w })
   {}
@@ -325,8 +326,12 @@ private:
   std::array<T, 4> _storage;
 };
 
+// FIXME(KS): the extern template declarations broke with link errors when adding `constexpr`
+// functions. Why?
+#ifdef _MSC_VER
 TES_EXTERN template class TES_CORE_API Vector4<float>;
 TES_EXTERN template class TES_CORE_API Vector4<double>;
+#endif  // _MSC_VER
 
 //---------------------------------------------------------------------------
 // Arithmetic operators

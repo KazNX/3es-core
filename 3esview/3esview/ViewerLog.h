@@ -6,10 +6,11 @@
 
 #include "3esview/ViewConfig.h"
 
-#include <3escore/log.h>
+#include <3escore/Log.h>
 
-#include <string>
+#include <atomic>
 #include <mutex>
+#include <string>
 #include <vector>
 
 namespace tes::view
@@ -300,7 +301,7 @@ private:
     /// This constructor is delibrately not @c explicit to allow implicit conversion.
     /// @param log_level The log level to initialise with.
     LogLevel(log::Level log_level)  // NOLINT(google-explicit-constructor)
-      : level(static_cast<int>(log_level))
+      : _level(static_cast<int>(log_level))
     {}
     LogLevel(const LogLevel &other) = default;
     LogLevel(LogLevel &&other) = default;
@@ -314,7 +315,7 @@ private:
     /// @return @c *this
     LogLevel &operator=(log::Level log_level)
     {
-      level = static_cast<int>(log_level);
+      _level = static_cast<int>(log_level);
       return *this;
     }
 
@@ -324,11 +325,11 @@ private:
 
     /// Explicit function conversion to a @c log::Level.
     /// @return The curent log level.
-    log::Level toEnum() const { return static_cast<log::Level>(level.load()); }
+    log::Level toEnum() const { return static_cast<log::Level>(_level.load()); }
 
   private:
     /// Atomic integer storing the log level. Direct read/write is not advised.
-    std::atomic_int level = static_cast<int>(log::Level::Fatal);
+    std::atomic_int _level = static_cast<int>(log::Level::Fatal);
   };
 
   /// Get the index of the @c begin entry.
@@ -473,9 +474,7 @@ inline void ViewerLog::View::const_iterator::next(size_t count)
 {
   _cursor = (_cursor + count) % _log->_max_lines;
   // Set _begin to false if count is not zero.
-  // We do so by multiplication tro avoid branching, effectively:
-  // _begin = _begin && !count
-  _begin = _begin * !count;
+  _begin = _begin && !count;
 }
 
 

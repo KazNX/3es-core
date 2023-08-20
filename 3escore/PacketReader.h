@@ -162,7 +162,8 @@ template <typename T>
 inline PacketReader &PacketReader::operator>>(T &val)
 {
   int read = readElement(val);
-  _status |= !(read == sizeof(T)) * Fail;
+  _status |=
+    static_cast<PacketStatus>(!(read == sizeof(T)) * static_cast<unsigned>(PacketStatus::Fail));
   return *this;
 }
 

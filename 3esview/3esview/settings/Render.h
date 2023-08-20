@@ -13,7 +13,7 @@ namespace tes::view::settings
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 struct Render
 {
-  Bool use_edl_shader = { "EDL shader", true, "Enable Eye-Dome-Lighting shader?" };
+  Boolean use_edl_shader = { "EDL shader", true, "Enable Eye-Dome-Lighting shader?" };
   UInt edl_radius = { "EDL radius", 1, 1, 10, "The pixel search radius used in EDL calculations." };
   Float edl_exponential_scale = { "EDL exponential scale", 3.0f, 0.1f, 30.0f,
                                   "Exponential scaling for EDL shader." };

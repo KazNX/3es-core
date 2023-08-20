@@ -96,6 +96,12 @@ inline Colour toColour(const Vector4<T> &v)
 template Colour TES_CORE_API toColour(const Vector4<float> &v);
 template Colour TES_CORE_API toColour(const Vector4<double> &v);
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+// Disable signed/unsigned int comparison for int_cast. The formulation should be ok.
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#endif  // __GNU__
+
 
 /// A helper to cast between integer types with a bounds check.
 ///
@@ -137,6 +143,11 @@ Int int_cast(SrcInt value)  // NOLINT(readability-identifier-naming)
   }
   return static_cast<Int>(value);
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif  // __GNU__
+
 }  // namespace tes
 
 #endif  // TES_CORE_CORE_UTIL_H

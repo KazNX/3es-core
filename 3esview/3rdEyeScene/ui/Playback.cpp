@@ -72,7 +72,8 @@ void Playback::drawButtons(data::DataThread *data_thread)
   const auto play_pause_icon =
     (data_thread && !data_thread->paused()) ? Action::Pause : Action::Play;
 
-  ImGui::BeginChild("Playback buttons", ImVec2(uiViewportSize().x() * 0.75f, button_row_size));
+  ImGui::BeginChild("Playback buttons", ImVec2(static_cast<float>(uiViewportSize().x()) * 0.75f,
+                                               static_cast<float>(button_row_size)));
   button({ { Action::Stop, "S" }, { Action::Record, "R" } });
   ImGui::SameLine();
   button({ { Action::Play, "P" }, { Action::Pause, play_pause_icon, "||" } });
@@ -148,7 +149,7 @@ void Playback::drawFrameSlider(data::DataThread *data_thread)
   int flags = 0;
 
   flags = (!writable) ? ImGuiSliderFlags_NoInput : 0;
-  ImGui::BeginChild("Frame slider", ImVec2(uiViewportSize().x() * 0.75f, 0));
+  ImGui::BeginChild("Frame slider", ImVec2(static_cast<float>(uiViewportSize().x()) * 0.75f, 0.0f));
   if (ImGui::SliderInt(frames_str.c_str(), &current_frame, 0, total_frames, "%d", flags))
   {
     _pending_frame = current_frame;
@@ -206,7 +207,6 @@ Playback::ButtonResult Playback::button(const PlaybackButtonParams &params, bool
 
 Playback::ButtonResult Playback::button(std::initializer_list<PlaybackButtonParams> candidates)
 {
-  Action first_action = Action::Count;
   const PlaybackButtonParams *first_params = nullptr;
 
   for (const auto &params : candidates)

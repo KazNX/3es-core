@@ -204,6 +204,7 @@ enum UpdateFlag : uint16_t
 /// Flags for @c CollatedPacketMessage.
 enum CollatedPacketFlag : uint16_t
 {
+  CPFZero = 0u,
   CPFCompress = (1u << 0u),
 };
 

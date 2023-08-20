@@ -33,14 +33,7 @@ namespace tes::view
 class Shapes : public testing::Test
 {
 public:
-  std::shared_ptr<TestViewer> createViewer() const
-  {
-    int argc = 1;
-    std::string arg = "test";
-    char *arg_ptr = arg.data();
-    char **argv = &arg_ptr;
-    return std::make_shared<TestViewer>(TestViewer::Arguments(argc, argv));
-  }
+  std::shared_ptr<TestViewer> createViewer() const { return TestViewer::createViewer(); }
 };
 
 /// A helper class for running painter parent shape tests.

@@ -82,7 +82,7 @@ TEST(Log, ViewFilter)
       const auto view_size = view.size();
       size_t expected_size = 0;
 
-      for (int l = 0; l <= static_cast<int>(level) && l < histogram.size(); ++l)
+      for (int l = 0; l <= static_cast<int>(level) && l < static_cast<int>(histogram.size()); ++l)
       {
         expected_size += histogram[l];
       }

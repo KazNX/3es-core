@@ -246,8 +246,8 @@ void UIViewer::viewportEvent(ViewportEvent &event)
         auto *hsize = (*iter)[kWindowSettingsHorizontal].getProperty<WindowSizeProperty>();
         auto *vsize = (*iter)[kWindowSettingsVertical].getProperty<WindowSizeProperty>();
 
-        if (hsize->value() != _expected_window_size.x() ||
-            vsize->value() != _expected_window_size.y())
+        if (static_cast<int>(hsize->value()) != _expected_window_size.x() ||
+            static_cast<int>(vsize->value()) != _expected_window_size.y())
         {
           hsize->setValue(_expected_window_size.x());
           vsize->setValue(_expected_window_size.y());

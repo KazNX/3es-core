@@ -131,6 +131,7 @@ enum MeshCreateFlag : uint16_t
 /// Flag values for @c MeshFinaliseMessage .
 enum MeshFinaliseFlag : uint16_t
 {
+  MffZero = 0u,
   /// Calculate normals on receive. Overwrites normals if present.
   MffCalculateNormals = (1u << 0u),
   /// Automatically colour vertices using a relative colour spectrum along the X axis.

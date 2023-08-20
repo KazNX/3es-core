@@ -48,6 +48,20 @@ public:
   /// Destructor.
   ~TestViewer();
 
+  /// Instantiate a singleton, shared viewer. A weak singleton reference is kept to this viewer.
+  ///
+  /// This is to work around an issue whereby the Magnum Graphics windowless app on window fails to
+  /// correctly join it's threads, leaving an exception. The exception isn't caught by GTest, so
+  /// we can create a global viewer and have it persist for all the test. Test cannot be run
+  /// concurrently.
+  ///
+  /// We use a single instance of the viewer to delay the exception until final exit, allowing all
+  /// tests to execute first. Creating a viewer for each test was causing a silent halt before all
+  /// tests had run.
+  ///
+  /// @return The singleton viewer.
+  static std::shared_ptr<TestViewer> createViewer();
+
   /// Get the @c ThirdEyeScene object.
   /// @return The main @c ThirdEyeScene object.
   std::shared_ptr<ThirdEyeScene> tes() const
@@ -142,7 +156,9 @@ public:
 private:
   int exec() override;
 
-private:
+  /// Reset for the next test run (if any).
+  void reset();
+
   std::shared_ptr<ThirdEyeScene> _tes;
   std::shared_ptr<data::DataThread> _data_thread;
   std::optional<Clock::time_point> _end_time;

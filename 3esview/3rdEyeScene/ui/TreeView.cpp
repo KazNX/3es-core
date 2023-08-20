@@ -33,11 +33,11 @@ bool TreeView::beginBranch(unsigned idx, const std::string &label, BranchFlag fl
   }
 
   const auto id_str = label + "_branch";
-  const bool node_open = ImGui::TreeNode(id_str.c_str(), label.c_str());
+  const bool node_open = ImGui::TreeNode(id_str.c_str(), "%s", label.c_str());
   ImGui::TableSetColumnIndex(1);
   if ((flags & BranchFlag::DrawLabel) != BranchFlag::None)
   {
-    ImGui::Text(label.c_str());
+    ImGui::Text("%s", label.c_str());
   }
 
   return node_open;
@@ -66,11 +66,11 @@ void TreeView::beginLeaf(unsigned idx, const std::string &label, const std::stri
   // We must give the tree node a name unique from the label as the label will be used for the child
   // UI node.
   const std::string tree_node_name = label + "_leaf";
-  ImGui::TreeNodeEx(tree_node_name.c_str(), flags, label.c_str());
+  ImGui::TreeNodeEx(tree_node_name.c_str(), flags, "%s", label.c_str());
   if (!info.empty() && ImGui::IsItemHovered())
   {
     ImGui::BeginTooltip();
-    ImGui::SetTooltip(info.c_str());
+    ImGui::SetTooltip("%s", info.c_str());
     ImGui::EndTooltip();
   }
 

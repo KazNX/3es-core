@@ -138,7 +138,7 @@ IOCode load(const ryml::ConstNodeRef &node, Log &log_config, std::ostream &log)
 }
 
 
-IOCode save(ryml::NodeRef &node, const Log &log_settings, std::ostream &log)
+IOCode save(ryml::NodeRef node, const Log &log_settings, std::ostream &log)
 {
   auto code = IOCode::Ok;
   node |= ryml::MAP;
@@ -218,7 +218,7 @@ IOCode load(const ryml::ConstNodeRef &node, Extension &extension, std::ostream &
 }
 
 
-IOCode save(ryml::NodeRef &node, const Playback &playback, std::ostream &log)
+IOCode save(ryml::NodeRef node, const Playback &playback, std::ostream &log)
 {
   auto code = IOCode::Ok;
   node |= ryml::MAP;
@@ -246,7 +246,7 @@ IOCode load(const ryml::ConstNodeRef &node, Render &render, std::ostream &log)
 }
 
 
-IOCode save(ryml::NodeRef &node, const Render &render, std::ostream &log)
+IOCode save(ryml::NodeRef node, const Render &render, std::ostream &log)
 {
   auto code = IOCode::Ok;
   node |= ryml::MAP;
@@ -260,7 +260,7 @@ IOCode save(ryml::NodeRef &node, const Render &render, std::ostream &log)
 }
 
 
-IOCode save(ryml::NodeRef &node, const Connection &connection, std::ostream &log)
+IOCode save(ryml::NodeRef node, const Connection &connection, std::ostream &log)
 {
   TES_UNUSED(log);
   auto code = IOCode::Ok;
@@ -285,7 +285,7 @@ IOCode save(ryml::NodeRef &node, const Connection &connection, std::ostream &log
 }
 
 
-IOCode save(ryml::NodeRef &node, const Extension &extension, std::ostream &log)
+IOCode save(ryml::NodeRef node, const Extension &extension, std::ostream &log)
 {
   auto code = IOCode::Ok;
 

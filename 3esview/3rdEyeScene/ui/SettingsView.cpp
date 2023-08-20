@@ -158,7 +158,7 @@ SettingsView::ViewStatus SettingsView::show(unsigned idx, settings::Extension &c
     {
       // Brute force solution: try convert each property to each of the available types.
       // Show the one which works.
-      if (auto *prop = property.getProperty<settings::Bool>())
+      if (auto *prop = property.getProperty<settings::Boolean>())
       {
         status += showProperty(idx++, *prop);
         continue;
@@ -203,7 +203,7 @@ SettingsView::ViewStatus SettingsView::show(unsigned idx, settings::Extension &c
 }
 
 
-SettingsView::ViewStatus SettingsView::showProperty(unsigned idx, settings::Bool &prop)
+SettingsView::ViewStatus SettingsView::showProperty(unsigned idx, settings::Boolean &prop)
 {
   beginLeaf(idx, prop.label(), prop.tip());
   bool value = prop.value();

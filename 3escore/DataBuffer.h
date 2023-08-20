@@ -21,19 +21,13 @@
 #include <utility>
 #include <variant>
 
-#define STREAM_TYPE_INFO(_type, _type_name) \
-  template <>                               \
-  class DataBufferPrimitiveTypeInfo<_type>  \
-  {                                         \
-  public:                                   \
-    constexpr static DataStreamType type()  \
-    {                                       \
-      return _type_name;                    \
-    }                                       \
-    constexpr static size_t size()          \
-    {                                       \
-      return sizeof(_type);                 \
-    }                                       \
+#define STREAM_TYPE_INFO(_type, _type_name)                       \
+  template <>                                                     \
+  class DataBufferPrimitiveTypeInfo<_type>                        \
+  {                                                               \
+  public:                                                         \
+    constexpr static DataStreamType type() { return _type_name; } \
+    constexpr static size_t size() { return sizeof(_type); }      \
   }
 
 
@@ -949,13 +943,25 @@ private:
     OwnPointer = (1u << 0u),  ///< Indicates this object owns the heap allocation for @c _stream
   };
 
+  using StreamPtr = std::variant<void *, const void *>;
+  /// Type indices relating to @c StreamPtr::index() .
+  enum class PtrType
+  {
+    Invalid = -1,
+    Mutable = 0,
+    Const = 1
+  };
+
   /// Get a writable address for the data buffer.
   ///
   /// This is the @c DataBuffer stream point provided the buffer owns its own memory. Otherwise
   /// a @c nullptr is given.
   ///
   /// @return The writable address, or @c nullptr when the buffer is not writable.
-  [[nodiscard]] void *writePtr() { return (ownPointer()) ? std::get<void *>(_stream) : nullptr; }
+  [[nodiscard]] void *writePtr()
+  {
+    return (pointerType() == PtrType::Mutable) ? std::get<void *>(_stream) : nullptr;
+  }
 
   /// Get a readable address for the data buffer.
   ///
@@ -964,7 +970,8 @@ private:
   /// @return The readable address or @c nullptr when the buffer doesn't have addressable content.
   [[nodiscard]] const void *readPtr() const
   {
-    return (ownPointer()) ? std::get<void *>(_stream) : std::get<const void *>(_stream);
+    return (pointerType() == PtrType::Mutable) ? std::get<void *>(_stream) :
+                                                 std::get<const void *>(_stream);
   }
 
   /// Clear the stream pointer and clear the ownership flag.
@@ -974,7 +981,23 @@ private:
     _flags &= static_cast<uint8_t>(~Flag::OwnPointer);
   }
 
-  using StreamPtr = std::variant<void *, const void *>;
+  /// Query the stored pointer type.
+  /// @return The @c PtrType info.
+  PtrType pointerType() const
+  {
+    switch (_stream.index())
+    {
+    case static_cast<int>(PtrType::Mutable):
+      return PtrType::Mutable;
+    case static_cast<int>(PtrType::Const):
+      return PtrType::Const;
+    default:
+      break;
+    }
+    return PtrType::Invalid;
+  }
+
+
   StreamPtr _stream = null();
   unsigned _count = 0;  ///< Number of vertices in the @p _stream .
   /// Number of primitive type component elements in each vertex. E.g., Vector3 has 3.
