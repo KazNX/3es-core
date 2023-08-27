@@ -3,6 +3,7 @@
 //
 #include "TestCommon.h"
 
+#include <3escore/ByteValue.h>
 #include <3escore/IntArg.h>
 #include <3escore/Ptr.h>
 #include <3escore/V3Arg.h>
@@ -215,5 +216,37 @@ TEST(Core, PtrAssign)
   // Test const upcast
   testPtrCast<const Resource>(mesh);
   testImplicitArgConvert<const Resource>(mesh, mesh);
+}
+
+TEST(Core, ByteValue)
+{
+  // Ensure conversion of progressively larger values is correct.
+  // Should really check units too.
+  uint64_t byte_count = 1u;
+  const uint64_t scale = 1024u;
+  for (int i = static_cast<int>(ByteUnit::Bytes); i <= static_cast<int>(ByteUnit::ExiBytes); ++i)
+  {
+    const auto byte_value = ByteValue(byte_count).succinct();
+    EXPECT_EQ(byte_value.value(), 1u);
+    EXPECT_EQ(byte_value.unit(), static_cast<ByteUnit>(i));
+    byte_count *= scale;
+  }
+
+  // Try again with the fractional component this time.
+  byte_count = 1u;
+  const uint64_t half = 512u;
+  uint64_t fractional = 0u;
+  for (int i = static_cast<int>(ByteUnit::Bytes); i <= static_cast<int>(ByteUnit::ExiBytes); ++i)
+  {
+    const auto byte_value = ByteValue(byte_count + fractional).succinct();
+    EXPECT_EQ(byte_value.value(), 1u);
+    EXPECT_EQ(byte_value.unit(), static_cast<ByteUnit>(i));
+    if (i > 0)
+    {
+      EXPECT_EQ(byte_value.fractional(), 0.5);
+    }
+    byte_count *= scale;
+    fractional = ByteValue(half, static_cast<ByteUnit>(i)).bytes();
+  }
 }
 }  // namespace tes
