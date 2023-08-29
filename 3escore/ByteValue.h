@@ -67,7 +67,7 @@ private:
 inline uint64_t ByteValue::bytes() const
 {
   return _value * conversion(_unit) +
-         static_cast<uint64_t>(_fractional * fractionalConversion(_unit));
+         static_cast<uint64_t>(_fractional * static_cast<double>(fractionalConversion(_unit)));
 }
 
 
