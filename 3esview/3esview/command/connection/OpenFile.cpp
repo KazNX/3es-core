@@ -2,7 +2,9 @@
 
 #include <3esview/Viewer.h>
 
-#include <nfd.h>
+#include <3esview/util/CStrPtr.h>
+
+#include <tinyfiledialogs.h>
 
 namespace tes::view::command::connection
 {
@@ -45,21 +47,15 @@ CommandResult OpenFile::invoke(Viewer &viewer, const ExecInfo &info, const Args 
 
 std::string OpenFile::fromDialog()
 {
-  // const nfdchar_t *filter_list = "3rd Eye Scene files (*.3es),*.3es";
-  // Seems the vcpkg version of nativefiledialog only supports file extension strings.
-  const nfdchar_t *filter_list = "3es";
-  // TODO(KS): cache the last use path and reload it.
-  const nfdchar_t *default_path = "";
-  nfdchar_t *selected_path = nullptr;
-  nfdresult_t result = NFD_OpenDialog(filter_list, default_path, &selected_path);
-
-  const std::string path = (selected_path) ? selected_path : std::string();
-  free(selected_path);
-
-  if (result == NFD_OKAY)
+  // // const char *filter_list = "3rd Eye Scene files (*.3es),*.3es";
+  std::array<const char *, 2> filters = { "*.3es" };
+  util::CStrPtr selection{ tinyfd_openFileDialog("Open file", nullptr, 1, filters.data(), nullptr,
+                                                 0) };
+  if (selection)
   {
-    return path;
+    return { selection.get() };
   }
+
   return std::string();
 }
 }  // namespace tes::view::command::connection

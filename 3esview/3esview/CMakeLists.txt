@@ -21,9 +21,7 @@ find_package(Magnum CONFIG REQUIRED
 # find_package(MagnumExtras CONFIG REQUIRED)
 find_package(ryml CONFIG REQUIRED)
 find_package(Threads)
-# TODO(KS): Check the vcpkg version of nfd for generaly compability. It seems quite different.
-# A submodule or source import may be better for this one.
-find_package(unofficial-nativefiledialog CONFIG REQUIRED)
+find_package(tinyfiledialogs CONFIG REQUIRED)
 
 #-------------------------------------------------------------------------------
 # Configuration header setup.
@@ -89,7 +87,7 @@ target_link_libraries(3esview
     $<BUILD_INTERFACE:Magnum::Shaders>
     $<BUILD_INTERFACE:Magnum::Text>
     $<BUILD_INTERFACE:ryml::ryml>
-    $<BUILD_INTERFACE:unofficial::nativefiledialog::nfd>)
+    $<BUILD_INTERFACE:tinyfiledialogs::tinyfiledialogs>)
 
 #-------------------------------------------------------------------------------
 # IDE source sorting

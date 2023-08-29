@@ -53,8 +53,8 @@
             "pngimporter"
           ]
         },
-        "nativefiledialog",
-        "ryml"
+        "ryml",
+        "tinyfiledialogs"
       ]
     },
     "occupancy": {
