@@ -18,12 +18,12 @@ PacketStreamReader::PacketStreamReader()
   _buffer.reserve(_chunk_size);
 }
 
-PacketStreamReader::PacketStreamReader(std::shared_ptr<std::istream> stream)
+PacketStreamReader::PacketStreamReader(std::istream &stream)
   : PacketStreamReader()
 {
   // An initialiser delegate must stand alone, so member initialisation must appear here.
   // NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
-  _stream = std::move(stream);
+  _stream = &stream;
   if (_stream)
   {
     _current_packet_pos = _stream->tellg();
@@ -34,14 +34,19 @@ PacketStreamReader::PacketStreamReader(std::shared_ptr<std::istream> stream)
 PacketStreamReader::~PacketStreamReader() = default;
 
 
-void PacketStreamReader::setStream(std::shared_ptr<std::istream> stream)
+void PacketStreamReader::setStream(std::istream &stream)
 {
-  std::swap(stream, _stream);
+  _stream = &stream;
   _buffer.clear();
-  if (_stream)
-  {
-    _current_packet_pos = _stream->tellg();
-  }
+  _current_packet_pos = _stream->tellg();
+}
+
+
+void PacketStreamReader::clearStream()
+{
+  _stream = nullptr;
+  _buffer.clear();
+  _current_packet_pos = 0;
 }
 
 

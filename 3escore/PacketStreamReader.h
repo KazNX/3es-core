@@ -62,7 +62,7 @@ public:
   /// @param stream The stream to read.
   /// @todo It doens't make sense to use a @c std::shared_ptr to a @c std::istream . Convert to move
   /// semantics.
-  PacketStreamReader(std::shared_ptr<std::istream> stream);
+  PacketStreamReader(std::istream &stream);
 
   PacketStreamReader(const PacketStreamReader &) = delete;
 
@@ -84,10 +84,12 @@ public:
 
   /// (Re)set the stream to read from.
   /// @param stream The stream to read from.
-  void setStream(std::shared_ptr<std::istream> stream);
+  void setStream(std::istream &stream);
+  /// Clear the stream reference, invaliding the reader.
+  void clearStream();
   /// Get the stream in use.
   /// @return The current stream - may be null.
-  [[nodiscard]] std::shared_ptr<std::istream> stream() const { return _stream; }
+  [[nodiscard]] std::istream *stream() const { return _stream; }
 
   /// Try extract the next packet from the stream. The packet pointer remains
   /// valid until the next call to @c extractPacket(). This object retains the
@@ -120,7 +122,7 @@ private:
   /// @return The expected packet size including payload as indicated by the packet header.
   size_t calcExpectedSize();
 
-  std::shared_ptr<std::istream> _stream;
+  std::istream *_stream = nullptr;
   MarkerBytes _marker_bytes = {};
   std::vector<uint8_t> _buffer;
   size_t _chunk_size = 1024u;
