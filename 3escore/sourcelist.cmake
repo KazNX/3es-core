@@ -4,6 +4,7 @@ list(APPEND PUBLIC_HEADERS
   AssertRange.h
   BaseConnection.h
   Bounds.h
+  ByteValue.h
   CollatedPacket.h
   CollatedPacketDecoder.h
   Colour.h
@@ -108,6 +109,7 @@ list(APPEND PUBLIC_TESSELLATE_HEADERS
 list(APPEND SOURCES
   BaseConnection.cpp
   Bounds.cpp
+  ByteValue.cpp
   CollatedPacket.cpp
   CollatedPacketDecoder.cpp
   Colour.cpp
