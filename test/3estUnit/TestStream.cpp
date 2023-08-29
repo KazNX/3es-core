@@ -26,8 +26,7 @@ namespace tes
 /// @param server_info Structure to read into.
 /// @param frame_count Frame count to read into.
 /// @return true on success.
-bool readStreamInfo(std::shared_ptr<std::iostream> stream, ServerInfoMessage &server_info,
-                    uint32_t &frame_count)
+bool readStreamInfo(std::iostream &stream, ServerInfoMessage &server_info, uint32_t &frame_count)
 {
   PacketStreamReader stream_reader(stream);
   auto [header, status, stream_pos] = stream_reader.extractPacket();
@@ -81,8 +80,7 @@ bool readStreamInfo(std::shared_ptr<std::iostream> stream, ServerInfoMessage &se
 TEST(Stream, Util)
 {
   // Test stream init/finalisation in the tes::streamutil namespace.
-  std::shared_ptr<std::stringstream> stream_ptr = std::make_shared<std::stringstream>();
-  std::stringstream &stream = *stream_ptr;
+  std::stringstream stream;
 
   const uint32_t expect_frame_count = 42u;
   ServerInfoMessage expected_info = { 101, 202, CoordinateFrame::ZYX, { 0u } };
@@ -113,7 +111,7 @@ TEST(Stream, Util)
   stream.clear();
   // For the first read we'll seek to the expected position and start from there.
   stream.seekg(server_info_pos);
-  ASSERT_TRUE(readStreamInfo(stream_ptr, server_info, frame_count));
+  ASSERT_TRUE(readStreamInfo(stream, server_info, frame_count));
 
   EXPECT_EQ(server_info.time_unit, expected_info.time_unit);
   EXPECT_EQ(server_info.default_frame_time, expected_info.default_frame_time);
@@ -129,7 +127,7 @@ TEST(Stream, Util)
   // This time we'll seek to the stream start where we have a partial packet marker.
   // We expect the PacketStreamReader to correctly skip this section.
   stream.seekg(0);
-  ASSERT_TRUE(readStreamInfo(stream_ptr, server_info, frame_count));
+  ASSERT_TRUE(readStreamInfo(stream, server_info, frame_count));
 
   EXPECT_EQ(server_info.time_unit, expected_info.time_unit);
   EXPECT_EQ(server_info.default_frame_time, expected_info.default_frame_time);
@@ -140,8 +138,7 @@ TEST(Stream, Util)
 TEST(Stream, PacketBuffer)
 {
   // Setup a stream.
-  std::shared_ptr<std::stringstream> stream_ptr = std::make_shared<std::stringstream>();
-  std::stringstream &stream = *stream_ptr;
+  std::stringstream stream;
   ServerInfoMessage expected_server_info = {};
   const uint32_t expected_frame_count = 42u;
   initDefaultServerInfo(&expected_server_info);

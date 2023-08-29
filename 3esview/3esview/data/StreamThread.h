@@ -320,6 +320,7 @@ private:
   bool _looping = false;
   float _playback_speed = 1.0f;
   std::unique_ptr<PacketStreamReader> _stream_reader;
+  std::shared_ptr<std::istream> _stream;
   /// The scene manager.
   std::shared_ptr<ThirdEyeScene> _tes;
   std::thread _thread;

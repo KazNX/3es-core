@@ -15,7 +15,8 @@
 namespace tes::view::data
 {
 StreamThread::StreamThread(std::shared_ptr<ThirdEyeScene> tes, std::shared_ptr<std::istream> stream)
-  : _stream_reader(std::make_unique<PacketStreamReader>(std::exchange(stream, nullptr)))
+  : _stream_reader(std::make_unique<PacketStreamReader>(*stream))
+  , _stream(std::move(stream))
   , _tes(std::exchange(tes, nullptr))
 {
   _keyframes.store = std::make_unique<KeyframeStore>();
@@ -588,8 +589,8 @@ void StreamThread::skipToClosestKeyframe(FrameNumber target_frame)
 
 bool StreamThread::loadSnapshot(const std::filesystem::path &snapshot_path)
 {
-  auto stream = std::make_shared<std::ifstream>(snapshot_path.string().c_str(), std::ios::binary);
-  if (!stream->is_open())
+  std::ifstream stream(snapshot_path.string().c_str(), std::ios::binary);
+  if (!stream.is_open())
   {
     return false;
   }
