@@ -281,7 +281,8 @@ unsigned MeshResource::draw(const DrawParams &params, const std::vector<DrawItem
   for (const auto &item : drawables)
   {
     const auto search = _resources.find(item.resource_id);
-    if (search != _resources.end() && search->second.mesh && search->second.shader)
+    if (search != _resources.end() && search->second.mesh && search->second.shader &&
+        search->second.mesh->count())
     {
       search->second.shader
         ->setDrawScale(search->second.current->drawScale())  //
