@@ -236,7 +236,10 @@ private:
   void updateCameraInput(float dt, camera::Camera &camera);
 
   void checkShortcuts(KeyEvent &event);
-  static bool checkShortcut(const command::Shortcut &shortcut, const KeyEvent &event);
+  /// Give @p shortcut a score based on the number of keys matched against @p event.
+  ///
+  /// Score 1 for each key and each modifier matched.
+  static int scoreShortcut(const command::Shortcut &shortcut, const KeyEvent &event);
 
   bool handleStartupArgs(CommandLineOptions::StartupMode startup_mode);
 

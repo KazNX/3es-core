@@ -19,6 +19,7 @@
 #include "painter/Star.h"
 
 #include <3escore/Log.h>
+#include <3escore/Maths.h>
 #include <3escore/Server.h>
 
 #include <Magnum/GL/Context.h>
@@ -437,13 +438,6 @@ void Viewer::keyPressEvent(KeyEvent &event)
     event.setAccepted();
   }
 
-  if (event.key() == KeyEvent::Key::Space)
-  {
-    _tes->camera().position.y() -= 0.1f;
-    dirty = true;
-    event.setAccepted();
-  }
-
   dirty = checkEdlKeys(event) || dirty;
 
   if (dirty)
@@ -708,44 +702,56 @@ void Viewer::checkShortcuts(KeyEvent &event)
     return;
   }
 
+  command::Set::Item best_shortcut = {};
+  int best_score = 0;
   for (const auto &[name, shortcut] : _commands->commands())
   {
-    if (checkShortcut(shortcut.shortcut, event) && shortcut.command->admissible(*this))
+    const int score = scoreShortcut(shortcut.shortcut, event);
+    if (score > best_score && shortcut.command->admissible(*this))
     {
-      log::info("Invoke shortcut command '", shortcut.command->name(), "'");
-      event.setAccepted();
-      const auto result = shortcut.command->invoke(*this);
-      switch (result.code())
-      {
-      case command::CommandResult::Code::Ok:
-        log::info("Invoked shortcut command '", shortcut.command->name(), "'");
-        break;
-      case command::CommandResult::Code::Cancel:
-        log::info("Cancelled shortcut command '", shortcut.command->name(), "'");
-        break;
-      default:
-        log::error("Failed shortcut command '", shortcut.command->name(), "' : ", result.reason());
-        break;
-      }
-      return;
+      best_shortcut = shortcut;
+      best_score = score;
+    }
+  }
+
+  if (best_shortcut.command)
+  {
+    log::info("Invoke shortcut command '", best_shortcut.command->name(), "'");
+    event.setAccepted();
+    const auto result = best_shortcut.command->invoke(*this);
+    switch (result.code())
+    {
+    case command::CommandResult::Code::Ok:
+      log::info("Invoked shortcut command '", best_shortcut.command->name(), "'");
+      break;
+    case command::CommandResult::Code::Cancel:
+      log::info("Cancelled shortcut command '", best_shortcut.command->name(), "'");
+      break;
+    default:
+      log::error("Failed shortcut command '", best_shortcut.command->name(),
+                 "' : ", result.reason());
+      break;
     }
   }
 }
 
 
-bool Viewer::checkShortcut(const command::Shortcut &shortcut, const KeyEvent &event)
+int Viewer::scoreShortcut(const command::Shortcut &shortcut, const KeyEvent &event)
 {
   if (event.key() != shortcut.key())
   {
-    return false;
+    return 0;
   }
 
-  if ((static_cast<int>(event.modifiers()) & shortcut.modifierFlags()) != shortcut.modifierFlags())
+  const int modifiers = static_cast<int>(event.modifiers()) & shortcut.modifierFlags();
+  if (modifiers != shortcut.modifierFlags())
   {
-    return false;
+    return 0;
   }
 
-  return true;
+  int score = 1;                  // for key match.
+  score += countBits(modifiers);  // for each modifier matched
+  return score;
 }
 
 

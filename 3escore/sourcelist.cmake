@@ -121,6 +121,7 @@ list(APPEND SOURCES
   Feature.cpp
   FileConnection.cpp
   Log.cpp
+  Maths.cpp
   MathsManip.cpp
   Matrix3.cpp
   Matrix4.cpp
