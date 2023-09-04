@@ -125,6 +125,7 @@ list(APPEND SOURCES
   command/playback/StepBackward.cpp
   command/playback/StepForward.cpp
   command/playback/Stop.cpp
+  command/render/Resolution.cpp
   data/DataThread.cpp
   data/KeyframeStore.cpp
   data/NetworkThread.cpp

@@ -19,6 +19,7 @@
 #include "playback/StepBackward.h"
 #include "playback/StepForward.h"
 #include "playback/Stop.h"
+#include "render/Resolution.h"
 
 #include <memory>
 
@@ -40,5 +41,8 @@ void registerDefaultCommands(Set &commands)
   commands.registerCommand(std::make_shared<playback::StepBackward>(), Shortcut(","));
   commands.registerCommand(std::make_shared<playback::StepForward>(), Shortcut("."));
   commands.registerCommand(std::make_shared<playback::Stop>(), Shortcut("ctrl+R"));
+  commands.registerCommand(std::make_shared<resolution::Resolution>());
+  commands.registerCommand(std::make_shared<resolution::ResolutionIncrease>(), Shortcut("ctrl+="));
+  commands.registerCommand(std::make_shared<resolution::ResolutionDecrease>(), Shortcut("ctrl+-"));
 }
 }  // namespace tes::view::command
