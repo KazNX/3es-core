@@ -148,6 +148,7 @@ void EdlEffect::viewportChange(const Magnum::Range2Di &viewport)
   if (viewport != _imp->settings.viewport)
   {
     makeBuffers(viewport);
+    _imp->settings.viewport = viewport;
   }
 }
 
