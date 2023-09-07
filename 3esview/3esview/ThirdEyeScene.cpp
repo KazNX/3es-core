@@ -176,6 +176,7 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
   const std::unique_lock guard(_render_mutex);
   if (_reset)
   {
+    // Effect (do/execute) the pending reset.
     effectReset();
   }
 

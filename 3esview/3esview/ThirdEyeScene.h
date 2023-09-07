@@ -206,6 +206,7 @@ public:
   void createSampleShapes();
 
 private:
+  /// Effect (do/execute) a pending reset.
   void effectReset();
 
   void initialiseFont();
