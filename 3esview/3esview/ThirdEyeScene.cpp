@@ -146,9 +146,10 @@ void ThirdEyeScene::clearActiveFboEffect()
 }
 
 
-void ThirdEyeScene::reset()
+void ThirdEyeScene::reset(std::function<bool()> abort)
 {
   std::unique_lock lock(_render_mutex);
+  bool aborted = false;
   if (std::this_thread::get_id() == _main_thread_id)
   {
     effectReset();
@@ -156,10 +157,13 @@ void ThirdEyeScene::reset()
   else
   {
     _reset = true;
-    _reset_notify.wait(lock, [target_reset = _reset_marker + 1, this]()  //
-                       { return _reset_marker >= target_reset; });
+    _reset_notify.wait(lock, [target_reset = _reset_marker + 1, &aborted, &abort, this]()  //
+                       {
+                         aborted = aborted || abort();
+                         return aborted || _reset_marker >= target_reset;
+                       });
   }
-  if (_reset_callback)
+  if (!aborted && _reset_callback)
   {
     _reset_callback();
   }

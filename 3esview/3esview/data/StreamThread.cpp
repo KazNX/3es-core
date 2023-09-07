@@ -437,7 +437,7 @@ StreamThread::Clock::duration StreamThread::processControlMessage(PacketReader &
       // This doesn't seem right any more. Need to check what the Unity viewer did with this. It may
       // be an artifact of the main thread needing to do so much work in Unity.
       _frame.current = msg.value32;
-      _tes->reset();
+      _tes->reset([this] { return stopping(); });
     }
     break;
   case CIdKeyframe:
@@ -556,7 +556,7 @@ void StreamThread::skipToClosestKeyframe(FrameNumber target_frame)
       return;
     }
 
-    _tes->reset();
+    _tes->reset([this] { return stopping(); });
 
     keyframe_ok = loadSnapshot(keyframe.snapshot_path);
     if (!keyframe_ok)
@@ -580,7 +580,7 @@ void StreamThread::skipToClosestKeyframe(FrameNumber target_frame)
   if (target_frame < _frame.current.load())
   {
     // No keyframe available or failed to load. Skip to stream start.
-    _tes->reset();
+    _tes->reset([this] { return stopping(); });
     _stream_reader->seek(0);
     _frame.current = 0;
   }

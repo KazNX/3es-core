@@ -139,7 +139,10 @@ public:
   ///
   /// When called on the main thread, this immediately resets the message handlers. From other
   /// threads, this will mark the main thread for reset and block until the reset is effected.
-  void reset();
+  ///
+  /// @param abort Optional abort check. Called to check if reset should be aborted (return value
+  /// true to abort).
+  void reset(std::function<bool()> abort = {});
 
   const ResetCallback &resetCallback() const { return _reset_callback; }
   void setResetCallback(ResetCallback callback) { _reset_callback = std::move(callback); }

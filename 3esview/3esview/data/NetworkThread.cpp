@@ -162,7 +162,7 @@ void NetworkThread::runWith(TcpSocket &socket)
   _total_frames = 0;
 
   // Make sure we reset from any previous connection.
-  _tes->reset();
+  _tes->reset([this] { return stopping(); });
 
   while (socket.isConnected() && !_quit_flag)
   {
@@ -262,7 +262,7 @@ void NetworkThread::processControlMessage(PacketReader &packet)
     // This doesn't seem right any more. Need to check what the Unity viewer did with this. It may
     // be an artifact of the main thread needing to do so much work in Unity.
     _current_frame = msg.value32;
-    _tes->reset();
+    _tes->reset([this] { return stopping(); });
     break;
   case CIdKeyframe:
     [[fallthrough]];
