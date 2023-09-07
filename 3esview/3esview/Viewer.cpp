@@ -396,7 +396,15 @@ void Viewer::drawEvent()
 void Viewer::viewportEvent(ViewportEvent &event)
 {
   Magnum::GL::defaultFramebuffer.setViewport({ {}, event.framebufferSize() });
-  _edl_effect->viewportChange(Magnum::GL::defaultFramebuffer.viewport());
+  // FIXME(KS): I used to just call _edl_effect->viewportChange() which should work to update the
+  // render textures. For some reason, this didn't seem change the texture resolution update
+  // correctly. Recreating the effect at the right size seems to be a viable workaround.
+  const bool edl_on = _tes->activeFboEffect() == _edl_effect;
+  _edl_effect = std::make_shared<EdlEffect>(Magnum::GL::defaultFramebuffer.viewport());
+  if (edl_on)
+  {
+    _tes->setActiveFboEffect(_edl_effect);
+  }
 }
 
 
