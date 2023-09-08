@@ -157,11 +157,18 @@ void ThirdEyeScene::reset(std::function<bool()> abort)
   else
   {
     _reset = true;
-    _reset_notify.wait(lock, [target_reset = _reset_marker + 1, &aborted, &abort, this]()  //
-                       {
-                         aborted = aborted || abort();
-                         return aborted || _reset_marker >= target_reset;
-                       });
+    const auto stop_waiting = [target_reset = _reset_marker + 1, &aborted, &abort, this]()  //
+    {
+      aborted = aborted || abort();
+      return aborted || _reset_marker >= target_reset;
+    };
+    // Use a wait_for loop on the condition variable to avoid a shutdown deadlock where the stream
+    // thread can be waiting here for a reset, but also being joined from the main thread to quit.
+    // The main thread can't service the reset request in this case (and doesn't need to).
+    while (!stop_waiting())
+    {
+      _reset_notify.wait_for(lock, std::chrono::seconds(1), stop_waiting);
+    }
   }
   if (!aborted && _reset_callback)
   {
