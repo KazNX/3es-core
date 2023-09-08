@@ -25,8 +25,8 @@ struct TES_VIEWER_API EdlEffectDetail
     Magnum::Range2Di viewport{ Magnum::Vector2i{ 0 }, Magnum::Vector2i{ 1 } };
   };
 
-  Magnum::GL::Texture2D colour_texture;
-  Magnum::GL::Texture2D depth_texture;
+  Magnum::GL::Texture2D colour_texture{ Magnum::NoCreate };
+  Magnum::GL::Texture2D depth_texture{ Magnum::NoCreate };
   Magnum::GL::Framebuffer frame_buffer{ Magnum::NoCreate };
   shaders::Edl shader;
   Settings settings;
@@ -159,13 +159,17 @@ void EdlEffect::makeBuffers(const Magnum::Range2Di &viewport)
   size.x() = std::max(size.x(), 1);
   size.y() = std::max(size.y(), 1);
 
+  // We need to fully recreate the FBO and textures for the viewport change to work.
+  _imp->frame_buffer = Magnum::GL::Framebuffer(viewport);
+  _imp->colour_texture = Magnum::GL::Texture2D{};
+  _imp->depth_texture = Magnum::GL::Texture2D{};
+
   _imp->colour_texture.setStorage(1, Magnum::GL::TextureFormat::RGBA8, size);
   _imp->depth_texture.setStorage(1, Magnum::GL::TextureFormat::DepthComponent32F, size);
 
   _imp->colour_texture.setWrapping(Magnum::GL::SamplerWrapping::ClampToEdge);
   _imp->depth_texture.setWrapping(Magnum::GL::SamplerWrapping::ClampToEdge);
 
-  _imp->frame_buffer = Magnum::GL::Framebuffer(viewport);
   _imp->frame_buffer.attachTexture(Magnum::GL::Framebuffer::ColorAttachment{ 0 },
                                    _imp->colour_texture, 0);
   _imp->frame_buffer.attachTexture(Magnum::GL::Framebuffer::BufferAttachment::Depth,
