@@ -220,7 +220,7 @@ void StreamThread::run()
         _have_server_info = false;
         _frame.catching_up = false;
       }
-      break;
+      [[fallthrough]];
     default:
       _frame.catching_up = false;
       std::this_thread::sleep_until(next_frame_start);
