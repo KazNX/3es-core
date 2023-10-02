@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "3es",
   "version-string": "0.9.0",
   "description": "3D debug rendering instrumentation library.",

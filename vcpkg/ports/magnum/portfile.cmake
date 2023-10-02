@@ -1,9 +1,10 @@
+
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO mosra/magnum
     # Commit from late August 2023
     REF ec018af93947b3a3c371e0b6909e831aca608747
-    SHA512 0
+    SHA512 90d57c072645f54241322f4288ddd9704972d695a339101259de795e7314f47d0e4bc74f37f5ece5bf0efcb25287ff178b06e06b61963af7e1df647e24bbac77
     HEAD_REF master
     PATCHES
         002-sdl-includes.patch
@@ -63,7 +64,7 @@ foreach(_feature IN LISTS ALL_SUPPORTED_FEATURES)
 
     # Final feature is empty, ignore it
     if(_feature)
-        list(APPEND _COMPONENTS ${_feature} WITH_${_FEATURE})
+        list(APPEND _COMPONENTS ${_feature} MAGNUM_WITH_${_FEATURE})
     endif()
 endforeach()
 
@@ -73,10 +74,12 @@ vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         ${FEATURE_OPTIONS}
-        -DBUILD_STATIC=${BUILD_STATIC}
-        -DBUILD_PLUGINS_STATIC=${BUILD_PLUGINS_STATIC}
+        -DMAGNUM_BUILD_STATIC=${BUILD_STATIC}
+        -DMAGNUM_BUILD_PLUGINS_STATIC=${BUILD_PLUGINS_STATIC}
         -DMAGNUM_PLUGINS_DEBUG_DIR=${CURRENT_INSTALLED_DIR}/debug/bin/magnum-d
         -DMAGNUM_PLUGINS_RELEASE_DIR=${CURRENT_INSTALLED_DIR}/bin/magnum
+        -DMAGNUM_BUILD_DEPRECATED=Off
+        -DMAGNUM_WITH_SDL2APPLICATION=Off
 )
 
 vcpkg_cmake_install()

@@ -1,0 +1,6 @@
+# Declare files that will always have LF line endings on checkout.
+# This is to match vcpkg behaviour and ensure patch file line endings match
+# that of downloaded source.
+# I'm not 100% on this, but it was causing issues before first check in of the
+# patch files.
+*.patch text eol=lf

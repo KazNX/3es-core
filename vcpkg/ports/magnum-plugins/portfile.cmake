@@ -3,7 +3,7 @@ vcpkg_from_github(
     REPO mosra/magnum-plugins
     # Early August 2023
     REF b3cfb9d97c97e3de3a574cff169c9b4b580003d3
-    SHA512 0
+    SHA512 801b312312bfabb70668f4e79dc29076a2e2cdb897c00da097ff6d7dffe968b2c6e276ef6a2e0647b9b6ba40b9dc95694be34ee037ef3f26dbf38439c3e4e1c3
     HEAD_REF master
     PATCHES
         002-fix-stb-conflict.patch
@@ -69,7 +69,7 @@ foreach(_feature IN LISTS ALL_SUPPORTED_FEATURES)
 
     # Final feature is empty, ignore it
     if(_feature)
-        list(APPEND _COMPONENTS ${_feature} WITH_${_FEATURE})
+        list(APPEND _COMPONENTS ${_feature} MAGNUM_WITH_${_FEATURE})
     endif()
 endforeach()
 
@@ -79,10 +79,11 @@ vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         ${FEATURE_OPTIONS}
-        -DBUILD_STATIC=${BUILD_PLUGINS_STATIC}
-        -DBUILD_PLUGINS_STATIC=${BUILD_PLUGINS_STATIC}
+        -DMAGNUM_BUILD_STATIC=${BUILD_PLUGINS_STATIC}
+        -DMAGNUM_BUILD_PLUGINS_STATIC=${BUILD_PLUGINS_STATIC}
         -DMAGNUM_PLUGINS_DEBUG_DIR=${CURRENT_INSTALLED_DIR}/debug/bin/magnum-d
         -DMAGNUM_PLUGINS_RELEASE_DIR=${CURRENT_INSTALLED_DIR}/bin/magnum
+        -DMAGNUM_BUILD_DEPRECATED=Off
 )
 
 vcpkg_cmake_install()

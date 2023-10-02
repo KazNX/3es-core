@@ -3,7 +3,7 @@ vcpkg_from_github(
     REPO mosra/magnum-integration
     # Early August 2023
     REF cbd5e6c055828234b6659844244a22373085f382
-    SHA512 0
+    SHA512 c1fd9ac9e2d27b3dae85cc28acd62dd343cc8d8ce0cc2a9baf6a8a77a338ea60f66103d862711664e2bd18378ed117a362110dfe15926e350b06443831061672
     HEAD_REF master
 )
 
@@ -12,19 +12,20 @@ string(COMPARE EQUAL "${VCPKG_LIBRARY_LINKAGE}" "static" BUILD_STATIC)
 vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
-        bullet WITH_BULLET
-        eigen  WITH_EIGEN
-        glm    WITH_GLM
-        imgui  WITH_IMGUI
+        bullet MAGNUM_WITH_BULLET
+        eigen  MAGNUM_WITH_EIGEN
+        glm    MAGNUM_WITH_GLM
+        imgui  MAGNUM_WITH_IMGUI
 )
 
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         ${FEATURE_OPTIONS}
-        -DBUILD_STATIC=${BUILD_STATIC}
+        -DMAGNUM_BUILD_STATIC=${BUILD_STATIC}
         -DMAGNUM_PLUGINS_DEBUG_DIR=${CURRENT_INSTALLED_DIR}/debug/bin/magnum-d
         -DMAGNUM_PLUGINS_RELEASE_DIR=${CURRENT_INSTALLED_DIR}/bin/magnum
+        -DMAGNUM_BUILD_DEPRECATED=Off
 )
 
 vcpkg_cmake_install()

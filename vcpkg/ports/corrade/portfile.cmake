@@ -6,7 +6,7 @@ vcpkg_from_github(
     SHA512 71490b39c97f0fbd9cc24fa1b011f05d9dba90f619c5ae68ef5e4fa20448cdd154c6ab99701727b7386ed8eeed4d5ee89bdc17e61fff704751fd49dfd5a1eb8d
     HEAD_REF master
     PATCHES
-        fix-vs2019.patch
+        # fix-vs2019.patch
         build-corrade-rc-always.patch
 )
 
