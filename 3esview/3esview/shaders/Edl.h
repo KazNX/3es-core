@@ -6,14 +6,14 @@
 #include <Magnum/GL/AbstractShaderProgram.h>
 #include <Magnum/GL/Texture.h>
 #include <Magnum/GL/Renderbuffer.h>
-#include <Magnum/Shaders/Generic.h>
+#include <Magnum/Shaders/GenericGL.h>
 
 namespace tes::shaders
 {
 class TES_VIEWER_API Edl : public Magnum::GL::AbstractShaderProgram
 {
 public:
-  using Position = Magnum::Shaders::Generic3D::Position;
+  using Position = Magnum::Shaders::GenericGL3D::Position;
   using TextureCoordinates = Magnum::GL::Attribute<1, Magnum::Vector2>;
 
   Edl();
@@ -26,7 +26,8 @@ public:
   Edl &setProjectionMatrix(const Magnum::Matrix4 &matrix);
 
   /// Set the projection parameters based on the near/far clip plane distances.
-  Edl &setClipParams(Magnum::Float near, Magnum::Float far, bool perspective = true, bool reverse_depth = false);
+  Edl &setClipParams(Magnum::Float near, Magnum::Float far, bool perspective = true,
+                     bool reverse_depth = false);
 
   /// Set the screen/view size in pixels.
   Edl &setScreenParams(const Magnum::Vector2i &view_size);

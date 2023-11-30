@@ -13,7 +13,7 @@
 namespace tes::view::shaders
 {
 VertexColour::VertexColour()
-  : _shader(std::make_shared<Magnum::Shaders::VertexColor3D>())
+  : _shader(std::make_shared<Magnum::Shaders::VertexColorGL3D>())
 {}
 
 

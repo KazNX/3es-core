@@ -6,8 +6,12 @@
 #include <Magnum/GL/Version.h>
 #include <Magnum/Math/Matrix4.h>
 
+#include <Corrade/Containers/Iterable.h>
 #include <Corrade/Containers/Reference.h>
+#include <Corrade/Containers/StringStl.h>
 #include <Corrade/Utility/Assert.h>
+
+#include <string>
 
 namespace tes::shaders
 {
@@ -29,7 +33,7 @@ Edl::Edl()
   vert.addSource(vert_code);
   frag.addSource(frag_code);
 
-  CORRADE_INTERNAL_ASSERT_OUTPUT(GL::Shader::compile({ vert, frag }));
+  CORRADE_INTERNAL_ASSERT_OUTPUT(vert.compile() && frag.compile());
 
   attachShaders({ vert, frag });
 

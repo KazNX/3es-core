@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "magnum-extras",
-  "version-string": "2020.06",
+  "version-string": "2023.08",
   "port-version": 2,
   "description": "Extras for magnum, C++11/C++14 graphics middleware for games and data visualization",
   "homepage": "https://magnum.graphics/",

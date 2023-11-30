@@ -20,8 +20,12 @@ vcpkg_cmake_configure(
     OPTIONS
         ${FEATURE_OPTIONS}
         -DBUILD_STATIC=${BUILD_STATIC}
+        -DMAGNUM_BUILD_STATIC=${BUILD_STATIC}
         -DMAGNUM_PLUGINS_DEBUG_DIR=${CURRENT_INSTALLED_DIR}/debug/bin/magnum-d
         -DMAGNUM_PLUGINS_RELEASE_DIR=${CURRENT_INSTALLED_DIR}/bin/magnum
+    MAYBE_UNUSED_VARIABLES
+        BUILD_STATIC
+        MAGNUM_BUILD_STATIC
 )
 
 vcpkg_cmake_install()

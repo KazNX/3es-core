@@ -10,7 +10,7 @@
 #include "Shader.h"
 
 #include <Magnum/GL/AbstractShaderProgram.h>
-#include <Magnum/Shaders/Generic.h>
+#include <Magnum/Shaders/GenericGL.h>
 
 #include <memory>
 
@@ -63,7 +63,7 @@ private:
 class TES_VIEWER_API PointGeomProgram : public Magnum::GL::AbstractShaderProgram
 {
 public:
-  using Generic = Magnum::Shaders::Generic<3>;
+  using Generic = Magnum::Shaders::GenericGL3D;
 
   using Position = Generic::Position;
   using Color3 = Generic::Color3;

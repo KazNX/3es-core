@@ -313,6 +313,7 @@ private:
   };
 
   std::mutex _render_mutex;
+  // std::recursive_mutex _render_mutex;
   FrameNumber _new_frame = 0;
   ServerInfoMessage _server_info = {};
   bool _have_new_frame = false;

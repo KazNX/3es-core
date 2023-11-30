@@ -7,6 +7,8 @@
 
 #include <3escore/Debug.h>
 
+#include <Corrade/Containers/ArrayViewStl.h>
+
 namespace tes::view::painter
 {
 constexpr size_t ShapeCache::kListEnd;

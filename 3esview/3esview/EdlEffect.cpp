@@ -10,6 +10,9 @@
 #include <Magnum/Math/Matrix4.h>
 #include <Magnum/Math/Vector2.h>
 
+#include <Corrade/Containers/ArrayView.h>
+#include <Corrade/Containers/ArrayViewStl.h>
+
 #include <array>
 
 namespace tes::view
@@ -56,6 +59,8 @@ EdlEffect::EdlEffect(const Magnum::Range2Di &viewport)
     0, 1, 2,  // | / /|
     2, 1, 3   // |/ / |
   };          // 2 2--0
+
+  Corrade::Containers::ArrayView<const void> a(vertices);
 
   _imp->mesh.setCount(Magnum::Int(indices.size()))
     .addVertexBuffer(Magnum::GL::Buffer{ vertices }, 0, shaders::Edl::Position{},
@@ -139,6 +144,7 @@ void EdlEffect::completeFrame()
     .setLinearScale(_imp->settings.linear_scale)
     .setExponentialScale(_imp->settings.exponential_scale)
     .setLightDirection(_imp->settings.light_direction);
+
   _imp->shader.draw(_imp->mesh);
 }
 

@@ -8,6 +8,8 @@
 
 #include <3escore/Log.h>
 
+#include <Corrade/Containers/PointerStl.h>
+#include <Corrade/Containers/StringStl.h>
 #include <Corrade/Utility/Resource.h>
 
 #include <Magnum/GL/Renderer.h>

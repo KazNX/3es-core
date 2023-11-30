@@ -12,7 +12,6 @@
 #include <3escore/shapes/Id.h>
 
 #include <Magnum/GL/Mesh.h>
-#include <Magnum/Shaders/VertexColor.h>
 
 #include <iosfwd>
 #include <memory>

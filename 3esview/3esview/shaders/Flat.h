@@ -9,7 +9,7 @@
 #include "Shader.h"
 #include "Pvm.h"
 
-#include <Magnum/Shaders/Flat.h>
+#include <Magnum/Shaders/FlatGL.h>
 
 #include <memory>
 
@@ -31,7 +31,7 @@ public:
   }
 
   std::shared_ptr<Magnum::GL::AbstractShaderProgram> shader() const override { return _shader; }
-  std::shared_ptr<Magnum::Shaders::Flat3D> typedShader() const { return _shader; }
+  std::shared_ptr<Magnum::Shaders::FlatGL3D> typedShader() const { return _shader; }
 
   Shader &setProjectionMatrix(const Magnum::Matrix4 &matrix) override;
   Shader &setViewMatrix(const Magnum::Matrix4 &matrix) override;
@@ -52,7 +52,7 @@ private:
   void updateTransform();
 
   /// Internal shader.
-  std::shared_ptr<Magnum::Shaders::Flat3D> _shader;
+  std::shared_ptr<Magnum::Shaders::FlatGL3D> _shader;
   Pvm _pvm;
 };
 

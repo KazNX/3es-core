@@ -18,6 +18,7 @@
 #include <Magnum/Trade/ImageData.h>
 
 #include <Corrade/Containers/Optional.h>
+#include <Corrade/Containers/StringStl.h>
 #include <Corrade/PluginManager/PluginManager.h>
 #include <Corrade/Utility/Resource.h>
 

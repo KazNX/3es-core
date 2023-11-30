@@ -97,7 +97,7 @@ struct VertexMapper<VertexP>
     const Array<VertexP> &vertices)
   {
     return Array<Magnum::Trade::MeshAttributeData>{
-      Corrade::Containers::InPlaceInit,
+      Corrade::InPlaceInit,
       { Magnum::Trade::MeshAttributeData{
         Magnum::Trade::MeshAttribute::Position,
         Corrade::Containers::stridedArrayView(vertices, &vertices[0].position, vertices.size(),
@@ -138,7 +138,7 @@ struct VertexMapper<VertexPN>
     const Array<VertexPN> &vertices)
   {
     return Array<Magnum::Trade::MeshAttributeData>{
-      Corrade::Containers::InPlaceInit,
+      Corrade::InPlaceInit,
       {
         Magnum::Trade::MeshAttributeData{
           Magnum::Trade::MeshAttribute::Position,
@@ -182,7 +182,7 @@ struct VertexMapper<VertexPC>
     const Array<VertexPC> &vertices)
   {
     return Array<Magnum::Trade::MeshAttributeData>{
-      Corrade::Containers::InPlaceInit,
+      Corrade::InPlaceInit,
       {
         Magnum::Trade::MeshAttributeData{
           Magnum::Trade::MeshAttribute::Position,
@@ -229,7 +229,7 @@ struct VertexMapper<VertexPNC>
     const Array<VertexPNC> &vertices)
   {
     return Array<Magnum::Trade::MeshAttributeData>{
-      Corrade::Containers::InPlaceInit,
+      Corrade::InPlaceInit,
       {
         Magnum::Trade::MeshAttributeData{
           Magnum::Trade::MeshAttribute::Position,
@@ -253,8 +253,8 @@ template <typename V>
 Magnum::GL::Mesh convert(const tes::MeshResource &mesh_resource, Magnum::MeshPrimitive draw_type,
                          tes::Bounds<Magnum::Float> &bounds, const ConvertOptions &options)
 {
-  Array<V> vertices(Corrade::Containers::DefaultInit, mesh_resource.vertexCount());
-  Array<Magnum::UnsignedInt> indices(Corrade::Containers::DefaultInit, mesh_resource.indexCount());
+  Array<V> vertices(Corrade::DefaultInit, mesh_resource.vertexCount());
+  Array<Magnum::UnsignedInt> indices(Corrade::DefaultInit, mesh_resource.indexCount());
 
   const DataBuffer src_vertices = mesh_resource.vertices();
   const DataBuffer src_normals = mesh_resource.normals();
@@ -290,15 +290,14 @@ Magnum::GL::Mesh convert(const tes::MeshResource &mesh_resource, Magnum::MeshPri
   }
   else if (options.auto_index)
   {
-    indices =
-      Array<Magnum::UnsignedInt>(Corrade::Containers::DefaultInit, mesh_resource.indexCount());
+    indices = Array<Magnum::UnsignedInt>(Corrade::DefaultInit, mesh_resource.indexCount());
     for (unsigned i = 0; i < unsigned(indices.size()); ++i)
     {
       indices[i] = i;
     }
   }
 
-  if (!indices.empty())
+  if (!indices.isEmpty())
   {
     const Magnum::Trade::MeshData md(
       draw_type, Magnum::Trade::DataFlags{}, ArrayView<const void>(indices),

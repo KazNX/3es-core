@@ -9,7 +9,7 @@
 #include "Shader.h"
 #include "Pvm.h"
 
-#include <Magnum/Shaders/VertexColor.h>
+#include <Magnum/Shaders/VertexColorGL.h>
 
 #include <memory>
 
@@ -27,7 +27,7 @@ public:
   Feature features() const override { return Feature::Transparent | Feature::DrawScale; }
 
   std::shared_ptr<Magnum::GL::AbstractShaderProgram> shader() const override { return _shader; }
-  std::shared_ptr<Magnum::Shaders::VertexColor3D> typedShader() const { return _shader; }
+  std::shared_ptr<Magnum::Shaders::VertexColorGL3D> typedShader() const { return _shader; }
 
   Shader &setProjectionMatrix(const Magnum::Matrix4 &matrix) override;
   Shader &setViewMatrix(const Magnum::Matrix4 &matrix) override;
@@ -44,7 +44,7 @@ private:
   void updateTransform();
 
   /// Internal shader.
-  std::shared_ptr<Magnum::Shaders::VertexColor3D> _shader;
+  std::shared_ptr<Magnum::Shaders::VertexColorGL3D> _shader;
   Pvm _pvm;
 };
 

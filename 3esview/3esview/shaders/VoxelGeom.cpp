@@ -14,7 +14,9 @@
 #include <Magnum/Math/Color.h>
 #include <Magnum/Math/Matrix4.h>
 
+#include <Corrade/Containers/Iterable.h>
 #include <Corrade/Containers/Reference.h>
+#include <Corrade/Containers/StringStl.h>
 #include <Corrade/Utility/Assert.h>
 
 namespace tes::view::shaders
@@ -124,7 +126,7 @@ VoxelGeomProgram::VoxelGeomProgram()
   geom.addSource(geom_code);
   frag.addSource(frag_code);
 
-  CORRADE_INTERNAL_ASSERT_OUTPUT(GL::Shader::compile({ vert, geom, frag }));
+  CORRADE_INTERNAL_ASSERT_OUTPUT(vert.compile() && geom.compile() && frag.compile());
 
   attachShaders({ vert, geom, frag });
 

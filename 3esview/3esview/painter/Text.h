@@ -14,7 +14,7 @@
 #include <Magnum/Math/Color.h>
 #include <Magnum/Math/Matrix4.h>
 #include <Magnum/Math/Vector2.h>
-#include <Magnum/Shaders/DistanceFieldVector.h>
+#include <Magnum/Shaders/DistanceFieldVectorGL.h>
 #include <Magnum/Text/AbstractFont.h>
 #include <Magnum/Text/DistanceFieldGlyphCache.h>
 #include <Magnum/Text/Renderer.h>
@@ -207,7 +207,7 @@ private:
   /// Magnum::Text::Renderer3D]`
   /// @tparam Matrix The text transformation matrix type of rank 3 or 4.
   /// @tparam Shader The text shader type:
-  ///   `[Magnum::Shader::DistanceFieldVector2D, Magnum::Shader::DistanceFieldVector3D]`
+  ///   `[Magnum::Shader::DistanceFieldVectorGL2D, Magnum::Shader::DistanceFieldVectorGL3D]`
   /// @param text The text item to draw.
   /// @param full_projection_matrix The full transformation matrix including projection, camera and
   /// model transforms.
@@ -224,8 +224,8 @@ private:
   Magnum::Matrix4 _default_transform;
 
   std::unique_ptr<Magnum::Text::AbstractFont> _font = nullptr;
-  Magnum::Shaders::DistanceFieldVector2D _shader_2d;
-  Magnum::Shaders::DistanceFieldVector3D _shader_3d;
+  Magnum::Shaders::DistanceFieldVectorGL2D _shader_2d;
+  Magnum::Shaders::DistanceFieldVectorGL3D _shader_3d;
   std::unique_ptr<Magnum::Text::DistanceFieldGlyphCache> _cache;
 };
 

@@ -8,6 +8,8 @@
 
 #include <Magnum/Platform/GlfwApplication.h>
 
+#include <string>
+
 namespace tes::view::command
 {
 /// Defines a keyboard shortcut sequence.
@@ -27,8 +29,9 @@ namespace tes::view::command
 /// - alt
 /// - meta
 ///
-/// When multiple modifiers are used, then order is irrelevant on parsing, but the resulting @c toString() operation
-/// uses the order listed above. Duplicate modifier specifications are redundant and will be stripped.
+/// When multiple modifiers are used, then order is irrelevant on parsing, but the resulting @c
+/// toString() operation uses the order listed above. Duplicate modifier specifications are
+/// redundant and will be stripped.
 ///
 /// Valid keys are:
 ///
@@ -190,7 +193,10 @@ public:
   /// Equality operator.
   /// @param other Object to compare to.
   /// @return True if the objects are semantically equivalent.
-  bool operator==(const Shortcut &other) const { return _key == other._key && _modifiers == other._modifiers; }
+  bool operator==(const Shortcut &other) const
+  {
+    return _key == other._key && _modifiers == other._modifiers;
+  }
 
   /// Equality operator.
   /// @param other Object to compare to.

@@ -10,7 +10,7 @@
 #include "Pvm.h"
 
 #include <Magnum/GL/AbstractShaderProgram.h>
-#include <Magnum/Shaders/Generic.h>
+#include <Magnum/Shaders/GenericGL.h>
 
 #include <memory>
 
@@ -27,7 +27,10 @@ public:
   /// Destructor.
   ~VoxelGeom();
 
-  Feature features() const override { return Feature::Transparent | Feature::Tint | Feature::DrawScale; }
+  Feature features() const override
+  {
+    return Feature::Transparent | Feature::Tint | Feature::DrawScale;
+  }
 
   std::shared_ptr<Magnum::GL::AbstractShaderProgram> shader() const override;
   std::shared_ptr<VoxelGeomProgram> typedShader() const { return _shader; }
@@ -55,7 +58,7 @@ private:
 class TES_VIEWER_API VoxelGeomProgram : public Magnum::GL::AbstractShaderProgram
 {
 public:
-  using Generic = Magnum::Shaders::Generic<3>;
+  using Generic = Magnum::Shaders::GenericGL3D;
 
   using Position = Generic::Position;
   using Color3 = Generic::Color3;

@@ -10,9 +10,10 @@
 namespace tes::view::shaders
 {
 Flat::Flat()
-  : _shader(std::make_shared<Magnum::Shaders::Flat3D>(
-      Magnum::Shaders::Flat3D::Flag::VertexColor |
-      Magnum::Shaders::Flat3D::Flag::InstancedTransformation))
+  : _shader(std::make_shared<Magnum::Shaders::FlatGL3D>(
+      Magnum::Shaders::FlatGL3D::Configuration{}.setFlags(
+        Magnum::Shaders::FlatGL3D::Flag::VertexColor |
+        Magnum::Shaders::FlatGL3D::Flag::InstancedTransformation)))
 {}
 
 
@@ -59,8 +60,8 @@ Shader &Flat::draw(Magnum::GL::Mesh &mesh, Magnum::GL::Buffer &buffer, size_t in
 {
   updateTransform();
   mesh.setInstanceCount(Magnum::Int(instance_count))
-    .addVertexBufferInstanced(buffer, 1, 0, Magnum::Shaders::Flat3D::TransformationMatrix{},
-                              Magnum::Shaders::Flat3D::Color4{});
+    .addVertexBufferInstanced(buffer, 1, 0, Magnum::Shaders::FlatGL3D::TransformationMatrix{},
+                              Magnum::Shaders::FlatGL3D::Color4{});
   _shader->draw(mesh);
   return *this;
 }

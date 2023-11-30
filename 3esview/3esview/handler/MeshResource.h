@@ -14,7 +14,6 @@
 
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/Math/Color.h>
-#include <Magnum/Shaders/VertexColor.h>
 
 #include <memory>
 #include <mutex>

@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "corrade",
-  "version-string": "2020.06",
-  "port-version": 6,
+  "version-string": "2023.08",
+  "port-version": 7,
   "description": "C++11/C++14 multiplatform utility library.",
   "homepage": "https://magnum.graphics/corrade/",
   "dependencies": [

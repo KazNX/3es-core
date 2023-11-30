@@ -21,7 +21,7 @@ foreach(_feature IN LISTS ALL_FEATURES)
 
     # Final feature is empty, ignore it
     if(_feature)
-        list(APPEND _COMPONENTS ${_feature} WITH_${_FEATURE})
+        list(APPEND _COMPONENTS ${_feature} CORRADE_WITH_${_FEATURE})
     endif()
 endforeach()
 
@@ -39,8 +39,9 @@ vcpkg_cmake_configure(
     OPTIONS
         ${FEATURE_OPTIONS}
         "${corrade_rc_param}"
-        -DUTILITY_USE_ANSI_COLORS=ON
-        -DBUILD_STATIC=${BUILD_STATIC}
+        -DCORRADE_UTILITY_USE_ANSI_COLORS=ON
+        -DCORRADE_BUILD_STATIC=${BUILD_STATIC}
+        -DCORRADE_BUILD_DEPRECATED=Off
     MAYBE_UNUSED_VARIABLES
         CORRADE_RC_EXECUTABLE
         UTILITY_USE_ANSI_COLORS
