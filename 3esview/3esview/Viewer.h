@@ -183,6 +183,8 @@ public:
     return *_command_line_options;
   }
 
+  [[nodiscard]] std::shared_ptr<EdlEffect> edlEffect() const { return _edl_effect; }
+
 protected:
   /// Return value for @c onDrawStart()
   enum class DrawMode
