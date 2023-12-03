@@ -101,7 +101,7 @@ private:
   std::shared_ptr<TcpConnectionMonitor> _monitor;
   ServerSettings _settings;
   ServerInfoMessage _server_info;
-  std::atomic_bool _active;
+  std::atomic_bool _active = false;
 };
 }  // namespace tes
 

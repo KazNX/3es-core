@@ -41,7 +41,7 @@ private:
   std::atomic_int64_t _frame_number = 0;
   std::atomic_bool _started = false;
   std::atomic_bool _quit = false;
-  std::thread _thread;
+  std::thread _thread = {};
 };
 }  // namespace tes
 

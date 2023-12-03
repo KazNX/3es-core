@@ -312,18 +312,18 @@ private:
     bool catching_up = false;
   };
 
-  mutable std::mutex _data_mutex;
-  std::condition_variable _notify;
-  FrameState _frame;
-  std::atomic_bool _quit_flag;
-  std::atomic_bool _paused;
+  mutable std::mutex _data_mutex = {};
+  std::condition_variable _notify = {};
+  FrameState _frame = {};
+  std::atomic_bool _quit_flag = false;
+  std::atomic_bool _paused = false;
   bool _looping = false;
   float _playback_speed = 1.0f;
   std::unique_ptr<PacketStreamReader> _stream_reader;
   std::shared_ptr<std::istream> _stream;
   /// The scene manager.
-  std::shared_ptr<ThirdEyeScene> _tes;
-  std::thread _thread;
+  std::shared_ptr<ThirdEyeScene> _tes = {};
+  std::thread _thread = {};
   ServerInfoMessage _server_info = {};
   bool _have_server_info = false;
   Keyframes _keyframes;

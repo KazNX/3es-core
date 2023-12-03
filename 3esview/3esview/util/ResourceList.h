@@ -519,10 +519,10 @@ private:
     Id next_free;
   };
 
-  std::vector<Item> _items;
-  mutable std::recursive_mutex _lock;
-  mutable std::atomic_uint32_t _lock_count = {};
-  std::atomic_size_t _item_count = {};
+  std::vector<Item> _items = {};
+  mutable std::recursive_mutex _lock = {};
+  mutable std::atomic_uint32_t _lock_count = 0;
+  std::atomic_size_t _item_count = 0;
   Id _free_head = kNullResource;
   Id _free_tail = kNullResource;
 };

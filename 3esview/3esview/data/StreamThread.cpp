@@ -18,6 +18,7 @@ StreamThread::StreamThread(std::shared_ptr<ThirdEyeScene> tes, std::shared_ptr<s
   : _stream_reader(std::make_unique<PacketStreamReader>(*stream))
   , _stream(std::move(stream))
   , _tes(std::exchange(tes, nullptr))
+  , _keyframes({})
 {
   _keyframes.store = std::make_unique<KeyframeStore>();
   _thread = std::thread([this] { run(); });
