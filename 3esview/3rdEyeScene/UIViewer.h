@@ -92,6 +92,13 @@ public:
   [[nodiscard]] bool uiEnabled() const { return _ui_enabled; }
   void setUiEnabled(bool enable) { _ui_enabled = enable; }
 
+  /// Set the window size.
+  ///
+  /// Hides the Magnum application implementation to deal with quirks with DPI scaling and settings.
+  ///
+  /// @param size The new windows size.
+  void setWindowSize(const Magnum::Vector2i &size) override;
+
 protected:
   void drawEvent() override;
   DrawMode onDrawStart(float dt) override;
@@ -125,6 +132,7 @@ private:
   /// This is a bit of an initialisation hack to make sure the virtual viewport functions are
   /// correctly called.
   Magnum::Vector2i _expected_window_size;
+  bool _viewport_event_pending = false;
   bool _ui_enabled = true;
 };
 }  // namespace tes::view

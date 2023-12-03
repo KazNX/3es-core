@@ -368,6 +368,17 @@ bool Viewer::continuousSim()
 }
 
 
+void Viewer::setWindowSize(const Magnum::Vector2i &size)
+{
+  // Copy the window size as we can end up modifying it again.
+  // Hack: adjust for dpiScaling() const windowSize() doesn't consider it, but setWindowSize()
+  // does.
+  const auto dpi_scaling = dpiScaling();
+  const auto new_size = (Magnum::Vector2(size) / dpi_scaling) + Magnum::Vector2(0.5f, 0.5f);
+  Magnum::Platform::Application::setWindowSize(Magnum::Vector2i(new_size));
+}
+
+
 void Viewer::drawEvent()
 {
   using namespace Magnum::Math::Literals;
@@ -398,15 +409,6 @@ void Viewer::viewportEvent(ViewportEvent &event)
   const auto viewport = Magnum::Range2Di{ {}, event.framebufferSize() };
   Magnum::GL::defaultFramebuffer.setViewport(viewport);
   _edl_effect->viewportChange(viewport);
-  // // FIXME(KS): I used to just call _edl_effect->viewportChange() which should work to update the
-  // // render textures. For some reason, this didn't seem change the texture resolution update
-  // // correctly. Recreating the effect at the right size seems to be a viable workaround.
-  // const bool edl_on = _tes->activeFboEffect() == _edl_effect;
-  // _edl_effect = std::make_shared<EdlEffect>(Magnum::GL::defaultFramebuffer.viewport());
-  // if (edl_on)
-  // {
-  //   _tes->setActiveFboEffect(_edl_effect);
-  // }
 }
 
 
@@ -753,7 +755,8 @@ int Viewer::scoreShortcut(const command::Shortcut &shortcut, const KeyEvent &eve
     return 0;
   }
 
-  const int modifiers = static_cast<int>(event.modifiers()) & shortcut.modifierFlags();
+  const auto modifiers =
+    static_cast<unsigned>(static_cast<int>(event.modifiers())) & shortcut.modifierFlags();
   if (modifiers != shortcut.modifierFlags())
   {
     return 0;

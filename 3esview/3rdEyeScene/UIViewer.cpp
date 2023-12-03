@@ -169,18 +169,23 @@ UIViewer::DrawMode UIViewer::onDrawStart(float dt)
 }
 
 
+void UIViewer::setWindowSize(const Magnum::Vector2i &size)
+{
+  if (size != windowSize())
+  {
+    Viewer::setWindowSize(size);
+    _viewport_event_pending = true;
+  }
+}
+
+
 void UIViewer::drawEvent()
 {
   Viewer::drawEvent();
   const auto window_size = windowSize();
-  if (_expected_window_size != window_size)
+  if (_expected_window_size != window_size && !_viewport_event_pending)
   {
-    // Copy the window size as we can end up modifying it again.
-    // Hack: adjust for dpiScaling() const windowSize() doesn't consider it, but setWindowSize()
-    // does.
-    const auto new_size =
-      (Magnum::Vector2(_expected_window_size) / dpiScaling()) + Magnum::Vector2(0.5f, 0.5f);
-    setWindowSize(Magnum::Vector2i(new_size));
+    setWindowSize(_expected_window_size);
   }
 }
 
@@ -237,6 +242,7 @@ void UIViewer::viewportEvent(ViewportEvent &event)
   // Update settings if required.
   if (event.windowSize() != _expected_window_size)
   {
+    _viewport_event_pending = false;
     _expected_window_size = event.windowSize();
     auto config = tes()->settings().config();
     for (auto iter = config.extentions.begin(); iter != config.extentions.end(); ++iter)
@@ -422,7 +428,7 @@ void UIViewer::updateWindowSize(const settings::Settings::Config &config,
     {
       const auto &window_settings = *iter;
       // Default to settings.
-      _expected_window_size = Magnum::Vector2i(
+      auto window_size = Magnum::Vector2i(
         window_settings[kWindowSettingsHorizontal].getProperty<WindowSizeProperty>()->value(),
         window_settings[kWindowSettingsVertical].getProperty<WindowSizeProperty>()->value());
 
@@ -431,13 +437,14 @@ void UIViewer::updateWindowSize(const settings::Settings::Config &config,
       {
         if (command_line_options->window.use_width)
         {
-          _expected_window_size.x() = command_line_options->window.size.x();
+          window_size.x() = command_line_options->window.size.x();
         }
         if (command_line_options->window.use_height)
         {
-          _expected_window_size.y() = command_line_options->window.size.y();
+          window_size.y() = command_line_options->window.size.y();
         }
       }
+      setWindowSize(window_size);
       break;
     }
   }

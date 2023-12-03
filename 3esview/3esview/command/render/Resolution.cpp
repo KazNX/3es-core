@@ -36,7 +36,6 @@ Magnum::Vector2i nextResolutionDown(Magnum::Vector2i resolution)
   auto last = resolution;
   for (const auto preset : kPresetResolutions)
   {
-    volatile auto cmp = resolution < preset;
     if (resolutionLess(resolution, preset) || resolution == preset)
     {
       return last;

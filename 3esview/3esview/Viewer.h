@@ -159,7 +159,6 @@ public:
   [[nodiscard]] std::shared_ptr<command::Set> commands() { return _commands; }
   [[nodiscard]] const std::shared_ptr<command::Set> &commands() const { return _commands; }
 
-
   bool open(const std::filesystem::path &path);
   bool connect(const std::string &host, uint16_t port, bool allow_reconnect = true);
   bool closeOrDisconnect();
@@ -182,6 +181,9 @@ public:
   {
     return *_command_line_options;
   }
+
+  /// Hide base class @c setWindowSize() for DPI scaling issues.
+  virtual void setWindowSize(const Magnum::Vector2i &size);
 
 protected:
   /// Return value for @c onDrawStart()
