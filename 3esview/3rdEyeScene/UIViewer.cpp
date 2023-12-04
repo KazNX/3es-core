@@ -171,11 +171,8 @@ UIViewer::DrawMode UIViewer::onDrawStart(float dt)
 
 void UIViewer::setWindowSize(const Magnum::Vector2i &size)
 {
-  if (size != windowSize())
-  {
-    Viewer::setWindowSize(size);
-    _viewport_event_pending = true;
-  }
+  Viewer::setWindowSize(size);
+  _viewport_event_pending = true;
 }
 
 

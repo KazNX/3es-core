@@ -131,7 +131,7 @@ private:
   /// Window size in sync with settings. Window may be resized on the next update if changed.
   /// This is a bit of an initialisation hack to make sure the virtual viewport functions are
   /// correctly called.
-  Magnum::Vector2i _expected_window_size;
+  Magnum::Vector2i _expected_window_size = { 0, 0 };
   bool _viewport_event_pending = false;
   bool _ui_enabled = true;
 };
