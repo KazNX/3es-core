@@ -2,8 +2,6 @@
 
 #include <3esview/Viewer.h>
 
-#include <3esview/util/CStrPtr.h>
-
 #include <tinyfiledialogs.h>
 
 namespace tes::view::command::connection
@@ -49,11 +47,13 @@ std::string OpenFile::fromDialog()
 {
   // // const char *filter_list = "3rd Eye Scene files (*.3es),*.3es";
   std::array<const char *, 2> filters = { "*.3es" };
-  util::CStrPtr selection{ tinyfd_openFileDialog("Open file", nullptr, 1, filters.data(), nullptr,
-                                                 0) };
+  // Do not delete the returned string. tinyfd manages it.
+  const char *selection{ tinyfd_openFileDialog("Open file", nullptr, 1, filters.data(), nullptr,
+                                               0) };
+
   if (selection)
   {
-    return { selection.get() };
+    return { selection };
   }
 
   return std::string();

@@ -6,8 +6,6 @@
 #include <3esview/data/NetworkThread.h>
 #include <3esview/Viewer.h>
 
-#include <3esview/util/CStrPtr.h>
-
 #include <tinyfiledialogs.h>
 
 namespace tes::view::command::playback
@@ -63,12 +61,12 @@ std::string Record::fromDialog()
 {
   // // const char *filter_list = "3rd Eye Scene files (*.3es),*.3es";
   std::array<const char *, 2> filters = { "*.3es" };
-  util::CStrPtr selection{ tinyfd_saveFileDialog("Save file", nullptr, 1, filters.data(),
-                                                 nullptr) };
+  // Do not delete the returned string. tinyfd manages it.
+  const char *selection{ tinyfd_saveFileDialog("Save file", nullptr, 1, filters.data(), nullptr) };
 
   if (selection)
   {
-    return { selection.get() };
+    return { selection };
   }
 
   return std::string();
