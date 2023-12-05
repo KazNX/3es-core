@@ -10,23 +10,28 @@ Loop::Loop()
 {}
 
 
-bool Loop::checkAdmissible(Viewer &viewer) const
+bool Loop::checkAdmissible([[maybe_unused]] Viewer &viewer) const
 {
-  auto stream = viewer.dataThread();
-  return stream != nullptr && !stream->isLiveStream();
+  // We can always change the config value without a playing stream.
+  return true;
 }
 
 
 CommandResult Loop::invoke(Viewer &viewer, const ExecInfo &info, const Args &args)
 {
   (void)info;
-  auto stream = viewer.dataThread();
-  if (!stream)
-  {
-    return { CommandResult::Code::Failed, "Invalid data thread" };
-  }
   const auto loop = arg<bool>(0, args);
-  stream->setLooping(loop);
+
+  // Update config
+  auto playback_settings = viewer.tes()->settings().config().playback;
+  playback_settings.looping.setValue(loop);
+  viewer.tes()->settings().update(playback_settings);
+
+  auto stream = viewer.dataThread();
+  if (stream)
+  {
+    stream->setLooping(loop);
+  }
   return { CommandResult::Code::Ok };
 }
 }  // namespace tes::view::command::playback

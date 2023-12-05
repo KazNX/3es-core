@@ -18,12 +18,12 @@
 namespace tes::view::data
 {
 class DataThread;
-}
+}  // namespace tes::view::data
 
 namespace tes::view::command
 {
 class Command;
-}
+}  // namespace tes::view::command
 
 namespace tes::view::ui
 {
@@ -123,6 +123,7 @@ private:
   ActionIcons _action_icons;
   std::weak_ptr<command::Command> _set_speed_command;
   std::weak_ptr<command::Command> _set_frame_command;
+  std::weak_ptr<command::Command> _loop_command;
   /// Frame number while being edited.
   std::optional<int> _pending_frame;
   std::optional<float> _pending_speed;

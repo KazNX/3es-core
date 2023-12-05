@@ -42,6 +42,7 @@ Playback::Playback(Viewer &viewer)
   registerAction(ui::Playback::SkipForward, viewer.commands()->lookupName("skipForward").command);
   _set_speed_command = viewer.commands()->lookupName("playbackSpeed").command;
   _set_frame_command = viewer.commands()->lookupName("skipToFrame").command;
+  _loop_command = viewer.commands()->lookupName("loop").command;
 }
 
 
@@ -73,7 +74,7 @@ void Playback::drawButtons(data::DataThread *data_thread)
   const auto play_pause_icon =
     (data_thread && !data_thread->paused()) ? Action::Pause : Action::Play;
 
-  ImGui::BeginChild("Playback buttons", ImVec2(static_cast<float>(uiViewportSize().x()) * 0.75f,
+  ImGui::BeginChild("Playback buttons", ImVec2(static_cast<float>(uiViewportSize().x()) * 0.66f,
                                                static_cast<float>(button_row_size)));
   button({ { Action::Stop, "S" }, { Action::Record, "R" } });
   ImGui::SameLine();
@@ -88,7 +89,18 @@ void Playback::drawButtons(data::DataThread *data_thread)
   button({ Action::SkipForward, ">>" });
   ImGui::EndChild();
 
-  ImGui::SameLine();  // Payback speed is on the same line.
+  ImGui::SameLine();  // Playback speed and looping control are on the same line.
+
+  ImGui::BeginChild("Playback speed", ImVec2{ 0, button_row_size });
+  bool looping = _viewer.tes()->settings().config().playback.looping.value();
+  if (ImGui::Checkbox("Looping", &looping))
+  {
+    if (auto command = _loop_command.lock())
+    {
+      command->invoke(_viewer, command::Args(looping));
+    }
+  }
+  ImGui::SameLine();  // Playback speed is on the same line.
 
   // Playback speed UI.
   float playback_speed = 1.0f;
@@ -102,7 +114,6 @@ void Playback::drawButtons(data::DataThread *data_thread)
     playback_speed = *_pending_speed;
   }
 
-  ImGui::BeginChild("Playback speed", ImVec2{ 0, button_row_size });
   if (ImGui::InputFloat("Speed", &playback_speed, 0.1f, 1.0f, "%.2f"))
   {
     _pending_speed = std::max(0.01f, std::min(playback_speed, 20.0f));
