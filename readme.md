@@ -71,7 +71,7 @@ Building with VCPKG is supported in order to fetch the dependencies. This affect
 ```shell
 # Must cmake configure from the source directory so vcpkg can find the vcpkg.json manifest.
 mkdir build
-cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=<vcpkg_dir>/scripts/buildsystems/vcpkg.cmake -DVCPKG_MANIFEST_FEATURES=test;viewer
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=<vcpkg_dir>/scripts/buildsystems/vcpkg.cmake -DVCPKG_MANIFEST_FEATURES=tests;viewer
 cmake --build build --targets all --
 ```
 
