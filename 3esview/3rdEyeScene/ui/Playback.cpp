@@ -154,24 +154,25 @@ void Playback::drawFrameSlider(data::DataThread *data_thread)
     current_frame = *_pending_frame;
   }
 
-  const auto frames_str = std::to_string(total_frames);
   auto set_frame_command = _set_frame_command.lock();
   const bool writable = set_frame_command && set_frame_command->admissible(_viewer);
 
   int flags = 0;
 
   flags = (!writable) ? ImGuiSliderFlags_NoInput : 0;
-  ImGui::BeginChild("Frame slider", ImVec2(static_cast<float>(uiViewportSize().x()) * 0.75f, 0.0f));
-  if (ImGui::SliderInt(frames_str.c_str(), &current_frame, 0, total_frames, "%d", flags))
+  ImGui::BeginChild("Frames slider child",
+                    ImVec2(static_cast<float>(uiViewportSize().x()) * 0.75f, 0.0f));
+  if (ImGui::SliderInt("Frames slider", &current_frame, 0, total_frames, "%d", flags))
   {
     _pending_frame = current_frame;
   }
   const bool slider_active = ImGui::IsItemActive();
   ImGui::EndChild();
+
   ImGui::SameLine();
-  flags = (!writable) ? ImGuiInputTextFlags_ReadOnly : 0;
-  ImGui::BeginChild("Frame edit");
-  if (ImGui::InputInt(frames_str.c_str(), &current_frame))
+
+  ImGui::BeginChild("Frame edit child");
+  if (ImGui::InputInt("Frames edit", &current_frame))
   {
     _pending_frame = std::max(-1, std::min(current_frame, total_frames));
   }
