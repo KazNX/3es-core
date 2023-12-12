@@ -19,6 +19,8 @@
 #include <3esview/ThirdEyeScene.h>
 #include <3esview/settings/Settings.h>
 
+#include <3escore/Finally.h>
+
 #include <cxxopts.hpp>
 
 #include <iostream>
@@ -172,18 +174,6 @@ UIViewer::DrawMode UIViewer::onDrawStart(float dt)
 void UIViewer::setWindowSize(const Magnum::Vector2i &size)
 {
   Viewer::setWindowSize(size);
-  _viewport_event_pending = true;
-}
-
-
-void UIViewer::drawEvent()
-{
-  Viewer::drawEvent();
-  const auto window_size = windowSize();
-  if (_expected_window_size != window_size && !_viewport_event_pending)
-  {
-    setWindowSize(_expected_window_size);
-  }
 }
 
 
@@ -233,14 +223,17 @@ void UIViewer::onDrawComplete(float dt)
 
 void UIViewer::viewportEvent(ViewportEvent &event)
 {
+  // Flag we are in a viewport event so that settings handle won't resize the window.
+  _in_viewport_event = true;
+  const Finally finally([this]() { _in_viewport_event = false; });
+
   Viewer::viewportEvent(event);
   _imgui.relayout(Magnum::Vector2{ event.windowSize() } / event.dpiScaling(), event.windowSize(),
                   event.framebufferSize());
-  // Update settings if required.
-  if (event.windowSize() != _expected_window_size)
+  // Update settings if not coming from a settings event.
+  if (!_in_settings_notify)
   {
-    _viewport_event_pending = false;
-    _expected_window_size = event.windowSize();
+    const auto window_size = event.windowSize();
     auto config = tes()->settings().config();
     for (auto iter = config.extentions.begin(); iter != config.extentions.end(); ++iter)
     {
@@ -249,11 +242,11 @@ void UIViewer::viewportEvent(ViewportEvent &event)
         auto *hsize = (*iter)[kWindowSettingsHorizontal].getProperty<WindowSizeProperty>();
         auto *vsize = (*iter)[kWindowSettingsVertical].getProperty<WindowSizeProperty>();
 
-        if (static_cast<int>(hsize->value()) != _expected_window_size.x() ||
-            static_cast<int>(vsize->value()) != _expected_window_size.y())
+        if (static_cast<int>(hsize->value()) != window_size.x() ||
+            static_cast<int>(vsize->value()) != window_size.y())
         {
-          hsize->setValue(_expected_window_size.x());
-          vsize->setValue(_expected_window_size.y());
+          hsize->setValue(window_size.x());
+          vsize->setValue(window_size.y());
           tes()->settings().update(config);
         }
         break;
@@ -419,6 +412,9 @@ void UIViewer::textInputEvent(TextInputEvent &event)
 void UIViewer::updateWindowSize(const settings::Settings::Config &config,
                                 const UICommandLineOptions *command_line_options)
 {
+  const Finally finally([this]() { _in_settings_notify = false; });
+  _in_settings_notify = true;
+
   for (auto iter = config.extentions.begin(); iter != config.extentions.end(); ++iter)
   {
     if (iter->name() == kWindowSettingsName)
@@ -441,7 +437,11 @@ void UIViewer::updateWindowSize(const settings::Settings::Config &config,
           window_size.y() = command_line_options->window.size.y();
         }
       }
-      setWindowSize(window_size);
+
+      if (!_in_viewport_event)
+      {
+        setWindowSize(window_size);
+      }
       break;
     }
   }

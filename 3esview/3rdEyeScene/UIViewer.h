@@ -100,7 +100,6 @@ public:
   void setWindowSize(const Magnum::Vector2i &size) override;
 
 protected:
-  void drawEvent() override;
   DrawMode onDrawStart(float dt) override;
   void onDrawComplete(float dt) override;
   void viewportEvent(ViewportEvent &event) override;
@@ -128,11 +127,8 @@ private:
 
   Magnum::ImGuiIntegration::Context _imgui{ Magnum::NoCreate };
   std::vector<std::shared_ptr<ui::Panel>> _panels;
-  /// Window size in sync with settings. Window may be resized on the next update if changed.
-  /// This is a bit of an initialisation hack to make sure the virtual viewport functions are
-  /// correctly called.
-  Magnum::Vector2i _expected_window_size = { 0, 0 };
-  bool _viewport_event_pending = false;
+  bool _in_settings_notify = false;
+  bool _in_viewport_event = false;
   bool _ui_enabled = true;
 };
 }  // namespace tes::view
