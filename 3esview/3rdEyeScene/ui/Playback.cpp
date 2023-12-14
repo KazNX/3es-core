@@ -157,30 +157,19 @@ void Playback::drawFrameSlider(data::DataThread *data_thread)
   auto set_frame_command = _set_frame_command.lock();
   const bool writable = set_frame_command && set_frame_command->admissible(_viewer);
 
-  int flags = 0;
-
-  flags = (!writable) ? ImGuiSliderFlags_NoInput : 0;
-  ImGui::BeginChild("Frames slider child",
-                    ImVec2(static_cast<float>(uiViewportSize().x()) * 0.75f, 0.0f));
-  if (ImGui::SliderInt("Frames slider", &current_frame, 0, total_frames, "%d", flags))
+  const auto total_frames_str = std::to_string(total_frames);
+  const int flags = (!writable) ? ImGuiSliderFlags_NoInput : 0;
+  ImGui::BeginChild("Frames slider child");
+  if (ImGui::SliderInt((total_frames_str + "##FramesSlider").c_str(), &current_frame, 0,
+                       total_frames, "%d", flags))
   {
     _pending_frame = current_frame;
   }
   const bool slider_active = ImGui::IsItemActive();
   ImGui::EndChild();
 
-  ImGui::SameLine();
-
-  ImGui::BeginChild("Frame edit child");
-  if (ImGui::InputInt("Frames edit", &current_frame))
-  {
-    _pending_frame = std::max(-1, std::min(current_frame, total_frames));
-  }
-  const bool edit_active = ImGui::IsItemActive();
-  ImGui::EndChild();
-
   // Commit pending frame when neither input control is active.
-  if (_pending_frame.has_value() && !slider_active && !edit_active)
+  if (_pending_frame.has_value() && !slider_active)
   {
     if (set_frame_command)
     {
