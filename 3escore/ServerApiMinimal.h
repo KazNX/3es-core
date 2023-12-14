@@ -8,13 +8,14 @@
 #ifndef TES_CORE_SERVER_API_MINIMAL_H
 #define TES_CORE_SERVER_API_MINIMAL_H
 
-#include <functional>
-#include <string>
 #include <memory>
 
-#ifndef TES_STMT
-#define TES_STMT(statement)
-#endif  // TES_STMT
+#ifndef TES
+#define TES(statement)
+#endif  // TES
+#ifndef TES2
+#define TES2(cond, statement)
+#endif  // TES2
 #ifndef TES_IF
 #define TES_IF(condition) if constexpr (false)
 #endif  // TES_IF

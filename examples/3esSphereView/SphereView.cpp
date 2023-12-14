@@ -105,9 +105,9 @@ unsigned tesUnrollDisplay(const std::vector<Vector3f> &vertices,
 
     cursor += count;
 
-    TES_STMT(tes::create(tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(SPHERE_ID),
-                                                    tes::DataBuffer(local_vertices))
-                                       .setColour(tes::Colour(200, 200, 200))));
+    TES(tes::create(tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(SPHERE_ID),
+                                               tes::DataBuffer(local_vertices))
+                                  .setColour(tes::Colour(200, 200, 200))));
     ++shape_count;
   }
 
@@ -227,9 +227,9 @@ void sphereInitialise(std::vector<Vector3f> &vertices, std::vector<unsigned> &in
   // Send the initial sphere. We know it has less than 65k vertices.
   if (!vertices.empty() && !indices.empty())
   {
-    TES_STMT(tes::create(tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(SPHERE_ID),
-                                                    tes::DataBuffer(vertices))
-                                       .setColour(tes::Colour(200, 200, 200))));
+    TES(tes::create(tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(SPHERE_ID),
+                                               tes::DataBuffer(vertices))
+                                  .setColour(tes::Colour(200, 200, 200))));
   }
 }
 
@@ -256,11 +256,11 @@ void subdivideUnitSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> 
     verts[2] = vertices[triangle[2]];
 
     // Highlight the working triangle: extrude it a bit to make it pop.
-    TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
-                                 std::array<tes::Vector3f, 3>{ verts[0] * 1.01f, verts[1] * 1.01f,
-                                                               verts[2] * 1.01f })
-                    .setColour(tes::Colour::FireBrick)));
+    TES(tes::create(tes_server,
+                    tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
+                                   std::array<tes::Vector3f, 3>{ verts[0] * 1.01f, verts[1] * 1.01f,
+                                                                 verts[2] * 1.01f })
+                      .setColour(tes::Colour::FireBrick)));
 
     // Calculate the new vertex at the centre of the existing triangle.
     new_vertices[0] = (0.5f * (verts[0] + verts[1])).normalised();
@@ -283,17 +283,17 @@ void subdivideUnitSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> 
     def[1] = insertVertex(new_vertices[1], vertices, vertex_map);
     def[2] = insertVertex(new_vertices[2], vertices, vertex_map);
 
-    TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
-                                 std::array<tes::Vector3f, 3>{ vertices[def[0]], vertices[def[1]],
-                                                               vertices[def[2]] })
-                    .setColour(tes::Colour::Cyan)));
-    TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
-                                 std::array<tes::Vector3f, 3>{ vertices[def[0]], vertices[def[1]],
-                                                               vertices[def[2]] })
-                    .setColour(tes::Colour::Navy)
-                    .setWireframe(true)));
+    TES(tes::create(tes_server,
+                    tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
+                                   std::array<tes::Vector3f, 3>{ vertices[def[0]], vertices[def[1]],
+                                                                 vertices[def[2]] })
+                      .setColour(tes::Colour::Cyan)));
+    TES(tes::create(tes_server,
+                    tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
+                                   std::array<tes::Vector3f, 3>{ vertices[def[0]], vertices[def[1]],
+                                                                 vertices[def[2]] })
+                      .setColour(tes::Colour::Navy)
+                      .setWireframe(true)));
 
     // Replace the original triangle ABC with DEF
     indices[i * 3 + 0] = def[0];
@@ -305,52 +305,52 @@ void subdivideUnitSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> 
     indices.push_back(def[0]);
     indices.push_back(def[2]);
 
-    TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
-                                 std::array<tes::Vector3f, 3>{ vertices[abc[0]], vertices[abc[1]],
-                                                               vertices[abc[2]] })
-                    .setColour(tes::Colour::Cyan)));
-    TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
-                                 std::array<tes::Vector3f, 3>{ vertices[abc[0]], vertices[abc[1]],
-                                                               vertices[abc[2]] })
-                    .setColour(tes::Colour::Navy)
-                    .setWireframe(true)));
+    TES(tes::create(tes_server,
+                    tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
+                                   std::array<tes::Vector3f, 3>{ vertices[abc[0]], vertices[abc[1]],
+                                                                 vertices[abc[2]] })
+                      .setColour(tes::Colour::Cyan)));
+    TES(tes::create(tes_server,
+                    tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
+                                   std::array<tes::Vector3f, 3>{ vertices[abc[0]], vertices[abc[1]],
+                                                                 vertices[abc[2]] })
+                      .setColour(tes::Colour::Navy)
+                      .setWireframe(true)));
 
     indices.push_back(abc[1]);
     indices.push_back(def[1]);
     indices.push_back(def[0]);
 
-    TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
-                                 std::array<tes::Vector3f, 3>{ vertices[abc[1]], vertices[def[1]],
-                                                               vertices[def[2]] })
-                    .setColour(tes::Colour::Cyan)));
-    TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
-                                 std::array<tes::Vector3f, 3>{ vertices[abc[1]], vertices[def[1]],
-                                                               vertices[def[2]] })
-                    .setColour(tes::Colour::Navy)
-                    .setWireframe(true)));
+    TES(tes::create(tes_server,
+                    tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
+                                   std::array<tes::Vector3f, 3>{ vertices[abc[1]], vertices[def[1]],
+                                                                 vertices[def[2]] })
+                      .setColour(tes::Colour::Cyan)));
+    TES(tes::create(tes_server,
+                    tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
+                                   std::array<tes::Vector3f, 3>{ vertices[abc[1]], vertices[def[1]],
+                                                                 vertices[def[2]] })
+                      .setColour(tes::Colour::Navy)
+                      .setWireframe(true)));
 
     indices.push_back(abc[2]);
     indices.push_back(def[2]);
     indices.push_back(def[1]);
 
-    TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
-                                 std::array<tes::Vector3f, 3>{ vertices[abc[2]], vertices[def[2]],
-                                                               vertices[def[1]] })
-                    .setColour(tes::Colour::Cyan)));
-    TES_STMT(tes::create(
-      tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
-                                 std::array<tes::Vector3f, 3>{ vertices[abc[2]], vertices[def[2]],
-                                                               vertices[def[1]] })
-                    .setColour(tes::Colour::Navy)
-                    .setWireframe(true)));
+    TES(tes::create(tes_server,
+                    tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
+                                   std::array<tes::Vector3f, 3>{ vertices[abc[2]], vertices[def[2]],
+                                                                 vertices[def[1]] })
+                      .setColour(tes::Colour::Cyan)));
+    TES(tes::create(tes_server,
+                    tes::MeshShape(tes::DrawType::Triangles, tes::Id(),
+                                   std::array<tes::Vector3f, 3>{ vertices[abc[2]], vertices[def[2]],
+                                                                 vertices[def[1]] })
+                      .setColour(tes::Colour::Navy)
+                      .setWireframe(true)));
 
 
-    TES_STMT(tes::updateServer(tes_server));
+    TES(tes::updateServer(tes_server));
   }
 }
 }  // namespace
@@ -402,39 +402,46 @@ int main(int argc, char **argv_non_const)
   sphereInitialise(vertices, indices, &sphere_map);
 
   const tes::Vector3f text_pos(0.05f, 0.05f, 0);
-  TES_STMT(tes::create(tes_server, tes::Text2D("Initial", 0u, text_pos)));
-  TES_STMT(tes::updateServer(tes_server));
+  TES(tes::create(tes_server, tes::Text2D("Initial", 0u, text_pos)));
+  TES(tes::updateServer(tes_server));
 
   // Start with one shape.
-  TES_STMT(unsigned shape_count = 1);
+  TES(unsigned shape_count = 1);
 
-  for (unsigned i = 0; i < iterations; ++i)
   {
-    std::stringstream label;
-    label << "Division " << i + 1;
-    std::cout << label.str() << std::endl;
-    subdivideUnitSphere(vertices, indices, sphere_map);
+    TES(auto origin = tes::ScopedShape<tes::Arrow>(
+          tes_server, { 1 }, [](auto &s) { s.setColour(tes::Colour{ tes::Colour::Green }); }));
+    TES(tes::updateServer(tes_server));
+
+    iterations = 0;
+    for (unsigned i = 0; i < iterations; ++i)
+    {
+      std::stringstream label;
+      label << "Division " << i + 1;
+      std::cout << label.str() << std::endl;
+      subdivideUnitSphere(vertices, indices, sphere_map);
 #ifdef TES_ENABLE
-    for (unsigned i = 0; i < shape_count; ++i)
-    {
-      tes::destroy(tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(SPHERE_ID) + i));
-    }
-    // Send the updated sphere. We must unroll into sets of triangles of less than 65K
-    // vertices.
-    shape_count = tesUnrollDisplay(vertices, indices);
-    if (i)
-    {
-      tes::destroy(tes_server, tes::Text2D("", tes::Id(TEXT_ID)));
-    }
-    tes::create(tes_server, tes::Text2D(label.str(), TEXT_ID, text_pos));
-    tes::updateServer(tes_server);
+      for (unsigned i = 0; i < shape_count; ++i)
+      {
+        tes::destroy(tes_server, tes::MeshShape(tes::DrawType::Triangles, tes::Id(SPHERE_ID) + i));
+      }
+      // Send the updated sphere. We must unroll into sets of triangles of less than 65K
+      // vertices.
+      shape_count = tesUnrollDisplay(vertices, indices);
+      if (i)
+      {
+        tes::destroy(tes_server, tes::Text2D("", tes::Id(TEXT_ID)));
+      }
+      tes::create(tes_server, tes::Text2D(label.str(), TEXT_ID, text_pos));
+      tes::updateServer(tes_server);
 #endif  // TES_ENABLE
+    }
   }
 
   std::cout << "Done" << std::endl;
 
   // Stop and close the server.
-  TES_STMT(tes::stopServer(tes_server));
+  TES(tes::stopServer(tes_server));
 
   return 0;
 }

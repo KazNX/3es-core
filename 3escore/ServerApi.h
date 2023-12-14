@@ -49,11 +49,11 @@
 /// #endif  // TES_ENABLE
 /// @endcode
 ///
-/// Alternatively, single statements can (should) be wrapped using @c TES_STMT() to conditionally
+/// Alternatively, single statements can (should) be wrapped using @c TES() to conditionally
 /// compile them.
 
 /// @ingroup tesserverapi
-/// @def TES_STMT(statement)
+/// @def TES(statement)
 /// Enable @p statement when @c TES_ENABLE is present.
 ///
 /// The statement is completely removed when 3es instrumentation is not enabled. All 3es function
@@ -61,16 +61,16 @@
 /// compilation. This includes the @ref tesserverapi function calls.
 ///
 /// @code
-/// // In this main function, all 3es function calls are wrapped in TES_STMT() and are removed when
+/// // In this main function, all 3es function calls are wrapped in TES() and are removed when
 /// // TES_ENABLE is not defined.
 /// // Note there are alternative ways to express this same functionality. In this case, the use
 /// // of a block of 3es enabled code could be better served using `#ifdef TES_ENABLE`
 /// int main()
 /// {
-///   TES_STMT(tes::ServerPtr tes_server = nullptr);
-///   TES_STMT(tes_server = createServer(tes::ServerSettings()));
-///   TES_STMT(startServer(tes_server));
-///   TES_STMT(stopServer(tes_server));
+///   TES(tes::ServerPtr tes_server = nullptr);
+///   TES(tes_server = createServer(tes::ServerSettings()));
+///   TES(startServer(tes_server));
+///   TES(stopServer(tes_server));
 /// }
 /// @endcode
 ///
@@ -83,10 +83,14 @@
 /// @param condition The if statement condition.
 
 #ifdef TES_ENABLE
-#define TES_STMT(statement) statement
+#define TES(statement) statement
+#define TES2(cond, statement) \
+  if (cond)                   \
+    statement;
 #define TES_IF(condition) if (condition)
 #else  // TES_ENABLE
-#define TES_STMT(statement)
+#define TES(statement)
+#define TES2(cond, statement)
 #define TES_IF(condition) if constexpr (false)
 #endif  // TES_ENABLE
 
@@ -600,41 +604,72 @@ inline int update(const ServerPtr &server, Shape &shape)
 /// The class is designed to use a move constructor for the shape type - @c S - so the shape
 /// should be declared when the @p ScopedShape is constructed.
 ///
+/// In the example below, the box persists for the scope of @c showBox() and a destroy message is
+/// sent on leaving that scope.
+///
 /// @code
 /// void showBox(Server *server)
 /// {
-///   TES_STMT(tes::ScopedShape::<Box> tes::box(
-///       server, tes::Box(1, Transform(tes::Vector3f(1, 2, 3), tes::Vector3f(3, 2, 1))))
-///     ->setColour(tes::Colour(tes::Colour::Green)));
+///   TES(tes::ScopedShape::<Box> box{
+///       server, {1, Transform{tes::Vector3f(1, 2, 3), tes::Vector3f(3, 2, 1)}},
+///       [] (auto &s) {
+///         s.setColour(tes::Colour{tes::Colour::Green});
+///       }});
 ///   updateServer(server);
 /// }
 /// @endcode
+///
+/// Because of the use of move semantics for the shape argument, it is not possible to call chain
+/// configuration of the shape - such as in `tes::Box{1}.setColour(tes::Colour::Green)`. We support
+/// configuration of the shape via an optional @c ConfigureCallback that is called immediately
+/// before calling @c Connection::create() for the shape. This function is given a reference to the
+/// shape object that will actually be given to @c Connection::create() rather than the temporary
+/// object given to the @c ScopedShape constructor.
+///
+/// Note the @c ConfigureCallback is not invoked if the @c Connection given to the constructor is
+/// null.
+///
+/// The scoped shape may be modified using the @c -> operator , but the @c ScopedShape::update()
+/// function must invoked afterwards to reflect the changes over the @c Connection .
 ///
 /// @tparam S A derivation of @c tes::Shape .
 template <typename S>
 class ScopedShape
 {
 public:
+  using ConfigureCallback = std::function<void(S &)>;
+
   /// The @c Server or @c Connection pointer. May be null.
-  Connection *const connection = nullptr;
+  Connection *connection = nullptr;
   /// The @c Shape class.
   S shape;
 
   /// Construct, sending the given @p shape to the @p connection .
   /// @param connection The @c Server or @c Connection pointer. May be null.
   /// @param shape The shape to send.
-  ScopedShape(Connection *connection, S &&shape)
+  /// @param configure Callback invoked to configure the shape before sending it over the
+  /// connection.
+  ScopedShape(Connection *connection, S &&shape, ConfigureCallback configure = {})
     : connection(connection)
     , shape(std::move(shape))
   {
     if (connection)
     {
+      if (configure)
+      {
+        configure(shape);
+      }
       connection->create(this->shape);
     }
   }
 
-  ScopedShape(const ServerPtr &server, S &&shape)
-    : ScopedShape(server.get(), std::forward(shape))
+  /// Constructor overload for a @c ServertPtr .
+  /// @param server The @c Server pointer. May be null.
+  /// @param shape The shape to send.
+  /// @param configure Callback invoked to configure the shape before sending it over the
+  /// connection.
+  ScopedShape(const ServerPtr &server, S &&shape, ConfigureCallback configure = {})
+    : ScopedShape(server.get(), std::move(shape), configure)
   {}
 
   ScopedShape(const ScopedShape &other) = delete;
@@ -696,7 +731,7 @@ public:
   {
     if (connection)
     {
-      if (!shape->isTransient())
+      if (!shape.isTransient())
       {
         const auto written = connection->destroy(shape);
         connection = nullptr;

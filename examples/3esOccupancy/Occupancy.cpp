@@ -192,10 +192,9 @@ int populateMap(const Options &opt)
   map.setClampingThresMin(0.01);
   // printf("min: %g\n", map.getClampingThresMinLog());
 
-  TES_STMT(
-    create(g_tes_server, MeshSet(&map_mesh, Id(RES_Map, CAT_Map)).setColour(Colour::SteelBlue)));
+  TES(create(g_tes_server, MeshSet(&map_mesh, Id(RES_Map, CAT_Map)).setColour(Colour::SteelBlue)));
   // Ensure mesh is created for later update.
-  TES_STMT(updateServer(g_tes_server));
+  TES(updateServer(g_tes_server));
 
   // Load the first point.
   bool have_point = loader.nextPoint(sample, origin, &timestamp);
@@ -226,12 +225,12 @@ int populateMap(const Options &opt)
     ++point_count;
     TES_IF(opt.rays & Rays_Lines)
     {
-      TES_STMT(rays.push_back(origin));
-      TES_STMT(rays.push_back(sample));
+      TES(rays.push_back(origin));
+      TES(rays.push_back(sample));
     }
     TES_IF(opt.samples & Samples_Points)
     {
-      TES_STMT(samples.push_back(sample));
+      TES(samples.push_back(sample));
     }
 
     if (first_batch_timestamp < 0)
@@ -252,7 +251,7 @@ int populateMap(const Options &opt)
         if (initiallyOccupied && !map.isNodeOccupied(node))
         {
           // Node became free.
-          TES_STMT(shiftToSet(become_free, become_occupied, key));
+          TES(shiftToSet(become_free, become_occupied, key));
         }
       }
       else
@@ -262,7 +261,7 @@ int populateMap(const Options &opt)
       }
       voxel = p2p(map.keyToCoord(key));
       // Collate for render.
-      TES_STMT(touched_free.insert(key));
+      TES(touched_free.insert(key));
       ++key_index;
     }
 
@@ -276,7 +275,7 @@ int populateMap(const Options &opt)
       if (!initiallyOccupied && map.isNodeOccupied(node))
       {
         // Node became occupied.
-        TES_STMT(shiftToSet(become_occupied, become_free, key));
+        TES(shiftToSet(become_occupied, become_free, key));
       }
     }
     else
@@ -284,9 +283,9 @@ int populateMap(const Options &opt)
       // New node.
       map.updateNode(key, true, true);
       // Collate for render.
-      TES_STMT(shiftToSet(become_occupied, become_free, key));
+      TES(shiftToSet(become_occupied, become_free, key));
     }
-    TES_STMT(shiftToSet(touched_occupied, touched_free, key));
+    TES(shiftToSet(touched_occupied, touched_free, key));
 
     if (point_count % ray_batch_size == 0 || quit)
     {
@@ -326,8 +325,8 @@ int populateMap(const Options &opt)
       }
       if (opt.samples)
       {
-        create(g_tes_server,
-               MeshShape(DrawType::Points, Id(0u, CAT_OccupiedCells), samples).setColour(Colour::Orange));
+        create(g_tes_server, MeshShape(DrawType::Points, Id(0u, CAT_OccupiedCells), samples)
+                               .setColour(Colour::Orange));
       }
       samples.clear();
       // updateServer(g_tes_server);
@@ -368,7 +367,7 @@ int populateMap(const Options &opt)
     have_point = loader.nextPoint(sample, origin, &timestamp);
   }
 
-  TES_STMT(updateServer(g_tes_server));
+  TES(updateServer(g_tes_server));
 
   if (!opt.quiet)
   {
@@ -611,6 +610,6 @@ int main(int argc, char *argv[])
   initialiseDebugCategories(opt);
 
   int res = populateMap(opt);
-  TES_STMT(stopServer(g_tes_server));
+  TES(stopServer(g_tes_server));
   return res;
 }
