@@ -9,9 +9,10 @@
 
 namespace tes
 {
-void Shape::updateFrom(const Shape &other)
+Shape &Shape::updateFrom(const Shape &other)
 {
   _attributes = other._attributes;
+  return *this;
 }
 
 

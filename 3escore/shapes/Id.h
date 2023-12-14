@@ -53,7 +53,11 @@ public:
   }
 
   [[nodiscard]] uint32_t id() const { return _id; }
-  void setId(size_t id) { _id = static_cast<uint32_t>(id); }
+  Id &setId(size_t id)
+  {
+    _id = static_cast<uint32_t>(id);
+    return *this;
+  }
 
   /// Set the @c id() from a pointer.
   ///
@@ -61,7 +65,7 @@ public:
   ///
   /// The pointer value is not recoverable.
   /// @param id_ptr The pointer address to convert to an id value.
-  void setId(const void *id_ptr)
+  Id &setId(const void *id_ptr)
   {
 #ifdef TES_64
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -70,15 +74,26 @@ public:
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     _id = static_cast<size_t>(id_ptr);
 #endif  // TES_64
+    return *this;
   }
 
-  [[nodiscard]] uint16_t category() const { return _category; }
-  void setCategory(uint16_t category) { _category = category; }
+  [[nodiscard]] uint16_t category() const
+  {
+    return _category;
+  }
+  Id &setCategory(uint16_t category)
+  {
+    _category = category;
+    return *this;
+  }
 
   /// Check if this ID represents a transient shape. By convention, a transient
   /// shape has a zero ID value, and we cannot address this ID.
   /// @return
-  [[nodiscard]] bool isTransient() const { return _id == 0; }
+  [[nodiscard]] bool isTransient() const
+  {
+    return _id == 0;
+  }
 
   /// Test for equality.
   /// @param other Object to compare to.
@@ -91,7 +106,10 @@ public:
   /// Test for in equality.
   /// @param other Object to compare to.
   /// @return True if the id values are not identical.
-  bool operator!=(const Id &other) const { return !operator==(other); }
+  bool operator!=(const Id &other) const
+  {
+    return !operator==(other);
+  }
 
 private:
   uint32_t _id;

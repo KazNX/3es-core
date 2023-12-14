@@ -192,7 +192,7 @@ public:
   /// The viewer is free to ignore this value.
   ///
   /// @param scale The new draw value. Zero or one for default.
-  void setDrawScale(float scale);
+  MeshShape &setDrawScale(float scale);
   /// Get the draw scale.
   /// @return The draw scale.
   [[nodiscard]] float drawScale() const;
@@ -373,9 +373,10 @@ inline bool MeshShape::colourByHeight() const
 }
 
 
-inline void MeshShape::setDrawScale(float scale)
+inline MeshShape &MeshShape::setDrawScale(float scale)
 {
   _draw_scale = scale;
+  return *this;
 }
 
 

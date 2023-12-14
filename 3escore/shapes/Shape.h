@@ -248,7 +248,7 @@ public:
   /// The default implementation copies only the @c ObjectAttributes.
   ///
   /// @param other The shape to update data from.
-  virtual void updateFrom(const Shape &other);
+  virtual Shape &updateFrom(const Shape &other);
 
   /// Writes the @c CreateMessage to @p stream.
   ///
