@@ -2,7 +2,7 @@
 
 #include <3esview/Viewer.h>
 
-namespace tes::view::command::resolution
+namespace tes::view::command::render
 {
 namespace
 {
@@ -123,4 +123,4 @@ CommandResult ResolutionDecrease::invoke(Viewer &viewer, [[maybe_unused]] const 
   viewer.setWindowSize(next);
   return { CommandResult::Code::Ok };
 }
-}  // namespace tes::view::command::resolution
+}  // namespace tes::view::command::render

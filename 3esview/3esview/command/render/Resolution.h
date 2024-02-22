@@ -5,7 +5,7 @@
 
 #include <3esview/command/Command.h>
 
-namespace tes::view::command::resolution
+namespace tes::view::command::render
 {
 /// Command to set the screen resolution.
 ///
@@ -42,6 +42,6 @@ protected:
   bool checkAdmissible(Viewer &viewer) const override;
   CommandResult invoke(Viewer &viewer, const ExecInfo &info, const Args &args) override;
 };
-}  // namespace tes::view::command::resolution
+}  // namespace tes::view::command::render
 
 #endif  // TES_VIEW_COMMAND_RENDER_RESOLUTION_H

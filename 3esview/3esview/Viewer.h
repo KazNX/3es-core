@@ -182,6 +182,8 @@ public:
     return *_command_line_options;
   }
 
+  [[nodiscard]] std::shared_ptr<EdlEffect> edlEffect() const { return _edl_effect; }
+
   /// Hide base class @c setWindowSize() for DPI scaling issues.
   virtual void setWindowSize(const Magnum::Vector2i &size);
 
