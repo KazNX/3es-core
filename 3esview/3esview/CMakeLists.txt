@@ -6,7 +6,6 @@
 #-------------------------------------------------------------------------------
 # 3esview configuration options.
 #-------------------------------------------------------------------------------
-find_package(cxxopts CONFIG REQUIRED)
 find_package(Corrade CONFIG REQUIRED Containers)
 find_package(Magnum CONFIG REQUIRED
   GlfwApplication
@@ -71,7 +70,7 @@ target_include_directories(3esview SYSTEM
   PRIVATE
     # Add cxxopts include directories from the import target. It's a header only library so we don't
     # need to link anything or propagate the dependency.
-    $<TARGET_PROPERTY:cxxopts::cxxopts,INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:cxxopts,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 target_link_libraries(3esview
@@ -87,7 +86,8 @@ target_link_libraries(3esview
     $<BUILD_INTERFACE:Magnum::Shaders>
     $<BUILD_INTERFACE:Magnum::Text>
     $<BUILD_INTERFACE:ryml::ryml>
-    $<BUILD_INTERFACE:tinyfiledialogs::tinyfiledialogs>)
+    $<BUILD_INTERFACE:tinyfiledialogs::tinyfiledialogs>
+  )
 
 #-------------------------------------------------------------------------------
 # IDE source sorting

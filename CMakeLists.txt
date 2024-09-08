@@ -52,6 +52,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Manage warnings, disabling ones we want to ignore.
 include(3esTarget)
 
+# Add third party local dependencies.
+add_subdirectory(3rd-party)
+
 # Include sub projects.
 add_subdirectory(3escore)
 if(TES_BUILD_EXAMPLES)
