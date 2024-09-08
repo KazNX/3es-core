@@ -11,6 +11,7 @@
 #include "PacketHeader.h"
 
 #include <limits>
+#include <utility>
 
 namespace tes
 {

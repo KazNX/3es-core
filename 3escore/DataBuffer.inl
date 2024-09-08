@@ -1,6 +1,7 @@
 //
 // author: Kazys Stepanas
 //
+#include <cstddef>
 
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 namespace tes
@@ -210,36 +211,36 @@ template <typename T>
 inline void DataBuffer::set(const T *v, size_t count, size_t component_count,
                             size_t component_stride)
 {
-  *this = std::move(DataBuffer(v, count, component_count, component_stride));
+  *this = DataBuffer(v, count, component_count, component_stride);
 }
 
 template <typename T, typename std::enable_if_t<!std::is_const_v<T>, bool>>
 inline void DataBuffer::set(bool own_pointer, T *v, size_t count, size_t component_count,
                             size_t component_stride)
 {
-  *this = std::move(DataBuffer(v, count, own_pointer, component_count, component_stride));
+  *this = DataBuffer(v, count, own_pointer, component_count, component_stride);
 }
 
 template <typename T>
 inline void DataBuffer::set(const std::vector<T> &v, size_t component_count,
                             size_t component_stride)
 {
-  *this = std::move(DataBuffer(v, component_count, component_stride));
+  *this = DataBuffer(v, component_count, component_stride);
 }
 
 inline void DataBuffer::set(const std::vector<Vector3f> &v)
 {
-  *this = std::move(DataBuffer(v));
+  *this = DataBuffer(v);
 }
 
 inline void DataBuffer::set(const std::vector<Vector3d> &v)
 {
-  *this = std::move(DataBuffer(v));
+  *this = DataBuffer(v);
 }
 
 inline void DataBuffer::set(const std::vector<Colour> &colours)
 {
-  *this = std::move(DataBuffer(colours));
+  *this = DataBuffer(colours);
 }
 
 template <typename T>

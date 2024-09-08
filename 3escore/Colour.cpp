@@ -155,7 +155,7 @@ Colour::Colour(NamedColour name)
       Colour(123, 104, 238),  //
     };
 
-  *this = colours.at(static_cast<int>(name));
+  *this = colours.at(static_cast<size_t>(name));
 }
 
 
@@ -231,17 +231,17 @@ void Colour::hsvToRgb(float &red, float &green, float &blue, const float hue,
 {
   const float degrees_per_sector = 60.0f;
   const float hue_sector = hue / degrees_per_sector;  // sector 0 to 5
-  const int sector_index =
-    static_cast<int>(std::min<float>(std::max<float>(0.0f, std::floor(hue_sector)), 5.0f));
+  const auto sector_index =
+    static_cast<size_t>(std::min<float>(std::max<float>(0.0f, std::floor(hue_sector)), 5.0f));
   const float f = hue_sector - static_cast<float>(sector_index);
   const float p = value * (1 - saturation);
   const float q = value * (1 - saturation * f);
   const float t = value * (1 - saturation * (1 - f));
 
-  static const std::array<int, 6> vindex = { 0, 1, 1, 2, 2, 0 };
-  static const std::array<int, 6> pindex = { 2, 2, 0, 0, 1, 1 };
-  static const std::array<int, 6> qindex = { 3, 0, 3, 1, 3, 2 };
-  static const std::array<int, 6> tindex = { 1, 3, 2, 3, 0, 3 };
+  static const std::array<size_t, 6> vindex = { 0, 1, 1, 2, 2, 0 };
+  static const std::array<size_t, 6> pindex = { 2, 2, 0, 0, 1, 1 };
+  static const std::array<size_t, 6> qindex = { 3, 0, 3, 1, 3, 2 };
+  static const std::array<size_t, 6> tindex = { 1, 3, 2, 3, 0, 3 };
 
   std::array<float, 4> rgb = {};
   rgb.at(vindex.at(sector_index)) = value;
@@ -613,6 +613,6 @@ const ColourSet &ColourSet::predefined(PredefinedSet name)
     } },
   };
 
-  return sets.at(static_cast<int>(name));
+  return sets.at(static_cast<size_t>(name));
 }
 }  // namespace tes

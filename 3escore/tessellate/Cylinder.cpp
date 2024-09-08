@@ -169,7 +169,7 @@ void wireframe(std::vector<Vector3f> &vertices, std::vector<unsigned> &indices,
   }
 
   // Build the ring vertices.
-  for (int r = 0; r < 2; ++r)
+  for (unsigned r = 0; r < 2; ++r)
   {
     for (unsigned i = 0; i < segments; ++i)
     {

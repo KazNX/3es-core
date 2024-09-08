@@ -248,14 +248,15 @@ int TcpSocket::read(char *buffer, int buffer_length) const
   }
 
   return bytesRead;
-#else   // #
+#else  // #
   if (_detail->socket == -1)
   {
     return -1;
   }
 
   const int flags = MSG_WAITALL;
-  const auto read = static_cast<int>(::recv(_detail->socket, buffer, buffer_length, flags));
+  const auto read =
+    static_cast<int>(::recv(_detail->socket, buffer, static_cast<size_t>(buffer_length), flags));
   if (read < 0)
   {
     if (!tcpbase::checkRecv(_detail->socket, read))
@@ -281,7 +282,8 @@ int TcpSocket::readAvailable(char *buffer, int buffer_length) const
 #ifndef WIN32
   flags |= MSG_DONTWAIT;
 #endif  // WIN32
-  const auto read = static_cast<int>(::recv(_detail->socket, buffer, buffer_length, flags));
+  const auto read =
+    static_cast<int>(::recv(_detail->socket, buffer, static_cast<size_t>(buffer_length), flags));
   if (read == -1)
   {
     if (!tcpbase::checkRecv(_detail->socket, read))
@@ -318,7 +320,7 @@ int TcpSocket::write(const char *buffer, int buffer_length) const
       retry = false;
       sent = static_cast<int>(::send(_detail->socket,
                                      reinterpret_cast<const char *>(buffer) + bytes_sent,  // NOLINT
-                                     buffer_length - bytes_sent, flags));
+                                     static_cast<size_t>(buffer_length - bytes_sent), flags));
 #ifdef WIN32
       if (sent < 0 && WSAGetLastError() == WSAEWOULDBLOCK)
 #else   // WIN32

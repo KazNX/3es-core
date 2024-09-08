@@ -155,8 +155,8 @@ size_t PacketStreamReader::readMore(size_t more_count)
   {
     return 0;
   }
-  _buffer.resize(have_count + read_count);
-  return read_count;
+  _buffer.resize(have_count + static_cast<size_t>(read_count));
+  return static_cast<size_t>(read_count);
 }
 
 
@@ -192,7 +192,7 @@ void PacketStreamReader::consume()
   if (_buffer.size() >= target_size)
   {
     // Update cursor.
-    _current_packet_pos += target_size;
+    _current_packet_pos += static_cast<ssize_t>(target_size);
     // Consume.
     std::copy(_buffer.begin() + static_cast<ssize_t>(target_size), _buffer.end(), _buffer.begin());
     _buffer.resize(_buffer.size() - target_size);

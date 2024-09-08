@@ -260,7 +260,6 @@ int main(int argc, char **argvNonConst)
   createShapes(nextId, shapes, resources, argc, argv);
 
   const unsigned targetFrameTimeMs = 1000 / 30;
-  float time = 0;
   auto lastTime = std::chrono::system_clock::now();
   auto onNewConnection = [&shapes](Server & /*server*/, Connection &connection) {
     for (auto &shape : shapes)
@@ -294,9 +293,6 @@ int main(int argc, char **argvNonConst)
     auto elapsed = now - lastTime;
 
     lastTime = now;
-    float dt =
-      float(std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count()) * 1e-6f;
-    time += dt;
 
     if (server->connectionMonitor()->mode() == tes::ConnectionMode::Synchronous)
     {

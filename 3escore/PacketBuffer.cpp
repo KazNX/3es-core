@@ -117,7 +117,7 @@ PacketHeader *PacketBuffer::extractPacket(std::vector<uint8_t> &buffer)
         // some sort of data issue.
         if (next_marker_pos >= 0)
         {
-          removeData(int_cast<size_t>(packet_size + next_marker_pos));
+          removeData(int_cast<size_t>(packet_size + static_cast<size_t>(next_marker_pos)));
           _marker_found = true;
         }
         else
@@ -151,8 +151,8 @@ void PacketBuffer::removeData(size_t remove_byte_count)
   if (remove_byte_count < _packet_buffer.size())
   {
     const size_t new_size = _packet_buffer.size() - remove_byte_count;
-    std::copy(_packet_buffer.begin() + remove_byte_count, _packet_buffer.end(),
-              _packet_buffer.begin());
+    std::copy(_packet_buffer.begin() + static_cast<ssize_t>(remove_byte_count),
+              _packet_buffer.end(), _packet_buffer.begin());
     _packet_buffer.resize(new_size);
   }
   else

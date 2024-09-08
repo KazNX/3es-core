@@ -180,7 +180,7 @@ void wireframe(std::vector<Vector3f> &vertices, std::vector<unsigned> &indices, 
   radials[2] = -radials[0];
   radials[3] = -radials[1];
 
-  for (int i = 0; i < 4; ++i)
+  for (unsigned i = 0; i < 4; ++i)
   {
     part_indices.emplace_back(int_cast<unsigned>(vertices.size()));
     part_vertices.emplace_back(0.5f * height * axis + radials[i] * radius);

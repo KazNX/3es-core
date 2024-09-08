@@ -67,7 +67,7 @@ const Matrix4<T> Matrix4<T>::Identity(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 
 template <typename T>
 Matrix4<T>::Matrix4(const T array16[16])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
-  for (int i = 0; i < 16; ++i)
+  for (size_t i = 0; i < 16; ++i)
   {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     _storage[i] = array16[i];
@@ -83,7 +83,7 @@ template <typename T>
 template <typename U>
 Matrix4<T>::Matrix4(const std::array<U, 16> &array) noexcept
 {
-  for (int i = 0; i < 16; ++i)
+  for (size_t i = 0; i < 16; ++i)
   {
     _storage[i] = static_cast<T>(array[i]);
   }
@@ -93,7 +93,7 @@ template <typename T>
 template <typename U>
 Matrix4<T>::Matrix4(const Matrix4<U> &other) noexcept
 {
-  for (int i = 0; i < 16; ++i)
+  for (size_t i = 0; i < 16; ++i)
   {
     _storage[i] = static_cast<T>(other[i]);
   }
@@ -197,7 +197,8 @@ inline Matrix4<T> Matrix4<T>::scaling(const Vector3<T> &scale)
 
 template <typename T>
 Matrix4<T> Matrix4<T>::lookAt(const Vector3<T> &eye, const Vector3<T> &target,
-                              const Vector3<T> &axis_up, int forward_axis_index, int up_axis_index)
+                              const Vector3<T> &axis_up, size_t forward_axis_index,
+                              size_t up_axis_index)
 {
   if (forward_axis_index == up_axis_index || forward_axis_index < 0 || forward_axis_index > 2 ||
       up_axis_index < 0 || up_axis_index > 2)
@@ -207,7 +208,7 @@ Matrix4<T> Matrix4<T>::lookAt(const Vector3<T> &eye, const Vector3<T> &target,
   }
 
   std::array<Vector3<T>, 3> axes = {};
-  int side_axis_index = 0;
+  size_t side_axis_index = 0;
   if (forward_axis_index == 1 && up_axis_index == 2 ||
       up_axis_index == 1 && forward_axis_index == 2)
   {
@@ -493,9 +494,10 @@ inline Vector3<T> Matrix4<T>::translation() const
 }
 
 template <typename T>
-inline Vector3<T> Matrix4<T>::axis(int index) const
+inline Vector3<T> Matrix4<T>::axis(size_t index) const
 {
-  const Vector3<T> v((*this)(0, index), (*this)(1, index), (*this)(2, index));
+  const Vector3<T> v((*this)(0, static_cast<size_t>(index)), (*this)(1, static_cast<size_t>(index)),
+                     (*this)(2, static_cast<size_t>(index)));
   return v;
 }
 
@@ -530,11 +532,11 @@ inline Matrix4<T> &Matrix4<T>::setTranslation(const Vector3<T> &axis)
 }
 
 template <typename T>
-inline Matrix4<T> &Matrix4<T>::setAxis(int index, const Vector3<T> &axis)
+inline Matrix4<T> &Matrix4<T>::setAxis(size_t index, const Vector3<T> &axis)
 {
-  (*this)(0, index) = axis.x();
-  (*this)(1, index) = axis.y();
-  (*this)(2, index) = axis.z();
+  (*this)(0, static_cast<size_t>(index)) = axis.x();
+  (*this)(1, static_cast<size_t>(index)) = axis.y();
+  (*this)(2, static_cast<size_t>(index)) = axis.z();
   return *this;
 }
 

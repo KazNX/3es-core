@@ -30,7 +30,7 @@ void makeHiResSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> &ind
 void makeLowResSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> &indices,
                       std::vector<Vector3f> *normals);
 void makeSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> &indices,
-                std::vector<Vector3f> *normals, int iterations);
+                std::vector<Vector3f> *normals, unsigned iterations);
 
 void validateMesh(const MeshResource &mesh, const MeshResource &reference);
 void validateShape(const Shape &shape, const Shape &reference, const ResourceMap &resources);

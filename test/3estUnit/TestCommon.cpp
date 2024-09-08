@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <iomanip>
 
 namespace tes
 {
@@ -27,7 +28,7 @@ void makeLowResSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> &in
 }
 
 void makeSphere(std::vector<Vector3f> &vertices, std::vector<unsigned> &indices,
-                std::vector<Vector3f> *normals, int iterations)
+                std::vector<Vector3f> *normals, unsigned iterations)
 {
   // Start with a unit sphere so we have normals precalculated.
   // Use a fine subdivision to ensure we need multiple data packets to transfer vertices.

@@ -70,7 +70,7 @@ bool MeshSet::writeCreate(PacketWriter &stream) const
   stream.writeElement(number_of_parts);
 
   bool ok = true;
-  for (int i = 0; i < number_of_parts; ++i)
+  for (uint16_t i = 0; i < number_of_parts; ++i)
   {
     const Part &part = _parts[i];
     if (part.resource)

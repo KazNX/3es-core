@@ -492,17 +492,17 @@ struct TES_CORE_API ObjectAttributes
     bool ok = true;
     T value;
     ok = reader.readElement(colour) == sizeof(colour) && ok;
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
     {
       ok = reader.readElement(value) == sizeof(value) && ok;
       position[i] = Real(value);
     }
-    for (int i = 0; i < 4; ++i)
+    for (size_t i = 0; i < 4; ++i)
     {
       ok = reader.readElement(value) == sizeof(value) && ok;
       rotation[i] = Real(value);
     }
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
     {
       ok = reader.readElement(value) == sizeof(value) && ok;
       scale[i] = Real(value);
@@ -541,17 +541,17 @@ struct TES_CORE_API ObjectAttributes
     bool ok = true;
     T value;
     ok = writer.writeElement(colour) == sizeof(colour) && ok;
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
     {
       value = T(position[i]);
       ok = writer.writeElement(value) == sizeof(value) && ok;
     }
-    for (int i = 0; i < 4; ++i)
+    for (size_t i = 0; i < 4; ++i)
     {
       value = T(rotation[i]);
       ok = writer.writeElement(value) == sizeof(value) && ok;
     }
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
     {
       value = T(scale[i]);
       ok = writer.writeElement(value) == sizeof(value) && ok;

@@ -21,13 +21,19 @@
 #include <utility>
 #include <variant>
 
-#define STREAM_TYPE_INFO(_type, _type_name)                       \
-  template <>                                                     \
-  class DataBufferPrimitiveTypeInfo<_type>                        \
-  {                                                               \
-  public:                                                         \
-    constexpr static DataStreamType type() { return _type_name; } \
-    constexpr static size_t size() { return sizeof(_type); }      \
+#define STREAM_TYPE_INFO(_type, _type_name) \
+  template <>                               \
+  class DataBufferPrimitiveTypeInfo<_type>  \
+  {                                         \
+  public:                                   \
+    constexpr static DataStreamType type()  \
+    {                                       \
+      return _type_name;                    \
+    }                                       \
+    constexpr static size_t size()          \
+    {                                       \
+      return sizeof(_type);                 \
+    }                                       \
   }
 
 

@@ -116,8 +116,8 @@ int countBits(uint8_t value);
 /// @copydoc countBits(int8_t)
 inline int countBits(int16_t value)
 {
-  return countBits(static_cast<uint8_t>(value & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 8u) & 0xFFu));
+  return countBits(static_cast<uint8_t>(value & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 8u) & 0xFF));
 }
 
 /// @copydoc countBits(int8_t)
@@ -130,10 +130,10 @@ inline int countBits(uint16_t value)
 /// @copydoc countBits(int8_t)
 inline int countBits(int32_t value)
 {
-  return countBits(static_cast<uint8_t>(value & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 8u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 16u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 24u) & 0xFFu));
+  return countBits(static_cast<uint8_t>(value & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 8u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 16u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 24u) & 0xFF));
 }
 
 /// @copydoc countBits(int8_t)
@@ -148,27 +148,27 @@ inline int countBits(uint32_t value)
 /// @copydoc countBits(int8_t)
 inline int countBits(int64_t value)
 {
-  return countBits(static_cast<uint8_t>(value & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 8u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 16u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 24u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 32u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 40u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 48u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 56u) & 0xFFu));
+  return countBits(static_cast<uint8_t>(value & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 8u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 16u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 24u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 32u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 40u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 48u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 56u) & 0xFF));
 }
 
 /// @copydoc countBits(int8_t)
 inline int countBits(uint64_t value)
 {
   return countBits(static_cast<uint8_t>(value & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 8u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 16u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 24u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 32u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 40u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 48u) & 0xFFu)) +
-         countBits(static_cast<uint8_t>((value >> 56u) & 0xFFu));
+         countBits(static_cast<uint8_t>((value >> 8u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 16u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 24u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 32u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 40u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 48u) & 0xFF)) +
+         countBits(static_cast<uint8_t>((value >> 56u) & 0xFF));
 }
 }  // namespace tes
 

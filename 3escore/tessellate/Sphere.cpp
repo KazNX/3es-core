@@ -49,6 +49,7 @@ unsigned insertVertex(const Vector3f &vertex, std::vector<Vector3f> &vertices,
 void initialise(std::vector<Vector3f> &vertices, std::vector<unsigned> &indices,
                 SphereVertexMap *vertex_map)
 {
+  // FIXME: It's meant to be two pentagon.
   // We start with two hexagonal rings to approximate the sphere.
   // All subdivision occurs on a unit radius sphere, at the origin. We translate and
   // scale the vertices at the end.

@@ -381,7 +381,7 @@ bool intersectTrianglesT(const Vector3<T> &a0, const Vector3<T> &a1, const Vecto
   T ta2 = {};
   T tb1 = {};
   T tb2 = {};
-  std::array<int, 3> refinds = {};
+  std::array<unsigned, 3> refinds = {};
   bool overlap_a = false;
   bool overlap_b = false;
 

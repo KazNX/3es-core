@@ -194,7 +194,7 @@ MeshShape &MeshShape::setUniformNormal(const Vector3f &normal)
 {
   setCalculateNormals(false);
   const std::array<Vector3f, 1> source = { normal };
-  _normals = std::move(DataBuffer(source));
+  _normals = DataBuffer(source);
   _normals.duplicate();
   return *this;
 }
@@ -398,9 +398,6 @@ bool MeshShape::readData(PacketReader &packet)
 
   ok = ok && msg.read(packet);
   ok = ok && packet.readElement(data_type) == sizeof(data_type);
-
-  // Record and mask out end flags.
-  data_type = data_type;
 
   switch (data_type)
   {

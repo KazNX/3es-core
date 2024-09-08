@@ -156,7 +156,8 @@ inline std::ostream &operator<<(std::ostream &out, const ByteUnit unit)
 inline std::ostream &operator<<(std::ostream &out, const ByteValue &bytes)
 {
   out << bytes.value();
-  if (const auto remainder = bytes.fractional())
+  const auto remainder = bytes.fractional();
+  if (remainder != 0)
   {
     const auto w = out.width();
     const auto f = out.fill();

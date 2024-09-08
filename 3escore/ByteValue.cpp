@@ -26,18 +26,18 @@ std::string_view ByteValue::unitSuffix(ByteUnit unit)
   static std::array<std::string_view, 8> names = {
     "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB",
   };
-  return names[static_cast<int>(unit)];
+  return names[static_cast<size_t>(unit)];
 }
 
 
 uint64_t ByteValue::conversion(ByteUnit unit)
 {
-  return kConversions[static_cast<int>(unit)];
+  return kConversions[static_cast<size_t>(unit)];
 }
 
 
 uint64_t ByteValue::fractionalConversion(ByteUnit unit)
 {
-  return (unit != ByteUnit::Bytes) ? kConversions[static_cast<int>(unit) - 1] : 0u;
+  return (unit != ByteUnit::Bytes) ? kConversions[static_cast<size_t>(unit) - 1] : 0u;
 }
 }  // namespace tes

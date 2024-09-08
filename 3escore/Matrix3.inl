@@ -46,7 +46,7 @@ const Matrix3<T> Matrix3<T>::Identity(1, 0, 0, 0, 1, 0, 0, 0, 1);
 template <typename T>
 Matrix3<T>::Matrix3(const T array9[9])  // NOLINT(cppcoreguidelines-avoid-c-arrays)
 {
-  for (int i = 0; i < 9; ++i)
+  for (size_t i = 0; i < 9; ++i)
   {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     _storage[i] = array9[i];
@@ -72,7 +72,7 @@ template <typename T>
 template <typename U>
 Matrix3<T>::Matrix3(const Matrix3<U> &other) noexcept
 {
-  for (int i = 0; i < 9; ++i)
+  for (size_t i = 0; i < 9; ++i)
   {
     _storage[i] = static_cast<T>(other._storage[i]);
   }
@@ -150,7 +150,8 @@ inline Matrix3<T> Matrix3<T>::scaling(const Vector3<T> &scale)
 
 template <typename T>
 Matrix3<T> Matrix3<T>::lookAt(const Vector3<T> &eye, const Vector3<T> &target,
-                              const Vector3<T> &axis_up, int forward_axis_index, int up_axis_index)
+                              const Vector3<T> &axis_up, size_t forward_axis_index,
+                              size_t up_axis_index)
 {
   if (forward_axis_index == up_axis_index || forward_axis_index < 0 || forward_axis_index > 2 ||
       up_axis_index < 0 || up_axis_index > 2)
@@ -160,7 +161,7 @@ Matrix3<T> Matrix3<T>::lookAt(const Vector3<T> &eye, const Vector3<T> &target,
   }
 
   std::array<Vector3<T>, 3> axes = {};
-  int side_axis_index = 0;
+  size_t side_axis_index = 0;
   if (forward_axis_index == 1 && up_axis_index == 2 ||
       up_axis_index == 1 && forward_axis_index == 2)
   {
@@ -221,7 +222,7 @@ Matrix3<T> &Matrix3<T>::invert()
   const T det = getAdjoint(adj);
   const T det_inv = static_cast<T>(1) / det;
 
-  for (int i = 0; i < 9; ++i)
+  for (size_t i = 0; i < 9; ++i)
   {
     _storage[i] = adj[i] * det_inv;
   }
@@ -236,7 +237,7 @@ Matrix3<T> Matrix3<T>::inverse() const
   const T det = getAdjoint(inv);
   const T det_inv = static_cast<T>(1) / det;
 
-  for (int i = 0; i < 9; ++i)
+  for (size_t i = 0; i < 9; ++i)
   {
     inv[i] *= det_inv;
   }
@@ -301,7 +302,7 @@ inline Vector3<T> Matrix3<T>::axisZ() const
 }
 
 template <typename T>
-inline Vector3<T> Matrix3<T>::axis(int index) const
+inline Vector3<T> Matrix3<T>::axis(size_t index) const
 {
   const Vector3<T> v((*this)(0, index), (*this)(1, index), (*this)(2, index));
   return v;
@@ -326,7 +327,7 @@ inline Matrix3<T> &Matrix3<T>::setAxisZ(const Vector3<T> &axis)
 }
 
 template <typename T>
-inline Matrix3<T> &Matrix3<T>::setAxis(int index, const Vector3<T> &axis)
+inline Matrix3<T> &Matrix3<T>::setAxis(size_t index, const Vector3<T> &axis)
 {
   (*this)(0, index) = axis.x();
   (*this)(1, index) = axis.y();

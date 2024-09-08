@@ -102,9 +102,6 @@ TEST(Stream, Util)
   streamutil::initialiseStream(stream, &expected_info);
   stream.flush();
 
-  // Check we've written placeholder messages correctly.
-  const auto stream_end = stream.tellp();
-
   ServerInfoMessage server_info = {};
   uint32_t frame_count = ~0u;  // Initialise to non zero value. We'll validate for zero later.
 
@@ -153,8 +150,7 @@ TEST(Stream, PacketBuffer)
 
   ServerInfoMessage restored_info = {};
   uint32_t final_frame_count = 0;
-  const auto handle_packet = [this, &restored_info,
-                              &final_frame_count](const PacketHeader *header) {
+  const auto handle_packet = [&restored_info, &final_frame_count](const PacketHeader *header) {
     PacketReader reader(header);
     switch (reader.routingId())
     {

@@ -82,10 +82,10 @@ Quaternion<T> matrixToQuaternion(const M &m)
   Quaternion<T> q = {};
   T trace = m(0, 0) + m(1, 1) + m(2, 2);
   T root;
-  const std::array<int, 3> next = { 1, 2, 0 };
-  int i = 0;
-  int j = 0;
-  int k = 0;
+  const std::array<size_t, 3> next = { 1, 2, 0 };
+  size_t i = 0;
+  size_t j = 0;
+  size_t k = 0;
 
   if (trace >= 0.0f)
   {

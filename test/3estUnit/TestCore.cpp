@@ -183,7 +183,7 @@ inline void testImplicitArgConvert(const Ptr<T> &ptr, const std::shared_ptr<U> &
 template <typename T, typename U>
 inline void testPtrCast(const std::shared_ptr<U> &src)
 {
-  size_t use_count = src.use_count();
+  auto use_count = src.use_count();
 
   // Assign to Ptr
   auto ptr_shared = Ptr<T>(src);          // shared

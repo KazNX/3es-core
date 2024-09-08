@@ -265,124 +265,70 @@ public:
   /// Access the specified colour channel for read/write.
   /// @param channel The channel to access.
   /// @return A reference to the colour channel value.
-  uint8_t &channel(Channel channel)
-  {
-    return _storage.at(static_cast<int>(channel));
-  }
+  uint8_t &channel(Channel channel) { return _storage.at(static_cast<size_t>(channel)); }
   /// Access the specified colour channel for read-only.
   /// @param channel The channel to access.
   /// @return The colour channel value.
   [[nodiscard]] uint8_t channel(Channel channel) const
   {
-    return _storage.at(static_cast<int>(channel));
+    return _storage.at(static_cast<size_t>(channel));
   }
 
   /// Return the internal data storage. Used for buffer packing and network transfer.
   /// @return The internal array.
-  [[nodiscard]] const std::array<uint8_t, 4> &storage() const
-  {
-    return _storage;
-  }
+  [[nodiscard]] const std::array<uint8_t, 4> &storage() const { return _storage; }
 
   /// Access the red colour channel for read/write.
   /// @return A reference to the red colour channel.
-  uint8_t &r()
-  {
-    return red();
-  }
+  uint8_t &r() { return red(); }
   /// Access the red colour channel for read-only.
   /// @return The red colour channel value.
-  [[nodiscard]] uint8_t r() const
-  {
-    return red();
-  }
+  [[nodiscard]] uint8_t r() const { return red(); }
   /// Access the red colour channel for read/write.
   /// @return A reference to the red colour channel.
-  uint8_t &red()
-  {
-    return channel(Channel::R);
-  }
+  uint8_t &red() { return channel(Channel::R); }
   /// Access the red colour channel for read-only.
   /// @return The red colour channel value.
-  [[nodiscard]] uint8_t red() const
-  {
-    return channel(Channel::R);
-  }
+  [[nodiscard]] uint8_t red() const { return channel(Channel::R); }
 
   /// Access the green colour channel for read/write.
   /// @return A reference to the green colour channel.
-  uint8_t &g()
-  {
-    return green();
-  }
+  uint8_t &g() { return green(); }
   /// Access the green colour channel for read-only.
   /// @return The green colour channel value.
-  [[nodiscard]] uint8_t g() const
-  {
-    return green();
-  }
+  [[nodiscard]] uint8_t g() const { return green(); }
   /// Access the green colour channel for read/write.
   /// @return A reference to the green colour channel.
-  uint8_t &green()
-  {
-    return channel(Channel::G);
-  }
+  uint8_t &green() { return channel(Channel::G); }
   /// Access the green colour channel for read-only.
   /// @return The green colour channel value.
-  [[nodiscard]] uint8_t green() const
-  {
-    return channel(Channel::G);
-  }
+  [[nodiscard]] uint8_t green() const { return channel(Channel::G); }
 
   /// Access the blue colour channel for read/write.
   /// @return A reference to the blue colour channel.
-  uint8_t &b()
-  {
-    return blue();
-  }
+  uint8_t &b() { return blue(); }
   /// Access the blue colour channel for read-only.
   /// @return The blue colour channel value.
-  [[nodiscard]] uint8_t b() const
-  {
-    return blue();
-  }
+  [[nodiscard]] uint8_t b() const { return blue(); }
   /// Access the blue colour channel for read/write.
   /// @return A reference to the blue colour channel.
-  uint8_t &blue()
-  {
-    return channel(Channel::B);
-  }
+  uint8_t &blue() { return channel(Channel::B); }
   /// Access the blue colour channel for read-only.
   /// @return The blue colour channel value.
-  [[nodiscard]] uint8_t blue() const
-  {
-    return channel(Channel::B);
-  }
+  [[nodiscard]] uint8_t blue() const { return channel(Channel::B); }
 
   /// Access the alpha colour channel for read/write.
   /// @return A reference to the alpha colour channel.
-  uint8_t &a()
-  {
-    return alpha();
-  }
+  uint8_t &a() { return alpha(); }
   /// Access the alpha colour channel for read-only.
   /// @return The alpha colour channel value.
-  [[nodiscard]] uint8_t a() const
-  {
-    return alpha();
-  }
+  [[nodiscard]] uint8_t a() const { return alpha(); }
   /// Access the alpha colour channel for read/write.
   /// @return A reference to the alpha colour channel.
-  uint8_t &alpha()
-  {
-    return channel(Channel::A);
-  }
+  uint8_t &alpha() { return channel(Channel::A); }
   /// Access the alpha colour channel for read-only.
   /// @return The alpha colour channel value.
-  [[nodiscard]] uint8_t alpha() const
-  {
-    return channel(Channel::A);
-  }
+  [[nodiscard]] uint8_t alpha() const { return channel(Channel::A); }
 
   /// Return a 32-bit integer representation of the colour.
   ///
@@ -394,10 +340,7 @@ public:
   [[nodiscard]] uint32_t colour32() const;
   /// Cast to a @c uint32_t - see @c colour32().
   /// @return A 32-bit integer representation of the colour.
-  operator uint32_t() const
-  {
-    return colour32();
-  }
+  operator uint32_t() const { return colour32(); }
 
   /// Get red channel in floating point form.
   /// @return Red channel [0, 1].
@@ -441,17 +384,11 @@ public:
 
   /// Lighten the colour by 1.5
   /// @return A lighter colour.
-  [[nodiscard]] Colour lighten() const
-  {
-    return adjust(1.5f);
-  }
+  [[nodiscard]] Colour lighten() const { return adjust(1.5f); }
 
   /// Darken the colour by 0.5
   /// @return A darker colour.
-  [[nodiscard]] Colour darken() const
-  {
-    return adjust(0.5f);
-  }
+  [[nodiscard]] Colour darken() const { return adjust(0.5f); }
 
   /// Assignment operator.
   /// @param other The colour value to assign.
@@ -757,13 +694,13 @@ inline void Colour::setAf(float value)
 
 inline void Colour::setf(float value, Channel channel)
 {
-  _storage.at(static_cast<int>(channel)) = static_cast<uint8_t>(value * 255.0f);
+  _storage.at(static_cast<size_t>(channel)) = static_cast<uint8_t>(value * 255.0f);
 }
 
 
 inline float Colour::getf(Channel channel) const
 {
-  return static_cast<float>(_storage.at(static_cast<int>(channel))) / 255.0f;
+  return static_cast<float>(_storage.at(static_cast<size_t>(channel))) / 255.0f;
 }
 
 
@@ -866,8 +803,10 @@ inline Colour Colour::fromHsv(float hue, float saturation, float value, float al
 
 inline uint32_t Colour::ConverterUInt32::operator()(const std::array<uint8_t, 4> &storage) const
 {
-  return (storage[kRedIndex] << kRedShift) | (storage[kGreenIndex] << kGreenShift) |
-         (storage[kBlueIndex] << kBlueShift) | (storage[kAlphaIndex] << kAlphaShift);
+  return static_cast<uint32_t>(storage[kRedIndex] << kRedShift) |
+         static_cast<uint32_t>(storage[kGreenIndex] << kGreenShift) |
+         static_cast<uint32_t>(storage[kBlueIndex] << kBlueShift) |
+         static_cast<uint32_t>(storage[kAlphaIndex] << kAlphaShift);
 }
 
 

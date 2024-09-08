@@ -431,7 +431,7 @@ bool PointCloud::processVertices(const MeshComponentMessage &msg, unsigned offse
 
   for (size_t i = 0; i + offset < _imp->vertices.size() && i < stream.count(); ++i)
   {
-    for (int j = 0; j < 3; ++j)
+    for (size_t j = 0; j < 3; ++j)
     {
       _imp->vertices[i + offset][j] = stream.get<float>(i, j);
     }
@@ -473,7 +473,7 @@ bool PointCloud::processNormals(const MeshComponentMessage &msg, unsigned offset
 
   for (size_t i = 0; i + offset < _imp->vertices.size() && i < stream.count(); ++i)
   {
-    for (int j = 0; j < 3; ++j)
+    for (size_t j = 0; j < 3; ++j)
     {
       _imp->normals[i + offset][j] = stream.get<float>(i, j);
     }

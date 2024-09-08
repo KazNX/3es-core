@@ -98,12 +98,16 @@ public:
   /// Indexing operator (no bounds checking).
   /// @param index The element to access [0, 9].
   /// @return The matrix element at @p index.
-  T &operator[](size_t index) { return _storage[index]; }
-
-  /// Indexing operator (no bounds checking).
-  /// @param index The element to access [0, 9].
-  /// @return The matrix element at @p index.
-  [[nodiscard]] const T &operator[](size_t index) const { return _storage[index]; }
+  T &operator[](size_t index) { return _storage.at(index); }
+  /// @overload
+  [[nodiscard]] const T &operator[](size_t index) const { return _storage.at(index); }
+  /// @overload
+  T &operator[](int index) { return this->operator[](static_cast<size_t>(index)); }
+  /// @overload
+  [[nodiscard]] const T &operator[](int index) const
+  {
+    return this->operator[](static_cast<size_t>(index));
+  }
 
   /// Access the internal storage for direct memory copies.
   /// @return The internal storage.
@@ -181,8 +185,8 @@ public:
   /// @return A model matrix at @p eye pointing at @p target. Returns identity if
   /// there are errors in the specification of @p forwardAxisIndex and @p upAxisIndex.
   [[nodiscard]] static Matrix3<T> lookAt(const Vector3<T> &eye, const Vector3<T> &target,
-                                         const Vector3<T> &axis_up, int forward_axis_index = 1,
-                                         int up_axis_index = 2);
+                                         const Vector3<T> &axis_up, size_t forward_axis_index = 1,
+                                         size_t up_axis_index = 2);
 
   /// Initialise this matrix as a model or camera matrix.
   /// @see @c lookAt().
@@ -193,7 +197,7 @@ public:
   /// @param upAxisIndex The index of the up axis. Must not be equal to @p forwardAxisIndex.
   /// @return @c this
   Matrix3<T> &initLookAt(const Vector3<T> &eye, const Vector3<T> &target, const Vector3<T> &axis_up,
-                         int forward_axis_index = 1, int up_axis_index = 2)
+                         size_t forward_axis_index = 1, size_t up_axis_index = 2)
   {
     *this = lookAt(eye, target, axis_up, forward_axis_index, up_axis_index);
     return *this;
@@ -253,7 +257,7 @@ public:
   /// @param index The index of the axis of interest.
   ///   0 => X, 1 => Y, 2 => Z.
   /// @return The axis of interest.
-  [[nodiscard]] Vector3<T> axis(int index) const;
+  [[nodiscard]] Vector3<T> axis(size_t index) const;
 
   /// Sets the X axis of this matrix. See @p axisX().
   /// @param axis The value to set the axis to.
@@ -275,7 +279,7 @@ public:
   ///   0 => X, 1 => Y, 2 => Z.
   /// @param axis The value to set the axis to.
   /// @return This matrix after the operation.
-  Matrix3<T> &setAxis(int index, const Vector3<T> &axis);
+  Matrix3<T> &setAxis(size_t index, const Vector3<T> &axis);
 
   /// Returns the scale contained in this matrix. This is the length of each axis.
   /// @return The scale of each rotation axis in this matrix.
@@ -310,7 +314,8 @@ using Matrix3f = Matrix3<float>;
 /// Defines a double precision 4x4 matrix.
 using Matrix3d = Matrix3<double>;
 
-// FIXME(KS): the extern template declarations broke with link errors when adding `constexpr` functions. Why?
+// FIXME(KS): the extern template declarations broke with link errors when adding `constexpr`
+// functions. Why?
 #ifdef _MSC_VER
 TES_EXTERN template class TES_CORE_API Matrix3<float>;
 TES_EXTERN template class TES_CORE_API Matrix3<double>;

@@ -558,7 +558,7 @@ bool SimpleMesh::processVertices(const MeshComponentMessage &msg, unsigned offse
   const auto vertex_count = vertexCount();
   for (size_t i = 0; i < stream_count && i + offset < vertex_count; ++i)
   {
-    for (int j = 0; j < 3; ++j)
+    for (size_t j = 0; j < 3; ++j)
     {
       _imp->vertices[i + offset][j] = stream.get<float>(i, j);
     }
@@ -622,9 +622,9 @@ bool SimpleMesh::processNormals(const MeshComponentMessage &msg, unsigned offset
     _imp->normals.resize(vertexCount());
     _imp->components |= MeshComponentFlag::Normal;
   }
-  for (unsigned i = 0; i < stream.count() && i + offset < vertexCount(); ++i)
+  for (size_t i = 0; i < stream.count() && i + offset < vertexCount(); ++i)
   {
-    for (unsigned j = 0; j < 3; ++j)
+    for (size_t j = 0; j < 3; ++j)
     {
       _imp->normals[i + static_cast<size_t>(offset)][j] = stream.get<float>(i, j);
     }

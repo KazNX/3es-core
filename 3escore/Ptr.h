@@ -7,6 +7,7 @@
 
 #include "CoreConfig.h"
 
+#include <cstddef>
 #include <memory>
 
 namespace tes
@@ -37,7 +38,7 @@ public:
   Ptr(T *ptr);
   /// Null pointer constructor.
   /// @param ptr @c nullptr
-  Ptr(nullptr_t) {}
+  Ptr(std::nullptr_t) {}
   /// Construct from a shared pointer resulting in @c Status::Shared, unless @p ptr is null.
   /// @param ptr The pointer to assign.
   Ptr(std::shared_ptr<T> ptr);
@@ -86,7 +87,7 @@ public:
   /// Assign a null pointer resulting in @c Status::Empty .
   /// @param ptr @c nullptr
   /// @return @c *this
-  Ptr &operator=(nullptr_t);
+  Ptr &operator=(std::nullptr_t);
   /// Assign a shared pointer resulting in @c Status::Shared, unless @p ptr is null.
   /// @param ptr The pointer to assign.
   /// @return @c *this
@@ -299,7 +300,7 @@ inline Ptr<T> &Ptr<T>::operator=(T *ptr)
 
 
 template <typename T>
-inline Ptr<T> &Ptr<T>::operator=(nullptr_t)
+inline Ptr<T> &Ptr<T>::operator=(std::nullptr_t)
 {
   _shared.reset();
   _borrowed = nullptr;
