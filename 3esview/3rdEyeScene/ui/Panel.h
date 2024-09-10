@@ -100,6 +100,8 @@ public:
     , _preferred_coordinates(preferred_coordinates)
   {}
 
+  virtual ~Panel() = default;
+
   void setPreferredCoordinates(const PreferredCoordinates &preferred)
   {
     _preferred_coordinates = preferred;

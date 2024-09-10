@@ -39,7 +39,7 @@ bool KeyframeStore::remove(FrameNumber keyframe_number)
     // Ignore errors deleting files
   }
   // Remove the record.
-  _keyframes.erase(_keyframes.begin() + index);  // NOLINT(cppcoreguidelines-narrowing-conversions)
+  _keyframes.erase(_keyframes.begin() + static_cast<unsigned>(index));
   return true;
 }
 

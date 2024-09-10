@@ -254,7 +254,7 @@ private:
   struct KeyAxis
   {
     KeyEvent::Key key;
-    int axis = 0;
+    unsigned axis = 0;
     bool negate = false;
     bool active = false;
   };

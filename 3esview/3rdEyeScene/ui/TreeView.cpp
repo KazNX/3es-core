@@ -22,7 +22,7 @@ TreeView::TreeView(const std::string &name, Viewer &viewer, const PreferredCoord
 bool TreeView::beginBranch(unsigned idx, const std::string &label, BranchFlag flags)
 {
   // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
-  ImGui::PushID(idx);
+  ImGui::PushID(int_cast<int>(idx));
   ImGui::TableNextRow();
   ImGui::TableSetColumnIndex(0);
   ImGui::AlignTextToFramePadding();
@@ -57,7 +57,7 @@ void TreeView::endBranch(bool open)
 void TreeView::beginLeaf(unsigned idx, const std::string &label, const std::string &info)
 {
   TES_UNUSED(info);
-  ImGui::PushID(idx);  // Use field index as identifier.
+  ImGui::PushID(int_cast<int>(idx));  // Use field index as identifier.
   ImGui::TableNextRow();
   ImGui::TableSetColumnIndex(0);
   ImGui::AlignTextToFramePadding();

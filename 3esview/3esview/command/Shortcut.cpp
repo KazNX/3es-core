@@ -3,6 +3,8 @@
 //
 #include "Shortcut.h"
 
+#include <3escore/CoreUtil.h>
+
 #include <algorithm>
 #include <cctype>
 #include <sstream>
@@ -198,7 +200,8 @@ Shortcut Shortcut::parse(const std::string &sequence)
   }
 
   // Erase the key from the tokens list.
-  tokens.erase(tokens.begin() + tokens.size() - 1);
+  const auto last_index = int_cast<int>(tokens.size()) - 1;
+  tokens.erase(tokens.begin() + last_index);
 
   // Build the modifiers.
   unsigned modifiers = 0u;

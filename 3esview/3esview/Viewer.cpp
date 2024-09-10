@@ -32,6 +32,8 @@
 #include <fstream>
 #include <iostream>
 
+std::istream &operator>>(std::istream &in, tes::log::Level &log_level);
+
 #include <cxxopts.hpp>
 
 // Things to learn about:
@@ -40,8 +42,6 @@
 // Things to implement:
 // - mesh renderer
 
-namespace
-{
 /// Streaming operator to support command line parsing.
 std::istream &operator>>(std::istream &in, tes::log::Level &log_level)
 {
@@ -99,7 +99,6 @@ std::istream &operator>>(std::istream &in, tes::log::Level &log_level)
 
 //   return out;
 // }
-}  // namespace
 
 namespace tes::view
 {
@@ -109,7 +108,6 @@ void focusCallback(GLFWwindow *window, int focused)
 {
   auto *app = static_cast<Magnum::Platform::GlfwApplication *>(glfwGetWindowUserPointer(window));
   auto *viewer = dynamic_cast<Viewer *>(app);
-  viewer = viewer;
   if (viewer)
   {
     viewer->setContinuousSim(focused != 0);

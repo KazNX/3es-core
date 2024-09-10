@@ -11,6 +11,7 @@
 #include <atomic>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace tes::view
@@ -303,12 +304,12 @@ private:
     LogLevel(log::Level log_level)  // NOLINT(google-explicit-constructor)
       : _level(static_cast<int>(log_level))
     {}
-    LogLevel(const LogLevel &other) = default;
-    LogLevel(LogLevel &&other) = default;
+    LogLevel(const LogLevel &other) = delete;
+    LogLevel(LogLevel &&other) = delete;
     ~LogLevel() = default;
 
-    LogLevel &operator=(const LogLevel &other) = default;
-    LogLevel &operator=(LogLevel &&other) = default;
+    LogLevel &operator=(const LogLevel &other) = delete;
+    LogLevel &operator=(LogLevel &&other) = delete;
 
     /// Assignment from a @c log::Level .
     /// @param log_level The log level to assign.

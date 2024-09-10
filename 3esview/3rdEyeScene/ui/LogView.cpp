@@ -96,7 +96,7 @@ void LogView::drawText(const ToolState &tool_state)
 
   while (clipper.Step())
   {
-    auto iter = log_view.begin() + clipper.DisplayStart;
+    auto iter = log_view.begin() + static_cast<unsigned>(clipper.DisplayStart);
     const auto end = log_view.end();
     for (int line_number = clipper.DisplayStart; line_number < clipper.DisplayEnd && iter != end;
          ++iter, ++line_number)

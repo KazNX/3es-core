@@ -80,7 +80,7 @@ void Hud::drawCameraCombo()
 
   int current_index = 0;
   // Add the enumerated cameras.
-  for (int i = 0; i < int_cast<int>(cameras.size()); ++i)
+  for (unsigned i = 0; i < int_cast<unsigned>(cameras.size()); ++i)
   {
     const auto write_idx = i + 1;
     const auto &id = cameras[i];
@@ -94,11 +94,11 @@ void Hud::drawCameraCombo()
       break;
     }
     labels_cstr[write_idx] = labels[write_idx].c_str();
-    ids[write_idx] = id;
+    ids[write_idx] = static_cast<int>(id);
 
     if (id == active_camera_id)
     {
-      current_index = write_idx;
+      current_index = static_cast<int>(write_idx);
     }
   }
 
@@ -110,7 +110,7 @@ void Hud::drawCameraCombo()
     {
       if (set_camera_command->admissible(viewer()))
       {
-        set_camera_command->invoke(viewer(), ids[current_index]);
+        set_camera_command->invoke(viewer(), ids[static_cast<unsigned>(current_index)]);
       }
     }
   }

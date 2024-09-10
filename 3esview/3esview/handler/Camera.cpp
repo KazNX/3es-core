@@ -324,12 +324,12 @@ void Camera::calculateCameraAxes(float pitch, float yaw, const Magnum::Vector3 &
   const auto transform = Magnum::Matrix4::rotation(Magnum::Rad(yaw), world_up) *  //
                          Magnum::Matrix4::rotation(Magnum::Rad(pitch), world_side);
 
-  int fwd_axis = 0;
-  int up_axis = 0;
+  unsigned fwd_axis = 0;
+  unsigned up_axis = 0;
   bool negate_fwd = false;
   bool negate_up = false;
 
-  for (int i = 1; i < 3; ++i)
+  for (unsigned i = 1; i < 3; ++i)
   {
     if (world_fwd[i] != 0)
     {

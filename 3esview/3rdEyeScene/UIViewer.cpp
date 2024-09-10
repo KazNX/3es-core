@@ -19,6 +19,7 @@
 #include <3esview/ThirdEyeScene.h>
 #include <3esview/settings/Settings.h>
 
+#include <3escore/CoreUtil.h>
 #include <3escore/Finally.h>
 
 #include <cxxopts.hpp>
@@ -58,7 +59,7 @@ public:
   {}
 
 protected:
-  bool checkAdmissible(Viewer &viewer) const
+  bool checkAdmissible(Viewer &viewer) const override
   {
     auto *ui_viewer = dynamic_cast<UIViewer *>(&viewer);
     return ui_viewer != nullptr;
@@ -245,8 +246,8 @@ void UIViewer::viewportEvent(ViewportEvent &event)
         if (static_cast<int>(hsize->value()) != window_size.x() ||
             static_cast<int>(vsize->value()) != window_size.y())
         {
-          hsize->setValue(window_size.x());
-          vsize->setValue(window_size.y());
+          hsize->setValue(int_cast<unsigned>(window_size.x()));
+          vsize->setValue(int_cast<unsigned>(window_size.y()));
           tes()->settings().update(config);
         }
         break;
@@ -422,8 +423,10 @@ void UIViewer::updateWindowSize(const settings::Settings::Config &config,
       const auto &window_settings = *iter;
       // Default to settings.
       auto window_size = Magnum::Vector2i(
-        window_settings[kWindowSettingsHorizontal].getProperty<WindowSizeProperty>()->value(),
-        window_settings[kWindowSettingsVertical].getProperty<WindowSizeProperty>()->value());
+        static_cast<int>(
+          window_settings[kWindowSettingsHorizontal].getProperty<WindowSizeProperty>()->value()),
+        static_cast<int>(
+          window_settings[kWindowSettingsVertical].getProperty<WindowSizeProperty>()->value()));
 
       // Override with command line options.
       if (command_line_options)

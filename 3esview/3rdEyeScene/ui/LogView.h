@@ -20,12 +20,12 @@
 namespace tes::view::data
 {
 class DataThread;
-}
+}  // namespace tes::view::data
 
 namespace tes::view::command
 {
 class Command;
-}
+}  // namespace tes::view::command
 
 namespace tes::view::ui
 {
@@ -57,7 +57,10 @@ private:
   /// Draw the log text window.
   void drawText(const ToolState &tool_state);
 
-  inline log::Level filterLogLevel() const { return _log_levels[_log_level_filter_index]; }
+  inline log::Level filterLogLevel() const
+  {
+    return _log_levels[static_cast<unsigned>(_log_level_filter_index)];
+  }
 
   /// Log level combo box index. Start with no filter.
   int _log_level_filter_index = 4;

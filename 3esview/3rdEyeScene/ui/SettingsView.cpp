@@ -311,18 +311,18 @@ SettingsView::ViewStatus SettingsView::showProperty(unsigned idx, settings::Enum
   const auto named_values = prop.namedValues();
   int value_index = 0;
   std::vector<const char *> names(named_values.size());
-  for (int i = 0; i < static_cast<int>(named_values.size()); ++i)
+  for (size_t i = 0; i < named_values.size(); ++i)
   {
     names[i] = named_values[i].second.c_str();
     if (value == named_values[i].first)
     {
-      value_index = i;
+      value_index = static_cast<int>(i);
     }
   }
   if (ImGui::Combo(prop.label().c_str(), &value_index, names.data(),
                    static_cast<int>(names.size())))
   {
-    prop.setValueByName(names[value_index]);
+    prop.setValueByName(names[static_cast<unsigned>(value_index)]);
     status.dirty = true;
   }
   status.active = ImGui::IsItemActive();

@@ -117,9 +117,6 @@ private:
 
   /// Pending actions, in order they arrived.
   std::vector<PendingAction> _pending_actions;
-
-  /// The last frame we handled.
-  FrameNumber _last_frame = 0;
 };
 }  // namespace tes::view::handler
 

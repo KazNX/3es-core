@@ -330,7 +330,7 @@ IOResult load(Settings::Config &config, const std::filesystem::path &path)
   const auto byte_count = in_file.tellg();
   in_file.seekg(0, std::ios_base::beg);
 
-  std::vector<char> content(byte_count);
+  std::vector<char> content(static_cast<size_t>(byte_count));
   in_file.read(content.data(), static_cast<std::streamsize>(content.size()));
 
   ryml::Tree doc = ryml::parse_in_place(ryml::to_substr(content));

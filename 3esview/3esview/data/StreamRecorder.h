@@ -92,7 +92,6 @@ private:
 
   /// Used to record and compress the data packets.
   FileConnection _connection;
-  ServerInfoMessage _server_info;
   std::filesystem::path _path;
   State _status = State::PendingSnapshot;
 };

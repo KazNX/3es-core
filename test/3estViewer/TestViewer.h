@@ -45,8 +45,8 @@ public:
   /// @param configuration The apllication configuration.
   TestViewer(const Arguments &arguments, const Configuration &configuration);
 
-  /// Destructor.
-  ~TestViewer();
+  /// Destructor. Magnum base class should be virtual but isn't.
+  virtual ~TestViewer();
 
   /// Instantiate a singleton, shared viewer. A weak singleton reference is kept to this viewer.
   ///

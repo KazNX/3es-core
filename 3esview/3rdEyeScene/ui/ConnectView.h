@@ -50,7 +50,7 @@ public:
   {
     if (action != Action::Count)
     {
-      _actions[static_cast<int>(action)] = command;
+      _actions[static_cast<unsigned>(action)] = command;
     }
   }
 

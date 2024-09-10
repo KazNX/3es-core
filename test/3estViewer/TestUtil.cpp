@@ -23,9 +23,9 @@ struct Resource
 
 using ResourceList = util::ResourceList<Resource>;
 
-void buildResources(ResourceList &list, unsigned item_count)
+void buildResources(ResourceList &list, int item_count)
 {
-  for (unsigned i = 0; i < item_count; ++i)
+  for (int i = 0; i < item_count; ++i)
   {
     list.allocate()->value = i;
   }
@@ -39,7 +39,7 @@ TEST(Util, ResourceList_Allocate)
   for (size_t i = 0; i < resources.size(); ++i)
   {
     auto resource = resources[i];
-    EXPECT_EQ(resource->value, i);
+    EXPECT_EQ(resource->value, static_cast<int>(i));
   }
 }
 
@@ -180,10 +180,10 @@ TEST(Util, ResourceList_Threads)
 
   // First resource will lock the list.
   auto ref1 = resources.allocate();
-  ref1->value = unsigned(resources.size());
+  ref1->value = static_cast<int>(resources.size());
   // Second resource will lock again the list.
   auto ref2 = resources.allocate();
-  ref2->value = unsigned(resources.size());
+  ref2->value = static_cast<int>(resources.size());
 
   // Release ref1 and start a thread. It should not be able to lock the resource list until after we
   // unlock ref2.
@@ -202,7 +202,7 @@ TEST(Util, ResourceList_Threads)
     auto thread_resource = resources.allocate();
     ++shared.contended_count;
     // We should block here until ref2 is released.
-    thread_resource->value = unsigned(resources.size());
+    thread_resource->value = static_cast<int>(resources.size());
 
     // Allow the other thread to have control.
     thread_lock.unlock();
@@ -243,7 +243,7 @@ TEST(Util, ResourceList_Threads)
   lock.lock();
   ref1 = resources.allocate();
   ++shared.contended_count;
-  ref1->value = unsigned(resources.size());
+  ref1->value = static_cast<int>(resources.size());
   // No more blocking.
   ref1.release();
   lock.unlock();

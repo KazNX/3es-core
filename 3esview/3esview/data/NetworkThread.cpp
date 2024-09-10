@@ -172,7 +172,7 @@ void NetworkThread::runWith(TcpSocket &socket)
       continue;
     }
 
-    packet_buffer.addBytes(read_buffer.data(), bytes_read);
+    packet_buffer.addBytes(read_buffer.data(), int_cast<size_t>(bytes_read));
 
     if (const auto *packet_header = packet_buffer.extractPacket(read_buffer))
     {

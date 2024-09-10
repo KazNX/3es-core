@@ -20,7 +20,7 @@ TEST(Log, View)
   const size_t log_range = 10 * log_size;
   ViewerLog log(log_size);
 
-  const auto validate_log = [&log, log_size](size_t cursor) {
+  const auto validate_log = [&log](size_t cursor) {
     size_t expected_value = (cursor >= log_size) ? cursor - log_size + 1 : 0;
     bool ok = true;
     const auto view = log.view();
@@ -82,7 +82,8 @@ TEST(Log, ViewFilter)
       const auto view_size = view.size();
       size_t expected_size = 0;
 
-      for (int l = 0; l <= static_cast<int>(level) && l < static_cast<int>(histogram.size()); ++l)
+      for (size_t l = 0; l <= static_cast<size_t>(level) && l < static_cast<int>(histogram.size());
+           ++l)
       {
         expected_size += histogram[l];
       }
@@ -121,7 +122,7 @@ TEST(Log, SizeChange)
   const size_t log_range = log_size + (log_size * 2) / 3;
   ViewerLog log(log_size);
 
-  const auto validate_log = [&log, log_size](size_t cursor) {
+  const auto validate_log = [&log](size_t cursor) {
     size_t expected_value = (cursor >= log_size) ? cursor - log_size + 1 : 0;
     bool ok = true;
     const auto view = log.view();
@@ -159,7 +160,7 @@ TEST(Log, SizeChange)
   std::copy(entries.begin() + (log_size - adjusted_size), entries.end(), entries.begin());
   entries.resize(adjusted_size);
 
-  const auto validate_resized_log = [&log, &entries, log_size]() {
+  const auto validate_resized_log = [&log, &entries]() {
     // Validate the log against the entries buffer.
     auto validation_iter = entries.begin();
     const auto view = log.view();

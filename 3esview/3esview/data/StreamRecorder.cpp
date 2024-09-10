@@ -16,7 +16,6 @@ namespace tes::view::data
 {
 StreamRecorder::StreamRecorder(std::filesystem::path path, const ServerInfoMessage &server_info)
   : _connection(path.string(), serverSettings())
-  , _server_info(server_info)
   , _path(std::move(path))
 {
   _connection.sendServerInfo(server_info);

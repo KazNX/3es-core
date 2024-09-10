@@ -125,7 +125,7 @@ void MeshShape::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &p
   update_shader_matrices(_shader_library->lookupForDrawType(DrawType::Triangles));
   update_shader_matrices(_shader_library->lookupForDrawType(DrawType::Voxels));
 
-  const auto draw_mesh = [this, &params, &categories](RenderMesh &render_mesh) {
+  const auto draw_mesh = [this, &categories](RenderMesh &render_mesh) {
     if (_culler->isVisible(render_mesh.bounds_id) && render_mesh.mesh && render_mesh.shader &&
         categories.isActive(render_mesh.category_id))
     {
