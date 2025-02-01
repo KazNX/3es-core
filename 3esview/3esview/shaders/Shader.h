@@ -151,7 +151,7 @@ public:
                        size_t instance_count) = 0;
 };
 
-TES_ENUM_FLAGS(Shader::Feature, unsigned);
+TES_ENUM_FLAGS(Shader::Feature);
 
 
 inline bool Shader::supportsFeatures(Feature feature_flags) const

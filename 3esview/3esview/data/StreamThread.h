@@ -329,7 +329,7 @@ private:
   Keyframes _keyframes;
 };
 
-TES_ENUM_FLAGS(StreamThread::ProcessPacketFlag, unsigned);
+TES_ENUM_FLAGS(StreamThread::ProcessPacketFlag);
 }  // namespace tes::view::data
 
 #endif  // TES_VIEW_STREAM_THREAD_H

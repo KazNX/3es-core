@@ -45,7 +45,7 @@ enum class PacketStatus : uint16_t
   CrcValid = (1u << 3u),
 };
 
-TES_ENUM_FLAGS(PacketStatus, uint16_t);
+TES_ENUM_FLAGS(PacketStatus);
 
 /// A utility class used for managing read/write operations to a @c PacketHeader payload.
 ///

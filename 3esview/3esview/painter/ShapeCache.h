@@ -495,7 +495,7 @@ private:
   TransformModifier _transform_modifier = {};
 };
 
-TES_ENUM_FLAGS(ShapeCache::ShapeFlag, unsigned);
+TES_ENUM_FLAGS(ShapeCache::ShapeFlag);
 
 
 inline void ShapeCache::const_iterator::next()

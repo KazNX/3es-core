@@ -16,8 +16,8 @@
     "viewer": {
       "description": "Build 3es viewer client.",
       "dependencies": [
-        "cxxopts",
         "glfw3",
+        "glm",
         "corrade",
         {
           "name": "magnum",
@@ -64,5 +64,6 @@
         "octomap"
       ]
     }
-  }
+  },
+  "builtin-baseline": "8568364fbeb414db3fa5b5bfc436e57b4368c55f"
 }

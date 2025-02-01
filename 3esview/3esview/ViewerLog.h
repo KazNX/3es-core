@@ -299,24 +299,35 @@ private:
     LogLevel() = default;
     /// Construct from a @c log::Level .
     ///
-    /// This constructor is delibrately not @c explicit to allow implicit conversion.
+    /// This constructor is deliberately not @c explicit to allow implicit conversion.
     /// @param log_level The log level to initialise with.
     LogLevel(log::Level log_level)  // NOLINT(google-explicit-constructor)
       : _level(static_cast<int>(log_level))
     {}
-    LogLevel(const LogLevel &other) = delete;
-    LogLevel(LogLevel &&other) = delete;
+    LogLevel(const LogLevel &other)
+      : _level(other._level.load(std::memory_order_release))
+    {}
+
+    LogLevel(LogLevel &&other) noexcept = delete;
     ~LogLevel() = default;
 
-    LogLevel &operator=(const LogLevel &other) = delete;
-    LogLevel &operator=(LogLevel &&other) = delete;
+    LogLevel &operator=(const LogLevel &other)
+    {
+      if (this != &other)
+      {
+        *this = static_cast<log::Level>(other);
+      }
+      return *this;
+    }
+
+    LogLevel &operator=(LogLevel &&other) noexcept = delete;
 
     /// Assignment from a @c log::Level .
     /// @param log_level The log level to assign.
     /// @return @c *this
     LogLevel &operator=(log::Level log_level)
     {
-      _level = static_cast<int>(log_level);
+      _level.store(static_cast<int>(log_level), std::memory_order_relaxed);
       return *this;
     }
 
@@ -326,7 +337,10 @@ private:
 
     /// Explicit function conversion to a @c log::Level.
     /// @return The curent log level.
-    log::Level toEnum() const { return static_cast<log::Level>(_level.load()); }
+    log::Level toEnum() const
+    {
+      return static_cast<log::Level>(_level.load(std::memory_order_relaxed));
+    }
 
   private:
     /// Atomic integer storing the log level. Direct read/write is not advised.

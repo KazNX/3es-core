@@ -41,7 +41,7 @@ protected:
   static void endLeaf();
 };
 
-TES_ENUM_FLAGS(TreeView::BranchFlag, unsigned);
+TES_ENUM_FLAGS(TreeView::BranchFlag);
 }  // namespace tes::view::ui
 
 #endif  // TRD_EYE_SCENE_UI_TABLE_VIEW_H

@@ -11,6 +11,7 @@
   - `tes::view::handler::MeshResource::readMessage` - complexity, pointer use
   - `tes::ObjectAttribute` - use `std::array` for position, etc
   - `tes::view::handler::MeshShape` protected members
+- Use `cxxopts` in `3esrec`
 
 ## Protocol breaking changes
 
@@ -34,3 +35,6 @@ Advanced:
 ## Bugs
 
 - Default draw size for points is zero.
+- Point draw size doesn't seem to dynamically update from settings
+- Double sided triangle rendering flag not working
+- OFReplace flag with mesh shape crashes?

@@ -32,8 +32,6 @@
 #include <fstream>
 #include <iostream>
 
-std::istream &operator>>(std::istream &in, tes::log::Level &log_level);
-
 #include <cxxopts.hpp>
 
 // Things to learn about:
@@ -41,64 +39,6 @@ std::istream &operator>>(std::istream &in, tes::log::Level &log_level);
 
 // Things to implement:
 // - mesh renderer
-
-/// Streaming operator to support command line parsing.
-std::istream &operator>>(std::istream &in, tes::log::Level &log_level)
-{
-  using Level = tes::log::Level;
-  std::string str;
-  in >> str;
-  std::transform(str.begin(), str.end(), str.begin(),
-                 [](char ch) { return static_cast<char>(tolower(ch)); });
-  if (str == "trace")
-  {
-    log_level = Level::Trace;
-  }
-  else if (str == "info")
-  {
-    log_level = Level::Info;
-  }
-  else if (str == "warn")
-  {
-    log_level = Level::Warn;
-  }
-  else if (str == "error")
-  {
-    log_level = Level::Error;
-    ;
-  }
-  else
-  {
-    throw cxxopts::exceptions::parsing("Invalid log level " + str);
-  }
-
-  return in;
-}
-
-// std::ostream &operator<<(std::ostream &out, tes::log::Level log_level)
-// {
-//   using Level = tes::log::Level;
-//   switch (log_level)
-//   {
-//   case Level::Fatal:
-//     out << "fatal";
-//     break;
-//   case Level::Error:
-//     out << "error";
-//     break;
-//   case Level::Warn:
-//     out << "warn";
-//     break;
-//   case Level::Info:
-//     out << "info";
-//     break;
-//   case Level::Trace:
-//     out << "trace";
-//     break;
-//   }
-
-//   return out;
-// }
 
 namespace tes::view
 {
@@ -108,6 +48,7 @@ void focusCallback(GLFWwindow *window, int focused)
 {
   auto *app = static_cast<Magnum::Platform::GlfwApplication *>(glfwGetWindowUserPointer(window));
   auto *viewer = dynamic_cast<Viewer *>(app);
+  viewer = viewer;
   if (viewer)
   {
     viewer->setContinuousSim(focused != 0);

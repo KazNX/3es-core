@@ -14,6 +14,7 @@
 include("${CMAKE_CURRENT_LIST_DIR}/3es-config-targets.cmake")
 
 function(register_target TARGET INCLUDES_VAR LIBRARIES_VAR)
+  cmake_parse_arguments(ARG "OPTIONAL" "" "" ${ARGN})
   if(TARGET ${TARGET})
     # Resolve include directories
     get_target_property(TARGET_INCLUDE_DIRS ${TARGET} INTERFACE_INCLUDE_DIRECTORIES)
@@ -64,10 +65,10 @@ function(register_target TARGET INCLUDES_VAR LIBRARIES_VAR)
     # Export to caller.
     set(${LIBRARIES_VAR} ${${LIBRARIES_VAR}} PARENT_SCOPE)
 
-  else(TARGET ${TARGET})
+  elseif(NOT ARG_OPTIONAL)
     message(SEND_ERROR "${TARGET} not found")
   endif(TARGET ${TARGET})
 endfunction(register_target)
 
 register_target(3es::3escore 3ES_INCLUDE_DIRS 3ES_LIBRARIES)
-register_target(3es::3esview 3ES_INCLUDE_DIRS 3ES_LIBRARIES)
+register_target(3es::3esview 3ES_INCLUDE_DIRS 3ES_LIBRARIES OPTIONAL)

@@ -177,8 +177,8 @@ private:
   std::shared_ptr<shaders::ShaderLibrary> _shader_library;
 };
 
-TES_ENUM_FLAGS(MeshResource::DrawFlag, unsigned);
-TES_ENUM_FLAGS(MeshResource::ResourceFlag, unsigned);
+TES_ENUM_FLAGS(MeshResource::DrawFlag);
+TES_ENUM_FLAGS(MeshResource::ResourceFlag);
 
 inline MeshResource::ResourceReference MeshResource::get(uint32_t id) const
 {

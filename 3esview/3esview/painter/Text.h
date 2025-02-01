@@ -251,7 +251,7 @@ void Text::draw2D(const Iter &begin, const Iter &end, const Resolver &resolver,
   endDraw2D();
 }
 
-TES_ENUM_FLAGS(Text::TextFlag, unsigned);
+TES_ENUM_FLAGS(Text::TextFlag);
 
 template <typename Iter, typename Resolver>
 void Text::draw3D(const Iter &begin, const Iter &end, const Resolver &resolver,

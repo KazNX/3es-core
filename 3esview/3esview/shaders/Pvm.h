@@ -120,7 +120,7 @@ private:
   DirtyFlag _flags = DirtyFlag::Zero;
 };
 
-TES_ENUM_FLAGS(Pvm::DirtyFlag, unsigned);
+TES_ENUM_FLAGS(Pvm::DirtyFlag);
 
 
 inline const Magnum::Matrix4 &Pvm::projection() const

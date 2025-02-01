@@ -14,6 +14,10 @@ namespace
 // NOLINTNEXTLINE(readability-identifier-naming, cppcoreguidelines-avoid-non-const-global-variables)
 LogFunction s_log_function = {};
 
+const std::array<std::string, 5> level_names = {
+  "Fatal", "Error", "Warn", "Info", "Trace",
+};
+
 struct DefaultLogFunctionInit
 {
   DefaultLogFunctionInit()
@@ -59,10 +63,28 @@ void setLogger(LogFunction logger)
 
 const std::string &toString(Level level)
 {
-  static const std::array<std::string, 5> names = {
-    "Fatal", "Error", "Warn", "Info", "Trace",
-  };
-  return names.at(static_cast<unsigned>(level));
+  return level_names.at(static_cast<unsigned>(level));
+}
+
+
+bool fromString(Level &level, const std::string &str)
+{
+  for (size_t i = 0; i < level_names.size(); ++i)
+  {
+    std::string name{ level_names[i] };
+    bool matched = str == name;
+    if (!matched)
+    {
+      std::transform(name.begin(), name.end(), name.begin(), [](char ch) { return tolower(ch); });
+      matched = name == str;
+    }
+    if (matched)
+    {
+      level = static_cast<Level>(i);
+      return true;
+    }
+  }
+  return false;
 }
 
 

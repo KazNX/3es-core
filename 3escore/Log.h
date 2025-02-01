@@ -104,6 +104,12 @@ void TES_CORE_API setLogger(LogFunction logger);
 /// @return The level string text.
 [[nodiscard]] const std::string TES_CORE_API &toString(Level level);
 
+/// Parse a string to a log level.
+/// @param[out] level Variable to parse into.
+/// @param str The string to parse. May exactly match the enum name or a fully lower case matching.
+/// @retrun True if parsing succeeds.
+bool TES_CORE_API fromString(Level &level, const std::string &str);
+
 /// Get the logging prefix for a particular logging level.
 ///
 /// Of the form @c "[{toString(level)}]"
@@ -216,6 +222,19 @@ inline std::ostream &operator<<(std::ostream &o, tes::log::Level level)
 {
   o << toString(level);
   return o;
+}
+
+inline std::istream &operator>>(std::istream &in, tes::log::Level &level)
+{
+  std::string name;
+  in >> name;
+
+  if (!fromString(level, name))
+  {
+    in.setstate(std::istream::failbit);
+  }
+
+  return in;
 }
 }  // namespace tes::log
 

@@ -57,7 +57,7 @@ enum class Stretch : unsigned
   Vertical = (1 << 1)
 };
 
-TES_ENUM_FLAGS(Stretch, unsigned);
+TES_ENUM_FLAGS(Stretch);
 
 struct PreferredCoordinates
 {
@@ -99,8 +99,7 @@ public:
     , _viewer(viewer)
     , _preferred_coordinates(preferred_coordinates)
   {}
-
-  virtual ~Panel() = default;
+  virtual ~Panel();
 
   void setPreferredCoordinates(const PreferredCoordinates &preferred)
   {

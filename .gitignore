@@ -5,7 +5,9 @@
 *.userprefs
 .vs/
 /data/
+Testing/
 
+.cache/
 build*/
 .vscode/
 *.user

@@ -107,6 +107,9 @@ ImVec2 Panel::PreferredCoordinates::Size::forView(const ImVec2 &viewport_size) c
 }
 
 
+Panel::~Panel() = default;
+
+
 void Panel::draw(Magnum::ImGuiIntegration::Context &ui)
 {
   auto window = defineWindow(preferredCoordinates(), _window_flags);

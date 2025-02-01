@@ -211,7 +211,7 @@ private:
   std::string _name;
 };
 
-TES_ENUM_FLAGS(Message::DrawableFlag, unsigned);
+TES_ENUM_FLAGS(Message::DrawableFlag);
 }  // namespace tes::view::handler
 
 #endif  // TES_VIEW_HANDLER_MESSAGE_H

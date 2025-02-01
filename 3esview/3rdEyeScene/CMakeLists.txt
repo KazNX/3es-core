@@ -62,6 +62,13 @@ target_include_directories(3rdEyeScene
     $<INSTALL_INTERFACE:include/3rdEyeScene>
 )
 
+target_include_directories(3rdEyeScene SYSTEM
+  PRIVATE
+    # Add cxxopts include directories from the import target. It's a header only library so we don't
+    # need to link anything or propagate the dependency.
+    $<TARGET_PROPERTY:cxxopts,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
 target_link_libraries(3rdEyeScene
   PRIVATE
     3escore

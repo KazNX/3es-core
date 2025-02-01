@@ -22,7 +22,7 @@ enum class MeshComponentFlag
   Uv = (1u << 4u)
 };
 
-TES_ENUM_FLAGS(MeshComponentFlag, int);
+TES_ENUM_FLAGS(MeshComponentFlag);
 }  // namespace tes
 
 #endif  // TES_CORE_SHAPES_MESH_COMPONENT_H

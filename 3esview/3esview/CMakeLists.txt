@@ -87,7 +87,7 @@ target_link_libraries(3esview
     $<BUILD_INTERFACE:Magnum::Text>
     $<BUILD_INTERFACE:ryml::ryml>
     $<BUILD_INTERFACE:tinyfiledialogs::tinyfiledialogs>
-  )
+    )
 
 #-------------------------------------------------------------------------------
 # IDE source sorting
