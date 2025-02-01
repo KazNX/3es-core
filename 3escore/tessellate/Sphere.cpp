@@ -49,8 +49,7 @@ unsigned insertVertex(const Vector3f &vertex, std::vector<Vector3f> &vertices,
 void initialise(std::vector<Vector3f> &vertices, std::vector<unsigned> &indices,
                 SphereVertexMap *vertex_map)
 {
-  // FIXME: It's meant to be two pentagon.
-  // We start with two hexagonal rings to approximate the sphere.
+  // We start with two pentagonal rings to approximate the sphere.
   // All subdivision occurs on a unit radius sphere, at the origin. We translate and
   // scale the vertices at the end.
   vertices.clear();
@@ -59,46 +58,64 @@ void initialise(std::vector<Vector3f> &vertices, std::vector<unsigned> &indices,
   static const float ring_control_angle = 25.0f / 180.0f * static_cast<float>(M_PI);
   static const float ring_height = std::sin(ring_control_angle);
   static const float ring_radius = std::cos(ring_control_angle);
-  static const float hex_angle = 2.0f * static_cast<float>(M_PI) / 6.0f;
-  static const float ring_to_offset_angle = 0.5f * hex_angle;
+  static const float pent_angle = 2.0f * static_cast<float>(M_PI) / 5.0f;
+  static const float ring_to_offset_angle = 0.5f * pent_angle;
   static const std::array<Vector3f, 14> initial_vertices = {
     Vector3f(0, 0, 1),
 
-    // Upper hexagon.
+    // Upper pentagon.
     Vector3f(ring_radius, 0, ring_height),
-    Vector3f(ring_radius * std::cos(hex_angle), ring_radius * std::sin(hex_angle), ring_height),
-    Vector3f(ring_radius * std::cos(2 * hex_angle), ring_radius * std::sin(2 * hex_angle),
+    Vector3f(ring_radius * std::cos(pent_angle), ring_radius * std::sin(pent_angle), ring_height),
+    Vector3f(ring_radius * std::cos(2 * pent_angle), ring_radius * std::sin(2 * pent_angle),
              ring_height),
-    Vector3f(ring_radius * std::cos(3 * hex_angle), ring_radius * std::sin(3 * hex_angle),
+    Vector3f(ring_radius * std::cos(3 * pent_angle), ring_radius * std::sin(3 * pent_angle),
              ring_height),
-    Vector3f(ring_radius * std::cos(4 * hex_angle), ring_radius * std::sin(4 * hex_angle),
-             ring_height),
-    Vector3f(ring_radius * std::cos(5 * hex_angle), ring_radius * std::sin(5 * hex_angle),
+    Vector3f(ring_radius * std::cos(4 * pent_angle), ring_radius * std::sin(4 * pent_angle),
              ring_height),
 
-    // Lower hexagon.
+    // Lower pentagon.
     Vector3f(ring_radius * std::cos(ring_to_offset_angle),
              ring_radius * std::sin(ring_to_offset_angle), -ring_height),
-    Vector3f(ring_radius * std::cos(ring_to_offset_angle + hex_angle),
-             ring_radius * std::sin(ring_to_offset_angle + hex_angle), -ring_height),
-    Vector3f(ring_radius * std::cos(ring_to_offset_angle + 2 * hex_angle),
-             ring_radius * std::sin(ring_to_offset_angle + 2 * hex_angle), -ring_height),
-    Vector3f(ring_radius * std::cos(ring_to_offset_angle + 3 * hex_angle),
-             ring_radius * std::sin(ring_to_offset_angle + 3 * hex_angle), -ring_height),
-    Vector3f(ring_radius * std::cos(ring_to_offset_angle + 4 * hex_angle),
-             ring_radius * std::sin(ring_to_offset_angle + 4 * hex_angle), -ring_height),
-    Vector3f(ring_radius * std::cos(ring_to_offset_angle + 5 * hex_angle),
-             ring_radius * std::sin(ring_to_offset_angle + 5 * hex_angle), -ring_height),
+    Vector3f(ring_radius * std::cos(ring_to_offset_angle + pent_angle),
+             ring_radius * std::sin(ring_to_offset_angle + pent_angle), -ring_height),
+    Vector3f(ring_radius * std::cos(ring_to_offset_angle + 2 * pent_angle),
+             ring_radius * std::sin(ring_to_offset_angle + 2 * pent_angle), -ring_height),
+    Vector3f(ring_radius * std::cos(ring_to_offset_angle + 3 * pent_angle),
+             ring_radius * std::sin(ring_to_offset_angle + 3 * pent_angle), -ring_height),
+    Vector3f(ring_radius * std::cos(ring_to_offset_angle + 4 * pent_angle),
+             ring_radius * std::sin(ring_to_offset_angle + 4 * pent_angle), -ring_height),
 
     Vector3f(0, 0, -1),
   };
   const unsigned initial_vertex_count = sizeof(initial_vertices) / sizeof(initial_vertices[0]);
 
-  static const std::array<unsigned, 72> initial_indices = {
-    0,  1,  2, 0,  2,  3, 0, 3,  4, 0, 4,  5, 0, 5,  6,  0,  6,  1,  1,  7,  2,  2,  8,  3,
-    3,  9,  4, 4,  10, 5, 5, 11, 6, 6, 12, 1, 7, 8,  2,  8,  9,  3,  9,  10, 4,  10, 11, 5,
-    11, 12, 6, 12, 7,  1, 7, 13, 8, 8, 13, 9, 9, 13, 10, 10, 13, 11, 11, 13, 12, 12, 13, 7
+  // clang-format off
+  static const std::array<unsigned, 60> initial_indices = {
+    // Top pentagon
+    0, 1, 2,
+    0, 2, 3,
+    0, 3, 4,
+    0, 4, 5,
+    0, 5, 1,
+    // Side walls
+    1, 6, 2,
+    2, 7, 3,
+    3, 8, 4,
+    4, 9, 5,
+    5, 10, 1,
+    6, 1, 10,
+    7, 2, 6,
+    8, 3, 7,
+    9, 4, 8,
+    10, 5, 9,
+    // Bottom pentagon
+    11, 7, 6,
+    11, 8, 7,
+    11, 9, 8,
+    11, 10, 9,
+    11, 6, 10,
   };
+  // clang-format on
   const auto initial_index_count = static_cast<unsigned>(initial_indices.size());
 
   for (unsigned i = 0; i < initial_vertex_count; ++i)
