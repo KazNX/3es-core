@@ -2,6 +2,7 @@
 
 #include "CoreUtil.h"
 
+#include <algorithm>
 #include <array>
 #include <iostream>
 

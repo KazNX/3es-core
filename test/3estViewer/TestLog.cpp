@@ -12,16 +12,17 @@
 
 namespace tes::view
 {
+constexpr size_t kTestLogSize = 10;
+
 TEST(Log, View)
 {
   // Make a log with a small number of max lines
-  const size_t log_size = 10;
   // Log 10 times as many items as the log size.
-  const size_t log_range = 10 * log_size;
-  ViewerLog log(log_size);
+  const size_t log_range = 10 * kTestLogSize;
+  ViewerLog log(kTestLogSize);
 
   const auto validate_log = [&log](size_t cursor) {
-    size_t expected_value = (cursor >= log_size) ? cursor - log_size + 1 : 0;
+    size_t expected_value = (cursor >= kTestLogSize) ? cursor - kTestLogSize + 1 : 0;
     bool ok = true;
     const auto view = log.view();
     const auto end = view.end();
@@ -45,11 +46,9 @@ TEST(Log, View)
 
 TEST(Log, ViewFilter)
 {
-  // Make a log with a small number of max lines
-  const size_t log_size = 10;
   // Log 10 times as many items as the log size.
-  const size_t log_range = 10 * log_size;
-  ViewerLog log(log_size);
+  const size_t log_range = 10 * kTestLogSize;
+  ViewerLog log(kTestLogSize);
 
   // Test filtered log views.
   const auto next_level = [](log::Level level) {
@@ -116,14 +115,12 @@ TEST(Log, ViewFilter)
 
 TEST(Log, SizeChange)
 {
-  // Make a log with a small number of max lines
-  const size_t log_size = 10;
   // Overflow the log size by 2/3.
-  const size_t log_range = log_size + (log_size * 2) / 3;
-  ViewerLog log(log_size);
+  const size_t log_range = kTestLogSize + (kTestLogSize * 2) / 3;
+  ViewerLog log(kTestLogSize);
 
   const auto validate_log = [&log](size_t cursor) {
-    size_t expected_value = (cursor >= log_size) ? cursor - log_size + 1 : 0;
+    size_t expected_value = (cursor >= kTestLogSize) ? cursor - kTestLogSize + 1 : 0;
     bool ok = true;
     const auto view = log.view();
     const auto end = view.end();
@@ -145,19 +142,19 @@ TEST(Log, SizeChange)
   }
 
   // Extract the log contents for comparison.
-  const auto adjusted_size = log_size / 2;
+  const auto adjusted_size = kTestLogSize / 2;
   std::vector<ViewerLog::Entry> entries;
   {
     // Get a view to build the comparison items.
     auto view = log.view();
-    for (auto iter = view.begin() + (log_size - adjusted_size); iter != view.end(); ++iter)
+    for (auto iter = view.begin() + (kTestLogSize - adjusted_size); iter != view.end(); ++iter)
     {
       entries.emplace_back(*iter);
     }
   }
 
   // Adjust entries to be the target size.
-  std::copy(entries.begin() + (log_size - adjusted_size), entries.end(), entries.begin());
+  std::copy(entries.begin() + (kTestLogSize - adjusted_size), entries.end(), entries.begin());
   entries.resize(adjusted_size);
 
   const auto validate_resized_log = [&log, &entries]() {
@@ -182,7 +179,7 @@ TEST(Log, SizeChange)
   log.setMaxLines(adjusted_size);
   validate_resized_log();
   // Set larger size.
-  log.setMaxLines(log_size);
+  log.setMaxLines(kTestLogSize);
   validate_resized_log();
   // Shrink to the current size.
   log.setMaxLines(adjusted_size);
