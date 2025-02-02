@@ -36,5 +36,4 @@ Advanced:
 
 - Default draw size for points is zero.
 - Point draw size doesn't seem to dynamically update from settings
-- Double sided triangle rendering flag not working
 - OFReplace flag with mesh shape crashes?

@@ -107,7 +107,6 @@ void MeshShape::endFrame(const FrameStamp &stamp)
 void MeshShape::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &params,
                      const painter::CategoryState &categories)
 {
-  (void)pass;
   (void)stamp;
   const std::lock_guard guard(_shapes_mutex);
 
@@ -125,10 +124,34 @@ void MeshShape::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &p
   update_shader_matrices(_shader_library->lookupForDrawType(DrawType::Triangles));
   update_shader_matrices(_shader_library->lookupForDrawType(DrawType::Voxels));
 
-  const auto draw_mesh = [this, &categories](RenderMesh &render_mesh) {
+  if (pass == DrawPass::Transparent)
+  {
+    Magnum::GL::Renderer::setBlendFunction(
+      Magnum::GL::Renderer::BlendFunction::SourceAlpha,
+      Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
+  }
+
+  bool two_sided_active = false;
+  const auto set_two_sided = [&two_sided_active](const bool two_sided) {
+    if (two_sided != two_sided_active)
+    {
+      if (two_sided)
+      {
+        Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::FaceCulling);
+      }
+      else
+      {
+        Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::FaceCulling);
+      }
+      two_sided_active = two_sided;
+    }
+  };
+
+  const auto draw_mesh = [this, &categories, &set_two_sided](RenderMesh &render_mesh) {
     if (_culler->isVisible(render_mesh.bounds_id) && render_mesh.mesh && render_mesh.shader &&
         categories.isActive(render_mesh.category_id))
     {
+      set_two_sided(render_mesh.shape->twoSided());
       render_mesh.shader->setDrawScale(render_mesh.shape->drawScale())
         .setModelMatrix(render_mesh.transform)
         .draw(*render_mesh.mesh);
@@ -137,12 +160,26 @@ void MeshShape::draw(DrawPass pass, const FrameStamp &stamp, const DrawParams &p
 
   for (auto &transient : _transients)
   {
-    draw_mesh(*transient);
+    if ((pass == DrawPass::Transparent) == transient->shape->transparent())
+    {
+      draw_mesh(*transient);
+    }
   }
 
   for (auto &[id, render_mesh] : _shapes)
   {
-    draw_mesh(*render_mesh);
+    if ((pass == DrawPass::Transparent) == render_mesh->shape->transparent())
+    {
+      draw_mesh(*render_mesh);
+    }
+  }
+
+  set_two_sided(false);
+
+  if (pass == DrawPass::Transparent)
+  {
+    Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::One,
+                                           Magnum::GL::Renderer::BlendFunction::Zero);
   }
 }
 

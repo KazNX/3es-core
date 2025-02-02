@@ -402,6 +402,7 @@ void createShapes(unsigned &next_id, std::vector<std::shared_ptr<tes::Shape>> &s
     auto triangles = std::make_shared<tes::MeshShape>(
       tes::DrawType::Triangles, tes::Id(next_id++, CatTriangles), tes::DataBuffer(triangle_set));
     triangles->setColours(colours);
+    triangles->setTwoSided(true);
     triangles->duplicateArrays();
     shapes.emplace_back(triangles);
     // if (!no_move)
@@ -419,6 +420,7 @@ void createShapes(unsigned &next_id, std::vector<std::shared_ptr<tes::Shape>> &s
     mesh->setPart(0, mesh_res, tes::Matrix4f::Identity, tes::Colour(tes::Colour::YellowGreen));
     mesh->setPart(1, mesh_res, tes::Matrix4f::translation(tes::Vector3f(0, 0, 1.5f)),
                   tes::Colour(tes::Colour::SkyBlue));
+    mesh->setTwoSided(true);
     shapes.emplace_back(mesh);
     // if (!no_move)
     // {
