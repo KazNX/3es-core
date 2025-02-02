@@ -12,9 +12,9 @@ function(tes_configure_target_flags TARGET)
     #-------------------------------------
     # Clang/GCC common settings
     #-------------------------------------
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-pedantic -Wall -Wextra -Wconversion -Werror=vla -Wno-parentheses -Wno-variadic-macros>
+    $<$<CXX_COMPILER_ID:GNU,AppleClang,Clang>:-pedantic -Wall -Wextra -Wconversion -Werror=vla -Wno-parentheses -Wno-variadic-macros>
     # Enable debug symbols for release builds. These can be stripped if required for distribution.
-    $<$<AND:$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>,$<CONFIG:Release>>:-g>
+    $<$<AND:$<CXX_COMPILER_ID:GNU,AppleClang,Clang>,$<CONFIG:Release>>:-g>
     #-------------------------------------
     # Clang settings
     #-------------------------------------
@@ -22,7 +22,7 @@ function(tes_configure_target_flags TARGET)
     # - and is equivalent to multiplication
     # - or is equilvanet to addition
     # Now we don't need excessive brackets (parentheses for the Americans)
-    $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wno-logical-op-parentheses>
+    $<$<OR:$<CXX_COMPILER_ID:AppleClang,Clang>>:-Wno-logical-op-parentheses>
     #-------------------------------------
     # MSC settings.
     #-------------------------------------
@@ -38,13 +38,10 @@ function(tes_configure_target_flags TARGET)
     $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/Zi>
   )
 
-  # Target link options was added in CMake 3.13 (Ubuntu 18.04 apt provides 3.10, 20.04 is 3.16).
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
-    # For Windows ensure linking provides debug symbols in release builds.
-    target_link_options(${TARGET} PRIVATE
-      $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/debug>
-    )
-  endif(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
+  # For Windows ensure linking provides debug symbols in release builds.
+  target_link_options(${TARGET} PRIVATE
+    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/debug>
+  )
 endfunction(tes_configure_target_flags)
 
 # tes_configure_target_properties(TARGET)
