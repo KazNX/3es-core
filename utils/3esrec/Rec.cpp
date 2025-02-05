@@ -113,8 +113,8 @@ const TesRec::DefaultModesAray TesRec::ModeArgStrings = { "mc", "mC", "mz", "mu"
 
 const char *TesRec::modeToArg(Mode m)
 {
-  const int mi = static_cast<int>(m);
-  if (0 <= mi && mi <= static_cast<int>(ModeArgStrings.size()))
+  const auto mi = static_cast<size_t>(m);
+  if (mi && mi <= ModeArgStrings.size())
   {
     return ModeArgStrings[mi];
   }
@@ -130,7 +130,7 @@ Mode TesRec::argToMode(const char *arg)
     arg_str.erase(0, 1);
   }
 
-  for (int i = 0; i < static_cast<int>(ModeArgStrings.size()); ++i)
+  for (size_t i = 0; i < ModeArgStrings.size(); ++i)
   {
     if (arg_str == ModeArgStrings[i])
     {
@@ -235,7 +235,7 @@ void TesRec::run(FrameDisplay *frame_display)
     // First try establish a connection.
     while (!_quit && !_connected)
     {
-      socket = std::move(attemptConnection());
+      socket = attemptConnection();
       if (socket)
       {
 #if PACKET_TIMING
@@ -248,7 +248,7 @@ void TesRec::run(FrameDisplay *frame_display)
           frame_display->start();
         }
 
-        io_stream = std::move(createOutputWriter());
+        io_stream = createOutputWriter();
         if (io_stream)
         {
           _connected = true;
@@ -280,7 +280,7 @@ void TesRec::run(FrameDisplay *frame_display)
       }
 
       have_data = true;
-      packet_buffer->addBytes(socket_buffer.data(), bytes_read);
+      packet_buffer->addBytes(socket_buffer.data(), static_cast<size_t>(bytes_read));
 
       while (PacketHeader *new_packet_header = packet_buffer->extractPacket(decode_buffer))
       {
@@ -402,7 +402,7 @@ std::unique_ptr<TcpSocket> TesRec::attemptConnection()
     socket->setWriteTimeout(0);
     socket->setReadTimeout(0);
     socket->setReadBufferSize(1024 * 1024);
-    return std::move(socket);
+    return socket;
   }
 
   return nullptr;
@@ -436,7 +436,7 @@ std::unique_ptr<std::iostream> TesRec::createOutputWriter()
   // in a GZipStream.
   streamutil::initialiseStream(*stream, &_server_info);
 
-  return std::move(stream);
+  return stream;
 
   // TODO(KS): implement compression modes
   // switch (DecodeMode)

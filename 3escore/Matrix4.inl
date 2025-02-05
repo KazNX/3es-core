@@ -200,8 +200,7 @@ Matrix4<T> Matrix4<T>::lookAt(const Vector3<T> &eye, const Vector3<T> &target,
                               const Vector3<T> &axis_up, size_t forward_axis_index,
                               size_t up_axis_index)
 {
-  if (forward_axis_index == up_axis_index || forward_axis_index < 0 || forward_axis_index > 2 ||
-      up_axis_index < 0 || up_axis_index > 2)
+  if (forward_axis_index == up_axis_index || forward_axis_index > 2 || up_axis_index > 2)
   {
     // Bad axis specification.
     return Identity;

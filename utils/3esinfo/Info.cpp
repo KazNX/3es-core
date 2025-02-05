@@ -26,7 +26,10 @@ struct PacketKey
   uint16_t routing_id = 0;
   uint16_t message_id = 0;
 
-  uint32_t key() const noexcept { return routing_id | message_id << 16u; }
+  uint32_t key() const noexcept
+  {
+    return static_cast<uint32_t>(routing_id) | static_cast<uint32_t>(message_id) << 16u;
+  }
 };
 
 inline bool operator==(const PacketKey &a, const PacketKey &b)

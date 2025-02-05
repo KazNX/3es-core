@@ -48,7 +48,6 @@ void focusCallback(GLFWwindow *window, int focused)
 {
   auto *app = static_cast<Magnum::Platform::GlfwApplication *>(glfwGetWindowUserPointer(window));
   auto *viewer = dynamic_cast<Viewer *>(app);
-  viewer = viewer;
   if (viewer)
   {
     viewer->setContinuousSim(focused != 0);
