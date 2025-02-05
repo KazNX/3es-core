@@ -49,7 +49,7 @@ corrade_add_resource(TesResources resources.conf)
 #-------------------------------------------------------------------------------
 # Define the 3rdEyeScene library.
 add_executable(3rdEyeScene ${PUBLIC_HEADERS} ${SOURCES} ${PRIVATE_HEADERS} ${PRIVATE_SOURCES} ${TesResources})
-tes_configure_target(3rdEyeScene)
+tes_configure_target(3rdEyeScene TARGET_COMPONENT Viewer)
 
 # set_target_properties(3rdEyeScene PROPERTIES FOLDER view)
 

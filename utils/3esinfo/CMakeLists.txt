@@ -10,10 +10,6 @@ target_include_directories(3esinfo SYSTEM
     $<TARGET_PROPERTY:cxxopts,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-install(TARGETS 3esinfo EXPORT 3es-config-targets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-)
+tes_configure_target(3esinfo TARGET_COMPONENT Util)
 
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}" PREFIX source FILES ${SOURCES})

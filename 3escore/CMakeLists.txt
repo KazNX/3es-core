@@ -37,7 +37,7 @@ option(TES_ASSERT_ENABLE_RELEASE "Enable assertions in release builds." ON)
 option(TES_BUILD_DOXYGEN "Build doxgen documentation?" OFF)
 
 option(TES_ZLIB_OFF "Disable ZLIB usage even if found? Intended for testing." OFF)
-set(TES_SOCKETS "custom" CACHE STRING "Select the TCP socket implementation. The 'custom' implementaiton is based on Berkley sockets or Winsock2.")
+set(TES_SOCKETS "custom" CACHE STRING "Select the TCP socket implementation. The 'custom' implementation is based on Berkley sockets or Winsock2.")
 set_property(CACHE TES_SOCKETS PROPERTY STRINGS custom Qt)
 
 message(STATUS "Using ${TES_SOCKETS} sockets")
@@ -104,6 +104,8 @@ tes_configure_target(3escore
     ${PUBLIC_HEADERS}
     ${PUBLIC_SHAPE_HEADERS}
     ${PUBLIC_TESSELLATE_HEADERS}
+  TARGET_COMPONENT Core
+  HEADER_COMPONENT Devel
 )
 
 # Define DLL export header (primarily for MSVC).

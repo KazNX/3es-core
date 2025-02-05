@@ -1,6 +1,6 @@
 
 add_executable(3estTessellate Tessellate.cpp)
-tes_configure_target(3estTessellate)
+tes_configure_target(3estTessellate SKIP INSTALL VERSION)
 target_link_libraries(3estTessellate
   PRIVATE
     3escore

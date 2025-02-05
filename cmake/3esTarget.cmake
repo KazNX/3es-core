@@ -68,15 +68,25 @@ endfunction(_ensure_value VAR DEFAULT_VALUE)
 #
 # Configure installation of the given TARGET
 function(tes_target_install TARGET)
-  cmake_parse_arguments(ARG "" "INCLUDE_PREFIX" "PUBLIC_HEADERS" ${ARGN})
+  cmake_parse_arguments(ARG "" "INCLUDE_PREFIX;HEADER_COMPONENT;TARGET_COMPONENT" "PUBLIC_HEADERS" ${ARGN})
 
   _ensure_value(ARG_INCLUDE_PREFIX include)
+
+  set(COMPONENT_STR)
+  if(ARG_TARGET_COMPONENT)
+    set(COMPONENT_STR COMPONENT ${ARG_TARGET_COMPONENT})
+  endif(ARG_TARGET_COMPONENT)
 
   install(TARGETS ${TARGET} EXPORT 3es-config-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
+    ${COMPONENT_STR}
   )
+  set(COMPONENT_STR)
+  if(ARG_HEADER_COMPONENT)
+    set(COMPONENT_STR COMPONENT ${ARG_HEADER_COMPONENT})
+  endif(ARG_HEADER_COMPONENT)
 
   # Helper for building INSTALL_PREFIX_FILES_<dir> variable names. See below.
   function(_dir_to_identifier VAR DIR)
@@ -140,7 +150,7 @@ function(tes_target_install TARGET)
     # Add install commands.
     foreach(PREFIX ${INSTALL_PREFIXES})
       _dir_to_identifier(FILE_SET "${PREFIX}" PREFIX INSTALL_PREFIX_FILES_)
-      install(FILES ${${FILE_SET}} DESTINATION "${PREFIX}")
+      install(FILES ${${FILE_SET}} DESTINATION "${PREFIX}" ${COMPONENT_STR})
     endforeach(PREFIX)
   endif(ARG_PUBLIC_HEADERS)
 
@@ -148,7 +158,7 @@ function(tes_target_install TARGET)
   if(MSVC)
     # Install PDB files (MSVC) in part to avoid unsupressable linker warnings.
     if(_target_type STREQUAL "EXECUTABLE" OR _target_type STREQUAL "MODULE" OR _target_type STREQUAL "SHARED")
-      install(FILES $<TARGET_PDB_FILE:${TARGET}> DESTINATION bin OPTIONAL)
+      install(FILES $<TARGET_PDB_FILE:${TARGET}> DESTINATION bin OPTIONAL ${COMPONENT_STR})
     endif()
   endif(MSVC)
 endfunction(tes_target_install)
@@ -197,7 +207,7 @@ endfunction(tes_target_version)
 # - INSTALL tes_target_install()
 # - VERSION tes_target_version()
 function(tes_configure_target TARGET)
-  cmake_parse_arguments(ARG "" "INCLUDE_PREFIX" "PUBLIC_HEADERS;SKIP" ${ARGN})
+  cmake_parse_arguments(ARG "" "INCLUDE_PREFIX;HEADER_COMPONENT;TARGET_COMPONENT" "PUBLIC_HEADERS;SKIP" ${ARGN})
 
   _ensure_value(ARG_INCLUDE_PREFIX include)
 
@@ -208,9 +218,17 @@ function(tes_configure_target TARGET)
     tes_configure_target_properties(${TARGET})
   endif(NOT "PROPERTIES" IN_LIST ARG_SKIP)
   if(NOT "INSTALL" IN_LIST ARG_SKIP)
+    unset(COMPONENT_STR)
+    if(ARG_TARGET_COMPONENT)
+      set(COMPONENT_STR TARGET_COMPONENT ${ARG_TARGET_COMPONENT})
+    endif(ARG_TARGET_COMPONENT)
+    if(ARG_HEADER_COMPONENT)
+      set(COMPONENT_STR ${COMPONENT_STR} HEADER_COMPONENT ${ARG_HEADER_COMPONENT})
+    endif(ARG_HEADER_COMPONENT)
     tes_target_install(${TARGET}
       INCLUDE_PREFIX "${ARG_INCLUDE_PREFIX}"
       PUBLIC_HEADERS ${ARG_PUBLIC_HEADERS}
+      ${COMPONENT_STR}
     )
   endif(NOT "INSTALL" IN_LIST ARG_SKIP)
   if(NOT "VERSION" IN_LIST ARG_SKIP)

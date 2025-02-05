@@ -1,6 +1,6 @@
 
 add_executable(3estServer ServerTest.cpp)
-tes_configure_target(3estServer)
+tes_configure_target(3estServer SKIP INSTALL VERSION)
 target_link_libraries(3estServer
   PRIVATE
     3escore

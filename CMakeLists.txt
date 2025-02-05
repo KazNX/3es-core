@@ -95,3 +95,5 @@ if(TES_BUILD_TESTS)
   enable_testing()
   add_subdirectory(test)
 endif(TES_BUILD_TESTS)
+
+include(3esPack)

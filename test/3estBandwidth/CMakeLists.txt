@@ -1,5 +1,5 @@
 add_executable(3estBandwidth Bandwidth.cpp)
-tes_configure_target(3estBandwidth)
+tes_configure_target(3estBandwidth SKIP INSTALL VERSION)
 target_link_libraries(3estBandwidth
   PRIVATE
     3escore

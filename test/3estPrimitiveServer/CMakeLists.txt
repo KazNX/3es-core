@@ -1,5 +1,5 @@
 add_executable(3estPrimitiveServer PrimitiveServer.cpp)
-tes_configure_target(3estPrimitiveServer)
+tes_configure_target(3estPrimitiveServer SKIP INSTALL VERSION)
 target_link_libraries(3estPrimitiveServer
   PRIVATE
     3escore

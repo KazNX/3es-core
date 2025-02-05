@@ -123,7 +123,7 @@ endfunction(doxygen_create)
 # build tree where to find the Doxygen pages. This relates to the OUTPUT_DIR option given to doxygen_create(). The
 # destination specifies the subdirectory for the documentation pages and should generatelly match the project name.
 function(doxygen_install dir dest)
-  install(DIRECTORY ${dir} DESTINATION share/${dest} COMPONENT Devel)
+  install(DIRECTORY ${dir} DESTINATION share/${dest} COMPONENT Doc)
 endfunction(doxygen_install)
 
 function(_doxygen_absolute_paths VAR)

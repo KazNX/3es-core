@@ -42,7 +42,11 @@ include(sourcelist.cmake)
 #-------------------------------------------------------------------------------
 # Define the 3esview library.
 add_library(3esview ${PUBLIC_HEADERS} ${SOURCES} ${PRIVATE_HEADERS} ${PRIVATE_SOURCES})
-tes_configure_target(3esview INCLUDE_PREFIX include/3esview PUBLIC_HEADERS ${PUBLIC_HEADERS})
+tes_configure_target(3esview
+  INCLUDE_PREFIX include/3esview
+  PUBLIC_HEADERS ${PUBLIC_HEADERS}
+  TARGET_COMPONENT Viewer
+)
 
 # Define DLL export header (primarily for MSVC).
 include(GenerateExportHeader)

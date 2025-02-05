@@ -40,7 +40,7 @@ list(APPEND SOURCES
 )
 
 add_executable(3esOccupancy ${SOURCES})
-tes_configure_target(3esOccupancy)
+tes_configure_target(3esOccupancy SKIP INSTALL VERSION)
 
 target_link_libraries(3esOccupancy
   PRIVATE
