@@ -1,6 +1,10 @@
 # Install MSVC runtime libraries. This will also affect the CPack installation.
 include(InstallRequiredSystemLibraries)
 
+if(LINUX)
+  return()
+endif(LINUX)
+
 # Which targets will we try install per component
 # Only installs those actually resolved.
 
