@@ -234,8 +234,6 @@ private:
     Radius
   };
 
-  bool checkEdlKeys(KeyEvent &event);
-
   void updateCamera(float dt, bool allow_user_input);
   void updateCameraInput(float dt, camera::Camera &camera);
 

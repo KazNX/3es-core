@@ -388,8 +388,6 @@ void Viewer::keyPressEvent(KeyEvent &event)
     event.setAccepted();
   }
 
-  dirty = checkEdlKeys(event) || dirty;
-
   if (dirty)
   {
     redraw();
@@ -513,77 +511,6 @@ void Viewer::onPlaybackSettingsChange(const settings::Settings::Config &config)
     _data_thread->setLooping(config.playback.looping.value());
     updateStreamThreadKeyframesConfig(config.playback);
   }
-}
-
-
-bool Viewer::checkEdlKeys(KeyEvent &event)
-{
-  bool dirty = false;
-  auto render_config = _tes->settings().config().render;
-  if (event.key() == KeyEvent::Key::Tab)
-  {
-    render_config.use_edl_shader.setValue(!render_config.use_edl_shader.value());
-    event.setAccepted(true);
-    dirty = true;
-    Magnum::Debug() << "EDL: " << (render_config.use_edl_shader.value() ? "on" : "off");
-    _tes->settings().update(render_config);
-  }
-  else if (event.key() == KeyEvent::Key::Space)
-  {
-    _edl_tweak = EdlParam((int(_edl_tweak) + 1) % 3);
-    switch (_edl_tweak)
-    {
-    case EdlParam::LinearScale:
-      Magnum::Debug() << "EDL linear scale mode";
-      break;
-    case EdlParam::ExponentialScale:
-      Magnum::Debug() << "EDL exponential scale mode";
-      break;
-    case EdlParam::Radius:
-      Magnum::Debug() << "EDL radius scale mode";
-      break;
-    default:
-      break;
-    }
-    event.setAccepted(true);
-    dirty = true;
-  }
-  else if (event.key() == KeyEvent::Key::Equal || event.key() == KeyEvent::Key::Minus)
-  {
-    float delta = (event.key() == KeyEvent::Key::Equal) ? 0.5f : -0.5f;
-    switch (_edl_tweak)
-    {
-    case EdlParam::LinearScale:
-      render_config.edl_linear_scale.setValue(render_config.edl_linear_scale.value() + delta);
-      Magnum::Debug() << "EDL linear scale: " << _edl_effect->linearScale();
-      event.setAccepted(true);
-      dirty = true;
-      break;
-    case EdlParam::ExponentialScale:
-      render_config.edl_exponential_scale.setValue(render_config.edl_exponential_scale.value() +
-                                                   delta);
-      Magnum::Debug() << "EDL exponential scale: " << _edl_effect->exponentialScale();
-      event.setAccepted(true);
-      dirty = true;
-      break;
-    case EdlParam::Radius:
-      render_config.edl_radius.setValue(render_config.edl_radius.value() +
-                                        static_cast<unsigned>(2.0f * delta));
-      Magnum::Debug() << "EDL radius scale: " << _edl_effect->radius();
-      event.setAccepted(true);
-      dirty = true;
-      break;
-    default:
-      break;
-    }
-
-    if (dirty)
-    {
-      _tes->settings().update(render_config);
-    }
-  }
-
-  return dirty;
 }
 
 

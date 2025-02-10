@@ -35,8 +35,8 @@ void registerDefaultCommands(Set &commands)
   commands.registerCommand(std::make_shared<playback::Loop>(), Shortcut("ctrl+l"));
   commands.registerCommand(std::make_shared<playback::Record>(), Shortcut("ctrl+r"));
   commands.registerCommand(std::make_shared<playback::Pause>(), Shortcut("space"));
-  commands.registerCommand(std::make_shared<playback::SkipBackward>(), Shortcut("ctrl+."));
-  commands.registerCommand(std::make_shared<playback::SkipForward>(), Shortcut("ctrl+,"));
+  commands.registerCommand(std::make_shared<playback::SkipBackward>(), Shortcut("ctrl+,"));
+  commands.registerCommand(std::make_shared<playback::SkipForward>(), Shortcut("ctrl+."));
   commands.registerCommand(std::make_shared<playback::SkipToFrame>());
   commands.registerCommand(std::make_shared<playback::Speed>());
   commands.registerCommand(std::make_shared<playback::StepBackward>(), Shortcut(","));
