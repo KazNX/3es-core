@@ -1,20 +1,4 @@
 # Additional installation script. This is run at install time.
-
-function(dump_cmake_variables)
-    get_cmake_property(_variableNames VARIABLES)
-    list (SORT _variableNames)
-    foreach (_variableName ${_variableNames})
-        if (ARGV0)
-            unset(MATCHED)
-            string(REGEX MATCH ${ARGV0} MATCHED ${_variableName})
-            if (NOT MATCHED)
-                continue()
-            endif()
-        endif()
-        message(STATUS "${_variableName}=${${_variableName}}")
-    endforeach()
-endfunction()
-
 include(BundleUtilities)
 
 set(FIXUP_APPS @FIXUP_APPS@)
@@ -58,5 +42,3 @@ if(MARSHAL_MAGNUM_PLUGINS)
     endif()
   endforeach(SEARCH_DIR)
 endif(MARSHAL_MAGNUM_PLUGINS)
-
-dump_cmake_variables()
