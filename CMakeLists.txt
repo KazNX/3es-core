@@ -96,4 +96,5 @@ if(TES_BUILD_TESTS)
   add_subdirectory(test)
 endif(TES_BUILD_TESTS)
 
+include(3esConfigureInstall)  
 include(3esPack)

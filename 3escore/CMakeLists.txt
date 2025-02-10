@@ -231,6 +231,7 @@ install(EXPORT 3es-config-targets
   FILE 3es-config-targets.cmake
   NAMESPACE 3es::
   DESTINATION ${ConfigPackageLocation}
+  COMPONENT Devel
 )
 
 install(
@@ -239,7 +240,8 @@ install(
     # "${CMAKE_CURRENT_BINARY_DIR}/3es-config-targets.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/3es-config-version.cmake"
   DESTINATION ${ConfigPackageLocation}
-  COMPONENT Devel)
+  COMPONENT Devel
+)
 
   # Install MSVC runtime libraries. This will also affect the CPack installation.
 include(InstallRequiredSystemLibraries)

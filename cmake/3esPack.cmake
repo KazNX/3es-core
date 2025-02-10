@@ -19,7 +19,7 @@ set(CPACK_PACKAGE_VERSION_MAJOR "${TES_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${TES_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${TES_VERSION_PATCH}")
 
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "3escore")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "3rdEyeScene")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/readme.md")
 
@@ -32,6 +32,13 @@ endif(LINUX)
 
 if(WIN32)
   set(CPACK_GENERATOR "WIX")
+  # Disable component install. There's a clash I can't resolve with WIX:
+  # both Util and Viewer components depend on zlib1.dll. With a component install, both will try
+  # install that file and WIX fails reporting duplicate files. This is partly due to the packing
+  # process putting each component in it's own sub-directory. The monolithic install side steps the
+  # issue as zlib is marshalled into the same directory for all apps; i.e., it's copied multiple
+  # times, but into the same location, so the WIX only deals with one copy of the file.
+  set(CPACK_MONOLITHIC_INSTALL ON)
 endif(WIN32)
 
 # ---- Debian packing
@@ -73,7 +80,7 @@ set(CPACK_WIX_VERSION 4)
 set(CPACK_WIX_UPGRADE_GUID "7de59d88-6afd-48a9-8ba4-71186f97f3e8")
 set(CPACK_WIX_PRODUCT_GUID "b47efad3-89f6-41d5-9335-03348bf0bfde")
 set(CPACK_WIX_PROGRAM_MENU_FOLDER "${PROJECT_DISPLAY_NAME}")
-set(CPACK_WIX_LICENSE_RTF "LICENSE.txt")
+set(CPACK_WIX_LICENSE_RTF "${CMAKE_SOURCE_DIR}/license.rtf")
 # set(CPACK_WIX_PRODUCT_ICON )
 
 include(CPack)

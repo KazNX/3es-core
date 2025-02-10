@@ -44,7 +44,8 @@ include(sourcelist.cmake)
 add_library(3esview ${PUBLIC_HEADERS} ${SOURCES} ${PRIVATE_HEADERS} ${PRIVATE_SOURCES})
 tes_configure_target(3esview
   INCLUDE_PREFIX include/3esview
-  PUBLIC_HEADERS ${PUBLIC_HEADERS}
+  # Do not add public headers so as not to install them. The Magnum graphics dependency makes it
+  # difficult to manage a devel install for the viewer.
   TARGET_COMPONENT Viewer
 )
 
