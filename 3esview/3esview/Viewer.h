@@ -258,7 +258,6 @@ private:
   };
 
   std::shared_ptr<EdlEffect> _edl_effect;
-  EdlParam _edl_tweak = EdlParam::LinearScale;
 
   std::shared_ptr<ThirdEyeScene> _tes;
   std::shared_ptr<data::DataThread> _data_thread;
