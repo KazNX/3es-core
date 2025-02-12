@@ -157,17 +157,8 @@ UIViewer::~UIViewer() = default;
 UIViewer::DrawMode UIViewer::onDrawStart(float dt)
 {
   TES_UNUSED(dt);
-  const GuiContext gui_context(_imgui.context());
-
-  if (ImGui::GetIO().WantTextInput && !isTextInputActive())
-  {
-    startTextInput();
-  }
-  else if (!ImGui::GetIO().WantTextInput && isTextInputActive())
-  {
-    stopTextInput();
-  }
-
+  _in_startup = false;
+  prepareUiRender();
   return isTextInputActive() ? DrawMode::Modal : DrawMode::Normal;
 }
 
@@ -181,7 +172,73 @@ void UIViewer::setWindowSize(const Magnum::Vector2i &size)
 void UIViewer::onDrawComplete(float dt)
 {
   TES_UNUSED(dt);
+  completeUiRender();
+  if (_pending_window_size)
+  {
+    const auto window_size = *_pending_window_size;
+    _pending_window_size.reset();
+    setWindowSize(window_size);
+  }
+}
 
+
+void UIViewer::viewportEvent(ViewportEvent &event)
+{
+  // Flag we are in a viewport event so that settings handle won't resize the window.
+  _in_viewport_event = true;
+  const Finally finally([this]() { _in_viewport_event = false; });
+
+  Viewer::viewportEvent(event);
+  relayoutUi();
+
+  // Update settings if not coming from a settings event.
+  if (!_in_settings_notify)
+  {
+    const auto window_size = event.windowSize();
+    auto config = tes()->settings().config();
+    for (auto iter = config.extentions.begin(); iter != config.extentions.end(); ++iter)
+    {
+      if (iter->name() == kWindowSettingsName)
+      {
+        auto *hsize = (*iter)[kWindowSettingsHorizontal].getProperty<WindowSizeProperty>();
+        auto *vsize = (*iter)[kWindowSettingsVertical].getProperty<WindowSizeProperty>();
+
+        if (static_cast<int>(hsize->value()) != window_size.x() ||
+            static_cast<int>(vsize->value()) != window_size.y())
+        {
+          hsize->setValue(int_cast<unsigned>(window_size.x()));
+          vsize->setValue(int_cast<unsigned>(window_size.y()));
+          tes()->settings().update(config);
+        }
+        break;
+      }
+    }
+  }
+}
+
+
+void UIViewer::relayoutUi()
+{
+  _imgui.relayout(Magnum::Vector2{ windowSize() } / dpiScaling(), windowSize(), framebufferSize());
+}
+
+void UIViewer::prepareUiRender()
+{
+  const GuiContext gui_context(_imgui.context());
+
+  if (ImGui::GetIO().WantTextInput && !isTextInputActive())
+  {
+    startTextInput();
+  }
+  else if (!ImGui::GetIO().WantTextInput && isTextInputActive())
+  {
+    stopTextInput();
+  }
+}
+
+
+void UIViewer::completeUiRender()
+{
   const GuiContext gui_context(_imgui.context());
 
   _imgui.newFrame();
@@ -220,42 +277,6 @@ void UIViewer::onDrawComplete(float dt)
   Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::One,
                                          Magnum::GL::Renderer::BlendFunction::Zero);
 }
-
-
-void UIViewer::viewportEvent(ViewportEvent &event)
-{
-  // Flag we are in a viewport event so that settings handle won't resize the window.
-  _in_viewport_event = true;
-  const Finally finally([this]() { _in_viewport_event = false; });
-
-  Viewer::viewportEvent(event);
-  _imgui.relayout(Magnum::Vector2{ event.windowSize() } / event.dpiScaling(), event.windowSize(),
-                  event.framebufferSize());
-  // Update settings if not coming from a settings event.
-  if (!_in_settings_notify)
-  {
-    const auto window_size = event.windowSize();
-    auto config = tes()->settings().config();
-    for (auto iter = config.extentions.begin(); iter != config.extentions.end(); ++iter)
-    {
-      if (iter->name() == kWindowSettingsName)
-      {
-        auto *hsize = (*iter)[kWindowSettingsHorizontal].getProperty<WindowSizeProperty>();
-        auto *vsize = (*iter)[kWindowSettingsVertical].getProperty<WindowSizeProperty>();
-
-        if (static_cast<int>(hsize->value()) != window_size.x() ||
-            static_cast<int>(vsize->value()) != window_size.y())
-        {
-          hsize->setValue(int_cast<unsigned>(window_size.x()));
-          vsize->setValue(int_cast<unsigned>(window_size.y()));
-          tes()->settings().update(config);
-        }
-        break;
-      }
-    }
-  }
-}
-
 
 void UIViewer::initialiseUi()
 {
@@ -443,7 +464,24 @@ void UIViewer::updateWindowSize(const settings::Settings::Config &config,
 
       if (!_in_viewport_event)
       {
-        setWindowSize(window_size);
+        // We will end up here on startup and we can ensure the UI is created at the correct size
+        // now. See comment in constructor.
+        if (!_in_startup)
+        {
+          setWindowSize(window_size);
+        }
+        else
+        {
+          // See comment on _pending_window_size
+          _pending_window_size = window_size;
+          auto temp_size = Magnum::Vector2i{ 100, 100 };
+          // Ensure the temp size is different from the desired size.
+          if (temp_size.x() == window_size.x())
+          {
+            temp_size.x() += 1;
+          }
+          setWindowSize(temp_size);
+        }
       }
       break;
     }

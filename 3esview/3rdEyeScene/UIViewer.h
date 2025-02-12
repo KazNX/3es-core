@@ -112,6 +112,12 @@ protected:
   void textInputEvent(TextInputEvent &event) override;
 
 private:
+  /// Resize and layout the UI.
+  void relayoutUi();
+
+  void prepareUiRender();
+  void completeUiRender();
+
   void initialiseUi();
   void initialiseImGui();
   void initialiseHud();
@@ -124,12 +130,23 @@ private:
     updateWindowSize(config, nullptr);
   }
 
-
   Magnum::ImGuiIntegration::Context _imgui{ Magnum::NoCreate };
   std::vector<std::shared_ptr<ui::Panel>> _panels;
+  /// A hack for ensuring the UI is correctly sized during startup.
+  ///
+  /// On startup we start the application at a default window size then set another from settings.
+  /// This occurs without a viewport event happening and results in the IMGUI ui being rendered
+  /// in correctly - wrong scaling, wrong position, etc. Experimentation showed even deferring the
+  /// UI creation until after the first frame shows a scaling issue.
+  ///
+  /// The solution is to set a dummy size during startup  when the settings are loaded, and store
+  /// the desired size here. This size is applied after rendering the first frame and everything
+  /// looks right.
+  std::optional<Magnum::Vector2i> _pending_window_size;
   bool _in_settings_notify = false;
   bool _in_viewport_event = false;
   bool _ui_enabled = true;
+  bool _in_startup = true;
 };
 }  // namespace tes::view
 
