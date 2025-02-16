@@ -51,6 +51,11 @@ corrade_add_resource(TesResources resources.conf)
 add_executable(3rdEyeScene ${PUBLIC_HEADERS} ${SOURCES} ${PRIVATE_HEADERS} ${PRIVATE_SOURCES} ${TesResources})
 tes_configure_target(3rdEyeScene TARGET_COMPONENT Viewer)
 
+# Prevent console from appearing when running on Windows
+target_link_options(3rdEyeScene PRIVATE
+  $<$<CXX_COMPILER_ID:MSVC>:/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup>
+)
+
 # set_target_properties(3rdEyeScene PROPERTIES FOLDER view)
 
 # Include directories
