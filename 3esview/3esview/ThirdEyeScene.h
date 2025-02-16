@@ -147,7 +147,16 @@ public:
   const ResetCallback &resetCallback() const { return _reset_callback; }
   void setResetCallback(ResetCallback callback) { _reset_callback = std::move(callback); }
 
-  void render(float dt, const Magnum::Vector2i &window_size);
+  /// Render the scene.
+  ///
+  /// The scene can also be "rendered" with @p visible @c false in order to essentially run in the
+  /// background. This is especially useful when catching up to selected target frames to avoid
+  /// any screen flickering.
+  ///
+  /// @param dt Time since the last update.
+  /// @param window_size The rendering window pixel size.
+  /// @param visible True if rendering results should be made visible.
+  void render(float dt, const Magnum::Vector2i &window_size, bool visible = true);
 
   /// Update to the target frame number on the next @c render() call.
   ///

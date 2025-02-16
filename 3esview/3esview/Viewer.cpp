@@ -321,6 +321,8 @@ void Viewer::drawEvent()
 {
   using namespace Magnum::Math::Literals;
 
+  const bool waiting_for_catchup = waitingForCatchup();
+
   const auto now = Clock::now();
   const auto delta_time = now - _last_sim_time;
   _last_sim_time = now;
@@ -330,12 +332,16 @@ void Viewer::drawEvent()
 
   updateCamera(dt, draw_mode == DrawMode::Normal);
 
-  _tes->render(dt, windowSize());
+  _tes->render(dt, windowSize(), !waiting_for_catchup);
 
   onDrawComplete(dt);
 
+  if (!waiting_for_catchup)
+  {
   swapBuffers();
-  if (continuousSim() || isTextInputActive())
+  }
+
+  if (waiting_for_catchup || continuousSim() || isTextInputActive())
   {
     redraw();
   }
@@ -569,6 +575,15 @@ void Viewer::updateCameraInput(float dt, camera::Camera &camera)
   }
 
   _fly.updateKeys(dt, key_translation, key_rotation, camera);
+}
+
+
+bool Viewer::waitingForCatchup()
+{
+  std::optional<tes::view::FrameNumber> target_frame =
+    (_data_thread && _data_thread->paused()) ? _data_thread->targetFrame() : std::nullopt;
+
+  return target_frame.has_value();
 }
 
 

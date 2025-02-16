@@ -46,10 +46,10 @@ void StreamThread::setTargetFrame(FrameNumber frame)
 }
 
 
-FrameNumber StreamThread::targetFrame() const
+std::optional<FrameNumber> StreamThread::targetFrame() const
 {
   const std::scoped_lock guard(_data_mutex);
-  return _frame.target.has_value() ? *_frame.target : 0;
+  return _frame.target;
 }
 
 
@@ -303,7 +303,8 @@ void StreamThread::skipBack(FrameNumber target_frame)
 
 bool StreamThread::blockOnPause()
 {
-  if (_paused && targetFrame() == 0)
+  // Note: deliberate use of guarded, threadsafe access to targetFrame() .
+  if (_paused && !targetFrame().has_value())
   {
     std::unique_lock lock(_data_mutex);
     // Wait for unpause.
@@ -490,7 +491,7 @@ StreamThread::TargetFrameState StreamThread::checkTargetFrameState(FrameNumber &
     return TargetFrameState::Ahead;
   }
 
-  _frame.target.reset();
+  _frame.target = std::nullopt;
   return TargetFrameState::Reached;
 }
 

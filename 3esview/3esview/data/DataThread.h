@@ -5,6 +5,8 @@
 
 #include <3esview/FrameStamp.h>
 
+#include <optional>
+
 namespace tes
 {
 class PacketReader;
@@ -48,10 +50,9 @@ public:
   /// @param frame The frame to jump, skip or step to.
   virtual void setTargetFrame(FrameNumber frame) = 0;
 
-  /// Get the target frame to jump to. Zero the current frame is up to date; i.e., this is zero once
-  /// the current frame reaches the target frame.
+  /// Get the target frame to jump to if one is set.
   /// @return The target frame to jump to.
-  [[nodiscard]] virtual FrameNumber targetFrame() const = 0;
+  [[nodiscard]] virtual std::optional<FrameNumber> targetFrame() const = 0;
 
   /// Get the current frame number.
   [[nodiscard]] virtual FrameNumber currentFrame() const = 0;

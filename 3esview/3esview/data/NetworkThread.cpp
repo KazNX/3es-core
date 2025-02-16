@@ -48,9 +48,9 @@ void NetworkThread::setTargetFrame(FrameNumber frame)
 }
 
 
-FrameNumber NetworkThread::targetFrame() const
+std::optional<FrameNumber> NetworkThread::targetFrame() const
 {
-  return 0;
+  return std::nullopt;
 }
 
 

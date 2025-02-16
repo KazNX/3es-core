@@ -177,7 +177,7 @@ void ThirdEyeScene::reset(std::function<bool()> abort)
 }
 
 
-void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
+void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size, bool visible)
 {
   //---------------------------------------------------------------------------
   // This section is protected by the _render_mutex
@@ -218,6 +218,11 @@ void ThirdEyeScene::render(float dt, const Magnum::Vector2i &window_size)
 
   // Handle any waiting snapshot.
   handlePendingSnapshot();
+
+  if (!visible)
+  {
+    return;
+  }
 
   const auto categories = *_category_handler->categories();
   const DrawParams params(_camera, window_size);

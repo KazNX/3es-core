@@ -99,7 +99,7 @@ public:
   /// Get the target frame to jump to. Zero the current frame is up to date; i.e., this is zero once
   /// the current frame reaches the target frame.
   /// @return The target frame to jump to.
-  FrameNumber targetFrame() const override;
+  std::optional<FrameNumber> targetFrame() const override;
 
   /// Get the current frame number.
   FrameNumber currentFrame() const override { return _current_frame; }

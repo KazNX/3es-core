@@ -237,6 +237,9 @@ private:
   void updateCamera(float dt, bool allow_user_input);
   void updateCameraInput(float dt, camera::Camera &camera);
 
+  /// Check if we are waiting on the data thread to catch up to a specific frame.
+  bool waitingForCatchup();
+
   void checkShortcuts(KeyEvent &event);
   /// Give @p shortcut a score based on the number of keys matched against @p event.
   ///
