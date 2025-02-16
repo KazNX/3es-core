@@ -38,6 +38,8 @@ list(APPEND PUBLIC_HEADERS
   command/playback/StepBackward.h
   command/playback/StepForward.h
   command/playback/Stop.h
+  command/render/Edl.h
+  command/render/Resolution.h
   data/DataThread.h
   data/KeyframeStore.h
   data/NetworkThread.h

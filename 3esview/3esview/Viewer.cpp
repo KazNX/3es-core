@@ -338,7 +338,7 @@ void Viewer::drawEvent()
 
   if (!waiting_for_catchup)
   {
-  swapBuffers();
+    swapBuffers();
   }
 
   if (waiting_for_catchup || continuousSim() || isTextInputActive())

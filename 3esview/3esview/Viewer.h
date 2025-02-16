@@ -151,7 +151,7 @@ public:
 
   explicit Viewer(const ViewArguments &arguments);
   Viewer(const ViewArguments &arguments, const std::vector<settings::Extension> &extended_settings);
-  ~Viewer();
+  virtual ~Viewer();
 
   [[nodiscard]] std::shared_ptr<ThirdEyeScene> tes() const { return _tes; }
 

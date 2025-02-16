@@ -40,6 +40,7 @@ const KeyMap &keyMap()
                               { "backspace", Shortcut::Key::Backspace },
                               { "insert", Shortcut::Key::Insert },
                               { "delete", Shortcut::Key::Delete },
+                              { "esc", Shortcut::Key::Esc },
                               { "f1", Shortcut::Key::F1 },
                               { "f2", Shortcut::Key::F2 },
                               { "f3", Shortcut::Key::F3 },

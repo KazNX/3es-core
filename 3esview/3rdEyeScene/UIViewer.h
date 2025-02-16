@@ -16,6 +16,7 @@ struct ImGuiContext;
 
 namespace tes::view::ui
 {
+class IconBar;
 class Panel;
 }  // namespace tes::view::ui
 
@@ -92,6 +93,9 @@ public:
   [[nodiscard]] bool uiEnabled() const { return _ui_enabled; }
   void setUiEnabled(bool enable) { _ui_enabled = enable; }
 
+  ui::IconBar &iconBar() { return *_icon_bar; }
+  const ui::IconBar &iconBar() const { return *_icon_bar; }
+
   /// Set the window size.
   ///
   /// Hides the Magnum application implementation to deal with quirks with DPI scaling and settings.
@@ -132,6 +136,7 @@ private:
 
   Magnum::ImGuiIntegration::Context _imgui{ Magnum::NoCreate };
   std::vector<std::shared_ptr<ui::Panel>> _panels;
+  std::shared_ptr<ui::IconBar> _icon_bar;
   /// A hack for ensuring the UI is correctly sized during startup.
   ///
   /// On startup we start the application at a default window size then set another from settings.

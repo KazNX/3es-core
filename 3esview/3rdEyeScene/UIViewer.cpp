@@ -10,6 +10,9 @@
 #include "ui/LogView.h"
 #include "ui/Playback.h"
 #include "ui/SettingsView.h"
+
+// FIXME: Circular includes
+#include "ui/command/CloseActiveView.h"
 #include "ui/command/ToggleCategories.h"
 #include "ui/command/ToggleConnect.h"
 #include "ui/command/ToggleLog.h"
@@ -142,7 +145,7 @@ UIViewer::UIViewer(const UIViewArguments &arguments)
   _imgui = Magnum::ImGuiIntegration::Context(Magnum::Vector2{ windowSize() } / dpiScaling(),
                                              windowSize(), framebufferSize());
   initialiseUi();
-  commands()->registerCommand(std::make_shared<ToggleUI>(), command::Shortcut("F2"));
+  commands()->registerCommand(std::make_shared<ToggleUI>(), command::Shortcut("F8"));
   const auto config = tes()->settings().config();
   // Settings will have been restored at this point. Set the window size.
   updateWindowSize(config, dynamic_cast<const UICommandLineOptions *>(&commandLineOptions()));
@@ -322,33 +325,37 @@ void UIViewer::initialiseHud()
 
 void UIViewer::initialiseIconBarUi()
 {
-  auto icon_bar = std::make_shared<ui::IconBar>(*this);
+  _icon_bar = std::make_shared<ui::IconBar>(*this);
   auto command_set = this->commands();
 
   std::shared_ptr<command::Command> command;
 
-  command = std::make_shared<ui::command::ToggleCategories>(*icon_bar);
-  command_set->registerCommand(command);
-  icon_bar->registerCommand(ui::IconBar::View::Categories, command);
-  icon_bar->registerView(ui::IconBar::View::Categories,
-                         std::make_shared<ui::CategoriesView>(*this));
+  command = std::make_shared<ui::command::ToggleConnect>(*_icon_bar);
+  command_set->registerCommand(command, command::Shortcut("f2"));
+  command_set->registerCommand(command, command::Shortcut("ctrl+k"));
+  _icon_bar->registerCommand(ui::IconBar::View::Connect, command);
+  _icon_bar->registerView(ui::IconBar::View::Connect, std::make_shared<ui::ConnectView>(*this));
 
-  command = std::make_shared<ui::command::ToggleConnect>(*icon_bar);
-  command_set->registerCommand(command);
-  icon_bar->registerCommand(ui::IconBar::View::Connect, command);
-  icon_bar->registerView(ui::IconBar::View::Connect, std::make_shared<ui::ConnectView>(*this));
+  command = std::make_shared<ui::command::ToggleCategories>(*_icon_bar);
+  command_set->registerCommand(command, command::Shortcut("f3"));
+  _icon_bar->registerCommand(ui::IconBar::View::Categories, command);
+  _icon_bar->registerView(ui::IconBar::View::Categories,
+                          std::make_shared<ui::CategoriesView>(*this));
 
-  command = std::make_shared<ui::command::ToggleLog>(*icon_bar);
-  command_set->registerCommand(command);
-  icon_bar->registerCommand(ui::IconBar::View::Log, command);
-  icon_bar->registerView(ui::IconBar::View::Log, std::make_shared<ui::LogView>(*this));
+  command = std::make_shared<ui::command::ToggleLog>(*_icon_bar);
+  command_set->registerCommand(command, command::Shortcut("f4"));
+  _icon_bar->registerCommand(ui::IconBar::View::Log, command);
+  _icon_bar->registerView(ui::IconBar::View::Log, std::make_shared<ui::LogView>(*this));
 
-  command = std::make_shared<ui::command::ToggleSettings>(*icon_bar);
-  command_set->registerCommand(command);
-  icon_bar->registerCommand(ui::IconBar::View::Settings, command);
-  icon_bar->registerView(ui::IconBar::View::Settings, std::make_shared<ui::SettingsView>(*this));
+  command = std::make_shared<ui::command::ToggleSettings>(*_icon_bar);
+  command_set->registerCommand(command, command::Shortcut("ctrl+,"));
+  _icon_bar->registerCommand(ui::IconBar::View::Settings, command);
+  _icon_bar->registerView(ui::IconBar::View::Settings, std::make_shared<ui::SettingsView>(*this));
 
-  _panels.emplace_back(icon_bar);
+  command = std::make_shared<ui::command::CloseActiveView>();
+  command_set->registerCommand(command, command::Shortcut("esc"));
+
+  _panels.emplace_back(_icon_bar);
 }
 
 

@@ -3,6 +3,8 @@ list(APPEND PUBLIC_HEADERS
 )
 
 list(APPEND SOURCES
+  ui/command/CloseActiveView.cpp
+  ui/command/CloseActiveView.h
   ui/command/ToggleCategories.cpp
   ui/command/ToggleCategories.h
   ui/command/ToggleConnect.cpp
