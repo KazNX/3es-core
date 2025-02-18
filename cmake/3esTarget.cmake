@@ -48,6 +48,7 @@ endfunction(tes_configure_target_flags)
 #
 # Configure properties for the given TARGET
 function(tes_configure_target_properties TARGET)
+  set_target_properties(${TARGET} PROPERTIES CXX__VISIBILITY_PRESET hidden)
   # Propagate the debug suffix to executables.
   get_target_property(_target_type ${TARGET} TYPE)
   if(_target_type STREQUAL "EXECUTABLE")

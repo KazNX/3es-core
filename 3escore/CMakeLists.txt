@@ -137,7 +137,7 @@ target_link_libraries(3escore
 
 if(ZLIB_FOUND AND NOT TES_ZLIB_OFF)
   target_include_directories(3escore PRIVATE SYSTEM "${ZLIB_INCLUDE_DIRS}")
-  target_link_libraries(3escore PUBLIC ${ZLIB_LIBRARIES})
+  target_link_libraries(3escore PRIVATE ${ZLIB_LIBRARIES})
 endif(ZLIB_FOUND AND NOT TES_ZLIB_OFF)
 
 # Need to explicitly define some compile flags because the target name starts with a number.

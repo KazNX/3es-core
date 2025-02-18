@@ -7,13 +7,6 @@
 
 #include "CoreExport.h"
 
-#ifdef TES_STATIC
-/// Macro for defining extern templates. Only use extern for static library.
-#define TES_EXTERN extern
-#else  // TES_STATIC
-#define TES_EXTERN
-#endif  // TES_STATIC
-
 // Version setup.
 /// Major version number.
 #define TES_VERSION_MAJOR @TES_VERSION_MAJOR@  // NOLINT(modernize-macro-to-enum)

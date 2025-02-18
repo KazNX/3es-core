@@ -213,8 +213,8 @@ protected:
   };
 };
 
-TES_EXTERN template class TES_CORE_API PacketStream<PacketHeader>;
-TES_EXTERN template class TES_CORE_API PacketStream<const PacketHeader>;
+extern template class PacketStream<PacketHeader>;
+extern template class PacketStream<const PacketHeader>;
 
 template <class Header>
 PacketStream<Header>::PacketStream(Header *packet)
