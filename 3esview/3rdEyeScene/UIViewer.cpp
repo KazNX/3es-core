@@ -130,6 +130,10 @@ UIViewer::GuiContext::GuiContext(ImGuiContext *context)
 {
   _restore = ImGui::GetCurrentContext();
   ImGui::SetCurrentContext(context);
+  // Disable imgui.ini saving.
+  auto &imgui_io = ImGui::GetIO();
+  imgui_io.IniFilename = nullptr;
+  imgui_io.LogFilename = nullptr;
 }
 
 
