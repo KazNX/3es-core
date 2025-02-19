@@ -2,6 +2,7 @@
 
 #include <3escore/CollatedPacketDecoder.h>
 #include <3escore/Endian.h>
+#include <3escore/Log.h>
 #include <3escore/Messages.h>
 #include <3escore/PacketBuffer.h>
 #include <3escore/PacketWriter.h>
@@ -18,6 +19,8 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+#include <cxxopts.hpp>
 
 // Note: this program is provided as a C++ implementation of command line packet recording. It is
 // equivalent to the 3esrec program which is part of the C#/dotnet 3es project. It is recommended
@@ -39,25 +42,41 @@ enum class Mode : int
   Default = Passthrough
 };
 
+struct EndPoint
+{
+  std::string host;
+  uint16_t port = 0;
+};
+
 class TesRec
 {
 #if PACKET_TIMING
   static const unsigned PacketLimit = 500u;
 #endif  // PACKET_TIMING
 public:
+  struct Options
+  {
+    EndPoint end_point = { "127.0.0.1", defaultPort() };
+    std::string prefix = "tes";
+    bool persist = false;
+    bool quiet = false;
+    bool overwrite = false;
+    bool help_mode = false;
+  };
+
   [[nodiscard]] bool quit() const { return _quit; }
   [[nodiscard]] bool argsOk() const { return _args_ok; }
-  [[nodiscard]] bool showUsage() const { return _show_usage; }
+  [[nodiscard]] bool helpMode() const { return _opt.help_mode; }
   [[nodiscard]] bool connected() const { return _connected; }
-  [[nodiscard]] bool persist() const { return _persist; }
-  [[nodiscard]] bool overwrite() const { return _overwrite; }
-  [[nodiscard]] bool quiet() const { return _quiet; }
+  [[nodiscard]] bool persist() const { return _opt.persist; }
+  [[nodiscard]] bool overwrite() const { return _opt.overwrite; }
+  [[nodiscard]] bool quiet() const { return _opt.quiet; }
 
   [[nodiscard]] Mode decodeMode() const { return _decode_mode; }
 
   [[nodiscard]] unsigned totalFrames() const { return _total_frames; }
   // IPEndPoint ServerEndPoint { get; private set; }
-  [[nodiscard]] const std::string &outputPrefix() const { return _output_prefix; }
+  [[nodiscard]] const std::string &outputPrefix() const { return _opt.prefix; }
   [[nodiscard]] constexpr static const char *defaultPrefix() { return "tes"; }
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
   [[nodiscard]] constexpr static uint16_t defaultPort() { return 33500u; }
@@ -68,8 +87,6 @@ public:
   [[nodiscard]] static Mode argToMode(const char *arg);
 
   TesRec(int argc, const char **args);
-
-  static void usage();
 
   void run(FrameDisplay *frame_display);
 
@@ -82,24 +99,18 @@ private:
 
   std::string generateNewOutputFile();
 
-  void parseArgs(int argc, const char *const *argv);
+  static bool parseArgs(Options &opt, int argc, const char *const *argv);
 
   ServerInfoMessage _server_info;
   int _next_output_number = 0;
   unsigned _total_frames = 0;
   Mode _decode_mode = Mode::Default;
-  std::string _output_prefix = "tes";
 
-  std::string _server_ip;
-  uint16_t _server_port = 0;
+  Options _opt;
 
   bool _quit = false;
   bool _args_ok = true;
-  bool _show_usage = false;
   bool _connected = false;
-  bool _persist = false;
-  bool _overwrite = false;
-  bool _quiet = false;
 
   using DefaultArgsArray = std::array<const char *, 4>;
   using DefaultModesAray = std::array<const char *, 5>;
@@ -146,64 +157,14 @@ TesRec::TesRec(int argc, const char **args)
   initDefaultServerInfo(&_server_info);
   if (argc)
   {
-    parseArgs(argc, args);
+    _args_ok = parseArgs(_opt, argc, args);
   }
   else
   {
-    parseArgs(static_cast<int>(DefaultArgs.size()), DefaultArgs.data());
+    _args_ok = parseArgs(_opt, static_cast<int>(DefaultArgs.size()), DefaultArgs.data());
   }
 }
 
-
-void TesRec::usage()
-{
-  printf("Usage:\n"
-         "3esrec --ip <server-ip> [--port <server-port>] [prefix]\n"
-         "\n"
-         "This program attempts to connect to and record a Third Eye Scene server.\n"
-         "--help, -?:\n"
-         "Show usage.\n"
-         "\n"
-         "--ip <server-ip>:\n"
-         "Specifies the server IP address to connect to.\n"
-         "\n"
-         // "-m[c,C,v,z,-]:\n"
-         // "Specifies how incoming packets are handled. In all modes except m-, incoming\n"
-         // "collated packets are first decoded.\n"
-         // "- mc : Packet collation and compression. Recollate and compress.\n"
-         // "- mC : Packet collation no compression. Recollate only.\n"
-         // "- mu : Uncompressed. Save packets as is. No compression.\n"
-         // "- mz : File level compression. Decode incoming packets and compress at the\n"
-         // "        file level.\n"
-         // "- m- : Passthrough. Packets are saved exactly as they come in.\n"
-         // "The fastest mode is -m- as this performs no additional calculations other than\n"
-         // "CRC validation. However, this mode requires naked frame packets for accurate\n"
-         // "frame count finalisation.\n"
-         // "\n"
-         // "The default mode is: %s\n"
-         // "\n"
-         "--port <server-port>:\n"
-         "Specifies the port to connect on.  The default port is %d\n"
-         "\n"
-         "--persist, -p:\n"
-         "Persist beyond the first connection. The program keeps running awaiting\n"
-         "further connections. Use Control-C to terminate.\n"
-         "\n"
-         "--quiet, -q:\n"
-         "Run in quiet mode (disable non-critical logging).\n"
-         "\n"
-         "--overwrite, -w:\n"
-         "Overwrite existing files using the current prefix. The current session\n"
-         "numbering will not overwrite until they loop to 0.\n"
-         "\n"
-         "[prefix]:\n"
-         "Specifies the file prefix used for recording. The recording file is\n"
-         "formulated as {prefix###.3es}, where the number used is the first missing\n"
-         "file up to 999. At that point the program will complain that there are no\n"
-         "more available file names.\n",
-         defaultPort());
-  // , modeToArg(Mode::Default), defaultPort());
-}
 
 void TesRec::run(FrameDisplay *frame_display)
 {
@@ -224,12 +185,12 @@ void TesRec::run(FrameDisplay *frame_display)
 #endif                                                    // PACKET_TIMING
   bool once = true;
 
-  if (!_quiet)
+  if (!quiet())
   {
-    std::cout << "Connecting to " << _server_ip << ":" << _server_port << std::endl;
+    std::cout << "Connecting to " << _opt.end_point.host << ":" << _opt.end_point.port << std::endl;
   }
 
-  while (!_quit && (_persist || once))
+  while (!_quit && (persist() || once))
   {
     once = false;
     // First try establish a connection.
@@ -243,7 +204,7 @@ void TesRec::run(FrameDisplay *frame_display)
 #endif  // PACKET_TIMING
         _total_frames = 0u;
         frame_display->reset();
-        if (!_quiet)
+        if (!quiet())
         {
           frame_display->start();
         }
@@ -370,7 +331,7 @@ void TesRec::run(FrameDisplay *frame_display)
       io_stream.reset(nullptr);
     }
 
-    if (!_quiet)
+    if (!quiet())
     {
       std::cout << "\nConnection closed" << std::endl;
     }
@@ -396,7 +357,7 @@ std::unique_ptr<TcpSocket> TesRec::attemptConnection()
 {
   std::unique_ptr<TcpSocket> socket(new TcpSocket);
 
-  if (socket->open(_server_ip.c_str(), _server_port))
+  if (socket->open(_opt.end_point.host.c_str(), _opt.end_point.port))
   {
     socket->setNoDelay(true);
     socket->setWriteTimeout(0);
@@ -414,7 +375,7 @@ std::unique_ptr<std::iostream> TesRec::createOutputWriter()
   const std::string file_path = generateNewOutputFile();
   if (file_path.empty())
   {
-    std::cout << "Unable to generate a numbered file name using the prefix: " << _output_prefix
+    std::cout << "Unable to generate a numbered file name using the prefix: " << outputPrefix()
               << "Try cleaning up the output directory" << std::endl;
     return nullptr;
   }
@@ -467,11 +428,11 @@ std::string TesRec::generateNewOutputFile()
   for (int i = _next_output_number; i < max_files; ++i)
   {
     std::ostringstream output_path_stream;
-    output_path_stream << _output_prefix << std::setw(3) << std::setfill('0') << i << ".3es";
+    output_path_stream << outputPrefix() << std::setw(3) << std::setfill('0') << i << ".3es";
     output_path = output_path_stream.str();
 
     // Check if the file exists.
-    bool path_ok = _overwrite;
+    bool path_ok = overwrite();
     if (!path_ok)
     {
       const std::ifstream in_test(output_path.c_str(), std::ios::binary);
@@ -489,102 +450,47 @@ std::string TesRec::generateNewOutputFile()
 }
 
 
-void TesRec::parseArgs(int argc, const char *const *argv)
+bool TesRec::parseArgs(Options &opt, int argc, const char *const *argv)
 {
-  bool ok = argc > 0;
-  std::string ip_str;
-  bool output_prefix_set = false;
+  cxxopts::Options parser(
+    "3esrec", "This program attempts to connect to and record a Third Eye Scene server.");
 
-  _args_ok = false;
-  for (int i = 1; i < argc; ++i)
+  // clang-format off
+  parser.add_options()
+    ("h,help", "Show command line help")
+    ("i,ip", "Specifies the server IP address to connect to.", cxxopts::value(opt.end_point.host)->default_value(opt.end_point.host))
+    ("p,port", "Specifies the port to connect on.", cxxopts::value(opt.end_point.port)->default_value(std::to_string(defaultPort())))
+    ("persist", "Persist running after the first connection closes, waiting for a new connection. Use Ctrl-C to terminate.", cxxopts::value(opt.persist)->implicit_value("true"))
+    ("q,quiet", "Run in quiet mode (disable non-critical logging).", cxxopts::value(opt.quiet)->implicit_value("true"))
+    ("overwrite", "Overwrite existing files using the current prefix. The current session numbering will not overwrite until it loops to 0.", cxxopts::value(opt.overwrite)->implicit_value("true"))
+    ("prefix", "Specifies the file prefix used for recording. The recording file is "
+         "formulated as {prefix###.3es}, where the number used is the first missing "
+         "file up to 999. At that point the program will complain that there are no "
+         "more available file names.", cxxopts::value(opt.prefix)->default_value(opt.prefix))
+  ;
+  // clang-format on
+
+  parser.parse_positional({ "prefix" });
+
+  try
   {
-    const std::string arg(argv[i]);
-    if (arg == "--help" || arg == "-?" || arg == "-h")
+    cxxopts::ParseResult parsed = parser.parse(argc, argv);
+
+    if (parsed.count("help"))
     {
-      _show_usage = true;
-    }
-    else if (arg == "--ip")
-    {
-      if (i + 1 < argc)
-      {
-        ip_str = argv[++i];
-      }
-      else
-      {
-        ok = false;
-      }
-    }
-    else if (arg.find("-m") == 0)
-    {
-      _decode_mode = argToMode(arg.c_str());
-    }
-    else if (arg == "--overwrite" || arg == "-w")
-    {
-      _overwrite = true;
-    }
-    else if (arg == "--persist" || arg == "-w")
-    {
-      _persist = true;
-    }
-    else if (arg == "--quiet" || arg == "-q")
-    {
-      _quiet = true;
-      // std::cout << "Setting Quiet" << std::endl;
-    }
-    else if (arg == "--port")
-    {
-      if (i + 1 < argc)
-      {
-        const std::string port_str = argv[++i];
-        std::istringstream port_in(port_str);
-        port_in >> _server_port;
-        if (port_in.bad())
-        {
-          std::cout << "Error parsing port" << std::endl;
-          ok = false;
-        }
-      }
-      else
-      {
-        ok = false;
-      }
-    }
-    else if (!output_prefix_set && arg.find('-') != 0)
-    {
-      _output_prefix = arg;
-      output_prefix_set = true;
+      // Force output: don't log as that could be filtered by log level.
+      std::cout << parser.help() << std::endl;
+      // Help already shown by cxxopts. Flag exit.
+      opt.help_mode = true;
     }
   }
-
-  if (ok)
+  catch (const cxxopts::exceptions::parsing &e)
   {
-    if (_server_port == 0)
-    {
-      _server_port = defaultPort();
-    }
-
-    if (ip_str.empty())
-    {
-      ip_str = defaultIP();
-    }
-
-    if (!ip_str.empty() && _server_port > 0)
-    {
-      _server_ip = ip_str;
-    }
-    else
-    {
-      ok = false;
-      std::cout << "Missing valid server IP address and port." << std::endl;
-    }
+    tes::log::error("Argument error\n", e.what());
+    return false;
   }
 
-  if (_output_prefix.empty())
-  {
-    _output_prefix = defaultPrefix();
-  }
-
-  _args_ok = ok;
+  return true;
 }
 }  // namespace tes
 
@@ -611,9 +517,8 @@ int main(int argc, const char **argv)
   signal(SIGINT, onSignal);
   signal(SIGTERM, onSignal);
 
-  if (prog.showUsage() || !prog.argsOk())
+  if (prog.helpMode() || !prog.argsOk())
   {
-    prog.usage();
     return 1;
   }
 
