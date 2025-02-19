@@ -661,10 +661,12 @@ void ThirdEyeScene::draw(float dt, const DrawParams &params,
   {
     handler->draw(handler::Message::DrawPass::Opaque, _render_stamp, params, categories);
   }
+  Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::Blending);
   for (const auto &handler : drawers)
   {
     handler->draw(handler::Message::DrawPass::Transparent, _render_stamp, params, categories);
   }
+  Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);
   for (const auto &handler : drawers)
   {
     handler->draw(handler::Message::DrawPass::Overlay, _render_stamp, params, categories);
