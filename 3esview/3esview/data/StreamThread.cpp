@@ -467,7 +467,7 @@ StreamThread::TargetFrameState StreamThread::checkTargetFrameState(FrameNumber &
   {
     // We have a new target frame. Migrate to the target frame.
     _frame.target = target_frame = *_frame.pending_target;
-    _frame.pending_target.reset();
+    _frame.pending_target = std::nullopt;
 
     // Mustn't call skipToClosestKeyframe() while _data_mutex is locked.
     return TargetFrameState::KeyframeSkip;
