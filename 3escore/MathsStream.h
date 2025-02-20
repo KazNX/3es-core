@@ -3,8 +3,7 @@
 // ABN 41 687 119 230
 //
 // Author: Kazys Stepanas
-#ifndef TES_CORE_MATHS_STREAM_H
-#define TES_CORE_MATHS_STREAM_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -131,5 +130,3 @@ inline std::ostream &operator<<(std::ostream &o, const tes::Colour &c)
   o << '[' << int(c.r()) << ',' << int(c.g()) << ',' << int(c.b()) << ',' << int(c.a()) << ']';
   return o;
 }
-
-#endif  // TES_CORE_MATHS_STREAM_H

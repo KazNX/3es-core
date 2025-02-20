@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SHADERS_POINT_GEOM_H
-#define TES_VIEW_SHADERS_POINT_GEOM_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -118,5 +117,3 @@ private:
   Int _point_size_uniform = 4;
 };
 }  // namespace tes::view::shaders
-
-#endif  // TES_VIEW_SHADERS_POINT_GEOM_H

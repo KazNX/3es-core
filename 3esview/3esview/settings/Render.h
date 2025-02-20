@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SETTINGS_RENDER_H
-#define TES_VIEW_SETTINGS_RENDER_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -35,5 +34,3 @@ struct Render
 };
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }  // namespace tes::view::settings
-
-#endif  // TES_VIEW_SETTINGS_RENDER_H

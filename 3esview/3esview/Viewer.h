@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_VIEWER_H
-#define TES_VIEW_VIEWER_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -284,5 +283,3 @@ private:
   std::unique_ptr<CommandLineOptions> _command_line_options;
 };
 }  // namespace tes::view
-
-#endif  // TES_VIEW_VIEWER_H

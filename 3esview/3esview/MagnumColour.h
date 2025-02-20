@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_MAGNUM_COLOUR_H
-#define TES_VIEW_MAGNUM_COLOUR_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -26,5 +25,3 @@ inline Magnum::Color4 convert(const tes::Colour &c)
            Magnum::Float(c.af()) };
 }
 };  // namespace tes::view
-
-#endif  // TES_VIEW_MAGNUM_COLOUR_H

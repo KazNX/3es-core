@@ -1,6 +1,7 @@
 //
 // author: Kazys Stepanas
 //
+#pragma once
 
 #include <3escore/CoreConfig.h>
 

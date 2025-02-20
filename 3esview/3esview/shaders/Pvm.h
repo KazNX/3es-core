@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SHADERS_PVM_H
-#define TES_VIEW_SHADERS_PVM_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -227,5 +226,3 @@ inline void Pvm::clearDirty()
   _flags = DirtyFlag::Zero;
 }
 }  // namespace tes::view::shaders
-
-#endif  // TES_VIEW_SHADERS_PVM_H

@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_DATA_STREAM_RECORDER_H
-#define TES_VIEW_DATA_STREAM_RECORDER_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -96,5 +95,3 @@ private:
   State _status = State::PendingSnapshot;
 };
 }  // namespace tes::view::data
-
-#endif  // TES_VIEW_DATA_STREAM_RECORDER_H

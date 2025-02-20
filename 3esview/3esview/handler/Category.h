@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_HANDLER_CATEGORY_H
-#define TES_VIEW_HANDLER_CATEGORY_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -89,5 +88,3 @@ private:
   std::vector<painter::CategoryInfo> _pending;
 };
 }  // namespace tes::view::handler
-
-#endif  // TES_VIEW_HANDLER_CATEGORY_H

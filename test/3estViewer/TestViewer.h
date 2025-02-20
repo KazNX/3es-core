@@ -1,5 +1,4 @@
-#ifndef TES_3EST_VIEWER_VIEWER_H
-#define TES_3EST_VIEWER_VIEWER_H
+#pragma once
 
 #include "3estViewer/TestViewerConfig.h"
 
@@ -167,5 +166,3 @@ private:
   mutable std::mutex _mutex;
 };  // namespace tes::test::view
 }  // namespace tes::view
-
-#endif  // TES_3EST_VIEWER_VIEWER_H

@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SETTINGS_YAMLFWD_H
-#define TES_VIEW_SETTINGS_YAMLFWD_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -16,5 +15,3 @@ namespace ryml
 {
 using namespace c4::yml;
 }  // namespace ryml
-
-#endif  // TES_VIEW_SETTINGS_YAMLFWD_H

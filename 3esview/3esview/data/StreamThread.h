@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_STREAM_THREAD_H
-#define TES_VIEW_STREAM_THREAD_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -331,5 +330,3 @@ private:
 
 TES_ENUM_FLAGS(StreamThread::ProcessPacketFlag);
 }  // namespace tes::view::data
-
-#endif  // TES_VIEW_STREAM_THREAD_H

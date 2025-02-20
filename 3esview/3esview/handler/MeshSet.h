@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_HANDLER_MESH_SET_H
-#define TES_VIEW_HANDLER_MESH_SET_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -119,5 +118,3 @@ private:
   std::vector<PendingAction> _pending_actions;
 };
 }  // namespace tes::view::handler
-
-#endif  // TES_VIEW_HANDLER_MESH_SET_H

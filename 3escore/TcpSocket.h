@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_TCP_SOCKET_H
-#define TES_CORE_TCP_SOCKET_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -150,5 +149,3 @@ private:
   std::unique_ptr<TcpSocketDetail> _detail;  ///< Implementation detail.
 };
 }  // namespace tes
-
-#endif  // TES_CORE_TCP_SOCKET_H

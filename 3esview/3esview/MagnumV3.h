@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_MAGNUM_V3_H
-#define TES_VIEW_MAGNUM_V3_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -21,5 +20,3 @@ inline Magnum::Vector3 convert(const tes::Vector3<T> &v)
   return { Magnum::Float(v.x()), Magnum::Float(v.y()), Magnum::Float(v.z()) };
 }
 };  // namespace tes::view
-
-#endif  // TES_VIEW_MAGNUM_V3_H

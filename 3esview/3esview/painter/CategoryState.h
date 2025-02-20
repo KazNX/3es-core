@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_HANDLER_PAINTER_STATE_H
-#define TES_VIEW_HANDLER_PAINTER_STATE_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -90,5 +89,3 @@ private:
   CategoryMap _category_map;
 };
 }  // namespace tes::view::painter
-
-#endif  // TES_VIEW_HANDLER_PAINTER_STATE_H

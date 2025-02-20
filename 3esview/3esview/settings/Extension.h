@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SETTINGS_EXTENSION_H
-#define TES_VIEW_SETTINGS_EXTENSION_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -239,5 +238,3 @@ const T *ExtensionProperty::getProperty() const
   return nullptr;
 }
 }  // namespace tes::view::settings
-
-#endif  // TES_VIEW_SETTINGS_EXTENSION_H

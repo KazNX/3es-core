@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SHADERS_SHADER_H
-#define TES_VIEW_SHADERS_SHADER_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -165,5 +164,3 @@ inline bool Shader::supportsFeatureAny(Feature feature_flags) const
   return (features() & feature_flags) != Feature::None;
 }
 }  // namespace tes::view::shaders
-
-#endif  // TES_VIEW_SHADERS_SHADER_H

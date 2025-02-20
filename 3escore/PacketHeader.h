@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PACKET_H
-#define TES_CORE_PACKET_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -74,5 +73,3 @@ struct TES_CORE_API PacketHeader
   uint8_t flags;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_PACKET_H

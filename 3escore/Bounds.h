@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_BOUNDS_H
-#define TES_CORE_BOUNDS_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -249,6 +248,3 @@ inline Bounds<T> &Bounds<T>::operator=(const Bounds<T> &other)
   return *this;
 }
 }  // namespace tes
-
-
-#endif  // TES_CORE_BOUNDS_H

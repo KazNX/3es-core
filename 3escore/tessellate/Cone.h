@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_TESSELATE_CONE_H
-#define TES_CORE_TESSELATE_CONE_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -53,5 +52,3 @@ void TES_CORE_API wireframe(std::vector<Vector3f> &vertices, std::vector<unsigne
                             const Vector3f &apex, const Vector3f &axis, float height, float angle,
                             unsigned segments);
 }  // namespace tes::cone
-
-#endif  // TES_CORE_TESSELATE_CONE_H

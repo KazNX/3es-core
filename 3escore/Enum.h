@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_CORE_UTIL_ENUM_H
-#define TES_CORE_UTIL_ENUM_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -43,6 +42,3 @@
   struct __TES_ENUM_REQUIRE_SEMICOLCON__
 
 // NOLINTEND(bugprone-macro-parentheses)
-
-
-#endif  // TES_CORE_UTIL_ENUM_H

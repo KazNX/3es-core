@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_HANDLER_TEXT3D_H
-#define TES_VIEW_HANDLER_TEXT3D_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -74,5 +73,3 @@ public:
   {}
 };
 }  // namespace tes::view::handler
-
-#endif  // TES_VIEW_HANDLER_TEXT3D_H

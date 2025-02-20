@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_UTIL_CSTR_PTR_H
-#define TES_VIEW_UTIL_CSTR_PTR_H
+#pragma once
 
 #include <memory>
 
@@ -27,5 +26,3 @@ struct CStrPtrDeleter
 using CStrPtr = std::unique_ptr<char, CStrPtrDeleter>;
 using CStrConstPtr = std::unique_ptr<const char, CStrPtrDeleter>;
 }  // namespace tes::view::util
-
-#endif  // TES_VIEW_UTIL_CSTR_PTR_H

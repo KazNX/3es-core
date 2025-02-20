@@ -1,5 +1,4 @@
-#ifndef TES_REC_FRAME_DISPLAY_H
-#define TES_REC_FRAME_DISPLAY_H
+#pragma once
 
 #include <atomic>
 #include <cinttypes>
@@ -44,5 +43,3 @@ private:
   std::thread _thread = {};
 };
 }  // namespace tes
-
-#endif  // TES_REC_FRAME_DISPLAY_H

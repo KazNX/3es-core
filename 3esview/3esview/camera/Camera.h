@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_CAMERA_CAMERA_H
-#define TES_VIEW_CAMERA_CAMERA_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -77,5 +76,3 @@ inline Magnum::Matrix4 viewProjection(const Camera &camera, const Magnum::Vector
 
 
 }  // namespace tes::view::camera
-
-#endif  // TES_VIEW_CAMERA_CAMERA_H

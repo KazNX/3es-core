@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_CORE_THROW_H
-#define TES_CORE_THROW_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -45,5 +44,3 @@ void TES_CORE_API logException(const Exception &e);
 /// @param line The line number from which the exception originates. Use @c __LINE__ .
 void TES_CORE_API logException(const Exception &e, const char *file, int line);
 }  // namespace tes
-
-#endif  // TES_CORE_THROW_H

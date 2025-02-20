@@ -1,6 +1,5 @@
 // Author: Kazys Stepanas
-#ifndef TES_VIEW_CONSTANTS_H
-#define TES_VIEW_CONSTANTS_H
+#pragma once
 
 #include "ViewConfig.h"
 
@@ -39,5 +38,3 @@ constexpr Vector3<Real> worldUp()
   return Vector3<Real>(0, 0, static_cast<Real>(1));
 }
 }  // namespace tes::view
-
-#endif  // TES_VIEW_CONSTANTS_H

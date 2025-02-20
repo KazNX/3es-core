@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_CRC_H
-#define TES_CORE_CRC_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -28,5 +27,3 @@ uint16_t TES_CORE_API crc16(const uint8_t *message, size_t byte_count);
 /// @return An 32-bit CRC for @c message.
 uint32_t TES_CORE_API crc32(const uint8_t *message, size_t byte_count);
 }  // namespace tes
-
-#endif  // TES_CORE_CRC_H

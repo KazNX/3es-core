@@ -2,8 +2,7 @@
 // Project configuration header. This is a generated header; do not modify
 // it directly. Instead, modify the config.h.in version and run CMake again.
 //
-#ifndef TES_CORE_CONFIG_H
-#define TES_CORE_CONFIG_H
+#pragma once
 
 #include "CoreExport.h"
 
@@ -134,5 +133,3 @@ static_assert(sizeof(ssize_t) == sizeof(size_t));
 }  // namespace tes
 
 #include <3escore/Meta.h>
-
-#endif  // TES_CORE_CONFIG_H

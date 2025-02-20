@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_UTIL_PENDING_ACTION_QUEUE_H
-#define TES_VIEW_UTIL_PENDING_ACTION_QUEUE_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -84,5 +83,3 @@ struct PendingAction
   ~PendingAction() = default;
 };
 }  // namespace tes::view::util
-
-#endif  // TES_VIEW_UTIL_PENDING_ACTION_QUEUE_H

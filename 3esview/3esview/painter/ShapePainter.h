@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_PAINTER_SHAPE_PAINTER_H
-#define TES_VIEW_PAINTER_SHAPE_PAINTER_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -410,5 +409,3 @@ protected:
   std::vector<Id> _pending_removal;
 };
 }  // namespace tes::view::painter
-
-#endif  // TES_VIEW_PAINTER_SHAPE_PAINTER_H

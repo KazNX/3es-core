@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_CAMERA_CONTROLLER_H
-#define TES_VIEW_CAMERA_CONTROLLER_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -91,5 +90,3 @@ private:
   Flag _flags = Flag::Zero;
 };
 }  // namespace tes::view::camera
-
-#endif  // TES_VIEW_CAMERA_CONTROLLER_H

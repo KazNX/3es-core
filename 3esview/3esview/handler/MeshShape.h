@@ -1,6 +1,5 @@
 
-#ifndef TES_VIEW_HANDLER_MESH_SHAPE_H
-#define TES_VIEW_HANDLER_MESH_SHAPE_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -151,5 +150,3 @@ protected:
   std::shared_ptr<shaders::ShaderLibrary> _shader_library;
 };
 }  // namespace tes::view::handler
-
-#endif  // TES_VIEW_HANDLER_MESH_SHAPE_H

@@ -81,5 +81,3 @@ private:
 
   std::unique_ptr<OccupancyMeshDetail> _detail;
 };
-
-#endif  // TES_ENABLE

@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_TESSELATE_ARROW_H
-#define TES_CORE_TESSELATE_ARROW_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -56,5 +55,3 @@ bool TES_CORE_API wireframe(std::vector<Vector3f> &vertices, std::vector<unsigne
                             float cylinder_length, float arrow_length,
                             const Vector3f &axis = Vector3f(0, 0, 1));
 }  // namespace tes::arrow
-
-#endif  // TES_CORE_TESSELATE_ARROW_H

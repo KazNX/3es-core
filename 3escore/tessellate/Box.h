@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_TESSELATE_BOX_H
-#define TES_CORE_TESSELATE_BOX_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -39,5 +38,3 @@ void TES_CORE_API solid(std::vector<Vector3f> &vertices, std::vector<unsigned> &
 void TES_CORE_API wireframe(std::vector<Vector3f> &vertices, std::vector<unsigned> &indices,
                             const Vector3f &scale = Vector3f(1.0f));
 }  // namespace tes::box
-
-#endif  // TES_CORE_TESSELATE_BOX_H

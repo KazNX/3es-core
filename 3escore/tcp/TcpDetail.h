@@ -2,8 +2,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_TCP_TCP_DETAIL_H
-#define TES_CORE_TCP_TCP_DETAIL_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -33,5 +32,3 @@ struct TcpListenSocketDetail
   struct sockaddr_in address = {};
 };
 }  // namespace tes
-
-#endif  // TES_CORE_TCP_TCP_DETAIL_H

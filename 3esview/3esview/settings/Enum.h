@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SETTINGS_ENUM_H
-#define TES_VIEW_SETTINGS_ENUM_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -119,5 +118,3 @@ inline std::string Enum::enumName(int value) const
   return {};
 }
 }  // namespace tes::view::settings
-
-#endif  // TES_VIEW_SETTINGS_ENUM_H

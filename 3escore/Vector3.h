@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_VECTOR3_H
-#define TES_CORE_VECTOR3_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -539,5 +538,3 @@ const Vector3<T> Vector3<T>::AxisY(0, 1, 0);
 template <typename T>
 const Vector3<T> Vector3<T>::AxisZ(0, 0, 1);
 }  // namespace tes
-
-#endif  // TES_CORE_VECTOR3_H

@@ -4,8 +4,7 @@
 // This file contains utility macros and defines mostly used to avoid compiler
 // warnings.
 //
-#ifndef TES_CORE_META_H
-#define TES_CORE_META_H
+#pragma once
 
 #include <tuple>
 
@@ -28,5 +27,3 @@
 #ifndef TES_FALLTHROUGH
 #define TES_FALLTHROUGH
 #endif  // TES_FALLTHROUGH
-
-#endif  // TES_CORE_META_H

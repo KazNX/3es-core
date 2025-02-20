@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_DATA_BUFFER_H
-#define TES_CORE_DATA_BUFFER_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -990,5 +989,3 @@ private:
 }  // namespace tes
 
 #include "DataBuffer.inl"
-
-#endif  // TES_CORE_DATA_BUFFER_H

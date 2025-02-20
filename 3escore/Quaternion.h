@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_QUATERNION_H
-#define TES_CORE_QUATERNION_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -298,5 +297,3 @@ TES_CORE_EXTERN template class TES_CORE_API Quaternion<double>;
 }  // namespace tes
 
 #include "Quaternion.inl"
-
-#endif  // TES_CORE_QUATERNION_H

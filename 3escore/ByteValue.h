@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_BYTE_VALUE_H
-#define TES_CORE_BYTE_VALUE_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -176,5 +175,3 @@ inline std::ostream &operator<<(std::ostream &out, const ByteValue &bytes)
   return out;
 }
 }  // namespace tes
-
-#endif  // TES_CORE_BYTE_VALUE_H

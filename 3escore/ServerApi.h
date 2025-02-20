@@ -5,8 +5,7 @@
 // author Kazys Stepanas
 //
 // Copyright (c) Kazys Stepanas 2023
-#ifndef TES_CORE_SERVER_API_H
-#define TES_CORE_SERVER_API_H
+#pragma once
 
 #ifdef TES_ENABLE
 #include "CoreConfig.h"
@@ -743,5 +742,3 @@ public:
 };
 #endif  // TES_ENABLE
 }  // namespace tes
-
-#endif  // TES_CORE_SERVER_API_H

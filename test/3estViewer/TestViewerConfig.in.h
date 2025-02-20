@@ -1,5 +1,4 @@
-#ifndef TES_3EST_VIEWER_TEST_VIEWER_CONFIG_H
-#define TES_3EST_VIEWER_TEST_VIEWER_CONFIG_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -11,5 +10,3 @@
 #define TES_MAGNUM_WINDOWLESS_APP Magnum::Platform::@WINDOWLESS_APP@
 
 #cmakedefine01 TES_DISABLE_PAINTER_TESTS
-
-#endif  // TES_3EST_VIEWER_TEST_VIEWER_CONFIG_H

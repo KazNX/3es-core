@@ -2,8 +2,7 @@
 // author: Kazys Stepanas
 //
 //
-#ifndef TES_CORE_FEATURE_H
-#define TES_CORE_FEATURE_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -64,5 +63,3 @@ bool TES_CORE_API checkFeatureFlag(uint64_t feature_flag);
 /// @return True if all features in @p feature_flags are available.
 bool TES_CORE_API checkFeatures(uint64_t feature_flags);
 }  // namespace tes
-
-#endif  // TES_CORE_FEATURE_H

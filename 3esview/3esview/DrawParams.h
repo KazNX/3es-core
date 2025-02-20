@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_DRAW_PARAMS_H
-#define TES_VIEW_DRAW_PARAMS_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -41,5 +40,3 @@ struct TES_VIEWER_API DrawParams
   {}
 };
 }  // namespace tes::view
-
-#endif  // TES_VIEW_DRAW_PARAMS_H

@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_FRAME_STAMP_H
-#define TES_VIEW_FRAME_STAMP_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -28,5 +27,3 @@ struct TES_VIEWER_API FrameStamp
   RenderStamp render_mark = 0;
 };
 }  // namespace tes::view
-
-#endif  // TES_VIEW_FRAME_STAMP_H

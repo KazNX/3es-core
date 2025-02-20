@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_UTIL_RESOURCE_LIST_H
-#define TES_VIEW_UTIL_RESOURCE_LIST_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -650,5 +649,3 @@ void ResourceList<T>::clear()
   _item_count = 0;
 }
 }  // namespace tes::view::util
-
-#endif  // TES_VIEW_UTIL_RESOURCE_LIST_H

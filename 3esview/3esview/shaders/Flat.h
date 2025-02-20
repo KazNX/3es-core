@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SHADERS_FLAT_H
-#define TES_VIEW_SHADERS_FLAT_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -57,5 +56,3 @@ private:
 };
 
 }  // namespace tes::view::shaders
-
-#endif  // TES_VIEW_SHADERS_FLAT_H

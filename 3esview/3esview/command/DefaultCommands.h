@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_COMMAND_DEFAULT_COMMANDS_H
-#define TES_VIEW_COMMAND_DEFAULT_COMMANDS_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -19,5 +18,3 @@ class Set;
 /// @param commands The command set to register in.
 void TES_VIEWER_API registerDefaultCommands(Set &commands);
 }  // namespace tes::view::command
-
-#endif  // TES_VIEW_COMMAND_DEFAULT_COMMANDS_H

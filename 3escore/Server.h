@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SERVER_H
-#define TES_CORE_SERVER_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -127,5 +126,3 @@ public:
   [[nodiscard]] virtual std::shared_ptr<const Connection> connection(unsigned index) const = 0;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_SERVER_H

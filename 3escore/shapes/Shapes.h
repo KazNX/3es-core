@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_SHAPES_H
-#define TES_CORE_SHAPES_SHAPES_H
+#pragma once
 
 #include "Arrow.h"
 #include "Box.h"
@@ -19,5 +18,3 @@
 #include "Star.h"
 #include "Text2D.h"
 #include "Text3D.h"
-
-#endif  // TES_CORE_SHAPES_SHAPES_H

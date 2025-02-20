@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_RESOURCE_H
-#define TES_CORE_RESOURCE_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -125,5 +124,3 @@ public:
   virtual bool readTransfer(int message_type, PacketReader &packet) = 0;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_RESOURCE_H

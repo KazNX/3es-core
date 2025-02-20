@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_BOUNDS_CULLER_H
-#define TES_VIEW_BOUNDS_CULLER_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -183,5 +182,3 @@ inline bool BoundsCuller::isVisible(BoundsId id, unsigned render_mark) const
   return bounds.isValid() && bounds->visible_mark == render_mark;
 }
 }  // namespace tes::view
-
-#endif  // TES_VIEW_BOUNDS_CULLER_H

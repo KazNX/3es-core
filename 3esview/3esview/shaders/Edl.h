@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_SHADERS_EDL_H
-#define TES_VIEW_SHADERS_EDL_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -71,5 +70,3 @@ private:
   Magnum::Int _lightDirUniform = -1;
 };
 }  // namespace tes::shaders
-
-#endif  // TES_VIEW_SHADERS_EDL_H

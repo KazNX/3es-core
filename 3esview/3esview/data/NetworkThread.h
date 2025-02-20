@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_NETWORK_THREAD_H
-#define TES_VIEW_NETWORK_THREAD_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -214,5 +213,3 @@ private:
   ServerInfoMessage _server_info = {};
 };
 }  // namespace tes::view::data
-
-#endif  // TES_VIEW_NETWORK_THREAD_H

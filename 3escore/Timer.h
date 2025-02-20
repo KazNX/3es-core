@@ -1,6 +1,5 @@
 
-#ifndef TES_CORE_TIMER_H
-#define TES_CORE_TIMER_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -182,5 +181,3 @@ std::string TES_CORE_API timeValueString(unsigned s, unsigned ms = 0, unsigned u
 /// @overload
 std::string TES_CORE_API timeValueString(double seconds);
 }  // namespace tes
-
-#endif  // TES_CORE_TIMER_H

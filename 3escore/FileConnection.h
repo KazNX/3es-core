@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_FILE_CONNECTION_H
-#define TES_CORE_FILE_CONNECTION_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -54,5 +53,3 @@ private:
   unsigned _frame_count = 0;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_FILE_CONNECTION_H

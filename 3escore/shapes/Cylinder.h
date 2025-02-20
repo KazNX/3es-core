@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_CYLINDER_H
-#define TES_CORE_SHAPES_CYLINDER_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -170,5 +169,3 @@ inline Vector3d Cylinder::axis() const
   return rot * Directional::DefaultDirection;
 }
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_CYLINDER_H

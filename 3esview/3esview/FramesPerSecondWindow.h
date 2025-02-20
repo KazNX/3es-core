@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_FRAMES_PER_SECOND_WINDOW_H
-#define TES_VIEW_FRAMES_PER_SECOND_WINDOW_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -34,5 +33,3 @@ private:
 };
 
 }  // namespace tes::view
-
-#endif  // TES_VIEW_FRAMES_PER_SECOND_WINDOW_H

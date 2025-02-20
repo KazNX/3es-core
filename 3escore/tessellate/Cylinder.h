@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_TESSELATE_CYLINDER_H
-#define TES_CORE_TESSELATE_CYLINDER_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -52,5 +51,3 @@ void TES_CORE_API solid(std::vector<Vector3f> &vertices, std::vector<unsigned> &
 void TES_CORE_API wireframe(std::vector<Vector3f> &vertices, std::vector<unsigned> &indices,
                             const Vector3f &axis, float height, float radius, unsigned segments);
 }  // namespace tes::cylinder
-
-#endif  // TES_CORE_TESSELATE_CYLINDER_H

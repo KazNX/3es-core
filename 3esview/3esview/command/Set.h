@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_COMMAND_SET_H
-#define TES_VIEW_COMMAND_SET_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -63,5 +62,3 @@ private:
   Commands _commands;
 };
 }  // namespace tes::view::command
-
-#endif  // TES_VIEW_COMMAND_SET_H

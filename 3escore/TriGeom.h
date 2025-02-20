@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_TRI_GEOM_H
-#define TES_CORE_TRI_GEOM_H
+#pragma once
 
 #include "Vector4.h"
 
@@ -198,5 +197,3 @@ bool intersectRay(double *hit_time, const Vector3d &v0, const Vector3d &v1, cons
 }  // namespace tes::trigeom
 
 #include "TriGeom.inl"
-
-#endif  // TES_CORE_TRI_GEOM_H

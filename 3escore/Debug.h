@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_DEBUG_H
-#define TES_CORE_DEBUG_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -27,5 +26,3 @@ void TES_CORE_API debugBreak();
 /// @param msg The assertion message to display.
 void TES_CORE_API assertionFailure(const char *msg = "");
 }  // namespace tes
-
-#endif  // TES_CORE_DEBUG_H

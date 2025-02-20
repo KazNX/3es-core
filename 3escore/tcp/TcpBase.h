@@ -1,5 +1,4 @@
-#ifndef TES_CORE_TCP_TCP_BASE_H
-#define TES_CORE_TCP_TCP_BASE_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -45,5 +44,3 @@ int TES_CORE_API getReceiveBufferSize(int socket);
 
 bool TES_CORE_API setReceiveBufferSize(int socket, int buffer_size);
 }  // namespace tes::tcpbase
-
-#endif  // TES_CORE_TCP_TCP_BASE_H

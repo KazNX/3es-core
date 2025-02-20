@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PRIVATE_TCP_SERVER_H
-#define TES_CORE_PRIVATE_TCP_SERVER_H
+#pragma once
 
 #include <3escore/Server.h>
 
@@ -104,5 +103,3 @@ private:
   std::atomic_bool _active = false;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_PRIVATE_TCP_SERVER_H

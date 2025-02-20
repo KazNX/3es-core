@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_MESH_PLACEHOLDER_H
-#define TES_CORE_SHAPES_MESH_PLACEHOLDER_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -57,5 +56,3 @@ private:
   uint32_t _id;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_MESH_PLACEHOLDER_H

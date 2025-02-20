@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PACKET_STREAM_READER_H
-#define TES_CORE_PACKET_STREAM_READER_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -129,5 +128,3 @@ private:
   std::istream::pos_type _current_packet_pos = {};
 };
 }  // namespace tes
-
-#endif  // TES_CORE_PACKET_STREAM_READER_H

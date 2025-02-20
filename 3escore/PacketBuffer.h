@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PACKET_BUFFER_H
-#define TES_CORE_PACKET_BUFFER_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -82,5 +81,3 @@ private:
   bool _marker_found = false;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_PACKET_BUFFER_H

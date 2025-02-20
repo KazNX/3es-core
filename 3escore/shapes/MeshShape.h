@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_MESH_SHAPE_H
-#define TES_CORE_SHAPES_MESH_SHAPE_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -385,5 +384,3 @@ inline float MeshShape::drawScale() const
   return _draw_scale;
 }
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_MESH_SHAPE_H

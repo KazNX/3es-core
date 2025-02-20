@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_CONNECTION_MONITOR_H
-#define TES_CORE_CONNECTION_MONITOR_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -195,5 +194,3 @@ public:
   virtual void commitConnections() = 0;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_CONNECTION_MONITOR_H

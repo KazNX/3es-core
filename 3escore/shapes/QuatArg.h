@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_QUAT_ARG_H
-#define TES_CORE_SHAPES_QUAT_ARG_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -78,5 +77,3 @@ struct QuatArg
   Quaterniond q;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_QUAT_ARG_H

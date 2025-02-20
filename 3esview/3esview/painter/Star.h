@@ -1,6 +1,5 @@
 
-#ifndef TES_VIEW_PAINTER_STAR_H
-#define TES_VIEW_PAINTER_STAR_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -34,5 +33,3 @@ public:
 private:
 };
 }  // namespace tes::view::painter
-
-#endif  // TES_VIEW_PAINTER_STAR_H

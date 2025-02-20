@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_HEADER_STREAM_H
-#define TES_CORE_HEADER_STREAM_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -327,5 +326,3 @@ inline void swap(PacketStream<Header> &a, PacketStream<Header> &b) noexcept
 // clang-format on
 
 }  // namespace tes
-
-#endif  // TES_CORE_HEADER_STREAM_H

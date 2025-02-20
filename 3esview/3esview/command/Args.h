@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_COMMAND_COMMAND_ARGS_H
-#define TES_VIEW_COMMAND_COMMAND_ARGS_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -244,5 +243,3 @@ private:
   std::vector<std::any> _args;
 };
 }  // namespace tes::view::command
-
-#endif  // TES_VIEW_COMMAND_COMMAND_ARGS_H

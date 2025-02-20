@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PACKET_WRITER_H
-#define TES_CORE_PACKET_WRITER_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -251,5 +250,3 @@ inline uint8_t *PacketWriter::payloadWritePtr()
 // clang-format off
 // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
 // clang-format on
-
-#endif  // TES_CORE_PACKET_WRITER_H

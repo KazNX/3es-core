@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_CAMERA_FLY
-#define TES_VIEW_CAMERA_FLY
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -64,5 +63,3 @@ private:
   float _mouse_multiplier = 1.0f;
 };
 }  // namespace tes::view::camera
-
-#endif  // TES_VIEW_CAMERA_FLY

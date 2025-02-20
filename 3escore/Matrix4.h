@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_MATRIX4_H
-#define TES_CORE_MATRIX4_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -426,5 +425,3 @@ Vector4<T> operator*(const Matrix4<T> &a, const Vector4<T> &v);
 }  // namespace tes
 
 #include "Matrix4.inl"
-
-#endif  // TES_CORE_MATRIX4_H

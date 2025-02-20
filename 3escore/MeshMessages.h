@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_MESH_MESSAGES_H
-#define TES_CORE_MESH_MESSAGES_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -403,5 +402,3 @@ struct MeshFinaliseMessage
   }
 };
 }  // namespace tes
-
-#endif  // TES_CORE_MESH_MESSAGES_H

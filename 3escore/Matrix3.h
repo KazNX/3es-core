@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_MATRIX3_H
-#define TES_CORE_MATRIX3_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -335,5 +334,3 @@ template <typename T>
 }  // namespace tes
 
 #include "Matrix3.inl"
-
-#endif  // TES_CORE_MATRIX3_H

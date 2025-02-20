@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_QUATERNION_ARG_H
-#define TES_CORE_QUATERNION_ARG_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -56,5 +55,3 @@ struct QuaternionArg
   Quaternionf q;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_QUATERNION_ARG_H

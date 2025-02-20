@@ -1,5 +1,4 @@
-#ifndef TES_CORE_LOG_H
-#define TES_CORE_LOG_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -237,5 +236,3 @@ inline std::istream &operator>>(std::istream &in, tes::log::Level &level)
   return in;
 }
 }  // namespace tes::log
-
-#endif  // TES_CORE_LOG_H

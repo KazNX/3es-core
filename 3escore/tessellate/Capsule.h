@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_TESSELATE_CAPSULE_H
-#define TES_CORE_TESSELATE_CAPSULE_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -134,5 +133,3 @@ void TES_CORE_API wireframe(std::vector<Vector3f> &vertices, std::vector<unsigne
                             std::array<PartIndexOffset, 4> *part_isolated_index_offsets = nullptr,
                             bool local_end_caps = false);
 }  // namespace tes::capsule
-
-#endif  // TES_CORE_TESSELATE_CAPSULE_H

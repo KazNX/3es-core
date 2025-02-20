@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PACKET_READER_H
-#define TES_CORE_PACKET_READER_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -173,5 +172,3 @@ inline void swap(PacketReader &a, PacketReader &b) noexcept
   a.swap(b);
 }
 }  // namespace tes
-
-#endif  // TES_CORE_PACKET_READER_H

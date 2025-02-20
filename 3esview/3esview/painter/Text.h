@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_PAINTER_TEXT_H
-#define TES_VIEW_PAINTER_TEXT_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -275,5 +274,3 @@ void Text::draw3D(const Iter &begin, const Iter &end, const Resolver &resolver,
   endDraw3D();
 }
 }  // namespace tes::view::painter
-
-#endif  // TES_VIEW_PAINTER_TEXT_H

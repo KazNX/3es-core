@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_MESH_H
-#define TES_CORE_SHAPES_MESH_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -170,5 +169,3 @@ inline const Colour &MeshSet::partColour(const UIntArg &index) const
   return _parts[index.i].colour;
 }
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_MESH_H

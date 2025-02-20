@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_TCP_LISTEN_SOCKET_H
-#define TES_CORE_TCP_LISTEN_SOCKET_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -62,5 +61,3 @@ private:
 };
 
 }  // namespace tes
-
-#endif  // TES_CORE_TCP_LISTEN_SOCKET_H

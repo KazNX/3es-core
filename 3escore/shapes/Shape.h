@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_SHAPE_H
-#define TES_CORE_SHAPES_SHAPE_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -627,5 +626,3 @@ inline Shape &Shape::setRoutingId(uint16_t routing_id)
 #ifdef WIN32
 #pragma warning(pop)
 #endif  // WIN32
-
-#endif  // TES_CORE_SHAPES_SHAPE_H

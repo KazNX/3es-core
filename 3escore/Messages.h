@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_MESSAGES_H
-#define TES_CORE_MESSAGES_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -852,5 +851,3 @@ struct TES_CORE_API CameraMessage
 // NOLINTEND(modernize-use-auto, cppcoreguidelines-avoid-c-arrays, modernize-loop-convert,
 // google-readability-casting)
 }  // namespace tes
-
-#endif  // TES_CORE_MESSAGES_H

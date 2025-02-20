@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PRIVATE_TCP_CONNECTION_MONITOR_H
-#define TES_CORE_PRIVATE_TCP_CONNECTION_MONITOR_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -173,5 +172,3 @@ private:
   std::unique_ptr<std::thread> _thread;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_PRIVATE_TCP_CONNECTION_MONITOR_H

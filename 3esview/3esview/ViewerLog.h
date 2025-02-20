@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_VIEWER_LOG_H
-#define TES_VIEW_VIEWER_LOG_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -501,5 +500,3 @@ inline ViewerLog::View::const_iterator operator+(const ViewerLog::View::const_it
   return updated;
 }
 }  // namespace tes::view
-
-#endif  // TES_VIEW_VIEWER_LOG_H

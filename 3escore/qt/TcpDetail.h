@@ -2,8 +2,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_QT_TCP_DETAIL_H
-#define TES_CORE_QT_TCP_DETAIL_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -32,5 +31,3 @@ struct TcpListenSocketDetail
   QTcpServer listen_socket;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_QT_TCP_DETAIL_H

@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SETTINGS_COLOUR_H
-#define TES_VIEW_SETTINGS_COLOUR_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -50,5 +49,3 @@ private:
   std::string _tip;
 };
 }  // namespace tes::view::settings
-
-#endif  // TES_VIEW_SETTINGS_COLOUR_H

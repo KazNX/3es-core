@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SETTINGS_PRIVATE_YAML_H
-#define TES_VIEW_SETTINGS_PRIVATE_YAML_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -44,5 +43,3 @@ IOCode write(ryml::NodeRef &parent, const UInt &prop, std::ostream &log);
 IOCode write(ryml::NodeRef &parent, const Float &prop, std::ostream &log);
 IOCode write(ryml::NodeRef &parent, const Double &prop, std::ostream &log);
 }  // namespace tes::view::settings::priv
-
-#endif  // TES_VIEW_SETTINGS_PRIVATE_YAML_H

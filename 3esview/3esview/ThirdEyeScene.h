@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_THIRD_EYE_SCENE_H
-#define TES_VIEW_THIRD_EYE_SCENE_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -340,5 +339,3 @@ private:
   settings::Settings _settings;
 };
 }  // namespace tes::view
-
-#endif  // TES_VIEW_THIRD_EYE_SCENE_H

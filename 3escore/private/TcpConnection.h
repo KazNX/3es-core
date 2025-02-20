@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PRIVATE_TCP_CONNECTION_H
-#define TES_CORE_PRIVATE_TCP_CONNECTION_H
+#pragma once
 
 #include <3escore/Server.h>
 
@@ -47,5 +46,3 @@ private:
   std::shared_ptr<TcpSocket> _client;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_PRIVATE_TCP_CONNECTION_H

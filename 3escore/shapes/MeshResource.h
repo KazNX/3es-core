@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_MESH_RESOURCE_H
-#define TES_CORE_SHAPES_MESH_RESOURCE_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -178,5 +177,3 @@ protected:
                           const DataBuffer &stream);
 };
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_MESH_RESOURCE_H

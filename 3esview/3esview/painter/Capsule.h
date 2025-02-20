@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_PAINTER_CAPSULE_H
-#define TES_VIEW_PAINTER_CAPSULE_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -95,5 +94,3 @@ private:
   static const Vector3f kDefaultAxis;
 };
 }  // namespace tes::view::painter
-
-#endif  // TES_VIEW_PAINTER_CAPSULE_H

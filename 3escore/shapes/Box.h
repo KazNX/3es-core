@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_BOX_H
-#define TES_CORE_SHAPES_BOX_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -60,5 +59,3 @@ inline Box::Box(const Id &id, const Transform &transform)
   : Shape(SIdBox, id, transform)
 {}
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_BOX_H

@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_SHAPE_CACHE_H
-#define TES_VIEW_SHAPE_CACHE_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -514,5 +513,3 @@ inline void ShapeCache::const_iterator::next()
   }
 }
 }  // namespace tes::view::painter
-
-#endif  // TES_VIEW_SHAPE_CACHE_H

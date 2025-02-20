@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_HANDLER_CAMERA_H
-#define TES_VIEW_HANDLER_CAMERA_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -90,5 +89,3 @@ private:
   ServerInfoMessage _server_info = {};
 };
 }  // namespace tes::view::handler
-
-#endif  // TES_VIEW_HANDLER_CAMERA_H

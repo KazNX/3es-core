@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_MUTABLE_MESH_H
-#define TES_CORE_SHAPES_MUTABLE_MESH_H
+#pragma once
 
 #include "SimpleMesh.h"
 
@@ -86,5 +85,3 @@ private:
   std::unique_ptr<MutableMeshImp> _imp;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_MUTABLE_MESH_H

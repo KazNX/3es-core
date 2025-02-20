@@ -3,8 +3,7 @@
 //
 // Copyright (c) Kazys Stepanas 2014
 //
-#ifndef TES_CORE_COLOUR_H
-#define TES_CORE_COLOUR_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -819,5 +818,3 @@ inline void Colour::ConverterUInt32::operator()(uint32_t colour,
   storage[kAlphaIndex] = static_cast<uint8_t>((colour >> kAlphaShift) & 0xffu);
 }
 }  // namespace tes
-
-#endif  // TES_CORE_COLOUR_H

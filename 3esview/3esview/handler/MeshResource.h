@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_HANDLER_MESH_RESOURCE_H
-#define TES_VIEW_HANDLER_MESH_RESOURCE_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -191,5 +190,3 @@ inline MeshResource::ResourceReference MeshResource::get(uint32_t id) const
   return {};
 }
 }  // namespace tes::view::handler
-
-#endif  // TES_VIEW_HANDLER_MESH_RESOURCE_H

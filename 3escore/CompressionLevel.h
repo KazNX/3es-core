@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_COMPRESSION_LEVEL_H
-#define TES_CORE_COMPRESSION_LEVEL_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -22,5 +21,3 @@ enum class CompressionLevel : uint16_t
   Default = Medium
 };
 }  // namespace tes
-
-#endif  // TES_CORE_COMPRESSION_LEVEL_H

@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_TESSELATE_SPHERE_H
-#define TES_CORE_TESSELATE_SPHERE_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -94,5 +93,3 @@ void TES_CORE_API wireframe(std::vector<Vector3f> &vertices, std::vector<unsigne
                             float radius = 1.0f, const Vector3f &origin = Vector3f(0.0f),
                             unsigned ring_vertex_count = 32u);
 }  // namespace tes::sphere
-
-#endif  // TES_CORE_TESSELATE_SPHERE_H

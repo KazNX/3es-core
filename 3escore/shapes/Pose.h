@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_POSE_H
-#define TES_CORE_SHAPES_POSE_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -52,5 +51,3 @@ inline Pose::Pose(const Id &id, const Transform &transform)
   : Shape(SIdPose, id, transform)
 {}
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_POSE_H

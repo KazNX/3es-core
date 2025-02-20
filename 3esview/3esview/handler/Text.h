@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_HANDLER_TEXT_H
-#define TES_VIEW_HANDLER_TEXT_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -352,5 +351,3 @@ bool Text<TextShape, Affordances>::destroy(uint32_t shape_id)
   return true;
 }
 }  // namespace tes::view::handler
-
-#endif  // TES_VIEW_HANDLER_TEXT_H

@@ -2,8 +2,7 @@
 // Author: Kazys Stepanas
 //
 
-#ifndef TES_VIEW_DATA_KEYFRAME_STORE_H
-#define TES_VIEW_DATA_KEYFRAME_STORE_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -89,5 +88,3 @@ private:
   Keyframes _keyframes;
 };
 }  // namespace tes::view::data
-
-#endif  // TES_VIEW_DATA_KEYFRAME_STORE_H

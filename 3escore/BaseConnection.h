@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_BASE_CONNECTION_H
-#define TES_CORE_BASE_CONNECTION_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -168,5 +167,3 @@ protected:
   // NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes)
 };
 }  // namespace tes
-
-#endif  // TES_CORE_BASE_CONNECTION_H

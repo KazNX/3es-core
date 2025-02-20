@@ -1,6 +1,5 @@
 
-#ifndef TES_VIEW_HANDLER_SHAPE_H
-#define TES_VIEW_HANDLER_SHAPE_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -73,5 +72,3 @@ private:
   MultiShapeInfo _last_transient_multi_shape;
 };
 }  // namespace tes::view::handler
-
-#endif  // TES_VIEW_HANDLER_SHAPE_H

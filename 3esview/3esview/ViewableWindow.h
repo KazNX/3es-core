@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_VIEWABLE_WINDOW_H
-#define TES_VIEW_VIEWABLE_WINDOW_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -124,5 +123,3 @@ inline bool operator>=(const ViewableWindow &window, FrameNumber frame)
 }
 
 }  // namespace tes::view
-
-#endif  // TES_VIEW_VIEWABLE_WINDOW_H

@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SHADERS_VERTEX_COLOUR_H
-#define TES_VIEW_SHADERS_VERTEX_COLOUR_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -49,5 +48,3 @@ private:
 };
 
 }  // namespace tes::view::shaders
-
-#endif  // TES_VIEW_SHADERS_VERTEX_COLOUR_H

@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_CAPSULE_H
-#define TES_CORE_SHAPES_CAPSULE_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -160,5 +159,3 @@ inline Vector3d Capsule::axis() const
   return rot * Directional::DefaultDirection;
 }
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_CAPSULE_H

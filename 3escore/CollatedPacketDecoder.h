@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_COLLATED_PACKET_DECODER_H
-#define TES_CORE_COLLATED_PACKET_DECODER_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -114,5 +113,3 @@ private:
   std::unique_ptr<CollatedPacketDecoderDetail> _detail;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_COLLATED_PACKET_DECODER_H

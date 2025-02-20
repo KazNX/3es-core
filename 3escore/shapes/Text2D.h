@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_TEXT2D_H
-#define TES_CORE_SHAPES_TEXT2D_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -89,5 +88,3 @@ inline Text2D &Text2D::setInWorldSpace(bool world_space)
   return *this;
 }
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_TEXT2D_H

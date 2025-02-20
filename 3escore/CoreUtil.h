@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_CORE_UTIL_H
-#define TES_CORE_CORE_UTIL_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -149,5 +148,3 @@ Int int_cast(SrcInt value)  // NOLINT(readability-identifier-naming)
 #endif  // __GNU__
 
 }  // namespace tes
-
-#endif  // TES_CORE_CORE_UTIL_H

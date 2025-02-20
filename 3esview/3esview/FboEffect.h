@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_FBO_EFFECT_H
-#define TES_VIEW_FBO_EFFECT_H
+#pragma once
 
 #include "3esview/ViewConfig.h"
 
@@ -45,5 +44,3 @@ public:
   virtual void viewportChange(const Magnum::Range2Di &viewport) = 0;
 };
 }  // namespace tes::view
-
-#endif  // TES_VIEW_FBO_EFFECT_H

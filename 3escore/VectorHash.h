@@ -26,8 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef TES_CORE_VECTOR_HASH_H
-#define TES_CORE_VECTOR_HASH_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -159,5 +158,3 @@ public:
 };
 // NOLINTEND(readability-identifier-length,cppcoreguidelines-avoid-magic-numbers, google-readability-casting)
 }  // namespace tes
-
-#endif  // TES_CORE_VECTOR_HASH_H

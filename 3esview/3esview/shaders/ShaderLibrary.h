@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SHADERS_SHADER_LIBRARY_H
-#define TES_VIEW_SHADERS_SHADER_LIBRARY_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -120,5 +119,3 @@ private:
   std::vector<std::shared_ptr<Shader>> _core_shaders;
 };
 }  // namespace tes::view::shaders
-
-#endif  // TES_VIEW_SHADERS_SHADER_LIBRARY_H

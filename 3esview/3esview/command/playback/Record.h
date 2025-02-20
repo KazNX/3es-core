@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_COMMAND_PLAYBACK_RECORD_H
-#define TES_VIEW_COMMAND_PLAYBACK_RECORD_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -28,5 +27,3 @@ protected:
   std::string fromDialog();
 };
 }  // namespace tes::view::command::playback
-
-#endif  // TES_VIEW_COMMAND_PLAYBACK_RECORD_H

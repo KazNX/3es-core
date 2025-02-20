@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SETTINGS_PLAYBACK_H
-#define TES_VIEW_SETTINGS_PLAYBACK_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -48,5 +47,3 @@ struct Playback
 };
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }  // namespace tes::view::settings
-
-#endif  // TES_VIEW_SETTINGS_PLAYBACK_H

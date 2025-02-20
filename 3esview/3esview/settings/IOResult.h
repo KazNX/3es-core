@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SETTINGS_IO_RESULT_H
-#define TES_VIEW_SETTINGS_IO_RESULT_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -30,5 +29,3 @@ struct IOResult
   std::string message;
 };
 }  // namespace tes::view::settings
-
-#endif  // TES_VIEW_SETTINGS_IO_RESULT_H

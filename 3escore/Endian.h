@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_ENDIAN_H
-#define TES_CORE_ENDIAN_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -387,5 +386,3 @@ inline int8_t networkEndianSwapValue(const int8_t &data)
 }  // namespace tes
 
 // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-
-#endif  // TES_CORE_ENDIAN_H

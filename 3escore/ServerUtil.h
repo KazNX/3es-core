@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SERVER_UTIL_H
-#define TES_CORE_SERVER_UTIL_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -45,5 +44,3 @@ int sendMessage(Connection &connection, uint16_t routing_id, uint16_t message_id
   return -1;
 }
 }  // namespace tes
-
-#endif  // TES_CORE_SERVER_UTIL_H

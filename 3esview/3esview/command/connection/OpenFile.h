@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_COMMAND_CONNECTION_OPEN_FILE_H
-#define TES_VIEW_COMMAND_CONNECTION_OPEN_FILE_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -20,5 +19,3 @@ protected:
   std::string fromDialog();
 };
 }  // namespace tes::view::command::connection
-
-#endif  // TES_VIEW_COMMAND_CONNECTION_OPEN_FILE_H

@@ -3,8 +3,7 @@
 // ABN 41 687 119 230
 //
 // Author: Kazys Stepanas
-#ifndef TES_CORE_MATHS_MANIP_H
-#define TES_CORE_MATHS_MANIP_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -67,5 +66,3 @@ std::ostream TES_CORE_API &tesV4WMode(std::ostream &stream, tes::WMode mode);
 /// @param mode The mode to set. See @c tes::WMode
 /// @return @c stream
 std::ostream TES_CORE_API &tesQuatWMode(std::ostream &stream, tes::WMode mode);
-
-#endif  // TES_CORE_MATHS_4MANIP_H

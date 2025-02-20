@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_VIEW_SETTINGS_SETTINGS_H
-#define TES_VIEW_SETTINGS_SETTINGS_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -82,5 +81,3 @@ private:
   std::array<std::vector<NotifyCallback>, static_cast<unsigned>(Category::Count)> _sub_observers;
 };
 }  // namespace tes::view::settings
-
-#endif  // TES_VIEW_SETTINGS_SETTINGS_H

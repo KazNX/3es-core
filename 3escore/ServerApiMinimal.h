@@ -5,8 +5,7 @@
 // author Kazys Stepanas
 //
 // Copyright (c) Kazys Stepanas 2023
-#ifndef TES_CORE_SERVER_API_MINIMAL_H
-#define TES_CORE_SERVER_API_MINIMAL_H
+#pragma once
 
 #include <memory>
 
@@ -39,5 +38,3 @@ struct ServerSettings;
 using ServerPtr = std::shared_ptr<Server>;
 using ResourcePtr = std::shared_ptr<const Resource>;
 }  // namespace tes
-
-#endif  // TES_CORE_SERVER_API_MINIMAL_H

@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_COORDINATE_FRAME_H
-#define TES_CORE_COORDINATE_FRAME_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -42,5 +41,3 @@ enum class CoordinateFrame : uint8_t
   Left = XYZNeg
 };
 }  // namespace tes
-
-#endif  // TES_CORE_COORDINATE_FRAME_H

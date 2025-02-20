@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_SHAPES_POINTCLOUD_H
-#define TES_CORE_SHAPES_POINTCLOUD_H
+#pragma once
 
 #include <3escore/CoreConfig.h>
 
@@ -280,5 +279,3 @@ inline void PointCloud::setPoint(const UIntArg &index, const Vector3f &point,
   setPoints(index, &point, &normals, &colours, 1);
 }
 }  // namespace tes
-
-#endif  // TES_CORE_SHAPES_POINTCLOUD_H

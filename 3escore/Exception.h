@@ -1,8 +1,7 @@
 //
 // Author: Kazys Stepanas
 //
-#ifndef TES_CORE_EXCEPTION_H
-#define TES_CORE_EXCEPTION_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -60,5 +59,3 @@ private:
   std::string _message;
 };
 }  // namespace tes
-
-#endif  // TES_CORE_EXCEPTION_H

@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_COLLATED_PACKET_H
-#define TES_CORE_COLLATED_PACKET_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -296,5 +295,3 @@ inline unsigned CollatedPacket::availableBytes() const
   return (_max_packet_size >= used) ? _max_packet_size - used : 0;
 }
 }  // namespace tes
-
-#endif  // TES_CORE_COLLATED_PACKET_H

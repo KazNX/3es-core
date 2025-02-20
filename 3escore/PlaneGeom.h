@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_PLANE_GEOM_H
-#define TES_CORE_PLANE_GEOM_H
+#pragma once
 
 #include "Vector4.h"
 
@@ -89,5 +88,3 @@ template <typename T>
   return PlaneClassification::On;
 }
 }  // namespace tes::planegeom
-
-#endif  // TES_CORE_PLANE_GEOM_H

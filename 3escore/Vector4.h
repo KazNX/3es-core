@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_VECTOR4_H
-#define TES_CORE_VECTOR4_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -580,5 +579,3 @@ const Vector4<T> Vector4<T>::AxisZ(0, 0, 1, 0);
 template <typename T>
 const Vector4<T> Vector4<T>::AxisW(0, 0, 0, 1);
 }  // namespace tes
-
-#endif  // TES_CORE_VECTOR4_H

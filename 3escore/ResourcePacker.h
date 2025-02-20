@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_RESOURCE_PACKER_H
-#define TES_CORE_RESOURCE_PACKER_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -89,5 +88,3 @@ private:
   bool _started = false;                        ///< Has the current resource been started?
 };
 }  // namespace tes
-
-#endif  // TES_CORE_RESOURCE_PACKER_H

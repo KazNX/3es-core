@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_COMMAND_RENDER_EDL_H
-#define TES_VIEW_COMMAND_RENDER_EDL_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -20,5 +19,3 @@ protected:
   CommandResult invoke(Viewer &viewer, const ExecInfo &info, const Args &args) override;
 };
 }  // namespace tes::view::command::render
-
-#endif  // TES_VIEW_COMMAND_RENDER_EDL_H

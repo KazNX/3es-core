@@ -2,8 +2,7 @@
 // Author: Kazys Stepanas
 //
 
-#ifndef TES_CORE_PTR
-#define TES_CORE_PTR
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -373,5 +372,3 @@ inline typename Ptr<T>::Status Ptr<T>::status() const
 }
 
 }  // namespace tes
-
-#endif  // TES_CORE_PTR

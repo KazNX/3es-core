@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_COMMAND_PLAYBACK_SKIP_BACKWARD_H
-#define TES_VIEW_COMMAND_PLAYBACK_SKIP_BACKWARD_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -17,5 +16,3 @@ protected:
   CommandResult invoke(Viewer &viewer, const ExecInfo &info, const Args &args) override;
 };
 }  // namespace tes::view::command::playback
-
-#endif  // TES_VIEW_COMMAND_PLAYBACK_SKIP_BACKWARD_H

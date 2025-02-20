@@ -1,5 +1,4 @@
-#ifndef TES_VIEW_MESH_CONVERTER_H
-#define TES_VIEW_MESH_CONVERTER_H
+#pragma once
 
 #include <3esview/ViewConfig.h>
 
@@ -36,5 +35,3 @@ inline Magnum::GL::Mesh convert(const tes::MeshResource &mesh_resource,
   return convert(mesh_resource, bounds, options);
 }
 }  // namespace tes::view::mesh
-
-#endif  // TES_VIEW_MESH_CONVERTER_H

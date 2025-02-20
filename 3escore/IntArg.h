@@ -1,8 +1,7 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_INT_ARG_H
-#define TES_CORE_INT_ARG_H
+#pragma once
 
 #include "CoreConfig.h"
 
@@ -144,5 +143,3 @@ TES_INTARG_OPERATORS_SELF(tes::SizeTArg);
 #endif  // __GNUC__
 
 #endif  // DOXYGEN_SHOULD_SKIP_THIS
-
-#endif  // TES_CORE_INT_ARG_H
