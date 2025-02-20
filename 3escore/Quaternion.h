@@ -292,8 +292,8 @@ using Quaterniond = Quaternion<double>;
 // FIXME(KS): the extern template declarations broke with link errors when adding `constexpr`
 // functions. Why?
 #ifdef _MSC_VER
-TES_EXTERN template class TES_CORE_API Quaternion<float>;
-TES_EXTERN template class TES_CORE_API Quaternion<double>;
+TES_CORE_EXTERN template class TES_CORE_API Quaternion<float>;
+TES_CORE_EXTERN template class TES_CORE_API Quaternion<double>;
 #endif  // _MSC_VER
 }  // namespace tes
 

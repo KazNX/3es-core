@@ -310,8 +310,8 @@ private:
 // FIXME(KS): the extern template declarations broke with link errors when adding `constexpr`
 // functions. Why?
 #ifdef _MSC_VER
-TES_EXTERN template class TES_CORE_API Vector3<float>;
-TES_EXTERN template class TES_CORE_API Vector3<double>;
+TES_CORE_EXTERN template class TES_CORE_API Vector3<float>;
+TES_CORE_EXTERN template class TES_CORE_API Vector3<double>;
 #endif  // _MSC_VER
 
 

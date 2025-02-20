@@ -113,8 +113,8 @@ private:
 // FIXME(KS): the extern template declarations broke with link errors when adding `constexpr`
 // functions. Why?
 #ifdef _MSC_VER
-TES_EXTERN template class TES_CORE_API Bounds<float>;
-TES_EXTERN template class TES_CORE_API Bounds<double>;
+TES_CORE_EXTERN template class TES_CORE_API Bounds<float>;
+TES_CORE_EXTERN template class TES_CORE_API Bounds<double>;
 #endif  // _MSC_VER
 
 /// Single precision bounds.

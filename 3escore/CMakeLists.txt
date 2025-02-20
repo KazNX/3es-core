@@ -32,9 +32,22 @@ include(cmake/3es-version.cmake)
 #-------------------------------------------------------------------------------
 # 3escore configuration options.
 #-------------------------------------------------------------------------------
+set(TES_CORE_BUILD_SHARED_INIT Off)
+if(VCPKG_MANIFEST_MODE AND LINUX)
+  # VCPKG defaults to building dependencies as static libraries on linux and shared on Windows.
+  # This creates an issue on linux if we want to package 3escore as we now depend on a static
+  # library which does not exist on the installed system. We can avoid this by building 3escore
+  # as a shared library, as all it's non-header vcpkg dependencies are private. Might pose some
+  # issues for libglm headers, but it's likely ABI stable at this point.
+  # Trying to build the viewer shared lead to seg faults, likely something to do with the Magnum
+  # plugin system. That's fine for now as it doesn't yet make sense to dev on the viewer.
+  set(TES_CORE_BUILD_SHARED_INIT On)
+endif(VCPKG_MANIFEST_MODE AND LINUX)
+
 option(TES_ASSERT_ENABLE_DEBUG "Enable assertions in debug builds." ON)
 option(TES_ASSERT_ENABLE_RELEASE "Enable assertions in release builds." ON)
 option(TES_BUILD_DOXYGEN "Build doxgen documentation?" OFF)
+option(TES_CORE_BUILD_SHARED "Force 3escore to build as shared library? Otherwise controlled by BUILD_SHARED_LIBS." ${TES_CORE_BUILD_SHARED_INIT})
 
 option(TES_ZLIB_OFF "Disable ZLIB usage even if found? Intended for testing." OFF)
 set(TES_SOCKETS "custom" CACHE STRING "Select the TCP socket implementation. The 'custom' implementation is based on Berkley sockets or Winsock2.")
@@ -97,7 +110,19 @@ include(sourcelist.cmake)
 # Library setup.
 #-------------------------------------------------------------------------------
 # Define the 3escore library.
-add_library(3escore ${PUBLIC_HEADERS} ${PUBLIC_SHAPE_HEADERS} ${PUBLIC_TESSELLATE_HEADERS} ${SOURCES} ${PRIVATE_HEADERS} ${PRIVATE_SOURCES})
+set(TES_CORE_LIB_TYPE)
+if(TES_CORE_BUILD_SHARED)
+  set(TES_CORE_LIB_TYPE SHARED)
+endif(TES_CORE_BUILD_SHARED)
+add_library(3escore ${TES_CORE_LIB_TYPE}
+  ${PUBLIC_HEADERS}
+  ${PUBLIC_SHAPE_HEADERS}
+  ${PUBLIC_TESSELLATE_HEADERS}
+  ${SOURCES}
+  ${PRIVATE_HEADERS}
+  ${PRIVATE_SOURCES}
+)
+
 tes_configure_target(3escore
   INCLUDE_PREFIX include/3escore
   PUBLIC_HEADERS
@@ -108,14 +133,12 @@ tes_configure_target(3escore
   HEADER_COMPONENT Devel
 )
 
-# Define DLL export header (primarily for MSVC).
 include(GenerateExportHeader)
 generate_export_header(3escore
       EXPORT_MACRO_NAME TES_CORE_API
       NO_EXPORT_MACRO_NAME TES_CORE_HIDDEN
       DEPRECATED_MACRO_NAME TES_CORE_DEPRECATED
       EXPORT_FILE_NAME 3escore/CoreExport.h
-      STATIC_DEFINE TES_STATIC
       )
 
 # set_target_properties(3escore PROPERTIES FOLDER core)

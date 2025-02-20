@@ -364,7 +364,7 @@ std::pair<bool, FrameNumber> ThirdEyeScene::saveSnapshot(tes::Connection &connec
     return { false, 0 };
   }
 
-  const Finally finally([this]() { _snapshot_wait.clear(); });
+  const auto at_exit = finally([this]() { _snapshot_wait.clear(); });
   _snapshot_wait.connection = &connection;
 
   // Block until signalled on the wait condition.

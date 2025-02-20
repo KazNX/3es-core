@@ -27,12 +27,6 @@ if(TES_BUILD_VIEWER)
   list(APPEND VCPKG_MANIFEST_FEATURES "viewer")
 endif(TES_BUILD_VIEWER)
 
-# Force building shared libraries on Linux when using vcpkg. This ensures we don't have to chain
-# static library dependencies to downstream installation.
-if(LINUX AND VCPKG_TOOLCHAIN)
-  set(BUILD_SHARED_LIBS ON)
-endif(LINUX AND VCPKG_TOOLCHAIN)
-
 include(3escore/cmake/3es-version.cmake)
 include(3esTarget)
 include(3esUtil)

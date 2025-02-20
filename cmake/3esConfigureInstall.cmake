@@ -39,7 +39,6 @@ foreach(COMPONENT ${INSTALL_COMPONENTS})
   # Resolve target names.
   unset(FIXUP_APPS)
   foreach(TARGET ${FIXUP_TARGETS_${COMPONENT}})
-    message("Checking ${COMPONENT} - ${TARGET}")
     if(NOT TARGET ${TARGET})
       continue()
     endif()

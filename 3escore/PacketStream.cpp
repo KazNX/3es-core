@@ -5,6 +5,6 @@
 
 namespace tes
 {
-template class TES_CORE_API PacketStream<PacketHeader>;
-template class TES_CORE_API PacketStream<const PacketHeader>;
+template class PacketStream<PacketHeader>;
+template class PacketStream<const PacketHeader>;
 }  // namespace tes

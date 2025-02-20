@@ -34,6 +34,12 @@ function(tes_configure_target_flags TARGET)
     # The warning syntax is /wd?3\d\d\d\d which means at warning level 3 enable (or disable with /wd)
     # warning number xxxx
     $<$<CXX_COMPILER_ID:MSVC>:/w34100> # Unused arguments.
+    # Disable MSVC warning triggered by exported classes as a whole and having members that are not
+    # dllexport. The actual fix would be to mark every public and private method and function with
+    # dllexport, but that's too much of a retrofit.
+    # https://learn.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-1-c4251?view=msvc-170
+    # Also disable the warning for deriving non-exported classes - for std::exception etc.
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4251 /wd4275>
     # Enable PDB files (debug symbols) for release builds.
     $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/Zi>
   )
@@ -158,7 +164,7 @@ function(tes_target_install TARGET)
   get_target_property(_target_type ${TARGET} TYPE)
   if(MSVC)
     # Install PDB files (MSVC) in part to avoid unsupressable linker warnings.
-    if(_target_type STREQUAL "EXECUTABLE" OR _target_type STREQUAL "MODULE" OR _target_type STREQUAL "SHARED")
+    if(_target_type STREQUAL "EXECUTABLE" OR _target_type STREQUAL "MODULE_LIBRARY" OR _target_type STREQUAL "SHARED_LIBRARY")
       install(FILES $<TARGET_PDB_FILE:${TARGET}> DESTINATION bin OPTIONAL ${COMPONENT_STR})
     endif()
   endif(MSVC)

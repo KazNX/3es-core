@@ -50,7 +50,7 @@ public:
   ///
   /// FIXME(KS): allow a @c View to have a @c log::Level restriction. Iteration is easy, but the
   /// @c size() must report the correct number of filtered items.
-  class View
+  class TES_VIEWER_API View
   {
   public:
     /// Iterator of a @c ViewerLog::View .

@@ -7,6 +7,16 @@
 
 #include "CoreExport.h"
 
+#if !defined(_3ESCORE_STATIC_DEFINE) && defined WIN32
+#ifdef _3escore_EXPORTS
+#define TES_CORE_EXTERN
+#else // _3escore_EXPORTS
+#define TES_CORE_EXTERN extern
+#endif // _3escore_EXPORTS
+#else  // !defined(_3ESCORE_STATIC_DEFINE) && defined WIN32
+#define TES_CORE_EXTERN extern
+#endif // !defined(_3ESCORE_STATIC_DEFINE) && defined WIN32
+
 // Version setup.
 /// Major version number.
 #define TES_VERSION_MAJOR @TES_VERSION_MAJOR@  // NOLINT(modernize-macro-to-enum)

@@ -226,7 +226,7 @@ public:
 /// @tparam T The primitive data type matching one of the non-packed types corresponding to
 /// @c DataStreamType.
 template <typename T>
-class TES_CORE_API DataBufferAffordancesT : public DataBufferAffordances
+class DataBufferAffordancesT : public DataBufferAffordances
 {
 public:
   /// Get the singleton implementation for this affordances type.
@@ -327,52 +327,16 @@ public:
                         unsigned component_count, void **stream_ptr) const;
 };
 
-// template <>
-// class DataBufferAffordancesT<Colour> : public DataBufferAffordances
-// {
-//   static DataBufferAffordances *instance()
-//   {
-//     static_assert(
-//       false, "Unsupported DataBuffer API function for Colour. Use const Colour * and
-//       duplicate().");
-//     return nullptr;
-//   }
-// };
-
-// template <>
-// class DataBufferAffordancesT<Vector3f> : public DataBufferAffordances
-// {
-//   static DataBufferAffordances *instance()
-//   {
-//     static_assert(
-//       false,
-//       "Unsupported DataBuffer API function for Vector3f. Use const Vector3f * and duplicate().");
-//     return nullptr;
-//   }
-// };
-
-// template <>
-// class DataBufferAffordancesT<Vector3d> : public DataBufferAffordances
-// {
-//   static DataBufferAffordances *instance()
-//   {
-//     static_assert(
-//       false,
-//       "Unsupported DataBuffer API function for Vector3d. Use const Vector3d * and duplicate().");
-//     return nullptr;
-//   }
-// };
-
-extern template class TES_CORE_API DataBufferAffordancesT<int8_t>;
-extern template class TES_CORE_API DataBufferAffordancesT<uint8_t>;
-extern template class TES_CORE_API DataBufferAffordancesT<int16_t>;
-extern template class TES_CORE_API DataBufferAffordancesT<uint16_t>;
-extern template class TES_CORE_API DataBufferAffordancesT<int32_t>;
-extern template class TES_CORE_API DataBufferAffordancesT<uint32_t>;
-extern template class TES_CORE_API DataBufferAffordancesT<int64_t>;
-extern template class TES_CORE_API DataBufferAffordancesT<uint64_t>;
-extern template class TES_CORE_API DataBufferAffordancesT<float>;
-extern template class TES_CORE_API DataBufferAffordancesT<double>;
+TES_CORE_EXTERN template class TES_CORE_API DataBufferAffordancesT<int8_t>;
+TES_CORE_EXTERN template class TES_CORE_API DataBufferAffordancesT<uint8_t>;
+TES_CORE_EXTERN template class TES_CORE_API DataBufferAffordancesT<int16_t>;
+TES_CORE_EXTERN template class TES_CORE_API DataBufferAffordancesT<uint16_t>;
+TES_CORE_EXTERN template class TES_CORE_API DataBufferAffordancesT<int32_t>;
+TES_CORE_EXTERN template class TES_CORE_API DataBufferAffordancesT<uint32_t>;
+TES_CORE_EXTERN template class TES_CORE_API DataBufferAffordancesT<int64_t>;
+TES_CORE_EXTERN template class TES_CORE_API DataBufferAffordancesT<uint64_t>;
+TES_CORE_EXTERN template class TES_CORE_API DataBufferAffordancesT<float>;
+TES_CORE_EXTERN template class TES_CORE_API DataBufferAffordancesT<double>;
 }  // namespace detail
 
 /// A helper class for wrapping various input array types into data streams for data transfer.

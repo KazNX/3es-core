@@ -193,7 +193,7 @@ void UIViewer::viewportEvent(ViewportEvent &event)
 {
   // Flag we are in a viewport event so that settings handle won't resize the window.
   _in_viewport_event = true;
-  const Finally finally([this]() { _in_viewport_event = false; });
+  const auto at_exit = finally([this]() { _in_viewport_event = false; });
 
   Viewer::viewportEvent(event);
   relayoutUi();
@@ -445,7 +445,7 @@ void UIViewer::textInputEvent(TextInputEvent &event)
 void UIViewer::updateWindowSize(const settings::Settings::Config &config,
                                 const UICommandLineOptions *command_line_options)
 {
-  const Finally finally([this]() { _in_settings_notify = false; });
+  const auto at_exit = finally([this]() { _in_settings_notify = false; });
   _in_settings_notify = true;
 
   for (auto iter = config.extentions.begin(); iter != config.extentions.end(); ++iter)

@@ -1,8 +1,9 @@
 //
 // author: Kazys Stepanas
 //
-#ifndef TES_CORE_MATHS_H
-#define TES_CORE_MATHS_H
+#pragma once
+
+#include "CoreConfig.h"
 
 #ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
@@ -109,9 +110,9 @@ inline T sqr(const T &value)
 /// Uses a lookup table for each byte.
 /// @param value The integer value to count bits in.
 /// @return The number of bits set.
-int countBits(int8_t value);
+TES_CORE_API int countBits(int8_t value);
 /// @copydoc countBits(int8_t)
-int countBits(uint8_t value);
+TES_CORE_API int countBits(uint8_t value);
 
 /// @copydoc countBits(int8_t)
 inline int countBits(int16_t value)
@@ -171,5 +172,3 @@ inline int countBits(uint64_t value)
          countBits(static_cast<uint8_t>((value >> 56u) & 0xFF));
 }
 }  // namespace tes
-
-#endif  // TES_CORE_MATHS_H
