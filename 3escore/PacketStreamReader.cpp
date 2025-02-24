@@ -81,6 +81,7 @@ PacketStreamReader::ExtractedPacket PacketStreamReader::extractPacket()
         std::copy(_buffer.begin() + static_cast<ssize_t>(i), _buffer.end(), _buffer.begin());
         _buffer.resize(_buffer.size() - i);
         status = Status::Dropped;
+        _current_packet_pos += i;
       }
 
       if (_buffer.size() < sizeof(PacketHeader))
@@ -131,6 +132,7 @@ void PacketStreamReader::seek(std::istream::pos_type position)
   {
     _stream->clear();
     _stream->seekg(position);
+    _current_packet_pos = position;
   }
 }
 

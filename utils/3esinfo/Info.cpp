@@ -55,6 +55,62 @@ struct hash<PacketKey>
 };
 }  // namespace std
 
+namespace
+{
+enum class InfoMode
+{
+  Message,
+  Packet
+};
+
+const std::array kInfoModeStrings = {
+  std::string_view{ "message" },
+  std::string_view{ "packet" },
+};
+
+std::string_view toString(const InfoMode mode)
+{
+  const auto idx = static_cast<uint32_t>(mode);
+  if (idx < kInfoModeStrings.size())
+  {
+    return kInfoModeStrings[idx];
+  }
+  return "<unknown>";
+}
+
+bool parse(InfoMode &mode, std::string name)
+{
+  std::transform(name.begin(), name.end(), name.begin(),
+                 [](const char ch) { return ::tolower(ch); });
+  for (size_t i = 0; i < kInfoModeStrings.size(); ++i)
+  {
+    if (name == kInfoModeStrings[i])
+    {
+      mode = static_cast<InfoMode>(i);
+      return true;
+    }
+  }
+  return false;
+}
+
+std::ostream &operator<<(std::ostream &o, const InfoMode mode)
+{
+  o << toString(mode);
+  return o;
+}
+
+std::istream &operator>>(std::istream &in, InfoMode &mode)
+{
+  std::string name{};
+  in >> name;
+  if (!parse(mode, name))
+  {
+    in.setstate(std::ios::failbit);
+  }
+
+  return in;
+}
+
 
 struct PacketInfo
 {
@@ -101,8 +157,10 @@ enum class ParseResult
 
 struct Options
 {
-  std::string filename;
-  std::optional<tes::ByteUnit> display_unit;
+  std::string filename{};
+  std::optional<tes::ByteUnit> display_unit{};
+  InfoMode mode = InfoMode::Message;
+  size_t offset = 0;
 };
 
 bool validate(Options &opt)
@@ -127,7 +185,9 @@ ParseResult parseArgs(int argc, char *argv[], Options &opt)
     ("help", "Show command line help.")
     ("file", "Data file to open (.3es)", cxxopts::value(opt.filename))
     ("du", "Size display unit: B, KiB, MiB, ...", cxxopts::value(display_unit))
-    ;
+    ("m,mode", "Information display mode. message for message information, packet for packet information.", cxxopts::value(opt.mode)->default_value(std::string{toString(opt.mode)}))
+    ("offset", "Offset starting position.", cxxopts::value(opt.offset)->default_value(std::to_string(opt.offset)))
+  ;
   // clang-format on
 
   parser.parse_positional({ "file" });
@@ -388,7 +448,7 @@ tes::ByteValue byteValue(uint64_t bytes, const Options &opt)
 }
 
 
-void displayInfo(const InfoMap &info, const Options &opt)
+void displayMessageInfo(const InfoMap &info, const Options &opt)
 {
   const Working working = { buildRoutingNames(), buildMessageNames() };
 
@@ -411,6 +471,21 @@ void displayInfo(const InfoMap &info, const Options &opt)
   std::cout.flush();
 }
 
+void displayInfo(const InfoMap &info, const Options &opt)
+{
+  switch (opt.mode)
+  {
+  case InfoMode::Message:
+    displayMessageInfo(info, opt);
+    break;
+  case InfoMode::Packet:
+    break;
+  default:
+    std::cerr << "Unhandled info mode " << opt.mode << std::flush;
+    break;
+  }
+}
+}  // namespace
 
 int main(int argc, char *argv[])
 {
@@ -441,6 +516,11 @@ int main(int argc, char *argv[])
   tes::CollatedPacketDecoder packet_decoder;
   InfoMap info = {};
 
+  if (opt.offset)
+  {
+    reader.seek(opt.offset);
+  }
+
   bool ok = true;
   while (reader.isOk() && !reader.isEof() && ok)
   {
@@ -453,6 +533,11 @@ int main(int argc, char *argv[])
         tes::log::warn("Failed to load packet.");
       }
       continue;
+    }
+
+    if (opt.mode == InfoMode::Packet)
+    {
+      std::cout << stream_pos << '\n';
     }
 
     // Handle collated packets by wrapping the header.
