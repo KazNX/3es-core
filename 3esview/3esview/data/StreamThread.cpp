@@ -499,8 +499,7 @@ StreamThread::TargetFrameState StreamThread::checkTargetFrameState(FrameNumber &
 bool StreamThread::keyframeNeeded(FrameNumber frame_number,
                                   std::istream::pos_type stream_position) const
 {
-  // const size_t bytes_interval = _keyframes.size_interval_mib * 1024ull * 1024ull;
-  const size_t bytes_interval = 0;
+  const size_t bytes_interval = _keyframes.size_interval_mib * 1024ull * 1024ull;
   const auto last_keyframe = _keyframes.store->last();
 
   // Check size and frame intervals have elapsed.
